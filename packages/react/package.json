@@ -1,0 +1,22 @@
+{
+  "name": "@tooark/react",
+  "version": "0.1.0",
+  "description": "React wrappers for Tooark Web Components",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rimraf dist"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "dependencies": {
+    "@tooark/core": "workspace:*"
+  }
+}

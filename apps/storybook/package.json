@@ -1,0 +1,17 @@
+{
+  "name": "storybook",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build": "storybook build",
+    "clean": "rimraf storybook-static"
+  },
+  "dependencies": {
+    "@tooark/core": "workspace:*"
+  },
+  "devDependencies": {
+    "vite": "^5.4.19"
+  }
+}

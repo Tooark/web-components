@@ -1,0 +1,42 @@
+{
+  "name": "@tooark/root",
+  "version": "1.0.0",
+  "description": "Biblioteca de Componentes Web para projetos Angular, React e Vue",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "install:ci": "pnpm install --frozen-lockfile",
+    "build": "pnpm -r build",
+    "dev:storybook": "pnpm --filter storybook storybook",
+    "clean": "pnpm -r run clean"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [],
+  "author": "Paulo Sergio de Freitas Junior",
+  "license": "MIT",
+  "packageManager": "pnpm@10.15.1",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@storybook/web-components-vite": "^10.3.4",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@tailwindcss/postcss": "^4.1.13",
+    "@rollup/plugin-commonjs": "^28.0.6",
+    "@rollup/plugin-node-resolve": "^16.0.1",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.6",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.50.1",
+    "rollup-plugin-dts": "^6.2.3",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-typescript2": "^0.36.0",
+    "storybook": "^10.3.4",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2"
+  }
+}
