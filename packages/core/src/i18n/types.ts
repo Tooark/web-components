@@ -7,7 +7,7 @@ export interface ArkDatepickerLocale {
   today: string;
   clear: string;
   close: string;
-  firstDayOfWeek: number; // 0=Sun, 1=Mon
+  firstDayOfWeek: number;
   previousMonth: string;
   nextMonth: string;
 }

@@ -1,5 +1,20 @@
 import "../styles/tailwind.css";
 import { resolveLocale, type ArkDatepickerLocale } from "../i18n";
+import type { ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "../types/style";
+
+type ArkDatepickerPalette = {
+  container: string;
+  headerText: string;
+  navButton: string;
+  weekdayText: string;
+  dayBase: string;
+  dayDisabled: string;
+  dayDefault: string;
+  dayToday: string;
+  daySelected: string;
+  footerPrimary: string;
+  footerSecondary: string;
+};
 
 export class ArkDatepicker extends HTMLElement {
   static readonly tagName = "ark-datepicker";
@@ -10,7 +25,7 @@ export class ArkDatepicker extends HTMLElement {
   private locale: ArkDatepickerLocale | null = null;
 
   static get observedAttributes(): string[] {
-    return ["lang", "locale-json", "value", "min", "max"];
+    return ["lang", "locale-json", "value", "min", "max", "theme", "intent", "accent-color"];
   }
 
   connectedCallback(): void {
@@ -45,9 +60,149 @@ export class ArkDatepicker extends HTMLElement {
   }
 
   private getLocale(): ArkDatepickerLocale {
-    const lang = this.getAttribute("lang") || "en";
+    const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
+  }
+
+  private getTheme(): ArkThemeSelected {
+    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
+    if (theme === "dark") return "dark";
+    if (theme === "light") return "light";
+    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+      return "dark";
+    }
+    return "light";
+  }
+
+  private getIntent(): ArkIntent {
+    const intent = (this.getAttribute("intent") || "primary").toLowerCase();
+    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+      return intent;
+    }
+    return "primary";
+  }
+
+  private getAccentColor(): string | null {
+    const accent = this.getAttribute("accent-color")?.trim();
+    return accent || null;
+  }
+
+  private getPalette(theme: ArkThemeSelected, intent: ArkIntent): ArkDatepickerPalette {
+    const lightIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
+      primary: {
+        selected: "bg-slate-900 font-semibold text-white hover:bg-slate-800",
+        today: "font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-100",
+        footer: "text-slate-700 hover:bg-slate-100"
+      },
+      secondary: {
+        selected: "bg-slate-700 font-semibold text-white hover:bg-slate-600",
+        today: "font-semibold text-slate-800 ring-1 ring-slate-300 hover:bg-slate-100",
+        footer: "text-slate-700 hover:bg-slate-100"
+      },
+      success: {
+        selected: "bg-emerald-600 font-semibold text-white hover:bg-emerald-500",
+        today: "font-semibold text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-50",
+        footer: "text-emerald-700 hover:bg-emerald-50"
+      },
+      warning: {
+        selected: "bg-amber-500 font-semibold text-slate-900 hover:bg-amber-400",
+        today: "font-semibold text-amber-700 ring-1 ring-amber-300 hover:bg-amber-50",
+        footer: "text-amber-700 hover:bg-amber-50"
+      },
+      danger: {
+        selected: "bg-red-600 font-semibold text-white hover:bg-red-500",
+        today: "font-semibold text-red-700 ring-1 ring-red-300 hover:bg-red-50",
+        footer: "text-red-700 hover:bg-red-50"
+      },
+      info: {
+        selected: "bg-sky-600 font-semibold text-white hover:bg-sky-500",
+        today: "font-semibold text-sky-700 ring-1 ring-sky-300 hover:bg-sky-50",
+        footer: "text-sky-700 hover:bg-sky-50"
+      },
+      neutral: {
+        selected: "bg-zinc-700 font-semibold text-white hover:bg-zinc-600",
+        today: "font-semibold text-zinc-700 ring-1 ring-zinc-300 hover:bg-zinc-50",
+        footer: "text-zinc-700 hover:bg-zinc-50"
+      }
+    };
+
+    const darkIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
+      primary: {
+        selected: "bg-slate-100 font-semibold text-slate-900 hover:bg-white",
+        today: "font-semibold text-slate-100 ring-1 ring-slate-500 hover:bg-slate-800",
+        footer: "text-slate-200 hover:bg-slate-800"
+      },
+      secondary: {
+        selected: "bg-slate-300 font-semibold text-slate-900 hover:bg-slate-200",
+        today: "font-semibold text-slate-100 ring-1 ring-slate-500 hover:bg-slate-800",
+        footer: "text-slate-200 hover:bg-slate-800"
+      },
+      success: {
+        selected: "bg-emerald-500 font-semibold text-slate-950 hover:bg-emerald-400",
+        today: "font-semibold text-emerald-300 ring-1 ring-emerald-600 hover:bg-emerald-950/40",
+        footer: "text-emerald-300 hover:bg-emerald-950/40"
+      },
+      warning: {
+        selected: "bg-amber-400 font-semibold text-slate-950 hover:bg-amber-300",
+        today: "font-semibold text-amber-300 ring-1 ring-amber-600 hover:bg-amber-950/40",
+        footer: "text-amber-300 hover:bg-amber-950/40"
+      },
+      danger: {
+        selected: "bg-red-500 font-semibold text-white hover:bg-red-400",
+        today: "font-semibold text-red-300 ring-1 ring-red-600 hover:bg-red-950/40",
+        footer: "text-red-300 hover:bg-red-950/40"
+      },
+      info: {
+        selected: "bg-sky-500 font-semibold text-slate-950 hover:bg-sky-400",
+        today: "font-semibold text-sky-300 ring-1 ring-sky-600 hover:bg-sky-950/40",
+        footer: "text-sky-300 hover:bg-sky-950/40"
+      },
+      neutral: {
+        selected: "bg-zinc-200 font-semibold text-zinc-900 hover:bg-zinc-100",
+        today: "font-semibold text-zinc-200 ring-1 ring-zinc-600 hover:bg-zinc-800",
+        footer: "text-zinc-200 hover:bg-zinc-800"
+      }
+    };
+
+    const surface =
+      theme === "dark"
+        ? {
+            container: "inline-block select-none rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-sm",
+            headerText: "text-sm font-semibold text-slate-100",
+            navButton: "rounded p-1 text-slate-300 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500",
+            weekdayText: "py-1 text-center text-xs font-medium text-slate-400",
+            dayBase: "h-9 w-9 rounded-md text-sm transition focus:outline-none focus:ring-2 focus:ring-slate-500",
+            dayDisabled: "cursor-not-allowed text-slate-700",
+            dayDefault: "text-slate-200 hover:bg-slate-800",
+            footerSecondary: "rounded-md px-3 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500"
+          }
+        : {
+            container: "inline-block select-none rounded-lg border border-slate-200 bg-white p-4 shadow-sm",
+            headerText: "text-sm font-semibold text-slate-900",
+            navButton: "rounded p-1 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400",
+            weekdayText: "py-1 text-center text-xs font-medium text-slate-500",
+            dayBase: "h-9 w-9 rounded-md text-sm transition focus:outline-none focus:ring-2 focus:ring-slate-400",
+            dayDisabled: "cursor-not-allowed text-slate-300",
+            dayDefault: "text-slate-700 hover:bg-slate-100",
+            footerSecondary: "rounded-md px-3 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          };
+
+    const intentStyles = (theme === "dark" ? darkIntent : lightIntent)[intent];
+
+    return {
+      container: surface.container,
+      headerText: surface.headerText,
+      navButton: surface.navButton,
+      weekdayText: surface.weekdayText,
+      dayBase: surface.dayBase,
+      dayDisabled: surface.dayDisabled,
+      dayDefault: surface.dayDefault,
+      dayToday: intentStyles.today,
+      daySelected: intentStyles.selected,
+      footerPrimary: `rounded-md px-3 py-1 text-xs font-medium focus:outline-none focus:ring-2 ${intentStyles.footer} ${theme === "dark" ? "focus:ring-slate-500" : "focus:ring-slate-400"}`,
+      footerSecondary: surface.footerSecondary
+    };
   }
 
   private getMinDate(): Date | null {
@@ -90,6 +245,10 @@ export class ArkDatepicker extends HTMLElement {
   private build(): void {
     if (!this.locale) this.locale = this.getLocale();
     const loc = this.locale;
+    const theme = this.getTheme();
+    const intent = this.getIntent();
+    const accentColor = this.getAccentColor();
+    const palette = this.getPalette(theme, intent);
 
     if (this.root) {
       this.root.remove();
@@ -97,7 +256,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const container = document.createElement("div");
     container.setAttribute("part", "container");
-    container.className = "inline-block select-none rounded-lg border border-slate-200 bg-white p-4 shadow-sm";
+    container.className = palette.container;
 
     // --- Header: prev / month-year / next ---
     const header = document.createElement("div");
@@ -106,7 +265,7 @@ export class ArkDatepicker extends HTMLElement {
     const prevBtn = document.createElement("button");
     prevBtn.type = "button";
     prevBtn.setAttribute("aria-label", loc.previousMonth);
-    prevBtn.className = "rounded p-1 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400";
+    prevBtn.className = palette.navButton;
     prevBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
     prevBtn.addEventListener("click", () => {
       this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() - 1, 1);
@@ -116,7 +275,7 @@ export class ArkDatepicker extends HTMLElement {
     const nextBtn = document.createElement("button");
     nextBtn.type = "button";
     nextBtn.setAttribute("aria-label", loc.nextMonth);
-    nextBtn.className = "rounded p-1 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400";
+    nextBtn.className = palette.navButton;
     nextBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
     nextBtn.addEventListener("click", () => {
       this.viewDate = new Date(this.viewDate.getFullYear(), this.viewDate.getMonth() + 1, 1);
@@ -124,7 +283,7 @@ export class ArkDatepicker extends HTMLElement {
     });
 
     const title = document.createElement("span");
-    title.className = "text-sm font-semibold text-slate-900";
+    title.className = palette.headerText;
     title.textContent = `${loc.months[this.viewDate.getMonth()]} ${this.viewDate.getFullYear()}`;
 
     header.appendChild(prevBtn);
@@ -140,7 +299,7 @@ export class ArkDatepicker extends HTMLElement {
     for (let i = 0; i < 7; i++) {
       const idx = (fdow + i) % 7;
       const cell = document.createElement("div");
-      cell.className = "py-1 text-center text-xs font-medium text-slate-500";
+      cell.className = palette.weekdayText;
       cell.textContent = loc.weekdaysMin[idx];
       weekRow.appendChild(cell);
     }
@@ -179,19 +338,31 @@ export class ArkDatepicker extends HTMLElement {
         const selected = this.selectedDate ? this.isSameDay(cellDate, this.selectedDate) : false;
         const today = this.isToday(cellDate);
 
-        let cls = "h-9 w-9 rounded-md text-sm transition focus:outline-none focus:ring-2 focus:ring-slate-400";
+        let cls = palette.dayBase;
 
         if (disabled) {
-          cls += " cursor-not-allowed text-slate-300";
+          cls += ` ${palette.dayDisabled}`;
         } else if (selected) {
-          cls += " bg-slate-900 font-semibold text-white hover:bg-slate-800";
+          cls += ` ${palette.daySelected}`;
         } else if (today) {
-          cls += " font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-100";
+          cls += ` ${palette.dayToday}`;
         } else {
-          cls += " text-slate-700 hover:bg-slate-100";
+          cls += ` ${palette.dayDefault}`;
         }
 
         cell.className = cls;
+        if (accentColor && !disabled) {
+          if (selected) {
+            cell.style.backgroundColor = accentColor;
+            cell.style.borderColor = accentColor;
+            cell.style.color = "#ffffff";
+          } else if (today) {
+            cell.style.color = accentColor;
+            cell.style.borderColor = accentColor;
+            cell.style.borderStyle = "solid";
+            cell.style.borderWidth = "1px";
+          }
+        }
         cell.textContent = String(dayIndex);
         cell.disabled = disabled;
 
@@ -216,7 +387,10 @@ export class ArkDatepicker extends HTMLElement {
 
     const todayBtn = document.createElement("button");
     todayBtn.type = "button";
-    todayBtn.className = "rounded-md px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400";
+    todayBtn.className = palette.footerPrimary;
+    if (accentColor) {
+      todayBtn.style.color = accentColor;
+    }
     todayBtn.textContent = loc.today;
     todayBtn.addEventListener("click", () => {
       const now = new Date();
@@ -229,7 +403,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const clearBtn = document.createElement("button");
     clearBtn.type = "button";
-    clearBtn.className = "rounded-md px-3 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400";
+    clearBtn.className = palette.footerSecondary;
     clearBtn.textContent = loc.clear;
     clearBtn.addEventListener("click", () => {
       this.selectedDate = null;
