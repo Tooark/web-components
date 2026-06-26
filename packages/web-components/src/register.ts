@@ -6,12 +6,10 @@ import { ArkButton, ArkCarousel, ArkDatepicker, ArkToaster } from "./components"
  * para garantir que eles estejam disponíveis como elementos personalizados.
  */
 export function registerTooarkComponents(): void {
-  // Verifica se o componente button já está registrado para evitar erros de redefinição
   if (!customElements.get(ArkButton.tagName)) {
     customElements.define(ArkButton.tagName, ArkButton);
   }
 
-  // Verifica se o componente datepicker já está registrado para evitar erros de redefinição
   if (!customElements.get(ArkDatepicker.tagName)) {
     customElements.define(ArkDatepicker.tagName, ArkDatepicker);
   }

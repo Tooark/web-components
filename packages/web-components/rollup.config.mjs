@@ -5,7 +5,7 @@ import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
 
 const input = "src/index.ts";
-const external = ["@tooark/tokens"];
+const external = ["@tooark/core"];
 
 export default [
   {

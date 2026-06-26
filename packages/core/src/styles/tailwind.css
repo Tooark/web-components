@@ -1,2 +1,2 @@
 @import "tailwindcss";
-@source "../components/**/*.ts";
+@import "@tooark/tokens/tokens.css";

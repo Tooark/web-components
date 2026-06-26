@@ -16,6 +16,7 @@
     "vue": ">=3"
   },
   "dependencies": {
-    "@tooark/core": "workspace:*"
+    "@tooark/core": "workspace:*",
+    "@tooark/web-components": "workspace:*"
   }
 }

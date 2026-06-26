@@ -1,0 +1,30 @@
+/**
+ * Design tokens do Tooark (Tailwind v4 @theme).
+ *
+ * Importe este arquivo no entry Tailwind do seu projeto OU diretamente no app:
+ *   @import "@tooark/tokens/tokens.css";
+ *
+ * Os valores ficam disponíveis como CSS custom properties (--color-*, --size-*, ...)
+ * e como utilitários Tailwind (bg-primary, text-danger, ...).
+ */
+@theme {
+  /* Intents — cores semânticas */
+  --color-primary: oklch(0.55 0.2 264);
+  --color-secondary: oklch(0.6 0.05 264);
+  --color-success: oklch(0.65 0.17 145);
+  --color-warning: oklch(0.78 0.16 80);
+  --color-danger: oklch(0.6 0.22 27);
+  --color-info: oklch(0.7 0.13 230);
+  --color-neutral: oklch(0.7 0.02 264);
+
+  /* Escala de tamanho (ex.: altura de controles) */
+  --size-sm: 1.75rem;
+  --size-md: 2.25rem;
+  --size-lg: 2.75rem;
+  --size-xl: 3.25rem;
+
+  /* Raio de borda */
+  --radius-ark-sm: 0.25rem;
+  --radius-ark-md: 0.5rem;
+  --radius-ark-lg: 0.75rem;
+}

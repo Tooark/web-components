@@ -1,6 +1,6 @@
 import "../styles/tailwind.css";
-import { resolveLocale, type ArkDatepickerLocale } from "../i18n";
-import type { ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "../types/style";
+import { resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
+import type { ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "@tooark/core";
 
 type ArkDatepickerPalette = {
   container: string;

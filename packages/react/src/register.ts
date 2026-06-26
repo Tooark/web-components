@@ -1,4 +1,4 @@
-import { registerTooarkComponents } from "@tooark/core";
+import { registerTooarkComponents } from "@tooark/web-components";
 
 let isRegistered = false;
 

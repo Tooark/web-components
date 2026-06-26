@@ -1,9 +1,8 @@
-// Exports types globais
-export type ArkIntent = "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral";
-export type ArkSize = "sm" | "md" | "lg" | "xl";
-export type ArkStyleVariant = "solid" | "outline" | "ghost";
-export type ArkTheme = "auto" | ArkThemeSelected;
-export type ArkThemeSelected = "light" | "dark";
+// Primitivas de design vêm de @tooark/tokens (reexportadas para compatibilidade).
+import type { ArkIntent, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected } from "@tooark/tokens";
+export type { ArkIntent, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected };
+
+// Exports types globais (específicos de comportamento de componente)
 export type ArkCarouselSnap = "mandatory" | "proximity";
 export type ArkToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
 export type ArkToastPosition = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";

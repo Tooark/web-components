@@ -1,7 +1,7 @@
 {
-  "name": "@tooark/core",
+  "name": "@tooark/web-components",
   "version": "0.1.0",
-  "description": "Design system core (Web Components nativos + Tailwind v4)",
+  "description": "Tooark Web Components (Custom Elements nativos baseados em @tooark/core)",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -20,14 +20,16 @@
   "files": [
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "**/*.css"
+  ],
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@tooark/tokens": "workspace:*",
+    "@tooark/core": "workspace:*",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

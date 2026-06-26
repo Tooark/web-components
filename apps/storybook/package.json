@@ -9,7 +9,10 @@
     "clean": "rimraf storybook-static"
   },
   "dependencies": {
-    "@tooark/core": "workspace:*"
+    "@tooark/chart": "workspace:*",
+    "@tooark/core": "workspace:*",
+    "@tooark/web-components": "workspace:*",
+    "@tooark/wysiwyg": "workspace:*"
   },
   "devDependencies": {
     "vite": "^5.4.19"

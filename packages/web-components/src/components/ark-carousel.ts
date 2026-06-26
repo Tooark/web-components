@@ -1,5 +1,5 @@
 import "../styles/tailwind.css";
-import type { ArkCarouselSnap, ArkIntent, ArkThemeSelected } from "../types/style";
+import type { ArkCarouselSnap, ArkIntent, ArkThemeSelected } from "@tooark/core";
 
 type ArkCarouselPalette = {
   frame: string;

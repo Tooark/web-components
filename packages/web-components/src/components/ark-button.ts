@@ -1,5 +1,5 @@
 import "../styles/tailwind.css";
-import type { ArkButtonType, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "../types/style";
+import type { ArkButtonType, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "@tooark/core";
 
 type ArkButtonPalette = {
   focusRing: string;

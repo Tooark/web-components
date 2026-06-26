@@ -12,7 +12,13 @@ const config: StorybookConfig = {
     viteConfig.resolve = viteConfig.resolve || {};
     viteConfig.resolve.alias = {
       ...(viteConfig.resolve.alias || {}),
-      "@tooark/core": path.resolve(rootDir, "packages/core/src/index.ts")
+        // Subpath CSS deve vir antes do alias geral de tokens (Vite casa na ordem).
+        "@tooark/tokens/tokens.css": path.resolve(rootDir, "packages/tokens/tokens.css"),
+        "@tooark/tokens": path.resolve(rootDir, "packages/tokens/src/index.ts"),
+        "@tooark/core": path.resolve(rootDir, "packages/core/src/index.ts"),
+        "@tooark/web-components": path.resolve(rootDir, "packages/web-components/src/index.ts"),
+        "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
+        "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts")
     };
 
     return viteConfig;

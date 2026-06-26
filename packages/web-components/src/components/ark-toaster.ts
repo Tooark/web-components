@@ -1,5 +1,5 @@
 import "../styles/tailwind.css";
-import type { ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "../types/style";
+import type { ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 
 type ArkToastItem = ArkToastOptions & {
   id: string;
