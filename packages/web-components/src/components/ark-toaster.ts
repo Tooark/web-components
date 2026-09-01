@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
-import type { ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
+import { arkEnter, arkExit } from "@tooark/core";
+import type { ArkMotionPreset, ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 
 type ArkToastItem = ArkToastOptions & {
   id: string;
@@ -24,18 +25,20 @@ export class ArkToaster extends HTMLElement {
   private root: HTMLDivElement | null = null;
   private toasts: ArkToastItem[] = [];
   private timers = new Map<string, number>();
+  private entered = new Set<string>();
+  private exiting = new Set<string>();
 
-  static get observedAttributes(): string[] {
+  static get observedAttributes (): string[] {
     return ["theme", "position", "rich-colors", "close-button", "max-visible", "duration"];
   }
 
-  connectedCallback(): void {
+  connectedCallback (): void {
     this.build();
     window.addEventListener("ark-toast", this.handleToast as EventListener);
     window.addEventListener("ark-toast-dismiss", this.handleDismiss as EventListener);
   }
 
-  disconnectedCallback(): void {
+  disconnectedCallback (): void {
     window.removeEventListener("ark-toast", this.handleToast as EventListener);
     window.removeEventListener("ark-toast-dismiss", this.handleDismiss as EventListener);
 
@@ -45,11 +48,11 @@ export class ArkToaster extends HTMLElement {
     this.timers.clear();
   }
 
-  attributeChangedCallback(): void {
+  attributeChangedCallback (): void {
     this.render();
   }
 
-  toast(options: ArkToastOptions): string {
+  toast (options: ArkToastOptions): string {
     const id = options.id || `ark-toast-${Math.random().toString(36).slice(2, 10)}`;
     const item: ArkToastItem = {
       ...options,
@@ -75,19 +78,31 @@ export class ArkToaster extends HTMLElement {
     return id;
   }
 
-  dismiss(id?: string): void {
+  dismiss (id?: string): void {
     if (!id) {
-      for (const toast of this.toasts) {
-        this.clearTimer(toast.id);
+      for (const toast of [...this.toasts]) {
+        this.dismiss(toast.id);
       }
-      this.toasts = [];
-      this.render();
       return;
     }
 
+    if (this.exiting.has(id)) return;
     this.clearTimer(id);
-    this.toasts = this.toasts.filter((toast) => toast.id !== id);
-    this.render();
+
+    const finalize = (): void => {
+      this.exiting.delete(id);
+      this.entered.delete(id);
+      this.toasts = this.toasts.filter((toast) => toast.id !== id);
+      this.render();
+    };
+
+    const card = this.root?.querySelector<HTMLElement>(`[data-toast-id="${id}"]`);
+    if (card) {
+      this.exiting.add(id);
+      arkExit(card, this.getExitPreset()).then(finalize);
+    } else {
+      finalize();
+    }
   }
 
   private readonly handleToast = (event: Event): void => {
@@ -101,7 +116,7 @@ export class ArkToaster extends HTMLElement {
     this.dismiss(detail?.id);
   };
 
-  private getTheme(): ArkThemeSelected {
+  private getTheme (): ArkThemeSelected {
     const theme = (this.getAttribute("theme") || "auto").toLowerCase();
     if (theme === "dark") return "dark";
     if (theme === "light") return "light";
@@ -112,7 +127,7 @@ export class ArkToaster extends HTMLElement {
     return "light";
   }
 
-  private getPosition(): ArkToastPosition {
+  private getPosition (): ArkToastPosition {
     const position = (this.getAttribute("position") || "bottom-right").toLowerCase();
     if (
       position === "top-left" ||
@@ -127,27 +142,27 @@ export class ArkToaster extends HTMLElement {
     return "bottom-right";
   }
 
-  private getMaxVisible(): number {
+  private getMaxVisible (): number {
     const parsed = Number(this.getAttribute("max-visible") || "4");
     if (!Number.isFinite(parsed)) return 4;
     return Math.max(1, Math.floor(parsed));
   }
 
-  private getBaseDuration(): number {
+  private getBaseDuration (): number {
     const parsed = Number(this.getAttribute("duration") || "4000");
     if (!Number.isFinite(parsed)) return 4000;
     return Math.max(0, Math.floor(parsed));
   }
 
-  private hasCloseButton(): boolean {
+  private hasCloseButton (): boolean {
     return !this.hasAttribute("close-button") || this.getAttribute("close-button") !== "false";
   }
 
-  private hasRichColors(): boolean {
+  private hasRichColors (): boolean {
     return this.hasAttribute("rich-colors");
   }
 
-  private clearTimer(id: string): void {
+  private clearTimer (id: string): void {
     const timer = this.timers.get(id);
     if (timer !== undefined) {
       window.clearTimeout(timer);
@@ -155,7 +170,7 @@ export class ArkToaster extends HTMLElement {
     }
   }
 
-  private scheduleDismiss(toast: ArkToastItem): void {
+  private scheduleDismiss (toast: ArkToastItem): void {
     this.clearTimer(toast.id);
     const duration = toast.duration ?? this.getBaseDuration();
     if (duration <= 0 || toast.type === "loading") return;
@@ -167,7 +182,7 @@ export class ArkToaster extends HTMLElement {
     this.timers.set(toast.id, timer);
   }
 
-  private getPalette(theme: ArkThemeSelected): ArkToasterPalette {
+  private getPalette (theme: ArkThemeSelected): ArkToasterPalette {
     if (theme === "dark") {
       return {
         stack: "fixed z-[9999] flex w-full max-w-sm flex-col gap-3 p-4 pointer-events-none",
@@ -193,7 +208,18 @@ export class ArkToaster extends HTMLElement {
     };
   }
 
-  private getPositionClasses(position: ArkToastPosition): string {
+  private getEnterPreset (): ArkMotionPreset {
+    return this.getPosition().startsWith("top") ? "slide-down" : "slide-up";
+  }
+
+  private getExitPreset (): ArkMotionPreset {
+    const position = this.getPosition();
+    if (position.endsWith("right")) return "slide-right";
+    if (position.endsWith("left")) return "slide-left";
+    return "fade";
+  }
+
+  private getPositionClasses (position: ArkToastPosition): string {
     if (position === "top-left") return "left-0 top-0 items-start";
     if (position === "top-center") return "left-1/2 top-0 -translate-x-1/2 items-center";
     if (position === "top-right") return "right-0 top-0 items-end";
@@ -202,7 +228,7 @@ export class ArkToaster extends HTMLElement {
     return "bottom-0 right-0 items-end";
   }
 
-  private getToastTypeClasses(type: ArkToastType, richColors: boolean): string {
+  private getToastTypeClasses (type: ArkToastType, richColors: boolean): string {
     if (!richColors) return "";
 
     if (type === "success") return "border-emerald-400/60 bg-emerald-50 text-emerald-900";
@@ -214,7 +240,7 @@ export class ArkToaster extends HTMLElement {
     return "";
   }
 
-  private getToastIcon(type: ArkToastType): string {
+  private getToastIcon (type: ArkToastType): string {
     if (type === "success") return "✓";
     if (type === "info") return "i";
     if (type === "warning") return "!";
@@ -223,7 +249,7 @@ export class ArkToaster extends HTMLElement {
     return "•";
   }
 
-  private build(): void {
+  private build (): void {
     if (!this.root) {
       this.root = document.createElement("div");
       this.root.setAttribute("part", "stack");
@@ -233,7 +259,7 @@ export class ArkToaster extends HTMLElement {
     this.render();
   }
 
-  private render(): void {
+  private render (): void {
     if (!this.root) return;
 
     const theme = this.getTheme();
@@ -245,9 +271,15 @@ export class ArkToaster extends HTMLElement {
     this.root.className = `${palette.stack} ${this.getPositionClasses(position)}`;
     this.root.innerHTML = "";
 
+    const activeIds = new Set(this.toasts.map((toast) => toast.id));
+    for (const id of this.entered) {
+      if (!activeIds.has(id)) this.entered.delete(id);
+    }
+
     for (const toast of this.toasts) {
       const card = document.createElement("section");
       card.setAttribute("part", "toast");
+      card.dataset.toastId = toast.id;
       card.className = `${palette.toastBase} ${this.getToastTypeClasses(toast.type, richColors)}`.trim();
 
       const row = document.createElement("div");
@@ -321,6 +353,15 @@ export class ArkToaster extends HTMLElement {
       }
 
       this.root.appendChild(card);
+
+      if (this.exiting.has(toast.id)) {
+        // Re-render durante uma saída em andamento: mantém o card oculto
+        card.style.opacity = "0";
+        card.style.pointerEvents = "none";
+      } else if (!this.entered.has(toast.id)) {
+        this.entered.add(toast.id);
+        arkEnter(card, this.getEnterPreset());
+      }
     }
   }
 }
