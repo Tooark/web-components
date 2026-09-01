@@ -1,3 +1,4 @@
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { toast } from "@tooark/core";
 import type { ArkTheme, ArkToastPosition } from "@tooark/core";
 
@@ -203,4 +204,32 @@ export const BottomLeftPersistent = {
     closeButton: true
   },
   render: renderToaster
+};
+
+export const FluxoDeDismiss = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Interaction test: dispara um toast, verifica a exibicao, fecha pelo botao Close e aguarda a animacao de saida remover o card do DOM."
+      }
+    }
+  },
+  args: {
+    duration: 0
+  },
+  render: renderToaster,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Default" }));
+
+    const title = await canvas.findByText("Projeto salvo");
+    await expect(title).toBeInTheDocument();
+
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+
+    // arkExit anima a saida antes de remover o card do DOM
+    await waitFor(() => expect(canvas.queryByText("Projeto salvo")).not.toBeInTheDocument());
+  }
 };

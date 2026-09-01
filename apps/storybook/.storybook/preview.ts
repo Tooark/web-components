@@ -8,10 +8,17 @@ registerTooarkChart();
 registerTooarkWysiwyg();
 
 const preview = {
+  // Gera página de docs automaticamente para todas as stories
+  tags: ["autodocs"],
   parameters: {
     layout: "centered",
     controls: {
       expanded: true
+    },
+    a11y: {
+      // "todo": violações aparecem como aviso nos testes sem falhar a suíte.
+      // Troque para "error" quando quiser que a11y quebre o CI.
+      test: "todo"
     }
   }
 };

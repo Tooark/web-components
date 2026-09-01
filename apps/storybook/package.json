@@ -6,15 +6,17 @@
   "scripts": {
     "storybook": "storybook dev -p 6006",
     "build": "storybook build",
+    "test": "vitest run",
     "clean": "rimraf storybook-static"
   },
   "dependencies": {
     "@tooark/chart": "workspace:*",
     "@tooark/core": "workspace:*",
+    "@tooark/motion": "workspace:*",
     "@tooark/web-components": "workspace:*",
     "@tooark/wysiwyg": "workspace:*"
   },
   "devDependencies": {
-    "vite": "^5.4.19"
+    "vite": "^6.4.3"
   }
 }

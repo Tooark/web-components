@@ -1,5 +1,8 @@
 node_modules/
 
+# Patches locais do Storybook para Windows (reativar em pnpm-workspace.yaml quando necessário)
+patches/
+
 # Build outputs
 dist/
 build/
