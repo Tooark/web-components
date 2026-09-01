@@ -17,6 +17,12 @@ export type ArkSize = "sm" | "md" | "lg" | "xl";
 /** Variantes de estilo visual. */
 export type ArkStyleVariant = "solid" | "outline" | "ghost";
 
+/** Escala de duração de animações. */
+export type ArkDuration = "instant" | "fast" | "normal" | "slow" | "slower";
+
+/** Curvas de easing de animações. */
+export type ArkEasing = "standard" | "in" | "out" | "in-out" | "spring";
+
 /** Tema resolvido (sem "auto"). */
 export type ArkThemeSelected = "light" | "dark";
 

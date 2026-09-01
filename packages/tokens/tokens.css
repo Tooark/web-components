@@ -28,3 +28,36 @@
   --radius-ark-md: 0.5rem;
   --radius-ark-lg: 0.75rem;
 }
+
+/*
+ * Motion tokens — primitivas de animação (fora do @theme: são custom
+ * properties puras, consumidas pelos presets do @tooark/core e por WAAPI).
+ */
+:root {
+  /* Durações */
+  --ark-duration-instant: 0ms;
+  --ark-duration-fast: 150ms;
+  --ark-duration-normal: 250ms;
+  --ark-duration-slow: 400ms;
+  --ark-duration-slower: 600ms;
+
+  /* Easings */
+  --ark-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ark-ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ark-ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ark-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ark-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Deslocamento padrão de slides (enter/exit) */
+  --ark-motion-distance: 0.75rem;
+}
+
+/* Acessibilidade: zera todas as durações quando o usuário reduz movimento */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --ark-duration-fast: 0ms;
+    --ark-duration-normal: 0ms;
+    --ark-duration-slow: 0ms;
+    --ark-duration-slower: 0ms;
+  }
+}
