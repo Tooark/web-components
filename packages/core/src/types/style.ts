@@ -1,6 +1,6 @@
 // Primitivas de design vêm de @tooark/tokens (reexportadas para compatibilidade).
-import type { ArkIntent, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected } from "@tooark/tokens";
-export type { ArkIntent, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected };
+import type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected } from "@tooark/tokens";
+export type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected };
 
 // Exports types globais (específicos de comportamento de componente)
 export type ArkCarouselSnap = "mandatory" | "proximity";
@@ -19,8 +19,42 @@ export type ArkButtonStyleOptions = {
   intent?: ArkIntent;
   theme?: ArkTheme;
   size?: ArkSize;
+  rounded?: ArkRounded;
+  loading?: boolean;
+  iconOnly?: boolean;
+  fullWidth?: boolean;
+  href?: string;
+  target?: string;
   color?: string;
   textColor?: string;
+};
+
+export type ArkSwitchStyleOptions = {
+  intent?: ArkIntent;
+  theme?: ArkTheme;
+  size?: ArkSize;
+  checked?: boolean;
+  labels?: boolean;
+  labelOn?: string;
+  labelOff?: string;
+  icons?: boolean;
+  color?: string;
+};
+
+export type ArkToggleStyleOptions = {
+  intent?: ArkIntent;
+  theme?: ArkTheme;
+  size?: ArkSize;
+  pressed?: boolean;
+  value?: string;
+};
+
+export type ArkToggleGroupStyleOptions = {
+  intent?: ArkIntent;
+  theme?: ArkTheme;
+  size?: ArkSize;
+  value?: string;
+  multiple?: boolean;
 };
 
 export type ArkDatepickerStyleOptions = {

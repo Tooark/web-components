@@ -1,5 +1,5 @@
 import React from "react";
-import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkDatepickerLang, ArkIntent, ArkTheme, ArkCarouselSnap, ArkToastPosition } from "@tooark/core";
+import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkDatepickerLang, ArkIntent, ArkRounded, ArkTheme, ArkCarouselSnap, ArkToastPosition } from "@tooark/core";
 
 declare global {
   namespace JSX {
@@ -11,8 +11,45 @@ declare global {
         intent?: ArkIntent;
         theme?: ArkTheme;
         size?: ArkSize;
+        rounded?: ArkRounded;
+        loading?: boolean;
+        "icon-only"?: boolean;
+        "full-width"?: boolean;
+        href?: string;
+        target?: string;
         color?: string;
         "text-color"?: string;
+      };
+      "ark-switch": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        checked?: boolean;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
+        labels?: boolean;
+        "label-on"?: string;
+        "label-off"?: string;
+        icons?: boolean;
+        color?: string;
+        name?: string;
+        value?: string;
+        label?: string;
+      };
+      "ark-toggle": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        pressed?: boolean;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
+        value?: string;
+      };
+      "ark-toggle-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        value?: string;
+        multiple?: boolean;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
       };
       "ark-datepicker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         lang?: ArkDatepickerLang;

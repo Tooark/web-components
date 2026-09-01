@@ -17,6 +17,9 @@ export type ArkSize = "sm" | "md" | "lg" | "xl";
 /** Variantes de estilo visual. */
 export type ArkStyleVariant = "solid" | "outline" | "ghost";
 
+/** Escala de arredondamento de borda ("full" transforma quadrados em círculos). */
+export type ArkRounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
+
 /** Escala de duração de animações. */
 export type ArkDuration = "instant" | "fast" | "normal" | "slow" | "slower";
 

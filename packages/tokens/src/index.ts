@@ -2,6 +2,7 @@ export type {
   ArkDuration,
   ArkEasing,
   ArkIntent,
+  ArkRounded,
   ArkSize,
   ArkStyleVariant,
   ArkTheme,

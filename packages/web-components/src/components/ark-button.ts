@@ -1,5 +1,5 @@
 import "../styles/tailwind.css";
-import type { ArkButtonType, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkButtonType, ArkRounded, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "@tooark/core";
 
 type ArkButtonPalette = {
   focusRing: string;
@@ -8,17 +8,36 @@ type ArkButtonPalette = {
   ghost: string;
 };
 
+const SPINNER_SVG = "<svg class=\"h-[1em] w-[1em] animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z\"></path></svg>";
+
 export class ArkButton extends HTMLElement {
   static readonly tagName = "ark-button";
 
-  private buttonEl: HTMLButtonElement | null = null;
+  private controlEl: HTMLButtonElement | HTMLAnchorElement | null = null;
+  private spinnerEl: HTMLSpanElement | null = null;
 
-  static get observedAttributes(): string[] {
-    return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class"];
+  static get observedAttributes (): string[] {
+    return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class", "rounded", "loading", "icon-only", "full-width", "href", "target"];
   }
 
-  connectedCallback(): void {
-    if (!this.buttonEl) {
+  constructor () {
+    super();
+    // Um botão desabilitado não dispara click, mas o host ainda dispararia:
+    // bloqueia na captura para listeners externos em <ark-button> não vazarem.
+    this.addEventListener(
+      "click",
+      (event) => {
+        if (this.hasAttribute("disabled") || this.hasAttribute("loading")) {
+          event.preventDefault();
+          event.stopImmediatePropagation();
+        }
+      },
+      { capture: true }
+    );
+  }
+
+  connectedCallback (): void {
+    if (!this.controlEl) {
       this.render();
     }
 
@@ -27,9 +46,17 @@ export class ArkButton extends HTMLElement {
     this.updateAppearance();
   }
 
-  attributeChangedCallback(name: string): void {
-    if (name === "disabled") {
+  attributeChangedCallback (name: string): void {
+    if (!this.controlEl) return;
+
+    if (name === "href" || name === "target") {
+      this.syncControlTag();
+      return;
+    }
+
+    if (name === "disabled" || name === "loading") {
       this.syncDisabled();
+      this.updateAppearance();
       return;
     }
 
@@ -38,12 +65,10 @@ export class ArkButton extends HTMLElement {
       return;
     }
 
-    if (name === "variant" || name === "size" || name === "intent" || name === "theme" || name === "color" || name === "text-color" || name === "class") {
-      this.updateAppearance();
-    }
+    this.updateAppearance();
   }
 
-  private getTheme(): ArkThemeSelected {
+  private getTheme (): ArkThemeSelected {
     const theme = (this.getAttribute("theme") || "auto").toLowerCase();
     if (theme === "dark") return "dark";
     if (theme === "light") return "light";
@@ -53,7 +78,7 @@ export class ArkButton extends HTMLElement {
     return "light";
   }
 
-  private normalizeIntent(value: string | null): ArkIntent {
+  private normalizeIntent (value: string | null): ArkIntent {
     const intent = (value || "").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
       return intent;
@@ -61,7 +86,7 @@ export class ArkButton extends HTMLElement {
     return "primary";
   }
 
-  private resolveVariantAndIntent(): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
+  private resolveVariantAndIntent (): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
     const variant = (this.getAttribute("variant") || "primary").toLowerCase();
     const attrIntent = this.getAttribute("intent");
 
@@ -85,7 +110,7 @@ export class ArkButton extends HTMLElement {
     };
   }
 
-  private getPalette(theme: ArkThemeSelected, intent: ArkIntent): ArkButtonPalette {
+  private getPalette (theme: ArkThemeSelected, intent: ArkIntent): ArkButtonPalette {
     const light: Record<ArkIntent, ArkButtonPalette> = {
       primary: {
         focusRing: "focus:ring-slate-400",
@@ -179,19 +204,41 @@ export class ArkButton extends HTMLElement {
     return (theme === "dark" ? dark : light)[intent];
   }
 
-  private syncDisabled(): void {
-    if (!this.buttonEl) return;
-    this.buttonEl.disabled = this.hasAttribute("disabled");
+  private isDisabled (): boolean {
+    return this.hasAttribute("disabled") || this.hasAttribute("loading");
   }
 
-  private syncType(): void {
-    if (!this.buttonEl) return;
+  private syncDisabled (): void {
+    if (!this.controlEl) return;
+
+    const disabled = this.isDisabled();
+    this.controlEl.setAttribute("aria-busy", this.hasAttribute("loading") ? "true" : "false");
+
+    if (this.controlEl instanceof HTMLButtonElement) {
+      this.controlEl.disabled = disabled;
+      return;
+    }
+
+    // Âncora não tem "disabled": remove o href e sinaliza via aria.
+    if (disabled) {
+      this.controlEl.removeAttribute("href");
+      this.controlEl.setAttribute("aria-disabled", "true");
+      this.controlEl.setAttribute("tabindex", "-1");
+    } else {
+      this.controlEl.setAttribute("href", this.getAttribute("href") || "");
+      this.controlEl.removeAttribute("aria-disabled");
+      this.controlEl.removeAttribute("tabindex");
+    }
+  }
+
+  private syncType (): void {
+    if (!(this.controlEl instanceof HTMLButtonElement)) return;
     const type = (this.getAttribute("type") || "button") as ArkButtonType;
-    this.buttonEl.type = type === "submit" || type === "reset" ? type : "button";
+    this.controlEl.type = type === "submit" || type === "reset" ? type : "button";
   }
 
-  private computeClasses(): string {
-    const base = "inline-flex items-center justify-center rounded-md border font-semibold transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50";
+  private computeClasses (): string {
+    const base = "inline-flex items-center justify-center gap-2 border font-semibold transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50";
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const theme = this.getTheme();
     const { styleVariant, intent } = this.resolveVariantAndIntent();
@@ -210,20 +257,42 @@ export class ArkButton extends HTMLElement {
       xl: "px-6 py-4 text-lg"
     };
 
+    // Padding simétrico para botão só de ícone (quadrado; vira círculo com rounded="full").
+    const iconOnlySizes: Record<ArkSize, string> = {
+      sm: "p-1.5 text-xs",
+      md: "p-2 text-sm",
+      lg: "p-3 text-base",
+      xl: "p-4 text-lg"
+    };
+
+    const roundedMap: Record<ArkRounded, string> = {
+      none: "rounded-none",
+      sm: "rounded-sm",
+      md: "rounded-md",
+      lg: "rounded-lg",
+      xl: "rounded-xl",
+      full: "rounded-full"
+    };
+    const rounded = (this.getAttribute("rounded") || "md").toLowerCase() as ArkRounded;
+
+    const iconOnly = this.hasAttribute("icon-only");
+    const sizeClasses = iconOnly ? iconOnlySizes[size] ?? iconOnlySizes.md : sizes[size] ?? sizes.md;
+    const fullWidth = this.hasAttribute("full-width") ? "w-full" : "";
+
     const custom = this.getAttribute("class") || "";
 
-    return [base, palette.focusRing, variantClasses[styleVariant], sizes[size] ?? sizes.md, custom]
+    return [base, roundedMap[rounded] ?? roundedMap.md, palette.focusRing, variantClasses[styleVariant], sizeClasses, fullWidth, custom]
       .join(" ")
       .trim()
       .replace(/\s+/g, " ");
   }
 
-  private applyCustomColors(): void {
-    if (!this.buttonEl) return;
+  private applyCustomColors (): void {
+    if (!this.controlEl) return;
 
-    this.buttonEl.style.backgroundColor = "";
-    this.buttonEl.style.borderColor = "";
-    this.buttonEl.style.color = "";
+    this.controlEl.style.backgroundColor = "";
+    this.controlEl.style.borderColor = "";
+    this.controlEl.style.color = "";
 
     const color = this.getAttribute("color")?.trim();
     if (!color) return;
@@ -232,33 +301,119 @@ export class ArkButton extends HTMLElement {
     const { styleVariant } = this.resolveVariantAndIntent();
 
     if (styleVariant === "solid") {
-      this.buttonEl.style.backgroundColor = color;
-      this.buttonEl.style.borderColor = color;
-      this.buttonEl.style.color = textColor || "#ffffff";
+      this.controlEl.style.backgroundColor = color;
+      this.controlEl.style.borderColor = color;
+      this.controlEl.style.color = textColor || "#ffffff";
       return;
     }
 
-    this.buttonEl.style.borderColor = color;
-    this.buttonEl.style.color = textColor || color;
+    this.controlEl.style.borderColor = color;
+    this.controlEl.style.color = textColor || color;
   }
 
-  private render(): void {
-    const button = document.createElement("button");
-    button.setAttribute("part", "button");
-    button.className = this.computeClasses();
+  private syncLoading (): void {
+    if (!this.controlEl) return;
 
-    while (this.firstChild) {
-      button.appendChild(this.firstChild);
+    const loading = this.hasAttribute("loading");
+
+    if (loading && !this.spinnerEl) {
+      const spinner = document.createElement("span");
+      spinner.setAttribute("part", "spinner");
+      spinner.setAttribute("aria-hidden", "true");
+      spinner.className = "inline-flex items-center";
+      spinner.innerHTML = SPINNER_SVG;
+      this.controlEl.prepend(spinner);
+      this.spinnerEl = spinner;
+      return;
     }
 
-    this.appendChild(button);
-    this.buttonEl = button;
+    if (!loading && this.spinnerEl) {
+      this.spinnerEl.remove();
+      this.spinnerEl = null;
+    }
   }
 
-  private updateAppearance(): void {
-    if (!this.buttonEl) return;
-    this.buttonEl.className = this.computeClasses();
+  private createControl (): HTMLButtonElement | HTMLAnchorElement {
+    const href = this.getAttribute("href");
+
+    if (href !== null) {
+      const anchor = document.createElement("a");
+      anchor.setAttribute("part", "button");
+      anchor.setAttribute("role", "button");
+      anchor.href = href;
+      const target = this.getAttribute("target");
+      if (target) {
+        anchor.target = target;
+        if (target === "_blank") {
+          anchor.rel = "noopener noreferrer";
+        }
+      }
+      return anchor;
+    }
+
+    const button = document.createElement("button");
+    button.setAttribute("part", "button");
+    return button;
+  }
+
+  private render (): void {
+    const control = this.createControl();
+    control.className = this.computeClasses();
+
+    while (this.firstChild) {
+      control.appendChild(this.firstChild);
+    }
+
+    this.appendChild(control);
+    this.controlEl = control;
+    this.updateAppearance();
+  }
+
+  // Troca <button> <-> <a> quando href entra/sai, preservando o conteúdo.
+  private syncControlTag (): void {
+    if (!this.controlEl) return;
+
+    const wantsAnchor = this.getAttribute("href") !== null;
+    const isAnchor = this.controlEl instanceof HTMLAnchorElement;
+
+    if (wantsAnchor !== isAnchor) {
+      if (this.spinnerEl) {
+        this.spinnerEl.remove();
+        this.spinnerEl = null;
+      }
+
+      const previous = this.controlEl;
+      const next = this.createControl();
+      while (previous.firstChild) {
+        next.appendChild(previous.firstChild);
+      }
+      previous.remove();
+      this.appendChild(next);
+      this.controlEl = next;
+      this.syncType();
+    } else if (isAnchor) {
+      const target = this.getAttribute("target");
+      if (target) {
+        this.controlEl.setAttribute("target", target);
+        if (target === "_blank") {
+          this.controlEl.setAttribute("rel", "noopener noreferrer");
+        }
+      } else {
+        this.controlEl.removeAttribute("target");
+        this.controlEl.removeAttribute("rel");
+      }
+    }
+
+    this.syncDisabled();
+    this.updateAppearance();
+  }
+
+  private updateAppearance (): void {
+    if (!this.controlEl) return;
+    this.controlEl.className = this.computeClasses();
+    this.style.display = this.hasAttribute("full-width") ? "block" : "";
     this.applyCustomColors();
+    this.syncLoading();
   }
 }
 

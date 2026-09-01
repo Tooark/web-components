@@ -1,4 +1,4 @@
-import { ArkButton, ArkCarousel, ArkDatepicker, ArkToaster } from "./components";
+import { ArkButton, ArkCarousel, ArkDatepicker, ArkSwitch, ArkToaster, ArkToggle, ArkToggleGroup } from "./components";
 
 /**
  * Registra os componentes personalizados do Tooark no navegador.
@@ -20,5 +20,17 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkToaster.tagName)) {
     customElements.define(ArkToaster.tagName, ArkToaster);
+  }
+
+  if (!customElements.get(ArkSwitch.tagName)) {
+    customElements.define(ArkSwitch.tagName, ArkSwitch);
+  }
+
+  if (!customElements.get(ArkToggle.tagName)) {
+    customElements.define(ArkToggle.tagName, ArkToggle);
+  }
+
+  if (!customElements.get(ArkToggleGroup.tagName)) {
+    customElements.define(ArkToggleGroup.tagName, ArkToggleGroup);
   }
 }

@@ -1,2 +1,2 @@
-export { ArkButton, ArkCarousel, ArkDatepicker, ArkToaster } from "./components";
+export { ArkButton, ArkCarousel, ArkDatepicker, ArkSwitch, ArkToaster, ArkToggle, ArkToggleGroup } from "./components";
 export { registerTooarkComponents } from "./register";
