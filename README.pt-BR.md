@@ -47,7 +47,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@tooark/tokens`         | Primitivas de design: cores semânticas (intents), escala de tamanhos, raios e motion tokens (`--ark-duration-*`, `--ark-ease-*`), expostos como custom properties CSS e valores `@theme` do Tailwind v4.               |
 | `@tooark/core`           | Fundação compartilhada: tipos TypeScript (`ArkIntent`, `ArkSize`, …), locales de i18n (`en`, `pt`, `es`), o serviço de toast e a camada de motion sem dependências (presets CSS + helpers WAAPI `arkEnter`/`arkExit`). |
-| `@tooark/web-components` | Os Custom Elements nativos: `ark-button`, `ark-carousel`, `ark-datepicker`, `ark-toaster`.                                                                                                                             |
+| `@tooark/web-components` | Os Custom Elements nativos: `ark-button`, `ark-carousel`, `ark-datepicker`, `ark-switch`, `ark-toaster`, `ark-toggle` e `ark-toggle-group`.                                                                            |
 | `@tooark/react`          | Wrappers React com props tipadas.                                                                                                                                                                                      |
 | `@tooark/vue`            | Wrappers Vue 3.                                                                                                                                                                                                        |
 | `@tooark/angular`        | Componentes wrapper para Angular.                                                                                                                                                                                      |
@@ -59,14 +59,27 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 
 ## Componentes
 
-| Elemento         | Pacote         | Destaques                                                                                                                    |
-| ---------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `ark-button`     | web-components | Intents, tamanhos e variantes de estilo (solid/outline/ghost).                                                               |
-| `ark-carousel`   | web-components | Arrasto por pointer com snap, autoplay, loop, dots e setas.                                                                  |
-| `ark-datepicker` | web-components | Localizado (`en`/`pt`/`es` + custom), temas, intents.                                                                        |
-| `ark-toaster`    | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado. |
-| `ark-chart`      | chart          | Tipos de gráfico do ECharts com suporte a temas.                                                                             |
-| `ark-wysiwyg`    | wysiwyg        | Editor + viewer somente leitura baseados em Tiptap.                                                                          |
+| Elemento           | Pacote         | Destaques                                                                                                                                    |
+| ------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ark-button`       | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width` e modo link (`href`). |
+| `ark-carousel`     | web-components | Arrasto por pointer com snap, autoplay, loop, dots e setas.                                                                                  |
+| `ark-datepicker`   | web-components | Localizado (`en`/`pt`/`es` + custom), temas, intents.                                                                                        |
+| `ark-switch`       | web-components | Switch on/off acessível (`role="switch"`): texto ON/OFF e ícones ✓/✕ opcionais, intents, participação em formulário via checkbox oculto.     |
+| `ark-toaster`      | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.                 |
+| `ark-toggle`       | web-components | Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.                                  |
+| `ark-toggle-group` | web-components | Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.       |
+| `ark-chart`        | chart          | Tipos de gráfico do ECharts com suporte a temas.                                                                                             |
+| `ark-wysiwyg`      | wysiwyg        | Editor + viewer somente leitura baseados em Tiptap.                                                                                          |
+
+### Atributos principais
+
+**`ark-button`** — `variant` (`solid`/`outline`/`ghost` ou um intent), `intent`, `size` (`sm`–`xl`), `rounded` (`none`/`sm`/`md`/`lg`/`xl`/`full` — com `icon-only`, `full` gera um botão circular), `loading` (spinner + `aria-busy` + clique bloqueado), `icon-only` (padding simétrico), `full-width`, `href`/`target` (renderiza `<a role="button">`; `_blank` ganha `rel="noopener noreferrer"`), `disabled`, `type`, `theme`, `color`/`text-color`.
+
+**`ark-switch`** — `checked`, `disabled`, `size`, `intent`, `theme`, `color`, `labels` (mostra ON/OFF no trilho; textos customizáveis via `label-on`/`label-off`), `icons` (✓/✕ no polegar), `label` (rótulo acessível), `name`/`value` (submissão em formulário quando marcado). Emite `change` com `detail: { checked }`.
+
+**`ark-toggle`** — `pressed`, `value`, `disabled`, `size`, `intent`, `theme`. Emite `change` com `detail: { pressed, value }`.
+
+**`ark-toggle-group`** — `value` (valor(es) selecionado(s), sincronizado com os itens), `multiple`, `disabled`, `size`, `intent`, `theme`. Emite `change` com `detail: { value }` (exclusivo) ou `detail: { values }` (múltiplo).
 
 ---
 
@@ -93,6 +106,17 @@ registerTooarkComponents();
 
 ```html
 <ark-button intent="primary" size="md">Salvar</ark-button>
+<ark-button icon-only rounded="full" intent="success" aria-label="Confirmar"
+  >✓</ark-button
+>
+
+<ark-switch labels icons intent="success" label="Notificações"></ark-switch>
+
+<ark-toggle-group value="dia">
+  <ark-toggle value="dia">Dia</ark-toggle>
+  <ark-toggle value="semana">Semana</ark-toggle>
+  <ark-toggle value="mes">Mês</ark-toggle>
+</ark-toggle-group>
 
 <ark-toaster position="bottom-right" lang="pt"></ark-toaster>
 ```
@@ -150,6 +174,45 @@ pnpm --filter storybook exec vitest run --project storybook --coverage
 ```
 
 Os testes também podem ser disparados pela UI do Storybook (widget "Run tests"). O CI roda a mesma suíte em cada push/PR via [GitHub Actions](.github/workflows/tests.yml).
+
+### Hooks para testes e2e
+
+Todo elemento interno criado por um componente carrega hooks estáveis para testes end-to-end, em duas camadas:
+
+1. **`data-ark` (estático, sem configuração)** — o elemento principal recebe `data-ark="<componente>"` e cada parte interna recebe `data-ark="<componente>-<parte>"`. São seletores que não quebram com mudanças de classes utilitárias.
+2. **`testid` (por instância)** — declare `testid="..."` no host e o valor é propagado como `data-testid` para o elemento principal, com sufixo `-<parte>` nas partes internas — o formato que `getByTestId` (Playwright, Cypress, Testing Library) procura por padrão. Disponível também como prop `testid` nos wrappers React/Vue/Angular.
+
+```html
+<ark-switch testid="notificacoes"></ark-switch>
+<!-- gera: -->
+<button data-ark="switch" data-testid="notificacoes" role="switch">
+  <span data-ark="switch-thumb" data-testid="notificacoes-thumb"></span>
+  ...
+</button>
+```
+
+```ts
+// Playwright
+await page.getByTestId("notificacoes").click();
+await expect(page.locator('[data-ark="switch-thumb"]')).toBeVisible();
+await page
+  .locator('[data-ark="datepicker-day"][data-date="2026-09-15"]')
+  .click();
+```
+
+Hooks por componente:
+
+| Componente         | Elemento principal | Partes internas                                                                                                                                                    |
+| ------------------ | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ark-button`       | `button`           | `button-spinner`                                                                                                                                                   |
+| `ark-switch`       | `switch`           | `switch-thumb`, `switch-label-on`, `switch-label-off`, `switch-input`                                                                                              |
+| `ark-toggle`       | `toggle`           | —                                                                                                                                                                  |
+| `ark-toggle-group` | `toggle-group`     | —                                                                                                                                                                  |
+| `ark-carousel`     | `carousel`         | `carousel-viewport`, `carousel-track`, `carousel-slide-{i}`, `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                     |
+| `ark-datepicker`   | `datepicker`       | `datepicker-prev`, `datepicker-next`, `datepicker-title`, `datepicker-grid`, `datepicker-day` (+ `data-date="AAAA-MM-DD"`), `datepicker-today`, `datepicker-clear` |
+| `ark-toaster`      | `toaster`          | `toaster-toast` (+ `data-toast-id`), `toaster-toast-title`, `toaster-toast-description`, `toaster-toast-close`, `toaster-toast-action`, `toaster-toast-cancel`     |
+
+Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) quando possível — os hooks são a rede de segurança para instâncias repetidas e asserções visuais.
 
 ---
 

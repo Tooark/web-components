@@ -144,6 +144,23 @@ export const TogglesOnClick = {
   }
 };
 
+export const TestHooks = {
+  render: () => {
+    const el = createSwitch({ labels: true, label: "Hooks" });
+    el.setAttribute("testid", "meu-switch");
+    return el;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const control = canvasElement.querySelector('[data-ark="switch"]');
+    const thumb = canvasElement.querySelector('[data-ark="switch-thumb"]');
+
+    await expect(control).not.toBeNull();
+    await expect(thumb).not.toBeNull();
+    await expect(control).toHaveAttribute("data-testid", "meu-switch");
+    await expect(thumb).toHaveAttribute("data-testid", "meu-switch-thumb");
+  }
+};
+
 export const DisabledDoesNotToggle = {
   render: () => createSwitch({ disabled: true, label: "Bloqueado" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

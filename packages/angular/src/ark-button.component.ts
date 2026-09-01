@@ -10,6 +10,7 @@ ensureTooarkComponentsRegistered();
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-button
+    [attr.testid]="testid"
     [attr.type]="type"
     [attr.disabled]="disabled ? '' : null"
     [attr.loading]="loading ? '' : null"
@@ -28,6 +29,7 @@ ensureTooarkComponentsRegistered();
   </ark-button>`
 })
 export class ArkButtonComponent {
+  @Input() testid: string | undefined;
   @Input() type: ArkButtonType = "button";
   @Input() disabled = false;
   @Input() loading = false;

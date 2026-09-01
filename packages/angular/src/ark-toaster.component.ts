@@ -10,6 +10,7 @@ ensureTooarkComponentsRegistered();
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-toaster
+    [attr.testid]="testid"
     [attr.theme]="theme"
     [attr.position]="position"
     [attr.max-visible]="maxVisible"
@@ -19,6 +20,7 @@ ensureTooarkComponentsRegistered();
   </ark-toaster>`
 })
 export class ArkToasterComponent {
+  @Input() testid: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() position: ArkToastPosition = "bottom-right";
   @Input() richColors = false;

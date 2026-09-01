@@ -1,6 +1,7 @@
 import "../styles/tailwind.css";
 import type { ArkThemeSelected } from "@tooark/core";
 import { ArkToggle } from "./ark-toggle";
+import { applyTestHooks } from "./test-hooks";
 
 export class ArkToggleGroup extends HTMLElement {
   static readonly tagName = "ark-toggle-group";
@@ -10,7 +11,7 @@ export class ArkToggleGroup extends HTMLElement {
   private syncingValue = false;
 
   static get observedAttributes (): string[] {
-    return ["value", "multiple", "disabled", "size", "intent", "theme", "class"];
+    return ["value", "multiple", "disabled", "size", "intent", "theme", "class", "testid"];
   }
 
   connectedCallback (): void {
@@ -163,6 +164,8 @@ export class ArkToggleGroup extends HTMLElement {
       theme === "dark" ? "bg-slate-800" : "bg-slate-100",
       custom
     ].join(" ").trim();
+
+    applyTestHooks(this, "toggle-group", this.wrapperEl);
   }
 }
 

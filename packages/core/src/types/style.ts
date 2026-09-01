@@ -15,6 +15,7 @@ export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 export type ArkDatepickerLang = "en" | "pt" | "es" | "custom";
 
 export type ArkButtonStyleOptions = {
+  testid?: string;
   variant?: ArkButtonVariant;
   intent?: ArkIntent;
   theme?: ArkTheme;
@@ -30,6 +31,7 @@ export type ArkButtonStyleOptions = {
 };
 
 export type ArkSwitchStyleOptions = {
+  testid?: string;
   intent?: ArkIntent;
   theme?: ArkTheme;
   size?: ArkSize;
@@ -42,6 +44,7 @@ export type ArkSwitchStyleOptions = {
 };
 
 export type ArkToggleStyleOptions = {
+  testid?: string;
   intent?: ArkIntent;
   theme?: ArkTheme;
   size?: ArkSize;
@@ -50,6 +53,7 @@ export type ArkToggleStyleOptions = {
 };
 
 export type ArkToggleGroupStyleOptions = {
+  testid?: string;
   intent?: ArkIntent;
   theme?: ArkTheme;
   size?: ArkSize;
@@ -58,12 +62,14 @@ export type ArkToggleGroupStyleOptions = {
 };
 
 export type ArkDatepickerStyleOptions = {
+  testid?: string;
   theme?: ArkTheme;
   intent?: ArkIntent;
   accentColor?: string;
 };
 
 export type ArkCarouselStyleOptions = {
+  testid?: string;
   theme?: ArkTheme;
   intent?: ArkIntent;
   accentColor?: string;
@@ -80,6 +86,7 @@ export type ArkCarouselStyleOptions = {
 };
 
 export type ArkToasterStyleOptions = {
+  testid?: string;
   theme?: ArkTheme;
   position?: ArkToastPosition;
   richColors?: boolean;

@@ -1,6 +1,7 @@
 import "../styles/tailwind.css";
 import { resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
 import type { ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkDatepickerPalette = {
   container: string;
@@ -25,7 +26,7 @@ export class ArkDatepicker extends HTMLElement {
   private locale: ArkDatepickerLocale | null = null;
 
   static get observedAttributes(): string[] {
-    return ["lang", "locale-json", "value", "min", "max", "theme", "intent", "accent-color"];
+    return ["lang", "locale-json", "value", "min", "max", "theme", "intent", "accent-color", "testid"];
   }
 
   connectedCallback(): void {
@@ -257,6 +258,7 @@ export class ArkDatepicker extends HTMLElement {
     const container = document.createElement("div");
     container.setAttribute("part", "container");
     container.className = palette.container;
+    applyTestHooks(this, "datepicker", container);
 
     // --- Header: prev / month-year / next ---
     const header = document.createElement("div");
@@ -264,6 +266,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const prevBtn = document.createElement("button");
     prevBtn.type = "button";
+    applyTestHooks(this, "datepicker", prevBtn, "prev");
     prevBtn.setAttribute("aria-label", loc.previousMonth);
     prevBtn.className = palette.navButton;
     prevBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>`;
@@ -274,6 +277,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const nextBtn = document.createElement("button");
     nextBtn.type = "button";
+    applyTestHooks(this, "datepicker", nextBtn, "next");
     nextBtn.setAttribute("aria-label", loc.nextMonth);
     nextBtn.className = palette.navButton;
     nextBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`;
@@ -284,6 +288,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const title = document.createElement("span");
     title.className = palette.headerText;
+    applyTestHooks(this, "datepicker", title, "title");
     title.textContent = `${loc.months[this.viewDate.getMonth()]} ${this.viewDate.getFullYear()}`;
 
     header.appendChild(prevBtn);
@@ -319,6 +324,7 @@ export class ArkDatepicker extends HTMLElement {
 
     const grid = document.createElement("div");
     grid.className = "grid grid-cols-7 gap-0";
+    applyTestHooks(this, "datepicker", grid, "grid");
 
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < 7; c++) {
@@ -365,6 +371,9 @@ export class ArkDatepicker extends HTMLElement {
         }
         cell.textContent = String(dayIndex);
         cell.disabled = disabled;
+        // data-date permite selecionar um dia específico no e2e sem depender do texto.
+        applyTestHooks(this, "datepicker", cell, "day");
+        cell.setAttribute("data-date", this.formatISO(cellDate));
 
         if (!disabled) {
           cell.addEventListener("click", () => {
@@ -388,6 +397,7 @@ export class ArkDatepicker extends HTMLElement {
     const todayBtn = document.createElement("button");
     todayBtn.type = "button";
     todayBtn.className = palette.footerPrimary;
+    applyTestHooks(this, "datepicker", todayBtn, "today");
     if (accentColor) {
       todayBtn.style.color = accentColor;
     }
@@ -404,6 +414,7 @@ export class ArkDatepicker extends HTMLElement {
     const clearBtn = document.createElement("button");
     clearBtn.type = "button";
     clearBtn.className = palette.footerSecondary;
+    applyTestHooks(this, "datepicker", clearBtn, "clear");
     clearBtn.textContent = loc.clear;
     clearBtn.addEventListener("click", () => {
       this.selectedDate = null;

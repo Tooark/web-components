@@ -27,7 +27,8 @@ export function ArkCarousel(props: ArkCarouselProps): React.JSX.Element {
     dragFree,
     snap,
     onSlideChange,
-    className
+    className,
+    testid
   } = props;
 
   const ref = React.useRef<HTMLElement>(null);
@@ -62,6 +63,7 @@ export function ArkCarousel(props: ArkCarouselProps): React.JSX.Element {
     "start-index": startIndex,
     "autoplay-delay": autoplayDelay,
     snap,
+    testid,
     class: className,
     loop: loop ? true : undefined,
     autoplay: autoplay ? true : undefined,

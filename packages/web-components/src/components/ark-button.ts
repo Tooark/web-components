@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
 import type { ArkButtonType, ArkRounded, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkButtonPalette = {
   focusRing: string;
@@ -17,7 +18,7 @@ export class ArkButton extends HTMLElement {
   private spinnerEl: HTMLSpanElement | null = null;
 
   static get observedAttributes (): string[] {
-    return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class", "rounded", "loading", "icon-only", "full-width", "href", "target"];
+    return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class", "rounded", "loading", "icon-only", "full-width", "href", "target", "testid"];
   }
 
   constructor () {
@@ -414,6 +415,11 @@ export class ArkButton extends HTMLElement {
     this.style.display = this.hasAttribute("full-width") ? "block" : "";
     this.applyCustomColors();
     this.syncLoading();
+
+    applyTestHooks(this, "button", this.controlEl);
+    if (this.spinnerEl) {
+      applyTestHooks(this, "button", this.spinnerEl, "spinner");
+    }
   }
 }
 

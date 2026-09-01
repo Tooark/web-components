@@ -13,7 +13,7 @@ export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
 };
 
 export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
-  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className } = props;
+  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid } = props;
   const ref = React.useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -44,6 +44,7 @@ export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
     value,
     min,
     max,
+    testid,
     class: className,
     "accent-color": accentColor,
     "locale-json": localeJson ? JSON.stringify(localeJson) : undefined

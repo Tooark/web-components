@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
 import type { ArkSize, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkTogglePalette = {
   focusRing: string;
@@ -13,7 +14,7 @@ export class ArkToggle extends HTMLElement {
   private buttonEl: HTMLButtonElement | null = null;
 
   static get observedAttributes (): string[] {
-    return ["pressed", "disabled", "size", "intent", "theme", "value", "class"];
+    return ["pressed", "disabled", "size", "intent", "theme", "value", "class", "testid"];
   }
 
   connectedCallback (): void {
@@ -158,6 +159,7 @@ export class ArkToggle extends HTMLElement {
     this.buttonEl.className = this.computeClasses();
     this.buttonEl.setAttribute("aria-pressed", this.pressed ? "true" : "false");
     this.buttonEl.disabled = this.hasAttribute("disabled");
+    applyTestHooks(this, "toggle", this.buttonEl);
   }
 }
 

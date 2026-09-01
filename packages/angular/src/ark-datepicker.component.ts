@@ -11,6 +11,7 @@ ensureTooarkComponentsRegistered();
   template: `
   <ark-datepicker 
     #picker
+    [attr.testid]="testid"
     [attr.lang]="lang"
     [attr.locale-json]="localeJsonStr"
     [attr.theme]="theme"
@@ -22,6 +23,7 @@ ensureTooarkComponentsRegistered();
   </ark-datepicker>`
 })
 export class ArkDatepickerComponent implements AfterViewInit, OnDestroy {
+  @Input() testid: string | undefined;
   @Input() lang: ArkDatepickerLang = "en";
   @Input() localeJson: Record<string, unknown> | undefined;
   @Input() theme: ArkTheme = "auto";

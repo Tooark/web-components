@@ -10,6 +10,7 @@ ensureTooarkComponentsRegistered();
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-switch
+    [attr.testid]="testid"
     [attr.checked]="checked ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.labels]="labels ? '' : null"
@@ -27,6 +28,7 @@ ensureTooarkComponentsRegistered();
   </ark-switch>`
 })
 export class ArkSwitchComponent {
+  @Input() testid: string | undefined;
   @Input() checked = false;
   @Input() disabled = false;
   @Input() labels = false;

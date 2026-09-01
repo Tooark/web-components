@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
 import type { ArkSize, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkSwitchPalette = {
   focusRing: string;
@@ -32,7 +33,7 @@ export class ArkSwitch extends HTMLElement {
   private inputEl: HTMLInputElement | null = null;
 
   static get observedAttributes (): string[] {
-    return ["checked", "disabled", "size", "intent", "theme", "color", "labels", "label-on", "label-off", "icons", "name", "value", "label", "aria-label"];
+    return ["checked", "disabled", "size", "intent", "theme", "color", "labels", "label-on", "label-off", "icons", "name", "value", "label", "aria-label", "testid"];
   }
 
   connectedCallback (): void {
@@ -231,6 +232,12 @@ export class ArkSwitch extends HTMLElement {
     this.inputEl.disabled = disabled;
     this.inputEl.name = this.getAttribute("name") || "";
     this.inputEl.value = this.getAttribute("value") || "on";
+
+    applyTestHooks(this, "switch", this.trackEl);
+    applyTestHooks(this, "switch", this.thumbEl, "thumb");
+    applyTestHooks(this, "switch", this.labelOnEl, "label-on");
+    applyTestHooks(this, "switch", this.labelOffEl, "label-off");
+    applyTestHooks(this, "switch", this.inputEl, "input");
   }
 }
 

@@ -5,6 +5,7 @@ declare global {
   namespace JSX {
     interface IntrinsicElements {
       "ark-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         type?: ArkButtonType;
         disabled?: boolean;
         variant?: ArkButtonVariant;
@@ -21,6 +22,7 @@ declare global {
         "text-color"?: string;
       };
       "ark-switch": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         checked?: boolean;
         disabled?: boolean;
         intent?: ArkIntent;
@@ -36,6 +38,7 @@ declare global {
         label?: string;
       };
       "ark-toggle": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         pressed?: boolean;
         disabled?: boolean;
         intent?: ArkIntent;
@@ -44,6 +47,7 @@ declare global {
         value?: string;
       };
       "ark-toggle-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         value?: string;
         multiple?: boolean;
         disabled?: boolean;
@@ -52,6 +56,7 @@ declare global {
         size?: ArkSize;
       };
       "ark-datepicker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         lang?: ArkDatepickerLang;
         theme?: ArkTheme;
         intent?: ArkIntent;
@@ -62,6 +67,7 @@ declare global {
         max?: string;
       };
       "ark-carousel": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         theme?: ArkTheme;
         intent?: ArkIntent;
         "accent-color"?: string;
@@ -77,6 +83,7 @@ declare global {
         snap?: ArkCarouselSnap;
       };
       "ark-toaster": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
         theme?: ArkTheme;
         position?: ArkToastPosition;
         "rich-colors"?: boolean;

@@ -7,7 +7,7 @@ export type ArkToasterProps = ArkToasterStyleOptions & {
 };
 
 export function ArkToaster(props: ArkToasterProps): React.JSX.Element {
-  const { theme, position, richColors, closeButton, maxVisible, duration, className } = props;
+  const { theme, position, richColors, closeButton, maxVisible, duration, className, testid } = props;
 
   useEffect(() => {
     ensureTooarkComponentsRegistered();
@@ -18,6 +18,7 @@ export function ArkToaster(props: ArkToasterProps): React.JSX.Element {
     position,
     "max-visible": maxVisible,
     duration,
+    testid,
     class: className,
     "rich-colors": richColors ? true : undefined,
     "close-button": closeButton === undefined ? undefined : closeButton ? true : "false"

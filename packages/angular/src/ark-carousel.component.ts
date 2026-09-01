@@ -11,6 +11,7 @@ ensureTooarkComponentsRegistered();
   template: `
   <ark-carousel
     #carousel
+    [attr.testid]="testid"
     [attr.theme]="theme"
     [attr.intent]="intent"
     [attr.accent-color]="accentColor"
@@ -28,6 +29,7 @@ ensureTooarkComponentsRegistered();
   </ark-carousel>`
 })
 export class ArkCarouselComponent implements AfterViewInit, OnDestroy {
+  @Input() testid: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() intent: ArkIntent = "primary";
   @Input() accentColor: string | undefined;

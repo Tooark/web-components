@@ -1,5 +1,6 @@
 import "../styles/tailwind.css";
 import type { ArkCarouselSnap, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkCarouselPalette = {
   frame: string;
@@ -45,7 +46,8 @@ export class ArkCarousel extends HTMLElement {
       "show-dots",
       "show-arrows",
       "drag-free",
-      "snap"
+      "snap",
+      "testid"
     ];
   }
 
@@ -314,6 +316,7 @@ export class ArkCarousel extends HTMLElement {
       dot.type = "button";
       dot.className = `${palette.dotButton} ${i === this.currentIndex ? palette.dotActive : ""}`.trim();
       dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+      applyTestHooks(this, "carousel", dot, `dot-${i}`);
 
       if (i === this.currentIndex && accentColor) {
         dot.style.backgroundColor = accentColor;
@@ -426,13 +429,16 @@ export class ArkCarousel extends HTMLElement {
     root.setAttribute("part", "container");
     root.setAttribute("data-ark-carousel-root", "true");
     root.className = `${palette.frame} relative`;
+    applyTestHooks(this, "carousel", root);
 
     const viewport = document.createElement("div");
     viewport.setAttribute("part", "viewport");
     viewport.className = palette.viewport;
+    applyTestHooks(this, "carousel", viewport, "viewport");
 
     const track = document.createElement("div");
     track.setAttribute("part", "track");
+    applyTestHooks(this, "carousel", track, "track");
     track.className = palette.track;
     track.style.gap = `${gap}px`;
     track.style.transition = "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)";
@@ -441,7 +447,8 @@ export class ArkCarousel extends HTMLElement {
 
     const slideWidth = `calc((100% - ${(slidesPerView - 1) * gap}px) / ${slidesPerView})`;
 
-    for (const slide of this.slides) {
+    for (const [index, slide] of this.slides.entries()) {
+      applyTestHooks(this, "carousel", slide, `slide-${index}`);
       slide.setAttribute("part", "slide");
       slide.className = `${palette.slideSurface} ${slide.getAttribute("class") || ""}`.trim();
       slide.style.flex = `0 0 ${slideWidth}`;
@@ -458,6 +465,7 @@ export class ArkCarousel extends HTMLElement {
       const prev = document.createElement("button");
       prev.type = "button";
       prev.className = `${palette.arrowButton} pointer-events-auto`;
+      applyTestHooks(this, "carousel", prev, "arrow-prev");
       prev.setAttribute("aria-label", "Previous slide");
       prev.innerHTML = "&#10094;";
       prev.addEventListener("click", this.prev);
@@ -465,6 +473,7 @@ export class ArkCarousel extends HTMLElement {
       const next = document.createElement("button");
       next.type = "button";
       next.className = `${palette.arrowButton} pointer-events-auto`;
+      applyTestHooks(this, "carousel", next, "arrow-next");
       next.setAttribute("aria-label", "Next slide");
       next.innerHTML = "&#10095;";
       next.addEventListener("click", this.next);
@@ -484,6 +493,7 @@ export class ArkCarousel extends HTMLElement {
 
     const dots = document.createElement("div");
     dots.setAttribute("part", "dots");
+    applyTestHooks(this, "carousel", dots, "dots");
     dots.className = "mt-4 flex items-center justify-center gap-2";
     root.appendChild(dots);
 

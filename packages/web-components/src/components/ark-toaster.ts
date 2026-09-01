@@ -1,6 +1,7 @@
 import "../styles/tailwind.css";
 import { arkEnter, arkExit, resolveLocale } from "@tooark/core";
 import type { ArkMotionPreset, ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
+import { applyTestHooks } from "./test-hooks";
 
 type ArkToastItem = ArkToastOptions & {
   id: string;
@@ -29,7 +30,7 @@ export class ArkToaster extends HTMLElement {
   private exiting = new Set<string>();
 
   static get observedAttributes (): string[] {
-    return ["theme", "position", "rich-colors", "close-button", "max-visible", "duration", "lang"];
+    return ["theme", "position", "rich-colors", "close-button", "max-visible", "duration", "lang", "testid"];
   }
 
   connectedCallback (): void {
@@ -274,6 +275,7 @@ export class ArkToaster extends HTMLElement {
 
     this.root.className = `${palette.stack} ${this.getPositionClasses(position)}`;
     this.root.innerHTML = "";
+    applyTestHooks(this, "toaster", this.root);
 
     const activeIds = new Set(this.toasts.map((toast) => toast.id));
     for (const id of this.entered) {
@@ -284,6 +286,8 @@ export class ArkToaster extends HTMLElement {
       const card = document.createElement("section");
       card.setAttribute("part", "toast");
       card.dataset.toastId = toast.id;
+      // Cada card compartilha o hook "toaster-toast"; desambigue via data-toast-id.
+      applyTestHooks(this, "toaster", card, "toast");
       card.className = `${palette.toastBase} ${this.getToastTypeClasses(toast.type, richColors)}`.trim();
 
       const row = document.createElement("div");
@@ -298,12 +302,14 @@ export class ArkToaster extends HTMLElement {
 
       const title = document.createElement("h4");
       title.className = palette.title;
+      applyTestHooks(this, "toaster", title, "toast-title");
       title.textContent = toast.title;
       content.appendChild(title);
 
       if (toast.description) {
         const description = document.createElement("p");
         description.className = palette.description;
+        applyTestHooks(this, "toaster", description, "toast-description");
         description.textContent = toast.description;
         content.appendChild(description);
       }
@@ -315,6 +321,7 @@ export class ArkToaster extends HTMLElement {
         const close = document.createElement("button");
         close.type = "button";
         close.className = palette.closeButton;
+        applyTestHooks(this, "toaster", close, "toast-close");
         close.textContent = this.getCloseLabel();
         close.addEventListener("click", () => this.dismiss(toast.id));
         row.appendChild(close);
@@ -330,6 +337,7 @@ export class ArkToaster extends HTMLElement {
           const cancel = document.createElement("button");
           cancel.type = "button";
           cancel.className = palette.cancelButton;
+          applyTestHooks(this, "toaster", cancel, "toast-cancel");
           cancel.textContent = toast.cancelLabel;
           cancel.addEventListener("click", () => this.dismiss(toast.id));
           actions.appendChild(cancel);
@@ -339,6 +347,7 @@ export class ArkToaster extends HTMLElement {
           const action = document.createElement("button");
           action.type = "button";
           action.className = palette.actionButton;
+          applyTestHooks(this, "toaster", action, "toast-action");
           action.textContent = toast.actionLabel;
           action.addEventListener("click", () => {
             this.dispatchEvent(

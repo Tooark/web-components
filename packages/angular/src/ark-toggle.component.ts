@@ -10,6 +10,7 @@ ensureTooarkComponentsRegistered();
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-toggle
+    [attr.testid]="testid"
     [attr.pressed]="pressed ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.intent]="intent"
@@ -21,6 +22,7 @@ ensureTooarkComponentsRegistered();
   </ark-toggle>`
 })
 export class ArkToggleComponent {
+  @Input() testid: string | undefined;
   @Input() pressed = false;
   @Input() disabled = false;
   @Input() intent: ArkIntent = "primary";
@@ -40,6 +42,7 @@ export class ArkToggleComponent {
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-toggle-group
+    [attr.testid]="testid"
     [attr.value]="value"
     [attr.multiple]="multiple ? '' : null"
     [attr.disabled]="disabled ? '' : null"
@@ -51,6 +54,7 @@ export class ArkToggleComponent {
   </ark-toggle-group>`
 })
 export class ArkToggleGroupComponent {
+  @Input() testid: string | undefined;
   @Input() value: string | undefined;
   @Input() multiple = false;
   @Input() disabled = false;
