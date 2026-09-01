@@ -1,5 +1,5 @@
 import "../styles/tailwind.css";
-import { arkEnter, arkExit } from "@tooark/core";
+import { arkEnter, arkExit, resolveLocale } from "@tooark/core";
 import type { ArkMotionPreset, ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 
 type ArkToastItem = ArkToastOptions & {
@@ -29,7 +29,7 @@ export class ArkToaster extends HTMLElement {
   private exiting = new Set<string>();
 
   static get observedAttributes (): string[] {
-    return ["theme", "position", "rich-colors", "close-button", "max-visible", "duration"];
+    return ["theme", "position", "rich-colors", "close-button", "max-visible", "duration", "lang"];
   }
 
   connectedCallback (): void {
@@ -152,6 +152,10 @@ export class ArkToaster extends HTMLElement {
     const parsed = Number(this.getAttribute("duration") || "4000");
     if (!Number.isFinite(parsed)) return 4000;
     return Math.max(0, Math.floor(parsed));
+  }
+
+  private getCloseLabel (): string {
+    return resolveLocale(this.getAttribute("lang") || "en", undefined).close;
   }
 
   private hasCloseButton (): boolean {
@@ -311,7 +315,7 @@ export class ArkToaster extends HTMLElement {
         const close = document.createElement("button");
         close.type = "button";
         close.className = palette.closeButton;
-        close.textContent = "Close";
+        close.textContent = this.getCloseLabel();
         close.addEventListener("click", () => this.dismiss(toast.id));
         row.appendChild(close);
       }

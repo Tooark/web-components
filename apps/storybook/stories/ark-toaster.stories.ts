@@ -15,6 +15,7 @@ const meta = {
   },
   argTypes: {
     theme: { control: "select", options: ["auto", "light", "dark"] },
+    lang: { control: "select", options: ["en", "pt", "es"] },
     position: {
       control: "select",
       options: ["top-left", "top-center", "top-right", "bottom-left", "bottom-center", "bottom-right"]
@@ -26,6 +27,7 @@ const meta = {
   },
   args: {
     theme: "light",
+    lang: "en",
     position: "bottom-right",
     richColors: false,
     closeButton: true,
@@ -38,6 +40,7 @@ export default meta;
 
 type StoryArgs = {
   theme: ArkTheme;
+  lang: "en" | "pt" | "es";
   position: ArkToastPosition;
   richColors: boolean;
   closeButton: boolean;
@@ -154,6 +157,7 @@ function renderToaster(args: StoryArgs): HTMLElement {
 
   const toaster = document.createElement("ark-toaster");
   toaster.setAttribute("theme", args.theme);
+  toaster.setAttribute("lang", args.lang || "en");
   toaster.setAttribute("position", args.position);
   toaster.setAttribute("max-visible", String(args.maxVisible));
   toaster.setAttribute("duration", String(args.duration));
