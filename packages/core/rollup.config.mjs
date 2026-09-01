@@ -1,6 +1,6 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
-import typescript from "rollup-plugin-typescript2";
+import typescript from "@rollup/plugin-typescript";
 import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
 
@@ -23,7 +23,7 @@ export default [
           path: "../../postcss.config.mjs"
         }
       }),
-      typescript({ tsconfig: "./tsconfig.json", useTsconfigDeclarationDir: true })
+      typescript({ tsconfig: "./tsconfig.json", outDir: "dist", declaration: false, declarationMap: false, declarationDir: undefined })
     ],
     external
   },
