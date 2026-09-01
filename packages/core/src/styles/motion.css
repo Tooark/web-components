@@ -1,0 +1,282 @@
+/*
+ * Presets de motion do Tooark — keyframes e classes utilitárias baseados
+ * nos motion tokens (--ark-duration-*, --ark-ease-*, --ark-motion-distance).
+ *
+ * Overrides por elemento via custom properties:
+ *   --ark-animate-duration, --ark-animate-ease, --ark-motion-distance
+ *
+ * prefers-reduced-motion é respeitado automaticamente: os tokens de duração
+ * zeram via media query em @tooark/tokens.
+ */
+
+/* ---------- Enter ---------- */
+
+@keyframes ark-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ark-slide-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(var(--ark-motion-distance, 0.75rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ark-slide-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--ark-motion-distance, 0.75rem) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ark-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(var(--ark-motion-distance, 0.75rem));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ark-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(calc(var(--ark-motion-distance, 0.75rem) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes ark-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ---------- Exit ---------- */
+
+@keyframes ark-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes ark-slide-out-up {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--ark-motion-distance, 0.75rem) * -1));
+  }
+}
+
+@keyframes ark-slide-out-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(var(--ark-motion-distance, 0.75rem));
+  }
+}
+
+@keyframes ark-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(calc(var(--ark-motion-distance, 0.75rem) * -1));
+  }
+}
+
+@keyframes ark-slide-out-right {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(var(--ark-motion-distance, 0.75rem));
+  }
+}
+
+@keyframes ark-scale-out {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+/* ---------- Atenção / loading ---------- */
+
+@keyframes ark-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-0.35rem);
+  }
+  40% {
+    transform: translateX(0.35rem);
+  }
+  60% {
+    transform: translateX(-0.25rem);
+  }
+  80% {
+    transform: translateX(0.25rem);
+  }
+}
+
+@keyframes ark-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes ark-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* ---------- Classes utilitárias ---------- */
+
+.ark-animate-fade-in,
+.ark-animate-fade-out,
+.ark-animate-slide-in-up,
+.ark-animate-slide-in-down,
+.ark-animate-slide-in-left,
+.ark-animate-slide-in-right,
+.ark-animate-slide-out-up,
+.ark-animate-slide-out-down,
+.ark-animate-slide-out-left,
+.ark-animate-slide-out-right,
+.ark-animate-scale-in,
+.ark-animate-scale-out {
+  animation-duration: var(
+    --ark-animate-duration,
+    var(--ark-duration-normal, 250ms)
+  );
+  animation-timing-function: var(
+    --ark-animate-ease,
+    var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1))
+  );
+  animation-fill-mode: both;
+}
+
+.ark-animate-fade-in {
+  animation-name: ark-fade-in;
+}
+.ark-animate-fade-out {
+  animation-name: ark-fade-out;
+}
+.ark-animate-slide-in-up {
+  animation-name: ark-slide-in-up;
+}
+.ark-animate-slide-in-down {
+  animation-name: ark-slide-in-down;
+}
+.ark-animate-slide-in-left {
+  animation-name: ark-slide-in-left;
+}
+.ark-animate-slide-in-right {
+  animation-name: ark-slide-in-right;
+}
+.ark-animate-slide-out-up {
+  animation-name: ark-slide-out-up;
+}
+.ark-animate-slide-out-down {
+  animation-name: ark-slide-out-down;
+}
+.ark-animate-slide-out-left {
+  animation-name: ark-slide-out-left;
+}
+.ark-animate-slide-out-right {
+  animation-name: ark-slide-out-right;
+}
+.ark-animate-scale-in {
+  animation-name: ark-scale-in;
+}
+.ark-animate-scale-out {
+  animation-name: ark-scale-out;
+}
+
+.ark-animate-shake {
+  animation: ark-shake var(--ark-duration-slow, 400ms)
+    var(--ark-ease-in-out, ease-in-out);
+}
+
+.ark-animate-spin {
+  animation: ark-spin 1s linear infinite;
+}
+
+.ark-animate-pulse {
+  animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
+}
+
+/* Skeleton de loading — bloco pulsante neutro */
+.ark-skeleton {
+  animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
+  background-color: color-mix(
+    in oklch,
+    var(--color-neutral, oklch(0.7 0.02 264)) 30%,
+    transparent
+  );
+  border-radius: var(--radius-ark-md, 0.5rem);
+}
+
+/* Loading contínuos não devem rodar com movimento reduzido */
+@media (prefers-reduced-motion: reduce) {
+  .ark-animate-spin,
+  .ark-animate-shake {
+    animation: none;
+  }
+
+  .ark-animate-pulse,
+  .ark-skeleton {
+    animation: none;
+    opacity: 0.7;
+  }
+}
