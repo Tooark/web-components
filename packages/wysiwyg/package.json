@@ -1,7 +1,8 @@
 {
   "name": "@tooark/wysiwyg",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Tooark WYSIWYG — editor e viewer (Custom Elements) baseados em Tiptap",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -14,6 +15,7 @@
     }
   },
   "files": [
+    "NOTICE",
     "dist"
   ],
   "sideEffects": false,

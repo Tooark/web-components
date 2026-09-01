@@ -1,11 +1,13 @@
 {
   "name": "@tooark/react",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "React wrappers for Tooark Web Components",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
+    "NOTICE",
     "dist"
   ],
   "scripts": {

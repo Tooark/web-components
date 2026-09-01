@@ -1,7 +1,8 @@
 {
   "name": "@tooark/motion",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Tooark Motion — Camada 3 do sistema de motion: stagger, scroll reveal, FLIP e swipe baseados na lib Motion (motion.dev)",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -14,6 +15,7 @@
     }
   },
   "files": [
+    "NOTICE",
     "dist"
   ],
   "sideEffects": false,

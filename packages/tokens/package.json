@@ -1,7 +1,8 @@
 {
   "name": "@tooark/tokens",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Design tokens do Tooark (primitivas de design: intents, sizes, themes, variants + CSS @theme)",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -18,6 +19,7 @@
     }
   },
   "files": [
+    "NOTICE",
     "dist",
     "tokens.css"
   ],

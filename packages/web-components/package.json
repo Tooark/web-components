@@ -1,7 +1,8 @@
 {
   "name": "@tooark/web-components",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Tooark Web Components (Custom Elements nativos baseados em @tooark/core)",
+  "license": "Apache-2.0",
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
@@ -18,6 +19,7 @@
     }
   },
   "files": [
+    "NOTICE",
     "dist"
   ],
   "sideEffects": [
