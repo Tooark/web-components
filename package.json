@@ -4,23 +4,51 @@
   "description": "Biblioteca de Componentes Web para projetos Angular, React e Vue",
   "private": true,
   "type": "module",
-  "scripts": {
-    "install:ci": "pnpm install --frozen-lockfile",
-    "build": "pnpm -r build",
-    "dev:storybook": "pnpm --filter storybook storybook",
-    "clean": "pnpm -r run clean"
+  "keywords": [
+    "web-components",
+    "angular",
+    "react",
+    "vue",
+    "storybook",
+    "tailwindcss",
+    "components",
+    "motion"
+  ],
+  "author": {
+    "name": "Paulo Sergio de Freitas Junior",
+    "email": "paulo.freitas@tooark.com",
+    "url": "https://paulofreitas.tooark.com"
   },
-  "engines": {
-    "node": ">=18"
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/paulosfjunior"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/paulosfjunior"
+    }
+  ],
+  "repository": {
+    "url": "https://github.com/Tooark/web-components"
   },
-  "keywords": [],
-  "author": "Paulo Sergio de Freitas Junior",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "packageManager": "pnpm@11.24.0",
+  "engines": {
+    "node": ">=22"
+  },
   "workspaces": [
     "packages/*",
     "apps/*"
   ],
+  "scripts": {
+    "install:ci": "pnpm install --frozen-lockfile",
+    "version": "node scripts/sync-versions.mjs && git add packages/*/package.json",
+    "version:sync": "node scripts/sync-versions.mjs",
+    "build": "pnpm -r build",
+    "dev:storybook": "pnpm --filter storybook storybook",
+    "clean": "pnpm -r run clean"
+  },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-node-resolve": "^16.0.3",
