@@ -55,6 +55,29 @@ declare global {
         theme?: ArkTheme;
         size?: ArkSize;
       };
+      "ark-calendar": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        lang?: ArkDatepickerLang;
+        theme?: ArkTheme;
+        intent?: ArkIntent;
+        "accent-color"?: string;
+        "locale-json"?: string;
+        value?: string;
+        min?: string;
+        max?: string;
+        events?: string;
+        "event-display"?: "dots" | "count" | "list";
+      };
+      "ark-clock": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        lang?: ArkDatepickerLang;
+        theme?: ArkTheme;
+        intent?: ArkIntent;
+        value?: string;
+        seconds?: boolean;
+        "step-minutes"?: number;
+        "hours-format"?: "24" | "12";
+      };
       "ark-datepicker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         lang?: ArkDatepickerLang;
@@ -65,6 +88,49 @@ declare global {
         value?: string;
         min?: string;
         max?: string;
+        mode?: "datetime" | "date" | "time";
+        input?: boolean;
+        placeholder?: string;
+        name?: string;
+        format?: string;
+        seconds?: boolean;
+        disabled?: boolean;
+        events?: string;
+        "event-display"?: "dots" | "count" | "list";
+        "step-minutes"?: number;
+        "hours-format"?: "24" | "12";
+      };
+      "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        view?: "week" | "day" | "month" | "agenda";
+        date?: string;
+        events?: string;
+        lang?: ArkDatepickerLang;
+        theme?: ArkTheme;
+        intent?: ArkIntent;
+        views?: string;
+        "hour-start"?: number;
+        "hour-end"?: number;
+        "slot-minutes"?: number;
+        "hours-format"?: "24" | "12";
+      };
+      "ark-input": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        type?: string;
+        label?: string;
+        placeholder?: string;
+        value?: string;
+        name?: string;
+        size?: ArkSize;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        rounded?: ArkRounded;
+        helper?: string;
+        error?: boolean;
+        "error-message"?: string;
+        disabled?: boolean;
+        required?: boolean;
+        readonly?: boolean;
       };
       "ark-carousel": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

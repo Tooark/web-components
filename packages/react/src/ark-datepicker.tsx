@@ -13,7 +13,7 @@ export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
 };
 
 export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
-  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid } = props;
+  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid, mode, input, placeholder, name, format, seconds, disabled, events, eventDisplay, stepMinutes, hoursFormat } = props;
   const ref = React.useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -45,9 +45,20 @@ export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
     min,
     max,
     testid,
+    mode,
+    placeholder,
+    name,
+    format,
+    input: input ? "" : undefined,
+    seconds: seconds ? "" : undefined,
+    disabled: disabled ? "" : undefined,
     class: className,
     "accent-color": accentColor,
-    "locale-json": localeJson ? JSON.stringify(localeJson) : undefined
+    "locale-json": localeJson ? JSON.stringify(localeJson) : undefined,
+    events: events ? JSON.stringify(events) : undefined,
+    "event-display": eventDisplay,
+    "step-minutes": stepMinutes !== undefined ? String(stepMinutes) : undefined,
+    "hours-format": hoursFormat
   };
 
   return React.createElement("ark-datepicker", { ...attrs, ref });

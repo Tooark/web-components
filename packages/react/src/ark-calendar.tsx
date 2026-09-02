@@ -1,0 +1,55 @@
+import React, { createElement, useCallback, useEffect } from "react";
+import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkDatepickerLocale } from "@tooark/core";
+import { ensureTooarkComponentsRegistered } from "./register";
+
+export type ArkCalendarProps = ArkCalendarStyleOptions & {
+  lang?: ArkDatepickerLang;
+  localeJson?: Partial<ArkDatepickerLocale>;
+  value?: string;
+  min?: string;
+  max?: string;
+  onChange?: (detail: { value: string | null; date: Date | null; events: ArkCalendarEvent[] }) => void;
+  className?: string;
+};
+
+export function ArkCalendar(props: ArkCalendarProps): React.JSX.Element {
+  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid, events, eventDisplay } = props;
+  const ref = React.useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    ensureTooarkComponentsRegistered();
+  }, []);
+
+  const handleChange = useCallback(
+    (e: Event) => {
+      if (onChange) {
+        onChange((e as CustomEvent).detail);
+      }
+    },
+    [onChange]
+  );
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.addEventListener("ark-change", handleChange);
+    return () => el.removeEventListener("ark-change", handleChange);
+  }, [handleChange]);
+
+  const attrs: Record<string, string | undefined> = {
+    lang,
+    theme,
+    intent,
+    value,
+    min,
+    max,
+    testid,
+    class: className,
+    "accent-color": accentColor,
+    "locale-json": localeJson ? JSON.stringify(localeJson) : undefined,
+    events: events ? JSON.stringify(events) : undefined,
+    "event-display": eventDisplay
+  };
+
+  return createElement("ark-calendar", { ...attrs, ref });
+}
