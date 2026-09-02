@@ -10,4 +10,15 @@ export interface ArkDatepickerLocale {
   firstDayOfWeek: number;
   previousMonth: string;
   nextMonth: string;
+  openCalendar: string;
+  hours: string;
+  minutes: string;
+  seconds: string;
+  events: string;
+  week: string;
+  day: string;
+  month: string;
+  agenda: string;
+  allDay: string;
+  noEvents: string;
 }

@@ -61,11 +61,93 @@ export type ArkToggleGroupStyleOptions = {
   multiple?: boolean;
 };
 
+export type ArkCalendarEvent = {
+  /** Data do evento em YYYY-MM-DD. */
+  date: string;
+  label?: string;
+  /** Cor CSS custom do marcador; tem precedência sobre intent. */
+  color?: string;
+  intent?: ArkIntent;
+};
+
+export type ArkCalendarEventDisplay = "dots" | "count" | "list";
+
+export type ArkCalendarStyleOptions = {
+  testid?: string;
+  theme?: ArkTheme;
+  intent?: ArkIntent;
+  accentColor?: string;
+  events?: ArkCalendarEvent[];
+  eventDisplay?: ArkCalendarEventDisplay;
+};
+
+export type ArkDatepickerMode = "datetime" | "date" | "time";
+
 export type ArkDatepickerStyleOptions = {
   testid?: string;
   theme?: ArkTheme;
   intent?: ArkIntent;
   accentColor?: string;
+  mode?: ArkDatepickerMode;
+  input?: boolean;
+  placeholder?: string;
+  name?: string;
+  format?: string;
+  seconds?: boolean;
+  disabled?: boolean;
+  /** Repassados ao ark-calendar interno. */
+  events?: ArkCalendarEvent[];
+  eventDisplay?: ArkCalendarEventDisplay;
+  /** Repassados ao ark-clock interno. */
+  stepMinutes?: number;
+  hoursFormat?: "24" | "12";
+};
+
+export type ArkSchedulerView = "week" | "day" | "month" | "agenda";
+
+export type ArkSchedulerEvent = {
+  id?: string;
+  title: string;
+  /** Início: "YYYY-MM-DDTHH:mm" (ou "YYYY-MM-DD" quando allDay). */
+  start: string;
+  /** Fim; ausente equivale a 1 hora após o início. */
+  end?: string;
+  allDay?: boolean;
+  location?: string;
+  /** Cor CSS custom; tem precedência sobre intent. */
+  color?: string;
+  intent?: ArkIntent;
+};
+
+export type ArkSchedulerStyleOptions = {
+  testid?: string;
+  theme?: ArkTheme;
+  intent?: ArkIntent;
+  view?: ArkSchedulerView;
+  date?: string;
+  events?: ArkSchedulerEvent[];
+  hourStart?: number;
+  hourEnd?: number;
+  slotMinutes?: number;
+  hoursFormat?: "24" | "12";
+  views?: string;
+};
+
+export type ArkInputStyleOptions = {
+  testid?: string;
+  theme?: ArkTheme;
+  intent?: ArkIntent;
+  size?: ArkSize;
+  rounded?: ArkRounded;
+};
+
+export type ArkClockStyleOptions = {
+  testid?: string;
+  theme?: ArkTheme;
+  intent?: ArkIntent;
+  seconds?: boolean;
+  stepMinutes?: number;
+  hoursFormat?: "24" | "12";
 };
 
 export type ArkCarouselStyleOptions = {

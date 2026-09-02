@@ -11,5 +11,16 @@ export const es: ArkDatepickerLocale = {
   close: "Cerrar",
   firstDayOfWeek: 1,
   previousMonth: "Mes anterior",
-  nextMonth: "Mes siguiente"
+  nextMonth: "Mes siguiente",
+  openCalendar: "Abrir calendario",
+  hours: "Horas",
+  minutes: "Minutos",
+  seconds: "Segundos",
+  events: "eventos",
+  week: "Semana",
+  day: "Día",
+  month: "Mes",
+  agenda: "Agenda",
+  allDay: "Todo el día",
+  noEvents: "Sin eventos"
 };
