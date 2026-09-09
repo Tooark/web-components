@@ -21,6 +21,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Build de todos os pacotes: além de validar TypeScript/rollup, roda o
+      # smoke test do CSS gerado (scripts/check-css.mjs) — garante que o
+      # styles.css publicado foi compilado pelo Tailwind e contém as classes.
+      - name: Build packages
+        run: pnpm -r build
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install chromium --with-deps
 

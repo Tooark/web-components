@@ -4,6 +4,8 @@ packages:
 
 allowBuilds:
   esbuild: false
+  # Dependência opcional do Tailwind CLI (--watch); usa binário pré-compilado.
+  "@parcel/watcher": false
 
 # Correções de segurança em dependências transitivas/peers (pnpm audit):
 # só os ranges vulneráveis são substituídos pela versão corrigida.

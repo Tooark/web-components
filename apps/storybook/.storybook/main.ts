@@ -1,5 +1,6 @@
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "@storybook/web-components-vite";
 
 const config: StorybookConfig = {
@@ -16,6 +17,11 @@ const config: StorybookConfig = {
   ],
   async viteFinal(viteConfig) {
     const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
+
+    // Tailwind v4 via plugin Vite (sem PostCSS): processa o preview.css das
+    // stories e o CSS da lib importado em preview.ts. Os pacotes publicados
+    // compilam o próprio CSS com o Tailwind CLI, sem depender daqui.
+    viteConfig.plugins = [...(viteConfig.plugins || []), tailwindcss()];
 
     viteConfig.resolve = viteConfig.resolve || {};
     viteConfig.resolve.alias = {

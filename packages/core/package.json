@@ -24,7 +24,8 @@
   ],
   "sideEffects": false,
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && pnpm run build:css",
+    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify && node ../../scripts/check-css.mjs dist/styles.css --min-bytes 2000 --expect --ark-duration-normal --ark-color-primary: ark-fade-in .ark-skeleton",
     "dev": "rollup -c -w",
     "clean": "rimraf dist"
   },

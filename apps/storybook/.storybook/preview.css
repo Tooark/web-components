@@ -1,0 +1,11 @@
+/*
+ * Tailwind do "app consumidor" do Storybook: só para as classes usadas nas
+ * próprias stories (layout de demonstração). É um Tailwind normal, sem
+ * prefixo e com preflight, exatamente como um projeto que consome a lib.
+ *
+ * O CSS dos componentes é importado separadamente em preview.ts, do mesmo
+ * jeito que um consumidor faria — assim o Storybook também testa a
+ * convivência do CSS prefixado da lib com um Tailwind de aplicação.
+ */
+@import "tailwindcss" source(none);
+@source "../stories";

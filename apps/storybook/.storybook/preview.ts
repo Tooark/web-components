@@ -1,4 +1,6 @@
-import "../../../packages/core/src/styles/tailwind.css";
+// Tailwind das stories (app consumidor) e CSS da lib, como um consumidor importaria.
+import "./preview.css";
+import "../../../packages/web-components/src/styles/index.css";
 import { registerTooarkComponents } from "@tooark/web-components";
 import { registerTooarkChart } from "@tooark/chart";
 import { registerTooarkWysiwyg } from "@tooark/wysiwyg";

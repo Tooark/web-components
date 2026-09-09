@@ -1,0 +1,13 @@
+/*
+ * CSS do @tooark/core: tokens de design + presets de motion. Sem utilities
+ * Tailwind — o core não tem componentes. Compilado pelo Tailwind CLI para
+ * resolver os imports e emitir o @theme dos tokens com o mesmo prefixo "ark"
+ * usado pelos componentes (variáveis --ark-color-*).
+ *
+ * Quem usa @tooark/web-components não precisa deste arquivo: o CSS dos
+ * componentes já inclui tokens e motion.
+ */
+@layer theme;
+@import "tailwindcss/theme.css" layer(theme) prefix(ark);
+@import "@tooark/tokens/tokens.css";
+@import "./motion.css";

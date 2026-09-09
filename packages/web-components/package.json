@@ -26,12 +26,15 @@
     "**/*.css"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "rollup -c && pnpm run build:css",
+    "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify && node ../../scripts/check-css.mjs dist/styles.css --min-bytes 20000 --expect --ark-duration-normal --ark-color-primary: light-dark( ark-fade-in --expect-class ark:inline-flex ark:hover:bg-primary-hover",
     "dev": "rollup -c -w",
+    "dev:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --watch",
     "clean": "rimraf dist"
   },
   "dependencies": {
     "@tooark/core": "workspace:*",
+    "@tooark/tokens": "workspace:*",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

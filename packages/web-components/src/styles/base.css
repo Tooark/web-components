@@ -1,0 +1,80 @@
+/*
+ * Reset escopado dos componentes Ark.
+ *
+ * Este pacote NÃO embarca o preflight do Tailwind: um reset global não
+ * pertence a uma biblioteca. Em vez disso, o subconjunto do preflight que os
+ * componentes pressupõem (box-sizing, border-style, reset de button/input,
+ * svg em bloco) é aplicado apenas ao DOM interno dos hosts ark-*, dentro de
+ * @layer base e com :where() para não ganhar de nenhuma regra do consumidor.
+ *
+ * Mantenha a lista de hosts em sincronia com register.ts.
+ */
+@layer base {
+  /*
+   * Tema. As cores dos tokens usam light-dark(), então o tema é só a
+   * propriedade color-scheme: "auto" (padrão) segue o sistema e o atributo
+   * theme="light|dark" força um lado. Nada de JavaScript envolvido, e a troca
+   * de tema do sistema é refletida na hora.
+   */
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) {
+    color-scheme: light dark;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group)[theme="light"] {
+    color-scheme: light;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group)[theme="dark"] {
+    color-scheme: dark;
+  }
+
+  /* Os hosts entram no reset: vários são o próprio controle estilizado. */
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group),
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) *,
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) *::before,
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where(h1, h2, h3, h4, h5, h6) {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where(a) {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where(img, svg, video, canvas) {
+    display: block;
+    vertical-align: middle;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where(button, input, select, textarea) {
+    font: inherit;
+    font-feature-settings: inherit;
+    font-variation-settings: inherit;
+    letter-spacing: inherit;
+    color: inherit;
+    border-radius: 0;
+    background-color: transparent;
+    opacity: 1;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where(button, input:where([type="button"], [type="reset"], [type="submit"])) {
+    appearance: button;
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) input::placeholder {
+    opacity: 1;
+    color: color-mix(in oklab, currentcolor 50%, transparent);
+  }
+
+  :where(ark-button, ark-calendar, ark-carousel, ark-clock, ark-datepicker, ark-input, ark-scheduler, ark-switch, ark-toaster, ark-toggle, ark-toggle-group) :where([hidden]:not([hidden="until-found"])) {
+    display: none !important;
+  }
+}

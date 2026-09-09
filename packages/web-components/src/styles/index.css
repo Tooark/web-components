@@ -1,0 +1,23 @@
+/*
+ * Entry único de CSS do @tooark/web-components, compilado pelo Tailwind CLI
+ * para dist/styles.css. É o único arquivo que o consumidor precisa importar:
+ *
+ *   import "@tooark/web-components/styles.css";
+ *
+ * Decisões:
+ * - Sem preflight: nenhum reset global sai daqui (ver base.css).
+ * - Utilities e variáveis do theme prefixadas com "ark": classes
+ *   `ark:inline-flex`, variáveis `--ark-color-*`. Não colidem com o Tailwind
+ *   do projeto consumidor, em qualquer versão.
+ * - source(none): só os componentes deste pacote são escaneados (@source).
+ */
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme) prefix(ark);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+
+@import "@tooark/tokens/tokens.css";
+@import "../../../core/src/styles/motion.css";
+@import "./base.css";
+@import "./components.css";
+
+@source "../components/**/*.ts";

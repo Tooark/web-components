@@ -1,9 +1,10 @@
 import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
-import postcss from "rollup-plugin-postcss";
 import dts from "rollup-plugin-dts";
 
+// Só JavaScript/tipos passam por aqui. O CSS (dist/styles.css) é gerado pelo
+// Tailwind CLI a partir de src/styles/index.css — ver o script "build".
 const input = "src/index.ts";
 const external = ["@tooark/tokens"];
 
@@ -17,12 +18,6 @@ export default [
     plugins: [
       resolve({ extensions: [".js", ".ts"] }),
       commonjs(),
-      postcss({
-        extract: "styles.css",
-        config: {
-          path: "../../postcss.config.mjs"
-        }
-      }),
       typescript({ tsconfig: "./tsconfig.json", outDir: "dist", declaration: false, declarationMap: false, declarationDir: undefined })
     ],
     external
@@ -31,6 +26,6 @@ export default [
     input,
     output: [{ file: "dist/index.d.ts", format: "esm" }],
     plugins: [dts()],
-    external: [...external, /\.css$/]
+    external
   }
 ];
