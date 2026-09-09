@@ -2,8 +2,6 @@ import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmit
 import type { ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-clock-wrapper",
   standalone: true,
@@ -22,6 +20,10 @@ ensureTooarkComponentsRegistered();
   </ark-clock>`
 })
 export class ArkClockComponent implements AfterViewInit, OnDestroy {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() value: string | undefined;
   @Input() lang: ArkDatepickerLang = "en";

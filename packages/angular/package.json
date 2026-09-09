@@ -3,23 +3,30 @@
   "version": "1.0.0",
   "description": "Angular wrappers for Tooark Web Components",
   "license": "Apache-2.0",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": [
-    "NOTICE",
-    "dist"
-  ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "ng-packagr -p ng-package.json -c tsconfig.json",
     "clean": "rimraf dist"
   },
+  "publishConfig": {
+    "directory": "dist",
+    "linkDirectory": true
+  },
   "peerDependencies": {
-    "@angular/core": ">=17",
-    "@angular/common": ">=17"
+    "@angular/common": ">=21.2.19",
+    "@angular/core": ">=21.2.19"
   },
   "dependencies": {
     "@tooark/core": "workspace:*",
-    "@tooark/web-components": "workspace:*"
+    "@tooark/web-components": "workspace:*",
+    "tslib": "^2.8.1"
+  },
+  "devDependencies": {
+    "@angular/common": "~21.2.19",
+    "@angular/compiler": "~21.2.19",
+    "@angular/compiler-cli": "~21.2.19",
+    "@angular/core": "~21.2.19",
+    "ng-packagr": "~21.2.7",
+    "rxjs": "^7.8.2",
+    "zone.js": "^0.15.1"
   }
 }

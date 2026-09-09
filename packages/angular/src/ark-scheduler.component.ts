@@ -2,8 +2,6 @@ import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmit
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-scheduler-wrapper",
   standalone: true,
@@ -26,6 +24,10 @@ ensureTooarkComponentsRegistered();
   </ark-scheduler>`
 })
 export class ArkSchedulerComponent implements AfterViewInit, OnDestroy {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() view: ArkSchedulerView = "week";
   @Input() date: string | undefined;

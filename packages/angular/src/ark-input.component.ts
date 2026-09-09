@@ -2,8 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from "@angular/core";
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-input-wrapper",
   standalone: true,
@@ -30,6 +28,10 @@ ensureTooarkComponentsRegistered();
   </ark-input>`
 })
 export class ArkInputComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() type = "text";
   @Input() label: string | undefined;

@@ -2,8 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, Output } from "
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-toggle-wrapper",
   standalone: true,
@@ -22,6 +20,10 @@ ensureTooarkComponentsRegistered();
   </ark-toggle>`
 })
 export class ArkToggleComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() pressed = false;
   @Input() disabled = false;
@@ -54,6 +56,10 @@ export class ArkToggleComponent {
   </ark-toggle-group>`
 })
 export class ArkToggleGroupComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() value: string | undefined;
   @Input() multiple = false;

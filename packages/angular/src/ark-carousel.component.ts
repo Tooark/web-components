@@ -2,8 +2,6 @@ import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmit
 import type { ArkCarouselSnap, ArkIntent, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-carousel-wrapper",
   standalone: true,
@@ -29,6 +27,10 @@ ensureTooarkComponentsRegistered();
   </ark-carousel>`
 })
 export class ArkCarouselComponent implements AfterViewInit, OnDestroy {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() intent: ArkIntent = "primary";

@@ -2,8 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, Output } from "
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-switch-wrapper",
   standalone: true,
@@ -28,6 +26,10 @@ ensureTooarkComponentsRegistered();
   </ark-switch>`
 })
 export class ArkSwitchComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() checked = false;
   @Input() disabled = false;

@@ -2,8 +2,6 @@ import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from "@angular/core";
 import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-button-wrapper",
   standalone: true,
@@ -29,6 +27,10 @@ ensureTooarkComponentsRegistered();
   </ark-button>`
 })
 export class ArkButtonComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() type: ArkButtonType = "button";
   @Input() disabled = false;

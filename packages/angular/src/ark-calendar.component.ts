@@ -2,8 +2,6 @@ import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmit
 import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-calendar-wrapper",
   standalone: true,
@@ -25,6 +23,10 @@ ensureTooarkComponentsRegistered();
   </ark-calendar>`
 })
 export class ArkCalendarComponent implements AfterViewInit, OnDestroy {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() lang: ArkDatepickerLang = "en";
   @Input() localeJson: Record<string, unknown> | undefined;

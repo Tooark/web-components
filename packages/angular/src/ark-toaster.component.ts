@@ -2,8 +2,6 @@ import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
 import type { ArkTheme, ArkToastPosition } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-ensureTooarkComponentsRegistered();
-
 @Component({
   selector: "ark-toaster-wrapper",
   standalone: true,
@@ -20,6 +18,10 @@ ensureTooarkComponentsRegistered();
   </ark-toaster>`
 })
 export class ArkToasterComponent {
+  constructor () {
+    ensureTooarkComponentsRegistered();
+  }
+
   @Input() testid: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() position: ArkToastPosition = "bottom-right";
