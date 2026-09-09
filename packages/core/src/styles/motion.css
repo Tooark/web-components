@@ -261,10 +261,10 @@
   animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
   background-color: color-mix(
     in oklch,
-    var(--color-neutral, oklch(0.7 0.02 264)) 30%,
+    var(--ark-color-muted, oklch(0.7 0.02 264)) 30%,
     transparent
   );
-  border-radius: var(--radius-ark-md, 0.5rem);
+  border-radius: var(--ark-radius-md, 0.5rem);
 }
 
 /* Loading contínuos não devem rodar com movimento reduzido */

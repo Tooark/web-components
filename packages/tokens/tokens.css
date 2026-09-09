@@ -1,39 +1,137 @@
-/**
+/*
  * Design tokens do Tooark (Tailwind v4 @theme).
  *
  * Importe este arquivo no entry Tailwind do seu projeto OU diretamente no app:
  *   @import "@tooark/tokens/tokens.css";
  *
  * Os valores ficam disponíveis como CSS custom properties (--color-*, --size-*, ...)
- * e como utilitários Tailwind (bg-primary, text-danger, ...).
+ * e como utilitários Tailwind (bg-primary, text-primary-fg, border-border, ...).
+ *
+ * Todas as cores são SEMÂNTICAS e resolvem claro/escuro sozinhas via
+ * light-dark(): o tema é decidido pela propriedade `color-scheme` do elemento
+ * (os componentes Ark usam `light dark` por padrão e `theme="light|dark"`
+ * força um lado). Para trocar a marca, sobrescreva os tokens no seu CSS —
+ * dentro do CSS dos componentes eles têm o prefixo "ark":
+ *
+ *   :root {
+ *     --ark-color-primary: light-dark(oklch(45% 0.2 264), oklch(80% 0.15 264));
+ *     --ark-color-primary-fg: #fff;
+ *   }
+ *
+ * Papéis de cada intent (primary, secondary, success, warning, danger, info, neutral):
+ *   <intent>          fundo sólido (botão solid, seleção, track ligado, eventos)
+ *   <intent>-fg       texto/ícone sobre o fundo sólido
+ *   <intent>-hover    fundo sólido em hover
+ *   <intent>-soft     fundo suave (hover de outline/ghost, toggle pressionado, toast rich)
+ *   <intent>-soft-fg  texto sobre o fundo suave e texto de outline/ghost
+ *   <intent>-border   borda de outline / anel do "hoje"
+ *   <intent>-ring     anel de foco
+ *
+ * Superfícies e texto neutros:
+ *   surface / surface-muted / surface-strong / surface-raised
+ *   fg / fg-soft / fg-muted / fg-faint / fg-placeholder
+ *   border / border-strong / muted (controles apagados) / ring (foco padrão)
  */
-@theme {
-  /* Intents — cores semânticas */
-  --color-primary: oklch(0.55 0.2 264);
-  --color-secondary: oklch(0.6 0.05 264);
-  --color-success: oklch(0.65 0.17 145);
-  --color-warning: oklch(0.78 0.16 80);
-  --color-danger: oklch(0.6 0.22 27);
-  --color-info: oklch(0.7 0.13 230);
-  --color-neutral: oklch(0.7 0.02 264);
+@theme static {
+  /* ---------- primary (slate) ---------- */
+  --color-primary: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
+  --color-primary-fg: light-dark(#fff, oklch(20.8% 0.042 265.755));
+  --color-primary-hover: light-dark(oklch(27.9% 0.041 260.031), #fff);
+  --color-primary-soft: light-dark(oklch(98.4% 0.003 247.858), oklch(27.9% 0.041 260.031));
+  --color-primary-soft-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
+  --color-primary-border: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
+  --color-primary-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
+
+  /* ---------- secondary (slate, tom médio) ---------- */
+  --color-secondary: light-dark(oklch(37.2% 0.044 257.287), oklch(86.9% 0.022 252.894));
+  --color-secondary-fg: light-dark(#fff, oklch(20.8% 0.042 265.755));
+  --color-secondary-hover: light-dark(oklch(44.6% 0.043 257.281), oklch(92.9% 0.013 255.508));
+  --color-secondary-soft: light-dark(oklch(98.4% 0.003 247.858), oklch(27.9% 0.041 260.031));
+  --color-secondary-soft-fg: light-dark(oklch(37.2% 0.044 257.287), oklch(92.9% 0.013 255.508));
+  --color-secondary-border: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
+  --color-secondary-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
+
+  /* ---------- success (emerald) ---------- */
+  --color-success: light-dark(oklch(59.6% 0.145 163.225), oklch(69.6% 0.17 162.48));
+  --color-success-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
+  --color-success-hover: light-dark(oklch(69.6% 0.17 162.48), oklch(76.5% 0.177 163.223));
+  --color-success-soft: light-dark(oklch(97.9% 0.021 166.113), color-mix(in oklab, oklch(26.2% 0.051 172.552) 40%, transparent));
+  --color-success-soft-fg: light-dark(oklch(50.8% 0.118 165.612), oklch(84.5% 0.143 164.978));
+  --color-success-border: light-dark(oklch(84.5% 0.143 164.978), oklch(59.6% 0.145 163.225));
+  --color-success-ring: light-dark(oklch(76.5% 0.177 163.223), oklch(69.6% 0.17 162.48));
+
+  /* ---------- warning (amber) ---------- */
+  --color-warning: light-dark(oklch(76.9% 0.188 70.08), oklch(82.8% 0.189 84.429));
+  --color-warning-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(12.9% 0.042 264.695));
+  --color-warning-hover: light-dark(oklch(82.8% 0.189 84.429), oklch(87.9% 0.169 91.605));
+  --color-warning-soft: light-dark(oklch(98.7% 0.022 95.277), color-mix(in oklab, oklch(27.9% 0.077 45.635) 40%, transparent));
+  --color-warning-soft-fg: light-dark(oklch(55.5% 0.163 48.998), oklch(87.9% 0.169 91.605));
+  --color-warning-border: light-dark(oklch(87.9% 0.169 91.605), oklch(66.6% 0.179 58.318));
+  --color-warning-ring: light-dark(oklch(82.8% 0.189 84.429), oklch(76.9% 0.188 70.08));
+
+  /* ---------- danger (red) ---------- */
+  --color-danger: light-dark(oklch(57.7% 0.245 27.325), oklch(63.7% 0.237 25.331));
+  --color-danger-fg: #fff;
+  --color-danger-hover: light-dark(oklch(63.7% 0.237 25.331), oklch(70.4% 0.191 22.216));
+  --color-danger-soft: light-dark(oklch(97.1% 0.013 17.38), color-mix(in oklab, oklch(25.8% 0.092 26.042) 40%, transparent));
+  --color-danger-soft-fg: light-dark(oklch(50.5% 0.213 27.518), oklch(80.8% 0.114 19.571));
+  --color-danger-border: light-dark(oklch(80.8% 0.114 19.571), oklch(57.7% 0.245 27.325));
+  --color-danger-ring: light-dark(oklch(70.4% 0.191 22.216), oklch(63.7% 0.237 25.331));
+
+  /* ---------- info (sky) ---------- */
+  --color-info: light-dark(oklch(58.8% 0.158 241.966), oklch(68.5% 0.169 237.323));
+  --color-info-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
+  --color-info-hover: light-dark(oklch(68.5% 0.169 237.323), oklch(74.6% 0.16 232.661));
+  --color-info-soft: light-dark(oklch(97.7% 0.013 236.62), color-mix(in oklab, oklch(29.3% 0.066 243.157) 40%, transparent));
+  --color-info-soft-fg: light-dark(oklch(50% 0.134 242.749), oklch(82.8% 0.111 230.318));
+  --color-info-border: light-dark(oklch(82.8% 0.111 230.318), oklch(58.8% 0.158 241.966));
+  --color-info-ring: light-dark(oklch(74.6% 0.16 232.661), oklch(68.5% 0.169 237.323));
+
+  /* ---------- neutral (zinc) ---------- */
+  --color-neutral: light-dark(oklch(37% 0.013 285.805), oklch(92% 0.004 286.32));
+  --color-neutral-fg: light-dark(#fff, oklch(21% 0.006 285.885));
+  --color-neutral-hover: light-dark(oklch(44.2% 0.017 285.786), oklch(96.7% 0.001 286.375));
+  --color-neutral-soft: light-dark(oklch(98.5% 0 none), oklch(27.4% 0.006 286.033));
+  --color-neutral-soft-fg: light-dark(oklch(37% 0.013 285.805), oklch(92% 0.004 286.32));
+  --color-neutral-border: light-dark(oklch(87.1% 0.006 286.286), oklch(44.2% 0.017 285.786));
+  --color-neutral-ring: light-dark(oklch(70.5% 0.015 286.067), oklch(55.2% 0.016 285.938));
+
+  /* ---------- superfícies ---------- */
+  --color-surface: light-dark(#fff, oklch(20.8% 0.042 265.755));
+  --color-surface-muted: light-dark(oklch(98.4% 0.003 247.858), oklch(27.9% 0.041 260.031));
+  --color-surface-strong: light-dark(oklch(96.8% 0.007 247.896), oklch(37.2% 0.044 257.287));
+  --color-surface-raised: light-dark(#fff, oklch(37.2% 0.044 257.287));
+
+  /* ---------- texto ---------- */
+  --color-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
+  --color-fg-soft: light-dark(oklch(37.2% 0.044 257.287), oklch(92.9% 0.013 255.508));
+  --color-fg-muted: light-dark(oklch(55.4% 0.046 257.417), oklch(70.4% 0.04 256.788));
+  --color-fg-faint: light-dark(oklch(86.9% 0.022 252.894), oklch(37.2% 0.044 257.287));
+  --color-fg-placeholder: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
+
+  /* ---------- bordas, controles apagados e foco ---------- */
+  --color-border: light-dark(oklch(92.9% 0.013 255.508), oklch(37.2% 0.044 257.287));
+  --color-border-strong: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
+  --color-muted: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
+  --color-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
 
   /* Escala de tamanho (ex.: altura de controles) */
   --size-sm: 1.75rem;
   --size-md: 2.25rem;
   --size-lg: 2.75rem;
   --size-xl: 3.25rem;
-
-  /* Raio de borda */
-  --radius-ark-sm: 0.25rem;
-  --radius-ark-md: 0.5rem;
-  --radius-ark-lg: 0.75rem;
 }
 
 /*
- * Motion tokens — primitivas de animação (fora do @theme: são custom
- * properties puras, consumidas pelos presets do @tooark/core e por WAAPI).
+ * Tokens fora do @theme: custom properties puras, com o mesmo nome em
+ * qualquer build (consumidas pelos presets do @tooark/core e por WAAPI).
  */
 :root {
+  /* Raio de borda */
+  --ark-radius-sm: 0.25rem;
+  --ark-radius-md: 0.5rem;
+  --ark-radius-lg: 0.75rem;
+
   /* Durações */
   --ark-duration-instant: 0ms;
   --ark-duration-fast: 150ms;
