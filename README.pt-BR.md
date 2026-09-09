@@ -63,7 +63,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 | ------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
 | `ark-button`       | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width` e modo link (`href`).  |
 | `ark-calendar`     | web-components | Grid de mês inline: localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).               |
-| `ark-carousel`     | web-components | Arrasto por pointer com snap, autoplay, loop, dots e setas.                                                                                   |
+| `ark-carousel`     | web-components | CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.                                                                                   |
 | `ark-clock`        | web-components | Seleção de hora em colunas digitais (hora/minuto/segundo), 24h/12h, step de minutos, localizado.                                              |
 | `ark-datepicker`   | web-components | Compõe `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (padrão)/date/time, inline ou campo+popup, parse de digitação, formulário. |
 | `ark-input`        | web-components | Campo de texto padronizado: label, helper/erro com aria, sufixo via `slot="suffix"`, tamanhos, intents, `rounded`.                            |
@@ -77,7 +77,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 
 ### Atributos principais
 
-**`ark-button`** — `variant` (`solid`/`outline`/`ghost` ou um intent), `intent`, `size` (`sm`–`xl`), `rounded` (`none`/`sm`/`md`/`lg`/`xl`/`full` — com `icon-only`, `full` gera um botão circular), `loading` (spinner + `aria-busy` + clique bloqueado), `icon-only` (padding simétrico), `full-width`, `href`/`target` (renderiza `<a role="button">`; `_blank` ganha `rel="noopener noreferrer"`), `disabled`, `type`, `theme`, `color`/`text-color`.
+**`ark-button`** — o próprio host é o controle (`role="button"`, foco, teclado, participação em formulário via ElementInternals), então `aria-label`, `class` e `id` em `<ark-button>` valem diretamente e os filhos nunca são movidos. `variant` (`solid`/`outline`/`ghost` ou um intent), `intent`, `size` (`sm`–`xl`), `rounded` (`none`/`sm`/`md`/`lg`/`xl`/`full` — com `icon-only`, `full` gera um botão circular), `loading` (spinner + `aria-busy` + clique bloqueado), `icon-only` (padding simétrico), `full-width`, `href`/`target` (um `<a>` "esticado" cobre o host, recebe o foco e é nomeado pelo conteúdo do host; `_blank` ganha `rel="noopener noreferrer"`), `disabled`, `type`, `theme`, `color`/`text-color`.
 
 **`ark-calendar`** — `value` (`YYYY-MM-DD`, interpretado no fuso local), `min`/`max`, `lang` (`en`/`pt`/`es`/`custom` + `locale-json`), `theme`, `intent`, `accent-color`. Título clicável alterna dias → meses → anos. Eventos: atributo `events` (JSON) ou propriedade JS `events` com `{ date, label?, color?, intent? }`, exibidos conforme `event-display` (`dots` padrão, `count`, `list`). Emite `ark-change` com `detail: { value, date, events }`. Navegação por teclado: setas movem entre dias (cruzando meses), `Home`/`End` início/fim do mês, `PageUp`/`PageDown` trocam de mês.
 
@@ -94,6 +94,10 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 **`ark-toggle`** — `pressed`, `value`, `disabled`, `size`, `intent`, `theme`. Emite `change` com `detail: { pressed, value }`.
 
 **`ark-toggle-group`** — `value` (valor(es) selecionado(s), sincronizado com os itens), `multiple`, `disabled`, `size`, `intent`, `theme`. Emite `change` com `detail: { value }` (exclusivo) ou `detail: { values }` (múltiplo).
+
+**`ark-carousel`** — o host é o container rolável e seus slides são filhos diretos dele. `slides-per-view`, `gap` (px), `start-index`, `loop`, `autoplay`/`autoplay-delay` (pausa em hover/foco e desliga com `prefers-reduced-motion`), `show-dots`/`show-arrows` (`"false"` esconde), `drag-free`, `snap` (`mandatory`/`proximity`), `intent`, `accent-color`, `theme`. API JS: `index`, `slides`, `next()`, `prev()`. Emite `ark-slide-change` com `detail: { index }`.
+
+**`ark-toaster`** — `position` (`top-left` … `bottom-right`), `rich-colors`, `close-button` (`"false"` esconde), `max-visible`, `duration` (ms; `0` mantém o toast até ser fechado), `lang`, `theme`. Alimentado pelo serviço `toast` do `@tooark/core` (ou pelos métodos `toast()`/`dismiss()`); emite `ark-toast-action` com `detail: { id, actionId }` ao clicar num botão de ação.
 
 ---
 
@@ -117,6 +121,11 @@ import "@tooark/web-components/styles.css";
 
 registerTooarkComponents();
 ```
+
+`styles.css` é a única folha de estilo necessária: reúne os design tokens, os presets de motion e os estilos dos componentes. É seguro carregá-la ao lado do seu próprio framework CSS:
+
+- **Sem reset global.** O preflight do Tailwind não é embarcado; um reset escopado vale só dentro dos elementos `ark-*`.
+- **Utilities e variáveis prefixadas.** Toda classe dos componentes é `ark:*` (ex.: `ark:inline-flex`) e as variáveis do theme são `--ark-*` (ex.: `--ark-color-primary`), então nada colide com um Tailwind v3/v4 do seu app.
 
 ```html
 <ark-button intent="primary" size="md">Salvar</ark-button>
@@ -208,12 +217,33 @@ Os eventos mantêm o nome nativo (`@ark-change`, `@ark-event-click`, …) e entr
 
 Importe os componentes wrapper de `@tooark/angular` (`ArkDatepickerComponent`, `ArkSchedulerComponent`, …). Cada um é standalone, usa o seletor `<ark-*-wrapper>` e reemite os eventos customizados como `@Output()` (`arkChange`, `arkEventClick`, `arkSlotClick`, `arkViewChange`, `arkRangeChange`).
 
-### Design tokens com Tailwind v4
+O pacote é compilado com `ng-packagr` em partial compilation (Ivy), então funciona em builds AOT de produção. Exige Angular ≥ 21.2.19 (o mesmo piso que o workspace impõe por correções de segurança). Os custom elements são registrados sob demanda no construtor de cada wrapper e ignorados no servidor, então os wrappers são seguros para SSR.
+
+### Tema e design tokens
+
+Toda cor usada pelos componentes é um token semântico com valor claro e escuro (`light-dark()`), então o tema é CSS puro:
+
+- **Tema**: por padrão os componentes seguem o sistema (`color-scheme: light dark`); `theme="light"` ou `theme="dark"` num elemento força um lado para ele e seus descendentes. Não há JavaScript envolvido, e a troca de tema do sistema é refletida na hora.
+- **Marca**: sobrescreva os tokens no seu CSS. Dentro da folha de estilo dos componentes eles têm o prefixo `ark`:
+
+```css
+:root {
+  --ark-color-primary: light-dark(oklch(45% 0.2 264), oklch(80% 0.15 264));
+  --ark-color-primary-fg: #fff;
+  --ark-color-primary-hover: light-dark(oklch(40% 0.2 264), oklch(85% 0.15 264));
+}
+```
+
+Cada intent (`primary`, `secondary`, `success`, `warning`, `danger`, `info`, `neutral`) tem `<intent>`, `-fg`, `-hover`, `-soft`, `-soft-fg`, `-border` e `-ring`; as superfícies neutras são `surface`, `surface-muted`, `surface-strong`, `surface-raised`, `fg`, `fg-soft`, `fg-muted`, `fg-faint`, `fg-placeholder`, `border`, `border-strong`, `muted` e `ring`. A lista completa com o papel de cada um está em [tokens.css](packages/tokens/tokens.css).
+
+Para reaproveitar os mesmos tokens como utilities (`bg-primary`, `text-fg-muted`, …) no seu próprio projeto Tailwind v4, importe-os no seu entry CSS:
 
 ```css
 @import "tailwindcss";
 @import "@tooark/tokens/tokens.css";
 ```
+
+Isso é independente da folha de estilo dos componentes: eles carregam a própria cópia prefixada do theme, então a configuração do Tailwind do seu app nunca altera a aparência dos componentes.
 
 ---
 
@@ -228,6 +258,8 @@ pnpm dev:storybook    # roda o Storybook em http://localhost:6006
 pnpm clean            # remove os artefatos de build
 ```
 
+Os pacotes de biblioteca compilam com Rollup (`tsc` nos wrappers React e Vue, `ng-packagr` no Angular). `@tooark/core` e `@tooark/web-components` também compilam seu entry CSS (`src/styles/index.css`) com o Tailwind CLI para `dist/styles.css` e em seguida rodam `scripts/check-css.mjs`, um smoke test que derruba o build se a folha de estilo não foi compilada ou não contém as classes esperadas. As classes dos componentes devem ser escritas com o prefixo `ark:` (`ark:flex`, `ark:hover:bg-surface-muted`); utilities sem prefixo não são geradas. O Storybook processa o mesmo CSS pelo plugin `@tailwindcss/vite`, então não existe configuração de PostCSS no repositório.
+
 ### Testes
 
 Os testes de componente rodam com o **addon Vitest do Storybook**: cada story é executada como smoke test em um navegador Chromium real (Playwright), além de testes de interação (funções `play`) e checagens de acessibilidade (axe-core via `@storybook/addon-a11y`).
@@ -238,7 +270,7 @@ pnpm --filter storybook test                 # roda a suíte
 pnpm --filter storybook exec vitest run --project storybook --coverage
 ```
 
-Os testes também podem ser disparados pela UI do Storybook (widget "Run tests"). O CI roda a mesma suíte em cada push/PR via [GitHub Actions](.github/workflows/tests.yml).
+Os testes também podem ser disparados pela UI do Storybook (widget "Run tests"). O CI compila todos os pacotes (incluindo o smoke test do CSS) e depois roda a mesma suíte em cada push/PR via [GitHub Actions](.github/workflows/tests.yml).
 
 ### Hooks para testes e2e
 
@@ -269,7 +301,7 @@ Hooks por componente:
 
 | Componente         | Elemento principal | Partes internas                                                                                                                                                                                                                                                                                                                                                                               |
 | ------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ark-button`       | `button`           | `button-spinner`                                                                                                                                                                                                                                                                                                                                                                              |
+| `ark-button`       | `button`           | `button-spinner`, `button-link` (modo href)                                                                                                                                                                                                                                                                                                                                                                             |
 | `ark-scheduler`    | `scheduler`        | `scheduler-header`, `scheduler-today`, `scheduler-prev`, `scheduler-next`, `scheduler-title`, `scheduler-views`, `scheduler-view-{view}`, `scheduler-body`, `scheduler-scroller`, `scheduler-grid`, `scheduler-day` (+ `data-date`), `scheduler-slot` (+ `data-start`), `scheduler-event` (+ `data-event-id`), `scheduler-event-more`, `scheduler-allday`, `scheduler-now`, `scheduler-empty` |
 | `ark-switch`       | `switch`           | `switch-thumb`, `switch-label-on`, `switch-label-off`, `switch-input`                                                                                                                                                                                                                                                                                                                         |
 | `ark-toggle`       | `toggle`           | —                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -277,9 +309,11 @@ Hooks por componente:
 | `ark-calendar`     | `calendar`         | `calendar-prev`, `calendar-next`, `calendar-title`, `calendar-grid`, `calendar-day` (+ `data-date`), `calendar-months`/`calendar-month` (+ `data-month`), `calendar-years`/`calendar-year` (+ `data-year`), `calendar-event`, `calendar-event-more`, `calendar-today`, `calendar-clear`                                                                                                       |
 | `ark-clock`        | `clock`            | `clock-hours`, `clock-minutes`, `clock-seconds`, `clock-meridiem` (opções via `data-value`)                                                                                                                                                                                                                                                                                                   |
 | `ark-input`        | `input`            | `input-label`, `input-suffix`, `input-helper`/`input-error`                                                                                                                                                                                                                                                                                                                                   |
-| `ark-carousel`     | `carousel`         | `carousel-viewport`, `carousel-track`, `carousel-slide-{i}`, `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                                                |
+| `ark-carousel`     | `carousel`         | `carousel-overlay`, `carousel-slide-{i}` (nos seus próprios elementos de slide), `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                                                |
 | `ark-datepicker`   | `datepicker`       | Composição: o campo carrega os hooks do `ark-input` (testid repassado), painéis internos recebem testid `-calendar`/`-clock`; próprios: `datepicker-toggle`, `datepicker-popup`.                                                                                                                                                                                                              |
 | `ark-toaster`      | `toaster`          | `toaster-toast` (+ `data-toast-id`), `toaster-toast-title`, `toaster-toast-description`, `toaster-toast-close`, `toaster-toast-action`, `toaster-toast-cancel`                                                                                                                                                                                                                                |
+
+Em `ark-button`, `ark-toggle`, `ark-toggle-group` e `ark-carousel` o hook principal fica no próprio host, já que o host é o controle; `input-suffix` é aplicado ao seu próprio elemento `slot="suffix"` e `carousel-slide-{i}` aos seus próprios slides.
 
 Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) quando possível — os hooks são a rede de segurança para instâncias repetidas e asserções visuais.
 
@@ -289,6 +323,7 @@ Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) qu
 
 - **Nomes**: elementos `ark-*`, tipos/classes TypeScript `Ark*`, funções helper `ark*`, custom properties CSS `--ark-*`, pacotes `@tooark/*`.
 - **Camadas**: um pacote só pode depender das camadas abaixo dele. Bibliotecas de animação nunca entram em `@tooark/core` ou `@tooark/web-components`.
+- **Light DOM**: os componentes nunca movem nem envolvem os filhos que você declara. O host é o próprio controle ou container estilizado (`ark-button`, `ark-toggle`, `ark-toggle-group`, `ark-input`, `ark-carousel`), então os frameworks continuam donos dos filhos.
 - **Acessibilidade**: `prefers-reduced-motion` é respeitado globalmente pelos motion tokens; as stories rodam checagens do axe-core.
 
 ---
