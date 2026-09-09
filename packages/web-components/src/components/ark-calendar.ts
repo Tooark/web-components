@@ -1,6 +1,6 @@
-import "../styles/tailwind.css";
 import { arkEnter, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
-import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
+import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCalendarPalette = {
@@ -19,17 +19,6 @@ type ArkCalendarPalette = {
 };
 
 type ArkCalendarView = "days" | "months" | "years";
-
-// Cores dos marcadores de evento por intent (quando o evento não traz `color`).
-const EVENT_INTENT_HEX: Record<ArkIntent, string> = {
-  primary: "#0f172a",
-  secondary: "#475569",
-  success: "#059669",
-  warning: "#f59e0b",
-  danger: "#dc2626",
-  info: "#0284c7",
-  neutral: "#3f3f46"
-};
 
 /**
  * Grid de mês inline para seleção de data — equivalente ao DateCalendar do MUI.
@@ -125,10 +114,8 @@ export class ArkCalendar extends HTMLElement {
     return map;
   }
 
-  private eventColor(event: ArkCalendarEvent): string {
-    if (event.color) return event.color;
-    const intent = (event.intent || "").toLowerCase() as ArkIntent;
-    return EVENT_INTENT_HEX[intent] || EVENT_INTENT_HEX.primary;
+  private eventColors(event: ArkCalendarEvent): { bg: string; fg: string } {
+    return intentColors(event.intent, event.color);
   }
 
   /**
@@ -155,16 +142,6 @@ export class ArkCalendar extends HTMLElement {
     return resolveLocale(lang, customJson);
   }
 
-  private getTheme(): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
@@ -178,123 +155,62 @@ export class ArkCalendar extends HTMLElement {
     return accent || null;
   }
 
-  private getPalette(theme: ArkThemeSelected, intent: ArkIntent): ArkCalendarPalette {
-    const lightIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
+  private getPalette(intent: ArkIntent): ArkCalendarPalette {
+    // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
+    const byIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
       primary: {
-        selected: "bg-slate-900 font-semibold text-white hover:bg-slate-800",
-        today: "font-semibold text-slate-900 ring-1 ring-slate-300 hover:bg-slate-100",
-        footer: "text-slate-700 hover:bg-slate-100"
+        selected: "ark:bg-primary ark:font-semibold ark:text-primary-fg ark:hover:bg-primary-hover",
+        today: "ark:font-semibold ark:text-primary-soft-fg ark:ring-1 ark:ring-primary-border ark:hover:bg-primary-soft",
+        footer: "ark:text-primary-soft-fg ark:hover:bg-primary-soft"
       },
       secondary: {
-        selected: "bg-slate-700 font-semibold text-white hover:bg-slate-600",
-        today: "font-semibold text-slate-800 ring-1 ring-slate-300 hover:bg-slate-100",
-        footer: "text-slate-700 hover:bg-slate-100"
+        selected: "ark:bg-secondary ark:font-semibold ark:text-secondary-fg ark:hover:bg-secondary-hover",
+        today: "ark:font-semibold ark:text-secondary-soft-fg ark:ring-1 ark:ring-secondary-border ark:hover:bg-secondary-soft",
+        footer: "ark:text-secondary-soft-fg ark:hover:bg-secondary-soft"
       },
       success: {
-        selected: "bg-emerald-600 font-semibold text-white hover:bg-emerald-500",
-        today: "font-semibold text-emerald-700 ring-1 ring-emerald-300 hover:bg-emerald-50",
-        footer: "text-emerald-700 hover:bg-emerald-50"
+        selected: "ark:bg-success ark:font-semibold ark:text-success-fg ark:hover:bg-success-hover",
+        today: "ark:font-semibold ark:text-success-soft-fg ark:ring-1 ark:ring-success-border ark:hover:bg-success-soft",
+        footer: "ark:text-success-soft-fg ark:hover:bg-success-soft"
       },
       warning: {
-        selected: "bg-amber-500 font-semibold text-slate-900 hover:bg-amber-400",
-        today: "font-semibold text-amber-700 ring-1 ring-amber-300 hover:bg-amber-50",
-        footer: "text-amber-700 hover:bg-amber-50"
+        selected: "ark:bg-warning ark:font-semibold ark:text-warning-fg ark:hover:bg-warning-hover",
+        today: "ark:font-semibold ark:text-warning-soft-fg ark:ring-1 ark:ring-warning-border ark:hover:bg-warning-soft",
+        footer: "ark:text-warning-soft-fg ark:hover:bg-warning-soft"
       },
       danger: {
-        selected: "bg-red-600 font-semibold text-white hover:bg-red-500",
-        today: "font-semibold text-red-700 ring-1 ring-red-300 hover:bg-red-50",
-        footer: "text-red-700 hover:bg-red-50"
+        selected: "ark:bg-danger ark:font-semibold ark:text-danger-fg ark:hover:bg-danger-hover",
+        today: "ark:font-semibold ark:text-danger-soft-fg ark:ring-1 ark:ring-danger-border ark:hover:bg-danger-soft",
+        footer: "ark:text-danger-soft-fg ark:hover:bg-danger-soft"
       },
       info: {
-        selected: "bg-sky-600 font-semibold text-white hover:bg-sky-500",
-        today: "font-semibold text-sky-700 ring-1 ring-sky-300 hover:bg-sky-50",
-        footer: "text-sky-700 hover:bg-sky-50"
+        selected: "ark:bg-info ark:font-semibold ark:text-info-fg ark:hover:bg-info-hover",
+        today: "ark:font-semibold ark:text-info-soft-fg ark:ring-1 ark:ring-info-border ark:hover:bg-info-soft",
+        footer: "ark:text-info-soft-fg ark:hover:bg-info-soft"
       },
       neutral: {
-        selected: "bg-zinc-700 font-semibold text-white hover:bg-zinc-600",
-        today: "font-semibold text-zinc-700 ring-1 ring-zinc-300 hover:bg-zinc-50",
-        footer: "text-zinc-700 hover:bg-zinc-50"
+        selected: "ark:bg-neutral ark:font-semibold ark:text-neutral-fg ark:hover:bg-neutral-hover",
+        today: "ark:font-semibold ark:text-neutral-soft-fg ark:ring-1 ark:ring-neutral-border ark:hover:bg-neutral-soft",
+        footer: "ark:text-neutral-soft-fg ark:hover:bg-neutral-soft"
       }
     };
 
-    const darkIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
-      primary: {
-        selected: "bg-slate-100 font-semibold text-slate-900 hover:bg-white",
-        today: "font-semibold text-slate-100 ring-1 ring-slate-500 hover:bg-slate-800",
-        footer: "text-slate-200 hover:bg-slate-800"
-      },
-      secondary: {
-        selected: "bg-slate-300 font-semibold text-slate-900 hover:bg-slate-200",
-        today: "font-semibold text-slate-100 ring-1 ring-slate-500 hover:bg-slate-800",
-        footer: "text-slate-200 hover:bg-slate-800"
-      },
-      success: {
-        selected: "bg-emerald-500 font-semibold text-slate-950 hover:bg-emerald-400",
-        today: "font-semibold text-emerald-300 ring-1 ring-emerald-600 hover:bg-emerald-950/40",
-        footer: "text-emerald-300 hover:bg-emerald-950/40"
-      },
-      warning: {
-        selected: "bg-amber-400 font-semibold text-slate-950 hover:bg-amber-300",
-        today: "font-semibold text-amber-300 ring-1 ring-amber-600 hover:bg-amber-950/40",
-        footer: "text-amber-300 hover:bg-amber-950/40"
-      },
-      danger: {
-        selected: "bg-red-500 font-semibold text-white hover:bg-red-400",
-        today: "font-semibold text-red-300 ring-1 ring-red-600 hover:bg-red-950/40",
-        footer: "text-red-300 hover:bg-red-950/40"
-      },
-      info: {
-        selected: "bg-sky-500 font-semibold text-slate-950 hover:bg-sky-400",
-        today: "font-semibold text-sky-300 ring-1 ring-sky-600 hover:bg-sky-950/40",
-        footer: "text-sky-300 hover:bg-sky-950/40"
-      },
-      neutral: {
-        selected: "bg-zinc-200 font-semibold text-zinc-900 hover:bg-zinc-100",
-        today: "font-semibold text-zinc-200 ring-1 ring-zinc-600 hover:bg-zinc-800",
-        footer: "text-zinc-200 hover:bg-zinc-800"
-      }
-    };
-
-    const surface =
-      theme === "dark"
-        ? {
-            container: "inline-block select-none rounded-lg border border-slate-700 bg-slate-900 p-4 shadow-sm",
-            headerText: "text-sm font-semibold text-slate-100",
-            navButton: "rounded p-1 text-slate-300 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500",
-            weekdayText: "py-1 text-center text-xs font-medium text-slate-400",
-            dayBase: "h-9 w-9 rounded-md text-sm transition focus:outline-none focus:ring-2 focus:ring-slate-500",
-            dayDisabled: "cursor-not-allowed text-slate-700",
-            dayDefault: "text-slate-200 hover:bg-slate-800",
-            footerSecondary: "rounded-md px-3 py-1 text-xs font-medium text-slate-400 hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500",
-            focusRing: "focus:ring-slate-500"
-          }
-        : {
-            container: "inline-block select-none rounded-lg border border-slate-200 bg-white p-4 shadow-sm",
-            headerText: "text-sm font-semibold text-slate-900",
-            navButton: "rounded p-1 text-slate-600 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400",
-            weekdayText: "py-1 text-center text-xs font-medium text-slate-500",
-            dayBase: "h-9 w-9 rounded-md text-sm transition focus:outline-none focus:ring-2 focus:ring-slate-400",
-            dayDisabled: "cursor-not-allowed text-slate-300",
-            dayDefault: "text-slate-700 hover:bg-slate-100",
-            footerSecondary: "rounded-md px-3 py-1 text-xs font-medium text-slate-500 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400",
-            focusRing: "focus:ring-slate-400"
-          };
-
-    const intentStyles = (theme === "dark" ? darkIntent : lightIntent)[intent];
+    const focusRing = "ark:focus:ring-ring";
+    const intentStyles = byIntent[intent];
 
     return {
-      container: surface.container,
-      headerText: surface.headerText,
-      navButton: surface.navButton,
-      weekdayText: surface.weekdayText,
-      dayBase: surface.dayBase,
-      dayDisabled: surface.dayDisabled,
-      dayDefault: surface.dayDefault,
+      container: "ark:inline-block ark:select-none ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-4 ark:shadow-sm",
+      headerText: "ark:text-sm ark:font-semibold ark:text-fg",
+      navButton: `ark:rounded ark:p-1 ark:text-fg-soft ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ${focusRing}`,
+      weekdayText: "ark:py-1 ark:text-center ark:text-xs ark:font-medium ark:text-fg-muted",
+      dayBase: `ark:h-9 ark:w-9 ark:rounded-md ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${focusRing}`,
+      dayDisabled: "ark:cursor-not-allowed ark:text-fg-faint",
+      dayDefault: "ark:text-fg-soft ark:hover:bg-surface-muted",
       dayToday: intentStyles.today,
       daySelected: intentStyles.selected,
-      footerPrimary: `rounded-md px-3 py-1 text-xs font-medium focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 ${intentStyles.footer} ${surface.focusRing}`,
-      footerSecondary: surface.footerSecondary,
-      focusRing: surface.focusRing
+      footerPrimary: `ark:rounded-md ark:px-3 ark:py-1 ark:text-xs ark:font-medium ark:focus:outline-none ark:focus:ring-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50 ${intentStyles.footer} ${focusRing}`,
+      footerSecondary: `ark:rounded-md ark:px-3 ark:py-1 ark:text-xs ark:font-medium ark:text-fg-muted ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ${focusRing}`,
+      focusRing
     };
   }
 
@@ -400,7 +316,7 @@ export class ArkCalendar extends HTMLElement {
 
   private buildMonthsGrid(palette: ArkCalendarPalette, loc: ArkDatepickerLocale): HTMLDivElement {
     const grid = document.createElement("div");
-    grid.className = "grid grid-cols-3 gap-1";
+    grid.className = "ark:grid ark:grid-cols-3 ark:gap-1";
     applyTestHooks(this, "calendar", grid, "months");
 
     const year = this.viewDate.getFullYear();
@@ -417,7 +333,7 @@ export class ArkCalendar extends HTMLElement {
       const isSelected = this.selectedDate !== null && this.selectedDate.getFullYear() === year && this.selectedDate.getMonth() === m;
       const isCurrent = now.getFullYear() === year && now.getMonth() === m;
       const state = isSelected ? palette.daySelected : isCurrent ? palette.dayToday : palette.dayDefault;
-      button.className = `rounded-md px-2 py-3 text-sm transition focus:outline-none focus:ring-2 ${palette.focusRing} ${state}`;
+      button.className = `ark:rounded-md ark:px-2 ark:py-3 ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing} ${state}`;
 
       button.addEventListener("click", () => {
         this.viewDate = new Date(year, m, 1);
@@ -433,7 +349,7 @@ export class ArkCalendar extends HTMLElement {
 
   private buildYearsGrid(palette: ArkCalendarPalette): HTMLDivElement {
     const grid = document.createElement("div");
-    grid.className = "grid grid-cols-3 gap-1";
+    grid.className = "ark:grid ark:grid-cols-3 ark:gap-1";
     applyTestHooks(this, "calendar", grid, "years");
 
     const start = this.yearsBlockStart();
@@ -450,7 +366,7 @@ export class ArkCalendar extends HTMLElement {
       const isSelected = this.selectedDate !== null && this.selectedDate.getFullYear() === year;
       const isCurrent = now.getFullYear() === year;
       const state = isSelected ? palette.daySelected : isCurrent ? palette.dayToday : palette.dayDefault;
-      button.className = `rounded-md px-2 py-3 text-sm transition focus:outline-none focus:ring-2 ${palette.focusRing} ${state}`;
+      button.className = `ark:rounded-md ark:px-2 ark:py-3 ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing} ${state}`;
 
       button.addEventListener("click", () => {
         this.viewDate = new Date(year, this.viewDate.getMonth(), 1);
@@ -467,10 +383,9 @@ export class ArkCalendar extends HTMLElement {
   private build(): void {
     if (!this.locale) this.locale = this.getLocale();
     const loc = this.locale;
-    const theme = this.getTheme();
     const intent = this.getIntent();
     const accentColor = this.getAccentColor();
-    const palette = this.getPalette(theme, intent);
+    const palette = this.getPalette(intent);
     const eventDisplay = this.getEventDisplay();
     const eventsMap = this.eventsByDay();
 
@@ -492,12 +407,12 @@ export class ArkCalendar extends HTMLElement {
 
     const container = document.createElement("div");
     container.setAttribute("part", "container");
-    container.className = eventDisplay === "list" ? `${palette.container} w-full min-w-[30rem]` : palette.container;
+    container.className = eventDisplay === "list" ? `${palette.container} ark:w-full ark:min-w-[30rem]` : palette.container;
     applyTestHooks(this, "calendar", container);
 
     // --- Header: prev / título (alterna view) / next ---
     const header = document.createElement("div");
-    header.className = "mb-3 flex items-center justify-between";
+    header.className = "ark:mb-3 ark:flex ark:items-center ark:justify-between";
 
     const prevBtn = document.createElement("button");
     prevBtn.type = "button";
@@ -538,7 +453,7 @@ export class ArkCalendar extends HTMLElement {
     // Título clicável: dias → meses → anos → dias.
     const title = document.createElement("button");
     title.type = "button";
-    title.className = `${palette.headerText} rounded px-2 py-0.5 transition hover:opacity-75 focus:outline-none focus:ring-2 ${palette.focusRing}`;
+    title.className = `${palette.headerText} ark:rounded ark:px-2 ark:py-0.5 ark:transition ark:hover:opacity-75 ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing}`;
     applyTestHooks(this, "calendar", title, "title");
     title.setAttribute("aria-live", "polite");
     if (this.view === "days") {
@@ -576,7 +491,7 @@ export class ArkCalendar extends HTMLElement {
 
     // --- Weekday header ---
     const weekRow = document.createElement("div");
-    weekRow.className = "mb-1 grid grid-cols-7 gap-0";
+    weekRow.className = "ark:mb-1 ark:grid ark:grid-cols-7 ark:gap-0";
 
     const fdow = loc.firstDayOfWeek;
     for (let i = 0; i < 7; i++) {
@@ -602,7 +517,7 @@ export class ArkCalendar extends HTMLElement {
     const rows = Math.ceil(totalCells / 7);
 
     const grid = document.createElement("div");
-    grid.className = eventDisplay === "list" ? "grid grid-cols-7 gap-1" : "grid grid-cols-7 gap-0";
+    grid.className = eventDisplay === "list" ? "ark:grid ark:grid-cols-7 ark:gap-1" : "ark:grid ark:grid-cols-7 ark:gap-0";
     applyTestHooks(this, "calendar", grid, "grid");
     grid.addEventListener("keydown", this.handleGridKeydown);
 
@@ -620,7 +535,7 @@ export class ArkCalendar extends HTMLElement {
 
         if (dayIndex < 1 || dayIndex > lastOfMonth.getDate()) {
           const filler = document.createElement("div");
-          filler.className = eventDisplay === "list" ? "min-h-16 w-full" : "h-9 w-9";
+          filler.className = eventDisplay === "list" ? "ark:min-h-16 ark:w-full" : "ark:h-9 ark:w-9";
           filler.setAttribute("aria-hidden", "true");
           grid.appendChild(filler);
           continue;
@@ -645,41 +560,43 @@ export class ArkCalendar extends HTMLElement {
               : palette.dayDefault;
 
         if (eventDisplay === "list") {
-          cell.className = `relative flex min-h-16 w-full flex-col items-stretch gap-0.5 rounded-md p-1 text-left text-xs transition focus:outline-none focus:ring-2 ${palette.focusRing} ${stateCls}`;
+          cell.className = `ark:relative ark:flex ark:min-h-16 ark:w-full ark:flex-col ark:items-stretch ark:gap-0.5 ark:rounded-md ark:p-1 ark:text-left ark:text-xs ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing} ${stateCls}`;
 
           const number = document.createElement("span");
-          number.className = "px-0.5 font-medium";
+          number.className = "ark:px-0.5 ark:font-medium";
           number.textContent = String(dayIndex);
           cell.appendChild(number);
 
           const maxChips = 2;
           for (const event of dayEvents.slice(0, maxChips)) {
             const chip = document.createElement("span");
-            chip.className = "truncate rounded px-1 py-0.5 text-[10px] font-medium text-white";
-            chip.style.backgroundColor = this.eventColor(event);
+            chip.className = "ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-[10px] ark:font-medium";
+            const chipColors = this.eventColors(event);
+            chip.style.backgroundColor = chipColors.bg;
+            chip.style.color = chipColors.fg;
             chip.textContent = event.label || "•";
             applyTestHooks(this, "calendar", chip, "event");
             cell.appendChild(chip);
           }
           if (dayEvents.length > maxChips) {
             const more = document.createElement("span");
-            more.className = `px-0.5 text-[10px] ${theme === "dark" ? "text-slate-400" : "text-slate-500"}`;
+            more.className = "ark:px-0.5 ark:text-[10px] ark:text-fg-muted";
             more.textContent = `+${dayEvents.length - maxChips}`;
             applyTestHooks(this, "calendar", more, "event-more");
             cell.appendChild(more);
           }
         } else {
-          cell.className = `relative ${palette.dayBase} ${stateCls}`;
+          cell.className = `ark:relative ${palette.dayBase} ${stateCls}`;
           cell.textContent = String(dayIndex);
 
           if (dayEvents.length > 0 && eventDisplay === "dots") {
             const dots = document.createElement("span");
-            dots.className = "pointer-events-none absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-0.5";
+            dots.className = "ark:pointer-events-none ark:absolute ark:bottom-0.5 ark:left-1/2 ark:flex ark:-translate-x-1/2 ark:gap-0.5";
             applyTestHooks(this, "calendar", dots, "event");
             for (const event of dayEvents.slice(0, 3)) {
               const dot = document.createElement("span");
-              dot.className = "h-1 w-1 rounded-full";
-              dot.style.backgroundColor = this.eventColor(event);
+              dot.className = "ark:h-1 ark:w-1 ark:rounded-full";
+              dot.style.backgroundColor = this.eventColors(event).bg;
               dots.appendChild(dot);
             }
             cell.appendChild(dots);
@@ -687,8 +604,10 @@ export class ArkCalendar extends HTMLElement {
 
           if (dayEvents.length > 0 && eventDisplay === "count") {
             const badge = document.createElement("span");
-            badge.className = "pointer-events-none absolute -right-1 -top-1 flex h-3.5 min-w-3.5 items-center justify-center rounded-full px-0.5 text-[9px] font-semibold text-white";
-            badge.style.backgroundColor = this.eventColor(dayEvents[0]);
+            badge.className = "ark:pointer-events-none ark:absolute ark:-right-1 ark:-top-1 ark:flex ark:h-3.5 ark:min-w-3.5 ark:items-center ark:justify-center ark:rounded-full ark:px-0.5 ark:text-[9px] ark:font-semibold";
+            const badgeColors = this.eventColors(dayEvents[0]);
+            badge.style.backgroundColor = badgeColors.bg;
+            badge.style.color = badgeColors.fg;
             badge.textContent = String(dayEvents.length);
             applyTestHooks(this, "calendar", badge, "event");
             cell.appendChild(badge);
@@ -729,7 +648,7 @@ export class ArkCalendar extends HTMLElement {
 
     // --- Footer: Today / Clear ---
     const footer = document.createElement("div");
-    footer.className = "mt-3 flex items-center justify-between gap-2";
+    footer.className = "ark:mt-3 ark:flex ark:items-center ark:justify-between ark:gap-2";
 
     const todayBtn = document.createElement("button");
     todayBtn.type = "button";

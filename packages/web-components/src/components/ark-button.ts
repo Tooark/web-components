@@ -1,5 +1,4 @@
-import "../styles/tailwind.css";
-import type { ArkButtonType, ArkRounded, ArkSize, ArkStyleVariant, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkButtonType, ArkRounded, ArkSize, ArkStyleVariant, ArkIntent } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkButtonPalette = {
@@ -9,13 +8,30 @@ type ArkButtonPalette = {
   ghost: string;
 };
 
-const SPINNER_SVG = "<svg class=\"h-[1em] w-[1em] animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle class=\"opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z\"></path></svg>";
+const SPINNER_SVG = "<svg class=\"ark:h-[1em] ark:w-[1em] ark:animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle class=\"ark:opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"ark:opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z\"></path></svg>";
 
+let arkButtonIdCounter = 0;
+
+/**
+ * Botão da família Ark.
+ *
+ * O PRÓPRIO host é o controle: recebe as classes, `role="button"`, foco,
+ * teclado (Enter/Espaço) e participa de formulários via ElementInternals
+ * (`type="submit"`/`"reset"`). Nenhum filho do usuário é movido ou envolvido,
+ * então frameworks que gerenciam os filhos (React, Vue, Angular) continuam
+ * donos deles. Com `href`, um `<a>` "esticado" cobre o host, recebe o foco e
+ * é nomeado pelo conteúdo do host (`aria-labelledby`).
+ */
 export class ArkButton extends HTMLElement {
   static readonly tagName = "ark-button";
+  static readonly formAssociated = true;
 
-  private controlEl: HTMLButtonElement | HTMLAnchorElement | null = null;
+  private readonly internals: ElementInternals | null;
   private spinnerEl: HTMLSpanElement | null = null;
+  private anchorEl: HTMLAnchorElement | null = null;
+  private ownClasses: string[] = [];
+  private syncingClass = false;
+  private formDisabled = false;
 
   static get observedAttributes (): string[] {
     return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class", "rounded", "loading", "icon-only", "full-width", "href", "target", "testid"];
@@ -23,61 +39,111 @@ export class ArkButton extends HTMLElement {
 
   constructor () {
     super();
-    // Um botão desabilitado não dispara click, mas o host ainda dispararia:
-    // bloqueia na captura para listeners externos em <ark-button> não vazarem.
+    this.internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
+
+    // Desabilitado/carregando: bloqueia o click na captura para listeners
+    // externos no host não vazarem (o host não tem "disabled" nativo).
     this.addEventListener(
       "click",
       (event) => {
-        if (this.hasAttribute("disabled") || this.hasAttribute("loading")) {
+        if (this.isDisabled()) {
           event.preventDefault();
           event.stopImmediatePropagation();
         }
       },
       { capture: true }
     );
+    this.addEventListener("click", this.handleClick);
+    this.addEventListener("keydown", this.handleKeydown);
+    this.addEventListener("keyup", this.handleKeyup);
   }
 
   connectedCallback (): void {
-    if (!this.controlEl) {
-      this.render();
-    }
-
-    this.syncDisabled();
-    this.syncType();
     this.updateAppearance();
   }
 
   attributeChangedCallback (name: string): void {
-    if (!this.controlEl) return;
-
-    if (name === "href" || name === "target") {
-      this.syncControlTag();
+    if (name === "class") {
+      // Um framework pode reescrever o atributo class inteiro (React/Vue
+      // setam `class` do zero): reaplica só as classes do próprio componente.
+      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
     }
-
-    if (name === "disabled" || name === "loading") {
-      this.syncDisabled();
-      this.updateAppearance();
-      return;
-    }
-
-    if (name === "type") {
-      this.syncType();
-      return;
-    }
-
+    if (!this.isConnected) return;
     this.updateAppearance();
   }
 
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
+  /** Chamado pelo navegador quando um <fieldset disabled> ancestral muda. */
+  formDisabledCallback (disabled: boolean): void {
+    this.formDisabled = disabled;
+    this.updateAppearance();
   }
+
+  get disabled (): boolean {
+    return this.hasAttribute("disabled");
+  }
+
+  set disabled (value: boolean) {
+    this.toggleAttribute("disabled", Boolean(value));
+  }
+
+  get loading (): boolean {
+    return this.hasAttribute("loading");
+  }
+
+  set loading (value: boolean) {
+    this.toggleAttribute("loading", Boolean(value));
+  }
+
+  get type (): ArkButtonType {
+    const type = this.getAttribute("type");
+    return type === "submit" || type === "reset" ? type : "button";
+  }
+
+  /** Formulário ao qual o botão pertence (via ElementInternals). */
+  get form (): HTMLFormElement | null {
+    return this.internals?.form ?? this.closest("form");
+  }
+
+  // --- Interação ---
+
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (this.anchorEl || this.type === "button") return;
+    const form = this.form;
+    if (!form) return;
+    // Submissão como ação padrão: só depois de todos os listeners (inclusive
+    // os delegados na raiz, como os do React) terem tido a chance de
+    // preventDefault(), igual a um <button type="submit"> nativo.
+    window.setTimeout(() => {
+      if (event.defaultPrevented) return;
+      if (this.type === "reset") {
+        form.reset();
+      } else {
+        form.requestSubmit();
+      }
+    }, 0);
+  };
+
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (this.anchorEl || event.target !== this || this.isDisabled()) return;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      this.click();
+    } else if (event.key === " ") {
+      // Evita o scroll da página; o click acontece no keyup, como no nativo.
+      event.preventDefault();
+    }
+  };
+
+  private readonly handleKeyup = (event: KeyboardEvent): void => {
+    if (this.anchorEl || event.target !== this || this.isDisabled()) return;
+    if (event.key === " ") {
+      event.preventDefault();
+      this.click();
+    }
+  };
+
+  // --- Estilo ---
 
   private normalizeIntent (value: string | null): ArkIntent {
     const intent = (value || "").toLowerCase();
@@ -111,139 +177,74 @@ export class ArkButton extends HTMLElement {
     };
   }
 
-  private getPalette (theme: ArkThemeSelected, intent: ArkIntent): ArkButtonPalette {
-    const light: Record<ArkIntent, ArkButtonPalette> = {
+  private getPalette (intent: ArkIntent): ArkButtonPalette {
+    // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
+    const palettes: Record<ArkIntent, ArkButtonPalette> = {
       primary: {
-        focusRing: "focus:ring-slate-400",
-        solid: "bg-slate-900 text-white border-transparent hover:bg-slate-800",
-        outline: "bg-transparent text-slate-900 border-slate-300 hover:bg-slate-50",
-        ghost: "bg-transparent text-slate-900 border-transparent hover:bg-slate-50"
+        focusRing: "ark:ring-primary-ring",
+        solid: "ark:bg-primary ark:text-primary-fg ark:border-transparent ark:hover:bg-primary-hover",
+        outline: "ark:bg-transparent ark:text-primary-soft-fg ark:border-primary-border ark:hover:bg-primary-soft",
+        ghost: "ark:bg-transparent ark:text-primary-soft-fg ark:border-transparent ark:hover:bg-primary-soft"
       },
       secondary: {
-        focusRing: "focus:ring-slate-400",
-        solid: "bg-white text-slate-900 border-slate-300 hover:bg-slate-50",
-        outline: "bg-transparent text-slate-900 border-slate-300 hover:bg-slate-50",
-        ghost: "bg-transparent text-slate-700 border-transparent hover:bg-slate-50"
+        focusRing: "ark:ring-secondary-ring",
+        // "Solid" secundário é a superfície com borda (botão neutro de apoio).
+        solid: "ark:bg-surface ark:text-fg ark:border-border-strong ark:hover:bg-surface-muted",
+        outline: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-secondary-border ark:hover:bg-secondary-soft",
+        ghost: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-transparent ark:hover:bg-secondary-soft"
       },
       success: {
-        focusRing: "focus:ring-emerald-400",
-        solid: "bg-emerald-600 text-white border-transparent hover:bg-emerald-500",
-        outline: "bg-transparent text-emerald-700 border-emerald-300 hover:bg-emerald-50",
-        ghost: "bg-transparent text-emerald-700 border-transparent hover:bg-emerald-50"
+        focusRing: "ark:ring-success-ring",
+        solid: "ark:bg-success ark:text-success-fg ark:border-transparent ark:hover:bg-success-hover",
+        outline: "ark:bg-transparent ark:text-success-soft-fg ark:border-success-border ark:hover:bg-success-soft",
+        ghost: "ark:bg-transparent ark:text-success-soft-fg ark:border-transparent ark:hover:bg-success-soft"
       },
       warning: {
-        focusRing: "focus:ring-amber-400",
-        solid: "bg-amber-500 text-slate-900 border-transparent hover:bg-amber-400",
-        outline: "bg-transparent text-amber-700 border-amber-300 hover:bg-amber-50",
-        ghost: "bg-transparent text-amber-700 border-transparent hover:bg-amber-50"
+        focusRing: "ark:ring-warning-ring",
+        solid: "ark:bg-warning ark:text-warning-fg ark:border-transparent ark:hover:bg-warning-hover",
+        outline: "ark:bg-transparent ark:text-warning-soft-fg ark:border-warning-border ark:hover:bg-warning-soft",
+        ghost: "ark:bg-transparent ark:text-warning-soft-fg ark:border-transparent ark:hover:bg-warning-soft"
       },
       danger: {
-        focusRing: "focus:ring-red-400",
-        solid: "bg-red-600 text-white border-transparent hover:bg-red-500",
-        outline: "bg-transparent text-red-700 border-red-300 hover:bg-red-50",
-        ghost: "bg-transparent text-red-700 border-transparent hover:bg-red-50"
+        focusRing: "ark:ring-danger-ring",
+        solid: "ark:bg-danger ark:text-danger-fg ark:border-transparent ark:hover:bg-danger-hover",
+        outline: "ark:bg-transparent ark:text-danger-soft-fg ark:border-danger-border ark:hover:bg-danger-soft",
+        ghost: "ark:bg-transparent ark:text-danger-soft-fg ark:border-transparent ark:hover:bg-danger-soft"
       },
       info: {
-        focusRing: "focus:ring-sky-400",
-        solid: "bg-sky-600 text-white border-transparent hover:bg-sky-500",
-        outline: "bg-transparent text-sky-700 border-sky-300 hover:bg-sky-50",
-        ghost: "bg-transparent text-sky-700 border-transparent hover:bg-sky-50"
+        focusRing: "ark:ring-info-ring",
+        solid: "ark:bg-info ark:text-info-fg ark:border-transparent ark:hover:bg-info-hover",
+        outline: "ark:bg-transparent ark:text-info-soft-fg ark:border-info-border ark:hover:bg-info-soft",
+        ghost: "ark:bg-transparent ark:text-info-soft-fg ark:border-transparent ark:hover:bg-info-soft"
       },
       neutral: {
-        focusRing: "focus:ring-zinc-400",
-        solid: "bg-zinc-700 text-white border-transparent hover:bg-zinc-600",
-        outline: "bg-transparent text-zinc-700 border-zinc-300 hover:bg-zinc-50",
-        ghost: "bg-transparent text-zinc-700 border-transparent hover:bg-zinc-50"
+        focusRing: "ark:ring-neutral-ring",
+        solid: "ark:bg-neutral ark:text-neutral-fg ark:border-transparent ark:hover:bg-neutral-hover",
+        outline: "ark:bg-transparent ark:text-neutral-soft-fg ark:border-neutral-border ark:hover:bg-neutral-soft",
+        ghost: "ark:bg-transparent ark:text-neutral-soft-fg ark:border-transparent ark:hover:bg-neutral-soft"
       }
     };
 
-    const dark: Record<ArkIntent, ArkButtonPalette> = {
-      primary: {
-        focusRing: "focus:ring-slate-500",
-        solid: "bg-slate-100 text-slate-900 border-transparent hover:bg-white",
-        outline: "bg-transparent text-slate-100 border-slate-600 hover:bg-slate-800",
-        ghost: "bg-transparent text-slate-100 border-transparent hover:bg-slate-800"
-      },
-      secondary: {
-        focusRing: "focus:ring-slate-500",
-        solid: "bg-slate-800 text-slate-100 border-slate-600 hover:bg-slate-700",
-        outline: "bg-transparent text-slate-100 border-slate-600 hover:bg-slate-800",
-        ghost: "bg-transparent text-slate-200 border-transparent hover:bg-slate-800"
-      },
-      success: {
-        focusRing: "focus:ring-emerald-500",
-        solid: "bg-emerald-500 text-slate-950 border-transparent hover:bg-emerald-400",
-        outline: "bg-transparent text-emerald-300 border-emerald-600 hover:bg-emerald-950/40",
-        ghost: "bg-transparent text-emerald-300 border-transparent hover:bg-emerald-950/40"
-      },
-      warning: {
-        focusRing: "focus:ring-amber-500",
-        solid: "bg-amber-400 text-slate-950 border-transparent hover:bg-amber-300",
-        outline: "bg-transparent text-amber-300 border-amber-600 hover:bg-amber-950/40",
-        ghost: "bg-transparent text-amber-300 border-transparent hover:bg-amber-950/40"
-      },
-      danger: {
-        focusRing: "focus:ring-red-500",
-        solid: "bg-red-500 text-white border-transparent hover:bg-red-400",
-        outline: "bg-transparent text-red-300 border-red-600 hover:bg-red-950/40",
-        ghost: "bg-transparent text-red-300 border-transparent hover:bg-red-950/40"
-      },
-      info: {
-        focusRing: "focus:ring-sky-500",
-        solid: "bg-sky-500 text-slate-950 border-transparent hover:bg-sky-400",
-        outline: "bg-transparent text-sky-300 border-sky-600 hover:bg-sky-950/40",
-        ghost: "bg-transparent text-sky-300 border-transparent hover:bg-sky-950/40"
-      },
-      neutral: {
-        focusRing: "focus:ring-zinc-500",
-        solid: "bg-zinc-200 text-zinc-900 border-transparent hover:bg-zinc-100",
-        outline: "bg-transparent text-zinc-200 border-zinc-600 hover:bg-zinc-800",
-        ghost: "bg-transparent text-zinc-200 border-transparent hover:bg-zinc-800"
-      }
-    };
-
-    return (theme === "dark" ? dark : light)[intent];
+    return palettes[intent];
   }
 
   private isDisabled (): boolean {
-    return this.hasAttribute("disabled") || this.hasAttribute("loading");
+    return this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("loading");
   }
 
-  private syncDisabled (): void {
-    if (!this.controlEl) return;
-
-    const disabled = this.isDisabled();
-    this.controlEl.setAttribute("aria-busy", this.hasAttribute("loading") ? "true" : "false");
-
-    if (this.controlEl instanceof HTMLButtonElement) {
-      this.controlEl.disabled = disabled;
-      return;
-    }
-
-    // Âncora não tem "disabled": remove o href e sinaliza via aria.
-    if (disabled) {
-      this.controlEl.removeAttribute("href");
-      this.controlEl.setAttribute("aria-disabled", "true");
-      this.controlEl.setAttribute("tabindex", "-1");
-    } else {
-      this.controlEl.setAttribute("href", this.getAttribute("href") || "");
-      this.controlEl.removeAttribute("aria-disabled");
-      this.controlEl.removeAttribute("tabindex");
-    }
-  }
-
-  private syncType (): void {
-    if (!(this.controlEl instanceof HTMLButtonElement)) return;
-    const type = (this.getAttribute("type") || "button") as ArkButtonType;
-    this.controlEl.type = type === "submit" || type === "reset" ? type : "button";
-  }
-
-  private computeClasses (): string {
-    const base = "inline-flex items-center justify-center gap-2 border font-semibold transition focus:outline-none focus:ring-2 disabled:cursor-not-allowed disabled:opacity-50 aria-disabled:cursor-not-allowed aria-disabled:opacity-50";
+  private computeClasses (): string[] {
+    const isLink = this.anchorEl !== null;
+    const base = [
+      this.hasAttribute("full-width") ? "ark:flex ark:w-full" : "ark:inline-flex",
+      "ark:relative ark:items-center ark:justify-center ark:gap-2 ark:border ark:font-semibold ark:transition ark:select-none ark:cursor-pointer ark:outline-none ark:ring-offset-0",
+      // Botão: anel no próprio host quando focado via teclado. Link: o foco
+      // está no <a> esticado, então o anel vem de focus-within.
+      isLink ? "ark:focus-within:ring-2" : "ark:focus-visible:ring-2",
+      "ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none"
+    ].join(" ");
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
-    const theme = this.getTheme();
     const { styleVariant, intent } = this.resolveVariantAndIntent();
-    const palette = this.getPalette(theme, intent);
+    const palette = this.getPalette(intent);
 
     const variantClasses: Record<ArkStyleVariant, string> = {
       solid: palette.solid,
@@ -252,48 +253,56 @@ export class ArkButton extends HTMLElement {
     };
 
     const sizes: Record<ArkSize, string> = {
-      sm: "px-3 py-1.5 text-xs",
-      md: "px-4 py-2 text-sm",
-      lg: "px-5 py-3 text-base",
-      xl: "px-6 py-4 text-lg"
+      sm: "ark:px-3 ark:py-1.5 ark:text-xs",
+      md: "ark:px-4 ark:py-2 ark:text-sm",
+      lg: "ark:px-5 ark:py-3 ark:text-base",
+      xl: "ark:px-6 ark:py-4 ark:text-lg"
     };
 
     // Padding simétrico para botão só de ícone (quadrado; vira círculo com rounded="full").
     const iconOnlySizes: Record<ArkSize, string> = {
-      sm: "p-1.5 text-xs",
-      md: "p-2 text-sm",
-      lg: "p-3 text-base",
-      xl: "p-4 text-lg"
+      sm: "ark:p-1.5 ark:text-xs",
+      md: "ark:p-2 ark:text-sm",
+      lg: "ark:p-3 ark:text-base",
+      xl: "ark:p-4 ark:text-lg"
     };
 
     const roundedMap: Record<ArkRounded, string> = {
-      none: "rounded-none",
-      sm: "rounded-sm",
-      md: "rounded-md",
-      lg: "rounded-lg",
-      xl: "rounded-xl",
-      full: "rounded-full"
+      none: "ark:rounded-none",
+      sm: "ark:rounded-sm",
+      md: "ark:rounded-md",
+      lg: "ark:rounded-lg",
+      xl: "ark:rounded-xl",
+      full: "ark:rounded-full"
     };
     const rounded = (this.getAttribute("rounded") || "md").toLowerCase() as ArkRounded;
 
     const iconOnly = this.hasAttribute("icon-only");
     const sizeClasses = iconOnly ? iconOnlySizes[size] ?? iconOnlySizes.md : sizes[size] ?? sizes.md;
-    const fullWidth = this.hasAttribute("full-width") ? "w-full" : "";
 
-    const custom = this.getAttribute("class") || "";
-
-    return [base, roundedMap[rounded] ?? roundedMap.md, palette.focusRing, variantClasses[styleVariant], sizeClasses, fullWidth, custom]
+    return [base, roundedMap[rounded] ?? roundedMap.md, palette.focusRing, variantClasses[styleVariant], sizeClasses]
       .join(" ")
-      .trim()
-      .replace(/\s+/g, " ");
+      .split(/\s+/)
+      .filter(Boolean);
+  }
+
+  // Troca as classes do componente no host sem tocar nas classes do usuário.
+  private applyOwnClasses (next: string[]): void {
+    this.syncingClass = true;
+    for (const cls of this.ownClasses) {
+      if (!next.includes(cls)) this.classList.remove(cls);
+    }
+    for (const cls of next) {
+      if (!this.classList.contains(cls)) this.classList.add(cls);
+    }
+    this.ownClasses = next;
+    this.syncingClass = false;
   }
 
   private applyCustomColors (): void {
-    if (!this.controlEl) return;
-
-    this.controlEl.style.backgroundColor = "";
-    this.controlEl.style.borderColor = "";
-    this.controlEl.style.color = "";
+    this.style.backgroundColor = "";
+    this.style.borderColor = "";
+    this.style.color = "";
 
     const color = this.getAttribute("color")?.trim();
     if (!color) return;
@@ -302,28 +311,26 @@ export class ArkButton extends HTMLElement {
     const { styleVariant } = this.resolveVariantAndIntent();
 
     if (styleVariant === "solid") {
-      this.controlEl.style.backgroundColor = color;
-      this.controlEl.style.borderColor = color;
-      this.controlEl.style.color = textColor || "#ffffff";
+      this.style.backgroundColor = color;
+      this.style.borderColor = color;
+      this.style.color = textColor || "#ffffff";
       return;
     }
 
-    this.controlEl.style.borderColor = color;
-    this.controlEl.style.color = textColor || color;
+    this.style.borderColor = color;
+    this.style.color = textColor || color;
   }
 
   private syncLoading (): void {
-    if (!this.controlEl) return;
-
     const loading = this.hasAttribute("loading");
 
     if (loading && !this.spinnerEl) {
       const spinner = document.createElement("span");
-      spinner.setAttribute("part", "spinner");
       spinner.setAttribute("aria-hidden", "true");
-      spinner.className = "inline-flex items-center";
+      spinner.className = "ark:inline-flex ark:items-center";
       spinner.innerHTML = SPINNER_SVG;
-      this.controlEl.prepend(spinner);
+      // Vai na frente do conteúdo do usuário, sem tocar nele.
+      this.prepend(spinner);
       this.spinnerEl = spinner;
       return;
     }
@@ -334,91 +341,94 @@ export class ArkButton extends HTMLElement {
     }
   }
 
-  private createControl (): HTMLButtonElement | HTMLAnchorElement {
-    const href = this.getAttribute("href");
-
-    if (href !== null) {
-      const anchor = document.createElement("a");
-      anchor.setAttribute("part", "button");
-      anchor.setAttribute("role", "button");
-      anchor.href = href;
-      const target = this.getAttribute("target");
-      if (target) {
-        anchor.target = target;
-        if (target === "_blank") {
-          anchor.rel = "noopener noreferrer";
-        }
-      }
-      return anchor;
-    }
-
-    const button = document.createElement("button");
-    button.setAttribute("part", "button");
-    return button;
+  private ensureId (): string {
+    if (!this.id) this.id = `ark-button-${++arkButtonIdCounter}`;
+    return this.id;
   }
 
-  private render (): void {
-    const control = this.createControl();
-    control.className = this.computeClasses();
-
-    while (this.firstChild) {
-      control.appendChild(this.firstChild);
-    }
-
-    this.appendChild(control);
-    this.controlEl = control;
-    this.updateAppearance();
-  }
-
-  // Troca <button> <-> <a> quando href entra/sai, preservando o conteúdo.
-  private syncControlTag (): void {
-    if (!this.controlEl) return;
-
+  // Modo link: cria/remove o <a> esticado conforme `href` entra/sai.
+  private syncAnchor (): void {
     const wantsAnchor = this.getAttribute("href") !== null;
-    const isAnchor = this.controlEl instanceof HTMLAnchorElement;
 
-    if (wantsAnchor !== isAnchor) {
-      if (this.spinnerEl) {
-        this.spinnerEl.remove();
-        this.spinnerEl = null;
-      }
-
-      const previous = this.controlEl;
-      const next = this.createControl();
-      while (previous.firstChild) {
-        next.appendChild(previous.firstChild);
-      }
-      previous.remove();
-      this.appendChild(next);
-      this.controlEl = next;
-      this.syncType();
-    } else if (isAnchor) {
-      const target = this.getAttribute("target");
-      if (target) {
-        this.controlEl.setAttribute("target", target);
-        if (target === "_blank") {
-          this.controlEl.setAttribute("rel", "noopener noreferrer");
-        }
-      } else {
-        this.controlEl.removeAttribute("target");
-        this.controlEl.removeAttribute("rel");
-      }
+    if (wantsAnchor && !this.anchorEl) {
+      const anchor = document.createElement("a");
+      anchor.className = "ark:absolute ark:inset-0 ark:rounded-[inherit] ark:outline-none";
+      this.appendChild(anchor);
+      this.anchorEl = anchor;
+    } else if (!wantsAnchor && this.anchorEl) {
+      this.anchorEl.remove();
+      this.anchorEl = null;
     }
 
-    this.syncDisabled();
-    this.updateAppearance();
+    if (!this.anchorEl) return;
+
+    const anchor = this.anchorEl;
+    const disabled = this.isDisabled();
+    anchor.setAttribute("aria-labelledby", this.ensureId());
+
+    const target = this.getAttribute("target");
+    if (target) {
+      anchor.target = target;
+      if (target === "_blank") {
+        anchor.rel = "noopener noreferrer";
+      } else {
+        anchor.removeAttribute("rel");
+      }
+    } else {
+      anchor.removeAttribute("target");
+      anchor.removeAttribute("rel");
+    }
+
+    // Âncora não tem "disabled": remove o href e sinaliza via aria.
+    if (disabled) {
+      anchor.removeAttribute("href");
+      anchor.setAttribute("aria-disabled", "true");
+      anchor.setAttribute("tabindex", "-1");
+    } else {
+      anchor.setAttribute("href", this.getAttribute("href") || "");
+      anchor.removeAttribute("aria-disabled");
+      anchor.removeAttribute("tabindex");
+    }
+  }
+
+  private syncHostSemantics (): void {
+    const disabled = this.isDisabled();
+
+    if (this.anchorEl) {
+      // O <a> é o controle acessível; o host vira só o "corpo" visual.
+      this.removeAttribute("role");
+      this.removeAttribute("tabindex");
+    } else {
+      this.setAttribute("role", "button");
+      this.setAttribute("tabindex", disabled ? "-1" : "0");
+    }
+
+    if (disabled) {
+      this.setAttribute("aria-disabled", "true");
+    } else {
+      this.removeAttribute("aria-disabled");
+    }
+
+    if (this.hasAttribute("loading")) {
+      this.setAttribute("aria-busy", "true");
+    } else {
+      this.removeAttribute("aria-busy");
+    }
   }
 
   private updateAppearance (): void {
-    if (!this.controlEl) return;
-    this.controlEl.className = this.computeClasses();
-    this.style.display = this.hasAttribute("full-width") ? "block" : "";
+    this.syncAnchor();
+    this.syncHostSemantics();
+    this.applyOwnClasses(this.computeClasses());
     this.applyCustomColors();
     this.syncLoading();
 
-    applyTestHooks(this, "button", this.controlEl);
+    applyTestHooks(this, "button", this);
     if (this.spinnerEl) {
       applyTestHooks(this, "button", this.spinnerEl, "spinner");
+    }
+    if (this.anchorEl) {
+      applyTestHooks(this, "button", this.anchorEl, "link");
     }
   }
 }

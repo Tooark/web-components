@@ -1,3 +1,4 @@
+import { expect, userEvent, waitFor } from "storybook/test";
 import type { ArkCarouselSnap, ArkCarouselStyleOptions } from "@tooark/core";
 
 const meta = {
@@ -154,4 +155,52 @@ export const MinimalNavigation = {
     accentColor: "#f97316"
   },
   render: renderCarousel
+};
+
+export const ArrowsNavigate = {
+  render: renderCarousel,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const carousel = canvasElement.querySelector("ark-carousel") as HTMLElement & { index: number };
+    const changes: number[] = [];
+    carousel.addEventListener("ark-slide-change", (event) => changes.push((event as CustomEvent).detail.index));
+
+    // Os slides continuam filhos diretos do host, na ordem declarada.
+    const slides = Array.from(carousel.children).filter((el) => !el.hasAttribute("data-ark-chrome"));
+    await expect(slides.length).toBe(5);
+    await expect(slides[0].tagName).toBe("ARTICLE");
+    await expect(slides[0]).toHaveAttribute("data-ark", "carousel-slide-0");
+
+    // Setas e dots ficam sobre a área visível do host rolável.
+    const hostRect = carousel.getBoundingClientRect();
+    const next = canvasElement.querySelector<HTMLButtonElement>('[data-ark="carousel-arrow-next"]')!;
+    const nextRect = next.getBoundingClientRect();
+    await expect(nextRect.right).toBeLessThanOrEqual(hostRect.right);
+    await expect(nextRect.left).toBeGreaterThan(hostRect.right - 80);
+
+    await userEvent.click(next);
+    await waitFor(() => expect(carousel.index).toBe(1));
+    await waitFor(() => expect(carousel.scrollLeft).toBeGreaterThan(0));
+    await expect(changes).toEqual([1]);
+
+    // O overlay acompanha a rolagem: a seta continua no mesmo lugar da tela.
+    await waitFor(() => expect(Math.abs(next.getBoundingClientRect().left - nextRect.left)).toBeLessThan(2));
+    await expect(canvasElement.querySelector('[data-ark="carousel-dot-1"]')).toHaveAttribute("aria-current", "true");
+  }
+};
+
+export const DynamicSlides = {
+  render: renderCarousel,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const carousel = canvasElement.querySelector("ark-carousel")!;
+    const dots = () => canvasElement.querySelectorAll('[data-ark^="carousel-dot-"]').length;
+    await expect(dots()).toBe(5);
+
+    // Slide adicionado depois da montagem (como um framework faria).
+    carousel.appendChild(createSlide("Novo", "Slide adicionado dinamicamente", "#e2e8f0"));
+    await waitFor(() => expect(dots()).toBe(6));
+    await expect(carousel.lastElementChild).toHaveAttribute("data-ark", "carousel-slide-5");
+
+    carousel.removeChild(carousel.lastElementChild!);
+    await waitFor(() => expect(dots()).toBe(5));
+  }
 };

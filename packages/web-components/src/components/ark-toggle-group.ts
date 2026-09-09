@@ -1,24 +1,29 @@
-import "../styles/tailwind.css";
-import type { ArkThemeSelected } from "@tooark/core";
 import { ArkToggle } from "./ark-toggle";
 import { applyTestHooks } from "./test-hooks";
 
+/**
+ * Segmented control de ark-toggle. O PRÓPRIO host é o container
+ * (`role="group"` + classes): os itens do usuário ficam onde estão, então
+ * frameworks podem adicionar/remover toggles livremente.
+ */
 export class ArkToggleGroup extends HTMLElement {
   static readonly tagName = "ark-toggle-group";
 
-  private wrapperEl: HTMLDivElement | null = null;
   private observer: MutationObserver | null = null;
   private syncingValue = false;
+  private ownClasses: string[] = [];
+  private syncingClass = false;
 
   static get observedAttributes (): string[] {
     return ["value", "multiple", "disabled", "size", "intent", "theme", "class", "testid"];
   }
 
-  connectedCallback (): void {
-    if (!this.wrapperEl) {
-      this.render();
-    }
+  constructor () {
+    super();
+    this.addEventListener("change", this.handleToggleChange);
+  }
 
+  connectedCallback (): void {
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncToggles());
       this.observer.observe(this, { childList: true, subtree: true });
@@ -34,7 +39,11 @@ export class ArkToggleGroup extends HTMLElement {
   }
 
   attributeChangedCallback (name: string): void {
-    if (!this.wrapperEl) return;
+    if (name === "class") {
+      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      return;
+    }
+    if (!this.isConnected) return;
 
     this.updateAppearance();
 
@@ -49,6 +58,14 @@ export class ArkToggleGroup extends HTMLElement {
     return this.getAttribute("value") || "";
   }
 
+  set value (next: string) {
+    if (next) {
+      this.setAttribute("value", next);
+    } else {
+      this.removeAttribute("value");
+    }
+  }
+
   get values (): string[] {
     return this.value.split(",").map((v) => v.trim()).filter(Boolean);
   }
@@ -57,37 +74,13 @@ export class ArkToggleGroup extends HTMLElement {
     return this.hasAttribute("multiple");
   }
 
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getToggles (): ArkToggle[] {
     return Array.from(this.querySelectorAll("ark-toggle")) as ArkToggle[];
   }
 
-  private render (): void {
-    const wrapper = document.createElement("div");
-    wrapper.setAttribute("part", "group");
-    wrapper.setAttribute("role", "group");
-    wrapper.addEventListener("change", (event) => this.handleToggleChange(event));
-
-    while (this.firstChild) {
-      wrapper.appendChild(this.firstChild);
-    }
-
-    this.appendChild(wrapper);
-    this.wrapperEl = wrapper;
-  }
-
-  private handleToggleChange (event: Event): void {
+  private readonly handleToggleChange = (event: Event): void => {
     const target = event.target as HTMLElement | null;
-    if (!target || target.tagName.toLowerCase() !== "ark-toggle") return;
+    if (!target || target === this || target.tagName.toLowerCase() !== "ark-toggle") return;
 
     // O evento do item não vaza; o grupo publica o próprio "change" consolidado.
     event.stopPropagation();
@@ -118,7 +111,7 @@ export class ArkToggleGroup extends HTMLElement {
       bubbles: true,
       composed: true
     }));
-  }
+  };
 
   private applyValueToToggles (): void {
     const values = this.values;
@@ -153,19 +146,23 @@ export class ArkToggleGroup extends HTMLElement {
     }
   }
 
+  private applyOwnClasses (next: string[]): void {
+    this.syncingClass = true;
+    for (const cls of this.ownClasses) {
+      if (!next.includes(cls)) this.classList.remove(cls);
+    }
+    for (const cls of next) {
+      if (!this.classList.contains(cls)) this.classList.add(cls);
+    }
+    this.ownClasses = next;
+    this.syncingClass = false;
+  }
+
   private updateAppearance (): void {
-    if (!this.wrapperEl) return;
+    this.setAttribute("role", "group");
+    this.applyOwnClasses("ark:inline-flex ark:items-center ark:gap-1 ark:rounded-lg ark:bg-surface-muted ark:p-1".split(/\s+/));
 
-    const theme = this.getTheme();
-    const custom = this.getAttribute("class") || "";
-
-    this.wrapperEl.className = [
-      "inline-flex items-center gap-1 rounded-lg p-1",
-      theme === "dark" ? "bg-slate-800" : "bg-slate-100",
-      custom
-    ].join(" ").trim();
-
-    applyTestHooks(this, "toggle-group", this.wrapperEl);
+    applyTestHooks(this, "toggle-group", this);
   }
 }
 

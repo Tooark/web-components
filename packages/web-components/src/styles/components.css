@@ -1,0 +1,105 @@
+/*
+ * Regras estruturais dos componentes que usam o PRÓPRIO host como container
+ * (light DOM, sem mover os filhos do usuário). Ficam em CSS, e não em classes
+ * aplicadas por JS, porque precisam alcançar nós do usuário (o `slot="suffix"`
+ * do ark-input, os slides do ark-carousel) sem tocar neles.
+ */
+@layer components {
+  /* ---------- ark-input: grid label / campo / mensagem ---------- */
+
+  ark-input {
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "label"
+      "field"
+      "message";
+    align-items: center;
+  }
+
+  ark-input > [data-ark="input-label"] {
+    grid-area: label;
+  }
+
+  ark-input > [data-ark="input"] {
+    grid-area: field;
+  }
+
+  ark-input > [data-ark="input-helper"],
+  ark-input > [data-ark="input-error"] {
+    grid-area: message;
+  }
+
+  /* O sufixo do usuário compartilha a área do campo e encosta na direita. */
+  ark-input > [slot="suffix"] {
+    grid-area: field;
+    justify-self: end;
+    align-self: center;
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-right: 0.5rem;
+  }
+
+  /* ---------- ark-carousel: host rolável com scroll snap ---------- */
+
+  ark-carousel {
+    --ark-carousel-per-view: 1;
+    --ark-carousel-gap: 12px;
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    gap: var(--ark-carousel-gap);
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    /* Espaço para os dots abaixo dos slides. */
+    padding-bottom: 2.5rem;
+  }
+
+  ark-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  ark-carousel[data-ark-snap="proximity"] {
+    scroll-snap-type: x proximity;
+  }
+
+  ark-carousel[drag-free],
+  ark-carousel[data-ark-dragging] {
+    scroll-snap-type: none;
+  }
+
+  ark-carousel[data-ark-dragging] {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  /* Slides: filhos do usuário (tudo que não é o overlay do componente). */
+  ark-carousel > :not([data-ark-chrome]) {
+    flex: 0 0 calc((100% - (var(--ark-carousel-per-view) - 1) * var(--ark-carousel-gap)) / var(--ark-carousel-per-view));
+    min-width: 0;
+    scroll-snap-align: start;
+    cursor: grab;
+    @apply ark:rounded-xl ark:border ark:border-border ark:bg-linear-to-br ark:from-surface ark:via-surface-muted ark:to-surface-strong ark:p-6 ark:text-fg;
+  }
+
+  /*
+   * Overlay de setas/dots: primeiro filho, sticky na borda esquerda, com a
+   * largura da área visível e sem ocupar espaço no fluxo (margem negativa).
+   * Assim acompanha a rolagem e as setas/dots ficam sempre sobre a viewport.
+   */
+  ark-carousel > [data-ark-chrome="overlay"] {
+    position: sticky;
+    left: 0;
+    flex: 0 0 100%;
+    margin-right: calc(-100% - var(--ark-carousel-gap));
+    align-self: stretch;
+    z-index: 1;
+    pointer-events: none;
+  }
+}

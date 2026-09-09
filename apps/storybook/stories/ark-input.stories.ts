@@ -1,4 +1,4 @@
-import { expect, userEvent } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 
 const meta = {
@@ -156,7 +156,29 @@ export const Sizes = {
 
 export const WithSuffix = {
   args: { label: "Buscar", placeholder: "Pesquisar...", suffix: "🔍" },
-  render: Playground.render
+  render: Playground.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const suffix = host.querySelector<HTMLElement>('[slot="suffix"]')!;
+    const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+
+    // O sufixo do usuário continua filho direto do host e é posicionado por
+    // CSS sobre a ponta direita do campo.
+    await expect(suffix.parentElement).toBe(host);
+    await expect(suffix).toHaveAttribute("data-ark", "input-suffix");
+
+    const inputRect = input.getBoundingClientRect();
+    const suffixRect = suffix.getBoundingClientRect();
+    await expect(suffixRect.right).toBeLessThanOrEqual(inputRect.right);
+    await expect(suffixRect.left).toBeGreaterThan(inputRect.left + inputRect.width / 2);
+    await expect(suffixRect.top).toBeGreaterThanOrEqual(inputRect.top - 1);
+    await expect(suffixRect.bottom).toBeLessThanOrEqual(inputRect.bottom + 1);
+
+    // Sufixo removido depois da montagem: o padding extra do campo some.
+    const paddedRight = getComputedStyle(input).paddingRight;
+    suffix.remove();
+    await waitFor(() => expect(getComputedStyle(input).paddingRight).not.toBe(paddedRight));
+  }
 };
 
 export const ReadOnly = {

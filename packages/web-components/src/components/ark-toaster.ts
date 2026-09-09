@@ -1,6 +1,5 @@
-import "../styles/tailwind.css";
 import { arkEnter, arkExit, resolveLocale } from "@tooark/core";
-import type { ArkMotionPreset, ArkThemeSelected, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
+import type { ArkMotionPreset, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkToastItem = ArkToastOptions & {
@@ -117,17 +116,6 @@ export class ArkToaster extends HTMLElement {
     this.dismiss(detail?.id);
   };
 
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getPosition (): ArkToastPosition {
     const position = (this.getAttribute("position") || "bottom-right").toLowerCase();
     if (
@@ -187,29 +175,16 @@ export class ArkToaster extends HTMLElement {
     this.timers.set(toast.id, timer);
   }
 
-  private getPalette (theme: ArkThemeSelected): ArkToasterPalette {
-    if (theme === "dark") {
-      return {
-        stack: "fixed z-[9999] flex w-full max-w-sm flex-col gap-3 p-4 pointer-events-none",
-        toastBase: "pointer-events-auto rounded-xl border border-slate-700 bg-slate-900/95 p-4 shadow-lg shadow-black/40 backdrop-blur",
-        title: "text-sm font-semibold text-slate-100",
-        description: "mt-1 text-xs text-slate-300",
-        closeButton: "rounded-md border border-slate-600 px-2 py-1 text-xs text-slate-300 transition hover:bg-slate-800",
-        actionButton: "rounded-md px-2 py-1 text-xs font-medium text-slate-900 bg-slate-100 transition hover:bg-white",
-        cancelButton: "rounded-md px-2 py-1 text-xs font-medium text-slate-300 transition hover:bg-slate-800",
-        icon: "text-sm"
-      };
-    }
-
+  private getPalette (): ArkToasterPalette {
     return {
-      stack: "fixed z-[9999] flex w-full max-w-sm flex-col gap-3 p-4 pointer-events-none",
-      toastBase: "pointer-events-auto rounded-xl border border-slate-200 bg-white/95 p-4 shadow-lg shadow-slate-200/80 backdrop-blur",
-      title: "text-sm font-semibold text-slate-900",
-      description: "mt-1 text-xs text-slate-600",
-      closeButton: "rounded-md border border-slate-300 px-2 py-1 text-xs text-slate-600 transition hover:bg-slate-100",
-      actionButton: "rounded-md px-2 py-1 text-xs font-medium text-white bg-slate-900 transition hover:bg-slate-800",
-      cancelButton: "rounded-md px-2 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-100",
-      icon: "text-sm"
+      stack: "ark:fixed ark:z-[9999] ark:flex ark:w-full ark:max-w-sm ark:flex-col ark:gap-3 ark:p-4 ark:pointer-events-none",
+      toastBase: "ark:pointer-events-auto ark:rounded-xl ark:border ark:border-border ark:bg-surface/95 ark:p-4 ark:shadow-lg ark:backdrop-blur",
+      title: "ark:text-sm ark:font-semibold ark:text-fg",
+      description: "ark:mt-1 ark:text-xs ark:text-fg-soft",
+      closeButton: "ark:rounded-md ark:border ark:border-border-strong ark:px-2 ark:py-1 ark:text-xs ark:text-fg-muted ark:transition ark:hover:bg-surface-muted",
+      actionButton: "ark:rounded-md ark:px-2 ark:py-1 ark:text-xs ark:font-medium ark:text-primary-fg ark:bg-primary ark:transition ark:hover:bg-primary-hover",
+      cancelButton: "ark:rounded-md ark:px-2 ark:py-1 ark:text-xs ark:font-medium ark:text-fg-muted ark:transition ark:hover:bg-surface-muted",
+      icon: "ark:text-sm"
     };
   }
 
@@ -225,22 +200,22 @@ export class ArkToaster extends HTMLElement {
   }
 
   private getPositionClasses (position: ArkToastPosition): string {
-    if (position === "top-left") return "left-0 top-0 items-start";
-    if (position === "top-center") return "left-1/2 top-0 -translate-x-1/2 items-center";
-    if (position === "top-right") return "right-0 top-0 items-end";
-    if (position === "bottom-left") return "bottom-0 left-0 items-start";
-    if (position === "bottom-center") return "bottom-0 left-1/2 -translate-x-1/2 items-center";
-    return "bottom-0 right-0 items-end";
+    if (position === "top-left") return "ark:left-0 ark:top-0 ark:items-start";
+    if (position === "top-center") return "ark:left-1/2 ark:top-0 ark:-translate-x-1/2 ark:items-center";
+    if (position === "top-right") return "ark:right-0 ark:top-0 ark:items-end";
+    if (position === "bottom-left") return "ark:bottom-0 ark:left-0 ark:items-start";
+    if (position === "bottom-center") return "ark:bottom-0 ark:left-1/2 ark:-translate-x-1/2 ark:items-center";
+    return "ark:bottom-0 ark:right-0 ark:items-end";
   }
 
   private getToastTypeClasses (type: ArkToastType, richColors: boolean): string {
     if (!richColors) return "";
 
-    if (type === "success") return "border-emerald-400/60 bg-emerald-50 text-emerald-900";
-    if (type === "info") return "border-sky-400/60 bg-sky-50 text-sky-900";
-    if (type === "warning") return "border-amber-400/60 bg-amber-50 text-amber-900";
-    if (type === "error") return "border-red-400/60 bg-red-50 text-red-900";
-    if (type === "loading") return "border-indigo-400/60 bg-indigo-50 text-indigo-900";
+    if (type === "success") return "ark:border-success-border/60 ark:bg-success-soft ark:text-success-soft-fg";
+    if (type === "info") return "ark:border-info-border/60 ark:bg-info-soft ark:text-info-soft-fg";
+    if (type === "warning") return "ark:border-warning-border/60 ark:bg-warning-soft ark:text-warning-soft-fg";
+    if (type === "error") return "ark:border-danger-border/60 ark:bg-danger-soft ark:text-danger-soft-fg";
+    if (type === "loading") return "ark:border-info-border/60 ark:bg-info-soft ark:text-info-soft-fg";
 
     return "";
   }
@@ -267,11 +242,10 @@ export class ArkToaster extends HTMLElement {
   private render (): void {
     if (!this.root) return;
 
-    const theme = this.getTheme();
     const position = this.getPosition();
     const richColors = this.hasRichColors();
     const closeButton = this.hasCloseButton();
-    const palette = this.getPalette(theme);
+    const palette = this.getPalette();
 
     this.root.className = `${palette.stack} ${this.getPositionClasses(position)}`;
     this.root.innerHTML = "";
@@ -291,14 +265,14 @@ export class ArkToaster extends HTMLElement {
       card.className = `${palette.toastBase} ${this.getToastTypeClasses(toast.type, richColors)}`.trim();
 
       const row = document.createElement("div");
-      row.className = "flex items-start gap-3";
+      row.className = "ark:flex ark:items-start ark:gap-3";
 
       const icon = document.createElement("span");
-      icon.className = `${palette.icon} mt-0.5 inline-flex h-5 w-5 items-center justify-center rounded-full border border-current/20`;
+      icon.className = `${palette.icon} ark:mt-0.5 ark:inline-flex ark:h-5 ark:w-5 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-current/20`;
       icon.textContent = this.getToastIcon(toast.type);
 
       const content = document.createElement("div");
-      content.className = "min-w-0 flex-1";
+      content.className = "ark:min-w-0 ark:flex-1";
 
       const title = document.createElement("h4");
       title.className = palette.title;
@@ -331,7 +305,7 @@ export class ArkToaster extends HTMLElement {
 
       if (toast.actionLabel || toast.cancelLabel) {
         const actions = document.createElement("div");
-        actions.className = "mt-3 flex items-center justify-end gap-2";
+        actions.className = "ark:mt-3 ark:flex ark:items-center ark:justify-end ark:gap-2";
 
         if (toast.cancelLabel) {
           const cancel = document.createElement("button");

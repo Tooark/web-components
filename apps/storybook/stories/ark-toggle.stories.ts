@@ -1,4 +1,4 @@
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 
 const meta = {
@@ -115,6 +115,28 @@ export const TogglesOnClick = {
     await expect(control).toHaveAttribute("aria-pressed", "false");
     await userEvent.click(control);
     await expect(control).toHaveAttribute("aria-pressed", "true");
+  }
+};
+
+export const GroupDynamicItems = {
+  render: Group.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvasElement.querySelector("ark-toggle-group")!;
+
+    // O host é o próprio grupo: role e itens como filhos diretos.
+    await expect(group).toHaveAttribute("role", "group");
+    await expect(canvas.getByRole("button", { name: "Left" }).parentElement).toBe(group);
+
+    // Item adicionado depois da montagem herda o size do grupo e entra na seleção.
+    group.setAttribute("size", "sm");
+    const extra = createToggle("Extra", { value: "extra" });
+    group.appendChild(extra);
+    await waitFor(() => expect(extra).toHaveAttribute("size", "sm"));
+
+    await userEvent.click(extra);
+    await expect(group).toHaveAttribute("value", "extra");
+    await expect(canvas.getByRole("button", { name: "Left" })).toHaveAttribute("aria-pressed", "false");
   }
 };
 

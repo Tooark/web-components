@@ -1,5 +1,4 @@
-import "../styles/tailwind.css";
-import type { ArkSize, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkSize, ArkIntent } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkTogglePalette = {
@@ -8,25 +7,38 @@ type ArkTogglePalette = {
   pressed: string;
 };
 
+/**
+ * Botão de estado pressionado (`aria-pressed`). O PRÓPRIO host é o controle
+ * (classes, role, foco, teclado): os filhos do usuário ficam onde estão.
+ * Dentro de um ark-toggle-group vira item de segmented control.
+ */
 export class ArkToggle extends HTMLElement {
   static readonly tagName = "ark-toggle";
 
-  private buttonEl: HTMLButtonElement | null = null;
+  private ownClasses: string[] = [];
+  private syncingClass = false;
 
   static get observedAttributes (): string[] {
     return ["pressed", "disabled", "size", "intent", "theme", "value", "class", "testid"];
   }
 
-  connectedCallback (): void {
-    if (!this.buttonEl) {
-      this.render();
-    }
+  constructor () {
+    super();
+    this.addEventListener("click", this.handleClick);
+    this.addEventListener("keydown", this.handleKeydown);
+    this.addEventListener("keyup", this.handleKeyup);
+  }
 
+  connectedCallback (): void {
     this.updateAppearance();
   }
 
-  attributeChangedCallback (): void {
-    if (!this.buttonEl) return;
+  attributeChangedCallback (name: string): void {
+    if (name === "class") {
+      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      return;
+    }
+    if (!this.isConnected) return;
     this.updateAppearance();
   }
 
@@ -35,11 +47,15 @@ export class ArkToggle extends HTMLElement {
   }
 
   set pressed (value: boolean) {
-    if (value) {
-      this.setAttribute("pressed", "");
-    } else {
-      this.removeAttribute("pressed");
-    }
+    this.toggleAttribute("pressed", Boolean(value));
+  }
+
+  get disabled (): boolean {
+    return this.hasAttribute("disabled");
+  }
+
+  set disabled (value: boolean) {
+    this.toggleAttribute("disabled", Boolean(value));
   }
 
   get value (): string {
@@ -47,7 +63,7 @@ export class ArkToggle extends HTMLElement {
   }
 
   toggle (): void {
-    if (this.hasAttribute("disabled")) return;
+    if (this.disabled) return;
 
     this.pressed = !this.pressed;
     this.dispatchEvent(new CustomEvent("change", {
@@ -57,18 +73,35 @@ export class ArkToggle extends HTMLElement {
     }));
   }
 
+  private readonly handleClick = (event: MouseEvent): void => {
+    if (this.disabled) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    this.toggle();
+  };
+
+  private readonly handleKeydown = (event: KeyboardEvent): void => {
+    if (event.target !== this || this.disabled) return;
+    if (event.key === "Enter") {
+      event.preventDefault();
+      this.toggle();
+    } else if (event.key === " ") {
+      event.preventDefault();
+    }
+  };
+
+  private readonly handleKeyup = (event: KeyboardEvent): void => {
+    if (event.target !== this || this.disabled) return;
+    if (event.key === " ") {
+      event.preventDefault();
+      this.toggle();
+    }
+  };
+
   private isInGroup (): boolean {
     return this.closest("ark-toggle-group") !== null;
-  }
-
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
   }
 
   private getIntent (): ArkIntent {
@@ -79,87 +112,73 @@ export class ArkToggle extends HTMLElement {
     return "primary";
   }
 
-  private getPalette (theme: ArkThemeSelected, intent: ArkIntent): ArkTogglePalette {
+  private getPalette (intent: ArkIntent): ArkTogglePalette {
     // Dentro de um ark-toggle-group o visual é de segmented control:
-    // fundo transparente e o item ativo "elevado" em branco.
+    // fundo transparente e o item ativo "elevado" na superfície.
     if (this.isInGroup()) {
-      if (theme === "dark") {
-        return {
-          focusRing: "focus-visible:ring-slate-500",
-          base: "border-transparent bg-transparent text-slate-300 hover:text-slate-100",
-          pressed: "border-transparent bg-slate-700 text-white shadow-sm"
-        };
-      }
       return {
-        focusRing: "focus-visible:ring-slate-400",
-        base: "border-transparent bg-transparent text-slate-600 hover:text-slate-900",
-        pressed: "border-transparent bg-white text-slate-900 shadow-sm"
+        focusRing: "ark:ring-ring",
+        base: "ark:border-transparent ark:bg-transparent ark:text-fg-muted ark:hover:text-fg",
+        pressed: "ark:border-transparent ark:bg-surface-raised ark:text-fg ark:shadow-sm"
       };
     }
 
-    const light: Record<ArkIntent, ArkTogglePalette> = {
-      primary: { focusRing: "focus-visible:ring-slate-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-slate-300 bg-slate-200 text-slate-900" },
-      secondary: { focusRing: "focus-visible:ring-slate-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-slate-300 bg-slate-100 text-slate-700" },
-      success: { focusRing: "focus-visible:ring-emerald-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-emerald-300 bg-emerald-50 text-emerald-700" },
-      warning: { focusRing: "focus-visible:ring-amber-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-amber-300 bg-amber-50 text-amber-700" },
-      danger: { focusRing: "focus-visible:ring-red-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-red-300 bg-red-50 text-red-700" },
-      info: { focusRing: "focus-visible:ring-sky-400", base: "border-slate-300 bg-transparent text-slate-600 hover:bg-slate-50", pressed: "border-sky-300 bg-sky-50 text-sky-700" },
-      neutral: { focusRing: "focus-visible:ring-zinc-400", base: "border-zinc-300 bg-transparent text-zinc-600 hover:bg-zinc-50", pressed: "border-zinc-300 bg-zinc-200 text-zinc-900" }
+    const base = "ark:border-border-strong ark:bg-transparent ark:text-fg-soft ark:hover:bg-surface-muted";
+    const palettes: Record<ArkIntent, ArkTogglePalette> = {
+      primary: { focusRing: "ark:ring-primary-ring", base, pressed: "ark:border-border-strong ark:bg-surface-strong ark:text-fg" },
+      secondary: { focusRing: "ark:ring-secondary-ring", base, pressed: "ark:border-border-strong ark:bg-surface-muted ark:text-fg-soft" },
+      success: { focusRing: "ark:ring-success-ring", base, pressed: "ark:border-success-border ark:bg-success-soft ark:text-success-soft-fg" },
+      warning: { focusRing: "ark:ring-warning-ring", base, pressed: "ark:border-warning-border ark:bg-warning-soft ark:text-warning-soft-fg" },
+      danger: { focusRing: "ark:ring-danger-ring", base, pressed: "ark:border-danger-border ark:bg-danger-soft ark:text-danger-soft-fg" },
+      info: { focusRing: "ark:ring-info-ring", base, pressed: "ark:border-info-border ark:bg-info-soft ark:text-info-soft-fg" },
+      neutral: { focusRing: "ark:ring-neutral-ring", base, pressed: "ark:border-neutral-border ark:bg-neutral-soft ark:text-neutral-soft-fg" }
     };
 
-    const dark: Record<ArkIntent, ArkTogglePalette> = {
-      primary: { focusRing: "focus-visible:ring-slate-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-slate-600 bg-slate-700 text-slate-100" },
-      secondary: { focusRing: "focus-visible:ring-slate-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-slate-600 bg-slate-800 text-slate-200" },
-      success: { focusRing: "focus-visible:ring-emerald-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-emerald-600 bg-emerald-950/40 text-emerald-300" },
-      warning: { focusRing: "focus-visible:ring-amber-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-amber-600 bg-amber-950/40 text-amber-300" },
-      danger: { focusRing: "focus-visible:ring-red-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-red-600 bg-red-950/40 text-red-300" },
-      info: { focusRing: "focus-visible:ring-sky-500", base: "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-800", pressed: "border-sky-600 bg-sky-950/40 text-sky-300" },
-      neutral: { focusRing: "focus-visible:ring-zinc-500", base: "border-zinc-600 bg-transparent text-zinc-300 hover:bg-zinc-800", pressed: "border-zinc-600 bg-zinc-700 text-zinc-100" }
-    };
-
-    return (theme === "dark" ? dark : light)[intent];
+    return palettes[intent];
   }
 
-  private computeClasses (): string {
-    const base = "inline-flex items-center justify-center gap-2 rounded-md border font-semibold transition focus:outline-none focus-visible:ring-2 disabled:cursor-not-allowed disabled:opacity-50";
+  private computeClasses (): string[] {
+    const base = "ark:inline-flex ark:items-center ark:justify-center ark:gap-2 ark:rounded-md ark:border ark:font-semibold ark:transition ark:select-none ark:cursor-pointer ark:outline-none ark:focus-visible:ring-2 ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none";
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
-    const palette = this.getPalette(this.getTheme(), this.getIntent());
+    const palette = this.getPalette(this.getIntent());
 
     const sizes: Record<ArkSize, string> = {
-      sm: "px-3 py-1.5 text-xs",
-      md: "px-4 py-2 text-sm",
-      lg: "px-5 py-3 text-base",
-      xl: "px-6 py-4 text-lg"
+      sm: "ark:px-3 ark:py-1.5 ark:text-xs",
+      md: "ark:px-4 ark:py-2 ark:text-sm",
+      lg: "ark:px-5 ark:py-3 ark:text-base",
+      xl: "ark:px-6 ark:py-4 ark:text-lg"
     };
 
-    const custom = this.getAttribute("class") || "";
-
-    return [base, palette.focusRing, this.pressed ? palette.pressed : palette.base, sizes[size] ?? sizes.md, custom]
+    return [base, palette.focusRing, this.pressed ? palette.pressed : palette.base, sizes[size] ?? sizes.md]
       .join(" ")
-      .trim()
-      .replace(/\s+/g, " ");
+      .split(/\s+/)
+      .filter(Boolean);
   }
 
-  private render (): void {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.setAttribute("part", "button");
-    button.addEventListener("click", () => this.toggle());
-
-    while (this.firstChild) {
-      button.appendChild(this.firstChild);
+  private applyOwnClasses (next: string[]): void {
+    this.syncingClass = true;
+    for (const cls of this.ownClasses) {
+      if (!next.includes(cls)) this.classList.remove(cls);
     }
-
-    this.appendChild(button);
-    this.buttonEl = button;
+    for (const cls of next) {
+      if (!this.classList.contains(cls)) this.classList.add(cls);
+    }
+    this.ownClasses = next;
+    this.syncingClass = false;
   }
 
   private updateAppearance (): void {
-    if (!this.buttonEl) return;
-    this.buttonEl.className = this.computeClasses();
-    this.buttonEl.setAttribute("aria-pressed", this.pressed ? "true" : "false");
-    this.buttonEl.disabled = this.hasAttribute("disabled");
-    applyTestHooks(this, "toggle", this.buttonEl);
+    const disabled = this.disabled;
+    this.setAttribute("role", "button");
+    this.setAttribute("aria-pressed", this.pressed ? "true" : "false");
+    this.setAttribute("tabindex", disabled ? "-1" : "0");
+    if (disabled) {
+      this.setAttribute("aria-disabled", "true");
+    } else {
+      this.removeAttribute("aria-disabled");
+    }
+    this.applyOwnClasses(this.computeClasses());
+    applyTestHooks(this, "toggle", this);
   }
 }
 

@@ -1,6 +1,5 @@
-import "../styles/tailwind.css";
 import { resolveLocale } from "@tooark/core";
-import type { ArkDatepickerLang, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkDatepickerLang, ArkIntent } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkClockColumn = "hours" | "minutes" | "seconds" | "meridiem";
@@ -50,16 +49,6 @@ export class ArkClock extends HTMLElement {
     return this.getAttribute("value") || "";
   }
 
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getIntent (): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
@@ -94,33 +83,23 @@ export class ArkClock extends HTMLElement {
     return { h, m, s };
   }
 
-  private getPalette (theme: ArkThemeSelected, intent: ArkIntent): ArkClockPalette {
-    const selectedByIntent: Record<ArkIntent, { light: string; dark: string }> = {
-      primary: { light: "bg-slate-900 text-white", dark: "bg-slate-100 text-slate-900" },
-      secondary: { light: "bg-slate-700 text-white", dark: "bg-slate-300 text-slate-900" },
-      success: { light: "bg-emerald-600 text-white", dark: "bg-emerald-500 text-slate-950" },
-      warning: { light: "bg-amber-500 text-slate-900", dark: "bg-amber-400 text-slate-950" },
-      danger: { light: "bg-red-600 text-white", dark: "bg-red-500 text-white" },
-      info: { light: "bg-sky-600 text-white", dark: "bg-sky-500 text-slate-950" },
-      neutral: { light: "bg-zinc-700 text-white", dark: "bg-zinc-200 text-zinc-900" }
+  private getPalette (intent: ArkIntent): ArkClockPalette {
+    const selectedByIntent: Record<ArkIntent, string> = {
+      primary: "ark:bg-primary ark:text-primary-fg",
+      secondary: "ark:bg-secondary ark:text-secondary-fg",
+      success: "ark:bg-success ark:text-success-fg",
+      warning: "ark:bg-warning ark:text-warning-fg",
+      danger: "ark:bg-danger ark:text-danger-fg",
+      info: "ark:bg-info ark:text-info-fg",
+      neutral: "ark:bg-neutral ark:text-neutral-fg"
     };
 
-    if (theme === "dark") {
-      return {
-        container: "inline-flex flex-col gap-1 rounded-lg border border-slate-700 bg-slate-900 p-2 shadow-sm",
-        columnLabel: "px-1 pb-1 text-center text-[10px] font-medium uppercase tracking-wide text-slate-400",
-        option: "text-slate-200 hover:bg-slate-800",
-        optionSelected: `${selectedByIntent[intent].dark} font-semibold`,
-        focusRing: "focus:ring-slate-500"
-      };
-    }
-
     return {
-      container: "inline-flex flex-col gap-1 rounded-lg border border-slate-200 bg-white p-2 shadow-sm",
-      columnLabel: "px-1 pb-1 text-center text-[10px] font-medium uppercase tracking-wide text-slate-500",
-      option: "text-slate-700 hover:bg-slate-100",
-      optionSelected: `${selectedByIntent[intent].light} font-semibold`,
-      focusRing: "focus:ring-slate-400"
+      container: "ark:inline-flex ark:flex-col ark:gap-1 ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-2 ark:shadow-sm",
+      columnLabel: "ark:px-1 ark:pb-1 ark:text-center ark:text-[10px] ark:font-medium ark:uppercase ark:tracking-wide ark:text-fg-muted",
+      option: "ark:text-fg-soft ark:hover:bg-surface-muted",
+      optionSelected: `${selectedByIntent[intent]} ark:font-semibold`,
+      focusRing: "ark:focus:ring-ring"
     };
   }
 
@@ -160,8 +139,8 @@ export class ArkClock extends HTMLElement {
 
   // Atualiza classes/aria das opções sem reconstruir (evita saltos de scroll).
   private updateSelection (scrollIntoView: boolean): void {
-    const palette = this.getPalette(this.getTheme(), this.getIntent());
-    const base = `w-12 shrink-0 rounded-md px-1 py-1.5 text-center text-sm transition focus:outline-none focus:ring-2 ${palette.focusRing}`;
+    const palette = this.getPalette(this.getIntent());
+    const base = `ark:w-12 ark:shrink-0 ark:rounded-md ark:px-1 ark:py-1.5 ark:text-center ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing}`;
 
     for (const [column, columnEl] of this.columnEls) {
       const selected = this.selectedValueFor(column);
@@ -199,9 +178,7 @@ export class ArkClock extends HTMLElement {
   };
 
   private build (): void {
-    const theme = this.getTheme();
-    const intent = this.getIntent();
-    const palette = this.getPalette(theme, intent);
+    const palette = this.getPalette(this.getIntent());
     const loc = resolveLocale((this.getAttribute("lang") || "en") as ArkDatepickerLang, undefined);
 
     this.root?.remove();
@@ -212,7 +189,7 @@ export class ArkClock extends HTMLElement {
     applyTestHooks(this, "clock", container);
 
     const columnsRow = document.createElement("div");
-    columnsRow.className = "flex gap-1";
+    columnsRow.className = "ark:flex ark:gap-1";
 
     const columns: Array<{ column: ArkClockColumn; label: string; options: Array<{ value: number; text: string }> }> = [];
 
@@ -255,7 +232,7 @@ export class ArkClock extends HTMLElement {
 
     for (const { column, label, options } of columns) {
       const wrap = document.createElement("div");
-      wrap.className = "flex flex-col";
+      wrap.className = "ark:flex ark:flex-col";
 
       const labelEl = document.createElement("div");
       labelEl.className = palette.columnLabel;
@@ -265,7 +242,7 @@ export class ArkClock extends HTMLElement {
       const list = document.createElement("div");
       list.setAttribute("role", "listbox");
       list.setAttribute("aria-label", label);
-      list.className = "flex h-56 flex-col gap-0.5 overflow-y-auto";
+      list.className = "ark:flex ark:h-56 ark:flex-col ark:gap-0.5 ark:overflow-y-auto";
       list.addEventListener("keydown", this.handleColumnKeydown);
       applyTestHooks(this, "clock", list, column);
 

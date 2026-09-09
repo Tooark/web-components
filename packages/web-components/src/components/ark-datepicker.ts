@@ -1,4 +1,3 @@
-import "../styles/tailwind.css";
 import { arkEnter, arkExit, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
 import type { ArkDatepickerLang, ArkDatepickerMode } from "@tooark/core";
 import type { ArkCalendar } from "./ark-calendar";
@@ -285,7 +284,7 @@ export class ArkDatepicker extends HTMLElement {
 
   private buildPanel(): HTMLDivElement {
     const panel = document.createElement("div");
-    panel.className = "flex flex-wrap items-start gap-3";
+    panel.className = "ark:flex ark:flex-wrap ark:items-start ark:gap-3";
 
     if (this.hasDatePanel()) {
       const calendar = document.createElement("ark-calendar") as ArkCalendar;
@@ -322,7 +321,7 @@ export class ArkDatepicker extends HTMLElement {
     }
 
     const wrapper = document.createElement("div");
-    wrapper.className = "relative inline-block";
+    wrapper.className = "ark:relative ark:inline-block";
     wrapper.addEventListener("keydown", this.handleKeydown);
 
     const inputComp = document.createElement("ark-input") as ArkInput;
@@ -364,7 +363,7 @@ export class ArkDatepicker extends HTMLElement {
     });
 
     const popup = document.createElement("div");
-    popup.className = "absolute left-0 top-full z-50 mt-2";
+    popup.className = "ark:absolute ark:left-0 ark:top-full ark:z-50 ark:mt-2";
     popup.setAttribute("role", "dialog");
     popup.hidden = true;
     popup.appendChild(panel);
@@ -454,11 +453,7 @@ export class ArkDatepicker extends HTMLElement {
 
     this.toggleEl.disabled = disabled;
     this.toggleEl.setAttribute("aria-label", loc.openCalendar);
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    const dark = theme === "dark" || (theme !== "light" && typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
-    this.toggleEl.className = dark
-      ? "rounded p-0.5 text-slate-400 transition hover:text-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
-      : "rounded p-0.5 text-slate-500 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50";
+    this.toggleEl.className = "ark:rounded ark:p-0.5 ark:text-fg-muted ark:transition ark:hover:text-fg-soft ark:disabled:cursor-not-allowed ark:disabled:opacity-50";
 
     this.popupEl.setAttribute("aria-label", loc.openCalendar);
     this.inputComp.inputElement?.setAttribute("aria-haspopup", "dialog");

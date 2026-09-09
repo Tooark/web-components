@@ -165,8 +165,10 @@ export const OverlappingEvents = {
     // Três eventos se cruzam entre 9h e 11h: devem dividir a largura em colunas
     // distintas, enquanto o almoço (sem conflito) segue ocupando a coluna inteira.
     const column = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-day"]')!;
-    const holders = Array.from(column.querySelectorAll<HTMLElement>("div.absolute"))
-      .filter((el) => el.querySelector('[data-ark="scheduler-event"]'));
+    // O holder posicionado é o pai direto de cada botão de evento (hook estável,
+    // independente das classes utilitárias).
+    const holders = Array.from(column.querySelectorAll<HTMLElement>('[data-ark="scheduler-event"]'))
+      .map((el) => el.parentElement as HTMLElement);
 
     const shared = holders.filter((el) => el.style.width !== "100%");
     await expect(shared.length).toBeGreaterThanOrEqual(2);
@@ -200,7 +202,8 @@ export const SwitchingViews = {
   render: Playground.render,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const scheduler = canvasElement.querySelector("ark-scheduler")!;
-    const monthToggle = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-view-month"] button')!;
+    // O ark-toggle é o próprio controle; o scheduler o marca como parte sua.
+    const monthToggle = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-view-month"]')!;
 
     await userEvent.click(monthToggle);
 

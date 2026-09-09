@@ -1,3 +1,4 @@
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import type { ArkRounded, ArkSize, ArkButtonStyleOptions, ArkButtonType } from "@tooark/core";
 
 const meta = {
@@ -236,4 +237,103 @@ export const CustomColors = {
     label: "Custom color"
   },
   render: Playground.render
+};
+
+export const HostIsTheControl = {
+  render: () => {
+    const el = document.createElement("ark-button");
+    el.setAttribute("testid", "salvar");
+    el.textContent = "Salvar";
+    return el;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const host = canvasElement.querySelector("ark-button")!;
+
+    // O host é o botão acessível: role, foco e hook de teste no próprio elemento.
+    const control = canvas.getByRole("button", { name: "Salvar" });
+    await expect(control).toBe(host);
+    await expect(host).toHaveAttribute("data-testid", "salvar");
+    await expect(host).toHaveAttribute("tabindex", "0");
+
+    let clicks = 0;
+    host.addEventListener("click", () => clicks++);
+    await userEvent.click(host);
+    host.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(clicks).toBe(3);
+  }
+};
+
+export const ChildrenStayInHost = {
+  render: () => {
+    const el = document.createElement("ark-button");
+    el.setAttribute("loading", "");
+    el.appendChild(document.createTextNode("Enviando"));
+    return el;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-button")!;
+    const text = Array.from(host.childNodes).find((node) => node.nodeType === Node.TEXT_NODE)!;
+
+    // Simula o que React/Vue fazem ao reconciliar filhos: inserir antes de um
+    // nó existente e remover nós. Como o componente não move os filhos do
+    // usuário, as referências continuam válidas e nada lança.
+    const icon = document.createElement("span");
+    icon.textContent = "✓";
+    host.insertBefore(icon, text);
+    host.removeChild(text);
+    host.appendChild(document.createTextNode("Enviado"));
+
+    await expect(host.textContent).toContain("✓");
+    await expect(host.textContent).toContain("Enviado");
+    await expect(host.querySelector('[data-ark="button-spinner"]')).not.toBeNull();
+
+    host.removeAttribute("loading");
+    await expect(host.querySelector('[data-ark="button-spinner"]')).toBeNull();
+  }
+};
+
+export const SubmitsForm = {
+  render: () => {
+    const form = document.createElement("form");
+    const input = document.createElement("input");
+    input.name = "q";
+    input.value = "tooark";
+    form.appendChild(input);
+
+    const el = document.createElement("ark-button");
+    el.setAttribute("type", "submit");
+    el.textContent = "Enviar";
+    form.appendChild(el);
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form")!;
+    const submits: string[] = [];
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submits.push(new FormData(form).get("q") as string);
+    });
+
+    await userEvent.click(within(canvasElement).getByRole("button", { name: "Enviar" }));
+    await waitFor(() => expect(submits).toEqual(["tooark"]));
+  }
+};
+
+export const LinkIsFocusable = {
+  render: AsLink.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-button")!;
+    const link = within(canvasElement).getByRole("link", { name: "Abrir no GitHub" });
+
+    await expect(link).toHaveAttribute("href", "https://github.com/tooark");
+    await expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(host).not.toHaveAttribute("role");
+
+    host.setAttribute("disabled", "");
+    await expect(link).not.toHaveAttribute("href");
+    await expect(link).toHaveAttribute("aria-disabled", "true");
+  }
 };

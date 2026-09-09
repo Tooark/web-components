@@ -1,38 +1,48 @@
-import "../styles/tailwind.css";
-import type { ArkCarouselSnap, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import { prefersReducedMotion } from "@tooark/core";
+import type { ArkCarouselSnap, ArkIntent } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCarouselPalette = {
   frame: string;
-  viewport: string;
-  track: string;
-  slideSurface: string;
   arrowButton: string;
   dotButton: string;
   dotActive: string;
 };
 
+// Marca os nós criados pelo componente (overlay de setas/dots) para
+// distingui-los dos slides do usuário sem tocar nestes.
+const CHROME_ATTR = "data-ark-chrome";
+
+/**
+ * Carousel com CSS scroll snap: o PRÓPRIO host é o container rolável e os
+ * slides são os filhos diretos, exatamente onde o usuário os declarou — nada
+ * é movido, então frameworks podem adicionar e remover slides à vontade.
+ * Setas e dots vivem num overlay `position: sticky` (ver components.css).
+ * Arrasto com mouse é emulado; touch/trackpad usam a rolagem nativa.
+ */
 export class ArkCarousel extends HTMLElement {
   static readonly tagName = "ark-carousel";
 
-  private root: HTMLDivElement | null = null;
-  private viewportEl: HTMLDivElement | null = null;
-  private trackEl: HTMLDivElement | null = null;
+  private overlayEl: HTMLDivElement | null = null;
   private dotsEl: HTMLDivElement | null = null;
   private arrowPrevEl: HTMLButtonElement | null = null;
   private arrowNextEl: HTMLButtonElement | null = null;
 
-  private slides: HTMLElement[] = [];
-  private slideStepPx = 0;
   private currentIndex = 0;
+  private autoplayId: number | null = null;
+  private scrollTimer: number | null = null;
+  private observer: MutationObserver | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+  private ownClasses: string[] = [];
+  private syncingClass = false;
 
+  // Arrasto com mouse.
   private dragging = false;
   private dragStartX = 0;
-  private dragOffsetPx = 0;
+  private dragStartScroll = 0;
+  private dragMoved = false;
 
-  private autoplayId: number | null = null;
-
-  static get observedAttributes(): string[] {
+  static get observedAttributes (): string[] {
     return [
       "theme",
       "intent",
@@ -47,62 +57,117 @@ export class ArkCarousel extends HTMLElement {
       "show-arrows",
       "drag-free",
       "snap",
+      "class",
       "testid"
     ];
   }
 
-  connectedCallback(): void {
-    this.captureSlides();
-    this.currentIndex = this.normalizeIndex(this.getStartIndex());
-    this.build();
-    this.startAutoplay();
-
+  constructor () {
+    super();
+    this.addEventListener("scroll", this.handleScroll, { passive: true });
+    this.addEventListener("pointerdown", this.handlePointerDown);
+    this.addEventListener("pointermove", this.handlePointerMove);
+    this.addEventListener("pointerup", this.handlePointerUp);
+    this.addEventListener("pointercancel", this.handlePointerUp);
+    // Um arrasto não deve virar click no slide.
+    this.addEventListener(
+      "click",
+      (event) => {
+        if (this.dragMoved) {
+          event.preventDefault();
+          event.stopPropagation();
+          this.dragMoved = false;
+        }
+      },
+      { capture: true }
+    );
     this.addEventListener("mouseenter", this.handleMouseEnter);
     this.addEventListener("mouseleave", this.handleMouseLeave);
-    window.addEventListener("resize", this.handleResize);
+    this.addEventListener("focusin", this.handleMouseEnter);
+    this.addEventListener("focusout", this.handleMouseLeave);
   }
 
-  disconnectedCallback(): void {
+  connectedCallback (): void {
+    this.build();
+
+    if (!this.observer) {
+      this.observer = new MutationObserver((records) => {
+        // Só reage a slides do usuário; ignora as mutações do próprio overlay.
+        const relevant = records.some((record) =>
+          [...record.addedNodes, ...record.removedNodes].some((node) => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR))
+        );
+        if (relevant) this.handleSlidesChanged();
+      });
+      this.observer.observe(this, { childList: true });
+    }
+
+    if (!this.resizeObserver && typeof ResizeObserver !== "undefined") {
+      this.resizeObserver = new ResizeObserver(() => {
+        this.renderDots();
+        this.goTo(this.currentIndex, { behavior: "auto" });
+      });
+      this.resizeObserver.observe(this);
+    }
+
+    const startIndex = this.normalizeIndex(this.getStartIndex());
+    this.currentIndex = startIndex;
+    requestAnimationFrame(() => {
+      this.goTo(startIndex, { behavior: "auto" });
+      this.startAutoplay();
+    });
+  }
+
+  disconnectedCallback (): void {
     this.stopAutoplay();
-    this.removeEventListener("mouseenter", this.handleMouseEnter);
-    this.removeEventListener("mouseleave", this.handleMouseLeave);
-    window.removeEventListener("resize", this.handleResize);
+    this.observer?.disconnect();
+    this.observer = null;
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+    if (this.scrollTimer !== null) {
+      window.clearTimeout(this.scrollTimer);
+      this.scrollTimer = null;
+    }
   }
 
-  attributeChangedCallback(name: string): void {
+  attributeChangedCallback (name: string): void {
+    if (name === "class") {
+      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      return;
+    }
+    if (!this.isConnected) return;
+
     if (name === "start-index") {
-      this.currentIndex = this.normalizeIndex(this.getStartIndex());
+      this.goTo(this.getStartIndex(), { emit: true });
+      return;
     }
 
     this.build();
     this.startAutoplay();
   }
 
-  private readonly handleMouseEnter = (): void => {
-    this.stopAutoplay();
-  };
-
-  private readonly handleMouseLeave = (): void => {
-    this.startAutoplay();
-  };
-
-  private readonly handleResize = (): void => {
-    this.measureSlideStep();
-    this.applyTrackTransform();
-    this.renderDots();
-  };
-
-  private getTheme(): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
+  /** Índice do slide atual (primeiro visível). */
+  get index (): number {
+    return this.currentIndex;
   }
 
-  private getIntent(): ArkIntent {
+  /** Slides do usuário: filhos diretos que não são o overlay do componente. */
+  get slides (): HTMLElement[] {
+    return Array.from(this.children).filter((node): node is HTMLElement => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR));
+  }
+
+  next (): void {
+    this.stopAutoplay();
+    this.goTo(this.currentIndex + 1, { emit: true });
+  }
+
+  prev (): void {
+    this.stopAutoplay();
+    this.goTo(this.currentIndex - 1, { emit: true });
+  }
+
+  // --- Atributos ---
+
+  private getIntent (): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
       return intent;
@@ -110,65 +175,61 @@ export class ArkCarousel extends HTMLElement {
     return "primary";
   }
 
-  private getAccentColor(): string | null {
+  private getAccentColor (): string | null {
     const color = this.getAttribute("accent-color")?.trim();
     return color || null;
   }
 
-  private getSlidesPerView(): number {
+  private getSlidesPerView (): number {
     const parsed = Number(this.getAttribute("slides-per-view") || "1");
     if (!Number.isFinite(parsed)) return 1;
     return Math.max(1, Math.floor(parsed));
   }
 
-  private getGap(): number {
+  private getGap (): number {
     const parsed = Number(this.getAttribute("gap") || "12");
     if (!Number.isFinite(parsed)) return 12;
     return Math.max(0, parsed);
   }
 
-  private getStartIndex(): number {
+  private getStartIndex (): number {
     const parsed = Number(this.getAttribute("start-index") || "0");
     if (!Number.isFinite(parsed)) return 0;
     return Math.max(0, Math.floor(parsed));
   }
 
-  private isLoopEnabled(): boolean {
+  private isLoopEnabled (): boolean {
     return this.hasAttribute("loop");
   }
 
-  private isAutoplayEnabled(): boolean {
+  private isAutoplayEnabled (): boolean {
     return this.hasAttribute("autoplay");
   }
 
-  private getAutoplayDelay(): number {
+  private getAutoplayDelay (): number {
     const parsed = Number(this.getAttribute("autoplay-delay") || "4200");
     if (!Number.isFinite(parsed)) return 4200;
     return Math.max(1200, parsed);
   }
 
-  private shouldShowDots(): boolean {
+  private shouldShowDots (): boolean {
     return !this.hasAttribute("show-dots") || this.getAttribute("show-dots") !== "false";
   }
 
-  private shouldShowArrows(): boolean {
+  private shouldShowArrows (): boolean {
     return !this.hasAttribute("show-arrows") || this.getAttribute("show-arrows") !== "false";
   }
 
-  private isDragFree(): boolean {
-    return this.hasAttribute("drag-free");
-  }
-
-  private getSnapMode(): ArkCarouselSnap {
+  private getSnapMode (): ArkCarouselSnap {
     const value = (this.getAttribute("snap") || "mandatory").toLowerCase();
     return value === "proximity" ? "proximity" : "mandatory";
   }
 
-  private getMaxIndex(): number {
+  private getMaxIndex (): number {
     return Math.max(0, this.slides.length - this.getSlidesPerView());
   }
 
-  private normalizeIndex(index: number): number {
+  private normalizeIndex (index: number): number {
     const maxIndex = this.getMaxIndex();
     if (maxIndex <= 0) return 0;
 
@@ -181,111 +242,166 @@ export class ArkCarousel extends HTMLElement {
     return Math.min(maxIndex, Math.max(0, index));
   }
 
-  private getPalette(theme: ArkThemeSelected, intent: ArkIntent): ArkCarouselPalette {
-    const lightIntent: Record<ArkIntent, { dotActive: string; frameBorder: string; shadow: string }> = {
-      primary: { dotActive: "bg-slate-900", frameBorder: "border-slate-200", shadow: "shadow-slate-200/70" },
-      secondary: { dotActive: "bg-slate-700", frameBorder: "border-slate-200", shadow: "shadow-slate-200/70" },
-      success: { dotActive: "bg-emerald-600", frameBorder: "border-emerald-200", shadow: "shadow-emerald-200/60" },
-      warning: { dotActive: "bg-amber-500", frameBorder: "border-amber-200", shadow: "shadow-amber-200/60" },
-      danger: { dotActive: "bg-red-600", frameBorder: "border-red-200", shadow: "shadow-red-200/60" },
-      info: { dotActive: "bg-sky-600", frameBorder: "border-sky-200", shadow: "shadow-sky-200/60" },
-      neutral: { dotActive: "bg-zinc-700", frameBorder: "border-zinc-200", shadow: "shadow-zinc-200/70" }
+  private getPalette (intent: ArkIntent): ArkCarouselPalette {
+    const byIntent: Record<ArkIntent, { dotActive: string; frameBorder: string }> = {
+      primary: { dotActive: "ark:bg-primary", frameBorder: "ark:border-border" },
+      secondary: { dotActive: "ark:bg-secondary", frameBorder: "ark:border-border" },
+      success: { dotActive: "ark:bg-success", frameBorder: "ark:border-success-border" },
+      warning: { dotActive: "ark:bg-warning", frameBorder: "ark:border-warning-border" },
+      danger: { dotActive: "ark:bg-danger", frameBorder: "ark:border-danger-border" },
+      info: { dotActive: "ark:bg-info", frameBorder: "ark:border-info-border" },
+      neutral: { dotActive: "ark:bg-neutral", frameBorder: "ark:border-neutral-border" }
     };
 
-    const darkIntent: Record<ArkIntent, { dotActive: string; frameBorder: string; shadow: string }> = {
-      primary: { dotActive: "bg-slate-100", frameBorder: "border-slate-700", shadow: "shadow-black/30" },
-      secondary: { dotActive: "bg-slate-300", frameBorder: "border-slate-700", shadow: "shadow-black/30" },
-      success: { dotActive: "bg-emerald-400", frameBorder: "border-emerald-700", shadow: "shadow-black/30" },
-      warning: { dotActive: "bg-amber-300", frameBorder: "border-amber-700", shadow: "shadow-black/30" },
-      danger: { dotActive: "bg-red-400", frameBorder: "border-red-700", shadow: "shadow-black/30" },
-      info: { dotActive: "bg-sky-400", frameBorder: "border-sky-700", shadow: "shadow-black/30" },
-      neutral: { dotActive: "bg-zinc-300", frameBorder: "border-zinc-700", shadow: "shadow-black/30" }
-    };
-
-    if (theme === "dark") {
-      const intentStyles = darkIntent[intent];
-      return {
-        frame: `rounded-2xl border bg-slate-900 p-4 shadow-lg ${intentStyles.frameBorder} ${intentStyles.shadow}`,
-        viewport: "overflow-hidden rounded-xl bg-slate-950",
-        track: "flex select-none touch-pan-y",
-        slideSurface: "rounded-xl border border-slate-700 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 text-slate-100",
-        arrowButton: "inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-600 bg-slate-800 text-slate-200 transition hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:opacity-40 disabled:cursor-not-allowed",
-        dotButton: "h-2.5 w-2.5 rounded-full bg-slate-600 transition hover:bg-slate-500",
-        dotActive: intentStyles.dotActive
-      };
-    }
-
-    const intentStyles = lightIntent[intent];
+    const intentStyles = byIntent[intent];
     return {
-      frame: `rounded-2xl border bg-white p-4 shadow-lg ${intentStyles.frameBorder} ${intentStyles.shadow}`,
-      viewport: "overflow-hidden rounded-xl bg-slate-50",
-      track: "flex select-none touch-pan-y",
-      slideSurface: "rounded-xl border border-slate-200 bg-gradient-to-br from-white via-slate-50 to-slate-100 p-6 text-slate-900",
-      arrowButton: "inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:opacity-40 disabled:cursor-not-allowed",
-      dotButton: "h-2.5 w-2.5 rounded-full bg-slate-300 transition hover:bg-slate-400",
+      frame: `ark:rounded-2xl ark:border ark:bg-surface-muted ark:shadow-lg ${intentStyles.frameBorder}`,
+      arrowButton: "ark:inline-flex ark:h-9 ark:w-9 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-border-strong ark:bg-surface ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-ring ark:disabled:opacity-40 ark:disabled:cursor-not-allowed",
+      dotButton: "ark:h-2.5 ark:w-2.5 ark:rounded-full ark:bg-muted ark:transition ark:hover:bg-fg-placeholder",
       dotActive: intentStyles.dotActive
     };
   }
 
-  private captureSlides(): void {
-    if (this.slides.length > 0) return;
+  // --- Navegação ---
 
-    const initialSlides = Array.from(this.children).filter((node): node is HTMLElement => {
-      return node instanceof HTMLElement && !node.hasAttribute("data-ark-carousel-root");
-    });
+  private slideOffset (index: number): number {
+    const slide = this.slides[index];
+    return slide ? slide.offsetLeft : 0;
+  }
 
-    this.slides = initialSlides;
+  private goTo (index: number, options?: { emit?: boolean; behavior?: ScrollBehavior }): void {
+    const nextIndex = this.normalizeIndex(index);
+    const changed = nextIndex !== this.currentIndex;
+    this.currentIndex = nextIndex;
 
-    for (const slide of this.slides) {
-      this.removeChild(slide);
+    const behavior: ScrollBehavior = options?.behavior ?? (prefersReducedMotion() ? "auto" : "smooth");
+    const left = this.slideOffset(nextIndex);
+    if (Math.abs(this.scrollLeft - left) > 1) {
+      this.scrollTo({ left, behavior });
+    }
+
+    this.renderDots();
+    this.syncArrowState();
+
+    if (changed && options?.emit) {
+      this.emitSlideChange();
     }
   }
 
-  private startAutoplay(): void {
+  private emitSlideChange (): void {
+    this.dispatchEvent(
+      new CustomEvent("ark-slide-change", {
+        detail: { index: this.currentIndex },
+        bubbles: true,
+        composed: true
+      })
+    );
+  }
+
+  // Índice do slide mais próximo da borda esquerda visível.
+  private indexFromScroll (): number {
+    const slides = this.slides;
+    if (slides.length === 0) return 0;
+    const left = this.scrollLeft;
+    let best = 0;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    slides.forEach((slide, index) => {
+      const distance = Math.abs(slide.offsetLeft - left);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = index;
+      }
+    });
+    return Math.min(best, this.getMaxIndex());
+  }
+
+  private readonly handleScroll = (): void => {
+    if (this.scrollTimer !== null) window.clearTimeout(this.scrollTimer);
+    // Rolagem nativa (touch/trackpad/setas): sincroniza o índice ao parar.
+    this.scrollTimer = window.setTimeout(() => {
+      this.scrollTimer = null;
+      const index = this.indexFromScroll();
+      if (index !== this.currentIndex) {
+        this.currentIndex = index;
+        this.renderDots();
+        this.syncArrowState();
+        this.emitSlideChange();
+      }
+    }, 80);
+  };
+
+  private handleSlidesChanged (): void {
+    this.slides.forEach((slide, index) => applyTestHooks(this, "carousel", slide, `slide-${index}`));
+    this.currentIndex = this.normalizeIndex(this.currentIndex);
+    this.renderDots();
+    this.syncArrowState();
+    this.startAutoplay();
+  }
+
+  // --- Arrasto com mouse (touch usa a rolagem nativa) ---
+
+  private readonly handlePointerDown = (event: PointerEvent): void => {
+    if (event.pointerType !== "mouse" || event.button !== 0 || this.slides.length <= 1) return;
+    if ((event.target as HTMLElement | null)?.closest(`[${CHROME_ATTR}]`)) return;
+
+    this.dragging = true;
+    this.dragMoved = false;
+    this.dragStartX = event.clientX;
+    this.dragStartScroll = this.scrollLeft;
+    this.setAttribute("data-ark-dragging", "");
+    this.setPointerCapture(event.pointerId);
+    this.stopAutoplay();
+  };
+
+  private readonly handlePointerMove = (event: PointerEvent): void => {
+    if (!this.dragging) return;
+    const delta = event.clientX - this.dragStartX;
+    if (Math.abs(delta) > 4) this.dragMoved = true;
+    this.scrollLeft = this.dragStartScroll - delta;
+  };
+
+  private readonly handlePointerUp = (event: PointerEvent): void => {
+    if (!this.dragging) return;
+    this.dragging = false;
+    if (this.hasPointerCapture(event.pointerId)) this.releasePointerCapture(event.pointerId);
+    // Restaurar o snap faz o navegador "encaixar" no slide mais próximo.
+    this.removeAttribute("data-ark-dragging");
+    const index = this.indexFromScroll();
+    this.goTo(index, { emit: true });
+  };
+
+  // --- Autoplay ---
+
+  private readonly handleMouseEnter = (): void => {
+    this.stopAutoplay();
+  };
+
+  private readonly handleMouseLeave = (): void => {
+    this.startAutoplay();
+  };
+
+  private startAutoplay (): void {
     this.stopAutoplay();
 
-    if (!this.isAutoplayEnabled() || this.slides.length <= 1) return;
+    // Movimento automático contínuo é desligado com prefers-reduced-motion.
+    if (!this.isAutoplayEnabled() || this.slides.length <= 1 || prefersReducedMotion()) return;
+    if (this.matches(":hover, :focus-within")) return;
 
     this.autoplayId = window.setInterval(() => {
       this.goTo(this.currentIndex + 1, { emit: true });
     }, this.getAutoplayDelay());
   }
 
-  private stopAutoplay(): void {
+  private stopAutoplay (): void {
     if (this.autoplayId !== null) {
       window.clearInterval(this.autoplayId);
       this.autoplayId = null;
     }
   }
 
-  private goTo(index: number, options?: { emit?: boolean }): void {
-    this.currentIndex = this.normalizeIndex(index);
-    this.applyTrackTransform();
-    this.renderDots();
-    this.syncArrowState();
+  // --- Overlay: setas e dots ---
 
-    if (options?.emit) {
-      this.dispatchEvent(
-        new CustomEvent("ark-slide-change", {
-          detail: { index: this.currentIndex },
-          bubbles: true,
-          composed: true
-        })
-      );
-    }
-  }
-
-  private prev = (): void => {
-    this.stopAutoplay();
-    this.goTo(this.currentIndex - 1, { emit: true });
-  };
-
-  private next = (): void => {
-    this.stopAutoplay();
-    this.goTo(this.currentIndex + 1, { emit: true });
-  };
-
-  private syncArrowState(): void {
+  private syncArrowState (): void {
     if (!this.arrowPrevEl || !this.arrowNextEl) return;
 
     if (this.isLoopEnabled()) {
@@ -299,26 +415,27 @@ export class ArkCarousel extends HTMLElement {
     this.arrowNextEl.disabled = this.currentIndex >= max;
   }
 
-  private renderDots(): void {
+  private renderDots (): void {
     if (!this.dotsEl) return;
 
-    this.dotsEl.innerHTML = "";
+    this.dotsEl.replaceChildren();
     const totalDots = this.getMaxIndex() + 1;
-    if (totalDots <= 1 || !this.shouldShowDots()) return;
+    this.dotsEl.hidden = totalDots <= 1 || !this.shouldShowDots();
+    if (this.dotsEl.hidden) return;
 
-    const theme = this.getTheme();
-    const intent = this.getIntent();
+    const palette = this.getPalette(this.getIntent());
     const accentColor = this.getAccentColor();
-    const palette = this.getPalette(theme, intent);
 
     for (let i = 0; i < totalDots; i++) {
       const dot = document.createElement("button");
       dot.type = "button";
-      dot.className = `${palette.dotButton} ${i === this.currentIndex ? palette.dotActive : ""}`.trim();
+      const active = i === this.currentIndex;
+      dot.className = `${palette.dotButton} ${active ? palette.dotActive : ""}`.trim();
       dot.setAttribute("aria-label", `Go to slide ${i + 1}`);
+      if (active) dot.setAttribute("aria-current", "true");
       applyTestHooks(this, "carousel", dot, `dot-${i}`);
 
-      if (i === this.currentIndex && accentColor) {
+      if (active && accentColor) {
         dot.style.backgroundColor = accentColor;
       }
 
@@ -330,189 +447,85 @@ export class ArkCarousel extends HTMLElement {
     }
   }
 
-  private measureSlideStep(): void {
-    if (!this.trackEl) return;
-
-    const first = this.trackEl.children.item(0) as HTMLElement | null;
-    const second = this.trackEl.children.item(1) as HTMLElement | null;
-    if (!first) {
-      this.slideStepPx = 0;
-      return;
+  private applyOwnClasses (next: string[]): void {
+    this.syncingClass = true;
+    for (const cls of this.ownClasses) {
+      if (!next.includes(cls)) this.classList.remove(cls);
     }
-
-    if (second) {
-      this.slideStepPx = second.offsetLeft - first.offsetLeft;
-      return;
+    for (const cls of next) {
+      if (!this.classList.contains(cls)) this.classList.add(cls);
     }
-
-    this.slideStepPx = first.getBoundingClientRect().width;
+    this.ownClasses = next;
+    this.syncingClass = false;
   }
 
-  private applyTrackTransform(): void {
-    if (!this.trackEl) return;
-
-    const offset = this.slideStepPx * this.currentIndex;
-    this.trackEl.style.transform = `translate3d(${-offset + this.dragOffsetPx}px, 0, 0)`;
-  }
-
-  private bindDragHandlers(viewport: HTMLDivElement, track: HTMLDivElement): void {
-    const getClientX = (event: PointerEvent): number => event.clientX;
-
-    viewport.onpointerdown = (event: PointerEvent) => {
-      if (this.slides.length <= 1) return;
-
-      this.dragging = true;
-      this.dragStartX = getClientX(event);
-      this.dragOffsetPx = 0;
-      track.style.transition = "none";
-      viewport.setPointerCapture(event.pointerId);
-      this.stopAutoplay();
-    };
-
-    viewport.onpointermove = (event: PointerEvent) => {
-      if (!this.dragging) return;
-
-      this.dragOffsetPx = getClientX(event) - this.dragStartX;
-      this.applyTrackTransform();
-    };
-
-    const finishDrag = (event: PointerEvent): void => {
-      if (!this.dragging) return;
-
-      this.dragging = false;
-      viewport.releasePointerCapture(event.pointerId);
-      track.style.transition = "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)";
-
-      const movement = this.dragOffsetPx;
-      const step = Math.max(1, this.slideStepPx);
-      const projected = this.currentIndex - movement / step;
-      const threshold = this.getSnapMode() === "proximity" ? 0.18 : 0.32;
-
-      if (!this.isDragFree() && Math.abs(movement) / step < threshold) {
-        this.dragOffsetPx = 0;
-        this.applyTrackTransform();
-        return;
-      }
-
-      this.dragOffsetPx = 0;
-      this.goTo(Math.round(projected), { emit: true });
-    };
-
-    viewport.onpointerup = finishDrag;
-    viewport.onpointercancel = finishDrag;
-    viewport.onpointerleave = (event: PointerEvent) => {
-      if (this.dragging) finishDrag(event);
-    };
-  }
-
-  private build(): void {
-    this.captureSlides();
-
-    if (this.root) {
-      this.root.remove();
-      this.root = null;
-      this.viewportEl = null;
-      this.trackEl = null;
-      this.dotsEl = null;
-      this.arrowPrevEl = null;
-      this.arrowNextEl = null;
-    }
-
-    const theme = this.getTheme();
-    const intent = this.getIntent();
-    const palette = this.getPalette(theme, intent);
+  private build (): void {
+    const palette = this.getPalette(this.getIntent());
     const accentColor = this.getAccentColor();
-    const slidesPerView = this.getSlidesPerView();
-    const gap = this.getGap();
 
-    const root = document.createElement("div");
-    root.setAttribute("part", "container");
-    root.setAttribute("data-ark-carousel-root", "true");
-    root.className = `${palette.frame} relative`;
-    applyTestHooks(this, "carousel", root);
-
-    const viewport = document.createElement("div");
-    viewport.setAttribute("part", "viewport");
-    viewport.className = palette.viewport;
-    applyTestHooks(this, "carousel", viewport, "viewport");
-
-    const track = document.createElement("div");
-    track.setAttribute("part", "track");
-    applyTestHooks(this, "carousel", track, "track");
-    track.className = palette.track;
-    track.style.gap = `${gap}px`;
-    track.style.transition = "transform 380ms cubic-bezier(0.22, 1, 0.36, 1)";
-    track.style.willChange = "transform";
-    track.style.cursor = "grab";
-
-    const slideWidth = `calc((100% - ${(slidesPerView - 1) * gap}px) / ${slidesPerView})`;
-
-    for (const [index, slide] of this.slides.entries()) {
-      applyTestHooks(this, "carousel", slide, `slide-${index}`);
-      slide.setAttribute("part", "slide");
-      slide.className = `${palette.slideSurface} ${slide.getAttribute("class") || ""}`.trim();
-      slide.style.flex = `0 0 ${slideWidth}`;
-      track.appendChild(slide);
+    // Host: frame + container rolável (estrutura em components.css).
+    this.style.setProperty("--ark-carousel-per-view", String(this.getSlidesPerView()));
+    this.style.setProperty("--ark-carousel-gap", `${this.getGap()}px`);
+    this.applyOwnClasses(palette.frame.split(/\s+/).filter(Boolean));
+    if (this.getSnapMode() === "proximity") {
+      this.setAttribute("data-ark-snap", "proximity");
+    } else {
+      this.removeAttribute("data-ark-snap");
     }
+    applyTestHooks(this, "carousel", this);
+    this.slides.forEach((slide, index) => applyTestHooks(this, "carousel", slide, `slide-${index}`));
 
-    viewport.appendChild(track);
-    root.appendChild(viewport);
+    // Overlay sticky: sempre o PRIMEIRO filho, cobrindo a área visível.
+    if (!this.overlayEl) {
+      const overlay = document.createElement("div");
+      overlay.setAttribute(CHROME_ATTR, "overlay");
+      this.prepend(overlay);
+      this.overlayEl = overlay;
+    }
+    const overlay = this.overlayEl;
+    overlay.replaceChildren();
+    applyTestHooks(this, "carousel", overlay, "overlay");
+
+    this.arrowPrevEl = null;
+    this.arrowNextEl = null;
 
     if (this.shouldShowArrows()) {
-      const arrowsWrap = document.createElement("div");
-      arrowsWrap.className = "pointer-events-none absolute inset-y-0 left-0 right-0 flex items-center justify-between px-2";
-
       const prev = document.createElement("button");
       prev.type = "button";
-      prev.className = `${palette.arrowButton} pointer-events-auto`;
+      prev.className = `${palette.arrowButton} ark:pointer-events-auto ark:absolute ark:left-2 ark:top-1/2 ark:-translate-y-1/2`;
       applyTestHooks(this, "carousel", prev, "arrow-prev");
       prev.setAttribute("aria-label", "Previous slide");
       prev.innerHTML = "&#10094;";
-      prev.addEventListener("click", this.prev);
+      prev.addEventListener("click", () => this.prev());
 
       const next = document.createElement("button");
       next.type = "button";
-      next.className = `${palette.arrowButton} pointer-events-auto`;
+      next.className = `${palette.arrowButton} ark:pointer-events-auto ark:absolute ark:right-2 ark:top-1/2 ark:-translate-y-1/2`;
       applyTestHooks(this, "carousel", next, "arrow-next");
       next.setAttribute("aria-label", "Next slide");
       next.innerHTML = "&#10095;";
-      next.addEventListener("click", this.next);
+      next.addEventListener("click", () => this.next());
 
       if (accentColor) {
         prev.style.borderColor = accentColor;
         next.style.borderColor = accentColor;
       }
 
-      arrowsWrap.appendChild(prev);
-      arrowsWrap.appendChild(next);
-      root.appendChild(arrowsWrap);
-
+      overlay.appendChild(prev);
+      overlay.appendChild(next);
       this.arrowPrevEl = prev;
       this.arrowNextEl = next;
     }
 
     const dots = document.createElement("div");
-    dots.setAttribute("part", "dots");
+    dots.className = "ark:pointer-events-auto ark:absolute ark:left-1/2 ark:top-full ark:mt-3 ark:flex ark:-translate-x-1/2 ark:items-center ark:gap-2";
     applyTestHooks(this, "carousel", dots, "dots");
-    dots.className = "mt-4 flex items-center justify-center gap-2";
-    root.appendChild(dots);
-
-    this.root = root;
-    this.viewportEl = viewport;
-    this.trackEl = track;
+    overlay.appendChild(dots);
     this.dotsEl = dots;
 
-    this.appendChild(root);
-    this.bindDragHandlers(viewport, track);
-
     this.currentIndex = this.normalizeIndex(this.currentIndex);
-
-    queueMicrotask(() => {
-      this.measureSlideStep();
-      this.applyTrackTransform();
-      this.renderDots();
-      this.syncArrowState();
-    });
+    this.renderDots();
+    this.syncArrowState();
   }
 }
 

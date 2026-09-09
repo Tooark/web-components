@@ -1,5 +1,4 @@
-import "../styles/tailwind.css";
-import type { ArkSize, ArkIntent, ArkThemeSelected } from "@tooark/core";
+import type { ArkSize, ArkIntent } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSwitchPalette = {
@@ -72,16 +71,6 @@ export class ArkSwitch extends HTMLElement {
     }));
   }
 
-  private getTheme (): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getIntent (): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
@@ -90,38 +79,28 @@ export class ArkSwitch extends HTMLElement {
     return "primary";
   }
 
-  private getPalette (theme: ArkThemeSelected, intent: ArkIntent): ArkSwitchPalette {
-    const light: Record<ArkIntent, ArkSwitchPalette> = {
-      primary: { focusRing: "focus-visible:ring-slate-400", onTrack: "bg-slate-900", thumbOn: "bg-white", iconOn: "text-slate-900", labelOn: "text-white" },
-      secondary: { focusRing: "focus-visible:ring-slate-400", onTrack: "bg-slate-600", thumbOn: "bg-white", iconOn: "text-slate-600", labelOn: "text-white" },
-      success: { focusRing: "focus-visible:ring-emerald-400", onTrack: "bg-emerald-600", thumbOn: "bg-white", iconOn: "text-emerald-600", labelOn: "text-white" },
-      warning: { focusRing: "focus-visible:ring-amber-400", onTrack: "bg-amber-500", thumbOn: "bg-white", iconOn: "text-amber-500", labelOn: "text-slate-900" },
-      danger: { focusRing: "focus-visible:ring-red-400", onTrack: "bg-red-600", thumbOn: "bg-white", iconOn: "text-red-600", labelOn: "text-white" },
-      info: { focusRing: "focus-visible:ring-sky-400", onTrack: "bg-sky-600", thumbOn: "bg-white", iconOn: "text-sky-600", labelOn: "text-white" },
-      neutral: { focusRing: "focus-visible:ring-zinc-400", onTrack: "bg-zinc-700", thumbOn: "bg-white", iconOn: "text-zinc-700", labelOn: "text-white" }
+  private getPalette (intent: ArkIntent): ArkSwitchPalette {
+    const palettes: Record<ArkIntent, ArkSwitchPalette> = {
+      primary: { focusRing: "ark:focus-visible:ring-primary-ring", onTrack: "ark:bg-primary", thumbOn: "ark:bg-primary-fg", iconOn: "ark:text-primary", labelOn: "ark:text-primary-fg" },
+      secondary: { focusRing: "ark:focus-visible:ring-secondary-ring", onTrack: "ark:bg-secondary", thumbOn: "ark:bg-secondary-fg", iconOn: "ark:text-secondary", labelOn: "ark:text-secondary-fg" },
+      success: { focusRing: "ark:focus-visible:ring-success-ring", onTrack: "ark:bg-success", thumbOn: "ark:bg-success-fg", iconOn: "ark:text-success", labelOn: "ark:text-success-fg" },
+      warning: { focusRing: "ark:focus-visible:ring-warning-ring", onTrack: "ark:bg-warning", thumbOn: "ark:bg-warning-fg", iconOn: "ark:text-warning", labelOn: "ark:text-warning-fg" },
+      danger: { focusRing: "ark:focus-visible:ring-danger-ring", onTrack: "ark:bg-danger", thumbOn: "ark:bg-danger-fg", iconOn: "ark:text-danger", labelOn: "ark:text-danger-fg" },
+      info: { focusRing: "ark:focus-visible:ring-info-ring", onTrack: "ark:bg-info", thumbOn: "ark:bg-info-fg", iconOn: "ark:text-info", labelOn: "ark:text-info-fg" },
+      neutral: { focusRing: "ark:focus-visible:ring-neutral-ring", onTrack: "ark:bg-neutral", thumbOn: "ark:bg-neutral-fg", iconOn: "ark:text-neutral", labelOn: "ark:text-neutral-fg" }
     };
 
-    const dark: Record<ArkIntent, ArkSwitchPalette> = {
-      primary: { focusRing: "focus-visible:ring-slate-500", onTrack: "bg-slate-100", thumbOn: "bg-slate-900", iconOn: "text-slate-100", labelOn: "text-slate-900" },
-      secondary: { focusRing: "focus-visible:ring-slate-500", onTrack: "bg-slate-500", thumbOn: "bg-white", iconOn: "text-slate-500", labelOn: "text-white" },
-      success: { focusRing: "focus-visible:ring-emerald-500", onTrack: "bg-emerald-500", thumbOn: "bg-white", iconOn: "text-emerald-500", labelOn: "text-white" },
-      warning: { focusRing: "focus-visible:ring-amber-500", onTrack: "bg-amber-400", thumbOn: "bg-white", iconOn: "text-amber-500", labelOn: "text-slate-900" },
-      danger: { focusRing: "focus-visible:ring-red-500", onTrack: "bg-red-500", thumbOn: "bg-white", iconOn: "text-red-500", labelOn: "text-white" },
-      info: { focusRing: "focus-visible:ring-sky-500", onTrack: "bg-sky-500", thumbOn: "bg-white", iconOn: "text-sky-500", labelOn: "text-white" },
-      neutral: { focusRing: "focus-visible:ring-zinc-500", onTrack: "bg-zinc-300", thumbOn: "bg-zinc-800", iconOn: "text-zinc-200", labelOn: "text-zinc-900" }
-    };
-
-    return (theme === "dark" ? dark : light)[intent];
+    return palettes[intent];
   }
 
   private getSizing (): ArkSwitchSizing {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
 
     const sizes: Record<ArkSize, ArkSwitchSizing> = {
-      sm: { track: "h-4 w-7", trackLabels: "h-4 w-12", thumb: "h-3 w-3", translate: "translate-x-3", translateLabels: "translate-x-8", icon: "h-2 w-2", label: "text-[7px]" },
-      md: { track: "h-6 w-11", trackLabels: "h-6 w-16", thumb: "h-5 w-5", translate: "translate-x-5", translateLabels: "translate-x-10", icon: "h-2.5 w-2.5", label: "text-[9px]" },
-      lg: { track: "h-7 w-12", trackLabels: "h-7 w-20", thumb: "h-6 w-6", translate: "translate-x-5", translateLabels: "translate-x-[3.25rem]", icon: "h-3 w-3", label: "text-[11px]" },
-      xl: { track: "h-8 w-14", trackLabels: "h-8 w-24", thumb: "h-7 w-7", translate: "translate-x-6", translateLabels: "translate-x-16", icon: "h-3.5 w-3.5", label: "text-xs" }
+      sm: { track: "ark:h-4 ark:w-7", trackLabels: "ark:h-4 ark:w-12", thumb: "ark:h-3 ark:w-3", translate: "ark:translate-x-3", translateLabels: "ark:translate-x-8", icon: "ark:h-2 ark:w-2", label: "ark:text-[7px]" },
+      md: { track: "ark:h-6 ark:w-11", trackLabels: "ark:h-6 ark:w-16", thumb: "ark:h-5 ark:w-5", translate: "ark:translate-x-5", translateLabels: "ark:translate-x-10", icon: "ark:h-2.5 ark:w-2.5", label: "ark:text-[9px]" },
+      lg: { track: "ark:h-7 ark:w-12", trackLabels: "ark:h-7 ark:w-20", thumb: "ark:h-6 ark:w-6", translate: "ark:translate-x-5", translateLabels: "ark:translate-x-[3.25rem]", icon: "ark:h-3 ark:w-3", label: "ark:text-[11px]" },
+      xl: { track: "ark:h-8 ark:w-14", trackLabels: "ark:h-8 ark:w-24", thumb: "ark:h-7 ark:w-7", translate: "ark:translate-x-6", translateLabels: "ark:translate-x-16", icon: "ark:h-3.5 ark:w-3.5", label: "ark:text-xs" }
     };
 
     return sizes[size] ?? sizes.md;
@@ -169,8 +148,7 @@ export class ArkSwitch extends HTMLElement {
   private updateAppearance (): void {
     if (!this.trackEl || !this.thumbEl || !this.labelOnEl || !this.labelOffEl || !this.inputEl) return;
 
-    const theme = this.getTheme();
-    const palette = this.getPalette(theme, this.getIntent());
+    const palette = this.getPalette(this.getIntent());
     const sizing = this.getSizing();
     const checked = this.checked;
     const disabled = this.hasAttribute("disabled");
@@ -178,11 +156,11 @@ export class ArkSwitch extends HTMLElement {
     const icons = this.hasAttribute("icons");
     const color = this.getAttribute("color")?.trim();
 
-    const offTrack = theme === "dark" ? "bg-slate-600" : "bg-slate-300";
-    const labelOffColor = theme === "dark" ? "text-slate-300" : "text-slate-600";
+    const offTrack = "ark:bg-muted";
+    const labelOffColor = "ark:text-fg-muted";
 
     this.trackEl.className = [
-      "relative inline-flex shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+      "ark:relative ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-full ark:border-2 ark:border-transparent ark:transition-colors ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50",
       palette.focusRing,
       labels ? sizing.trackLabels : sizing.track,
       checked ? palette.onTrack : offTrack
@@ -200,11 +178,11 @@ export class ArkSwitch extends HTMLElement {
     }
 
     this.thumbEl.className = [
-      "pointer-events-none inline-flex items-center justify-center rounded-full shadow transition-transform",
+      "ark:pointer-events-none ark:inline-flex ark:items-center ark:justify-center ark:rounded-full ark:shadow ark:transition-transform",
       sizing.thumb,
-      checked ? palette.thumbOn : "bg-white",
-      checked ? palette.iconOn : "text-slate-400",
-      checked ? (labels ? sizing.translateLabels : sizing.translate) : "translate-x-0"
+      checked ? palette.thumbOn : "ark:bg-white",
+      checked ? palette.iconOn : "ark:text-fg-placeholder",
+      checked ? (labels ? sizing.translateLabels : sizing.translate) : "ark:translate-x-0"
     ].join(" ");
     this.thumbEl.style.color = checked && color ? color : "";
 
@@ -222,9 +200,9 @@ export class ArkSwitch extends HTMLElement {
       delete this.thumbEl.dataset.icon;
     }
 
-    const labelBase = "pointer-events-none absolute top-0 flex h-full items-center font-bold uppercase tracking-wide transition-opacity select-none";
-    this.labelOnEl.className = [labelBase, "left-0 pl-2", sizing.label, palette.labelOn, labels && checked ? "opacity-100" : "opacity-0"].join(" ");
-    this.labelOffEl.className = [labelBase, "right-0 pr-2", sizing.label, labelOffColor, labels && !checked ? "opacity-100" : "opacity-0"].join(" ");
+    const labelBase = "ark:pointer-events-none ark:absolute ark:top-0 ark:flex ark:h-full ark:items-center ark:font-bold ark:uppercase ark:tracking-wide ark:transition-opacity ark:select-none";
+    this.labelOnEl.className = [labelBase, "ark:left-0 ark:pl-2", sizing.label, palette.labelOn, labels && checked ? "ark:opacity-100" : "ark:opacity-0"].join(" ");
+    this.labelOffEl.className = [labelBase, "ark:right-0 ark:pr-2", sizing.label, labelOffColor, labels && !checked ? "ark:opacity-100" : "ark:opacity-0"].join(" ");
     this.labelOnEl.textContent = this.getAttribute("label-on") || "ON";
     this.labelOffEl.textContent = this.getAttribute("label-off") || "OFF";
 

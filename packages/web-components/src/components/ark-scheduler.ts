@@ -1,6 +1,6 @@
-import "../styles/tailwind.css";
 import { arkEnter, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
-import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkThemeSelected } from "@tooark/core";
+import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView } from "@tooark/core";
+import { intentColors } from "./intent-colors";
 import {
   addDays,
   addMonths,
@@ -36,17 +36,6 @@ type PlacedEvent = {
   end: Date;
   column: number;
   columns: number;
-};
-
-// Cores dos eventos por intent (quando o evento não traz `color`).
-const EVENT_INTENT_HEX: Record<ArkIntent, string> = {
-  primary: "#0f172a",
-  secondary: "#475569",
-  success: "#059669",
-  warning: "#f59e0b",
-  danger: "#dc2626",
-  info: "#0284c7",
-  neutral: "#3f3f46"
 };
 
 const HOUR_HEIGHT_PX = 48;
@@ -152,16 +141,6 @@ export class ArkScheduler extends HTMLElement {
     return resolveLocale(lang, customJson);
   }
 
-  private getTheme(): ArkThemeSelected {
-    const theme = (this.getAttribute("theme") || "auto").toLowerCase();
-    if (theme === "dark") return "dark";
-    if (theme === "light") return "light";
-    if (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      return "dark";
-    }
-    return "light";
-  }
-
   private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
     if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
@@ -203,10 +182,8 @@ export class ArkScheduler extends HTMLElement {
     return `${pad2(hour)}:${pad2(minute)}`;
   }
 
-  private eventColor(event: ArkSchedulerEvent): string {
-    if (event.color) return event.color;
-    const intent = (event.intent || "").toLowerCase() as ArkIntent;
-    return EVENT_INTENT_HEX[intent] || EVENT_INTENT_HEX[this.getIntent()];
+  private eventColors(event: ArkSchedulerEvent): { bg: string; fg: string } {
+    return intentColors(event.intent, event.color, this.getIntent());
   }
 
   private eventStart(event: ArkSchedulerEvent): Date | null {
@@ -282,35 +259,20 @@ export class ArkScheduler extends HTMLElement {
     return placed;
   }
 
-  private getPalette(theme: ArkThemeSelected): ArkSchedulerPalette {
-    if (theme === "dark") {
-      return {
-        container: "flex w-full flex-col rounded-lg border border-slate-700 bg-slate-900 text-slate-100 shadow-sm",
-        headerText: "text-sm font-semibold text-slate-100",
-        navButton: "rounded-md border border-slate-600 p-1 text-slate-300 transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500",
-        mutedText: "text-slate-400",
-        gridLine: "border-slate-800",
-        columnBorder: "border-slate-800",
-        slotHover: "hover:bg-slate-800/60",
-        todayColumn: "bg-slate-800/40",
-        monthCellBase: "bg-slate-900 text-slate-200",
-        monthCellMuted: "bg-slate-950/40 text-slate-600",
-        agendaRow: "border-slate-800"
-      };
-    }
-
+  private getPalette(): ArkSchedulerPalette {
+    // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
     return {
-      container: "flex w-full flex-col rounded-lg border border-slate-200 bg-white text-slate-900 shadow-sm",
-      headerText: "text-sm font-semibold text-slate-900",
-      navButton: "rounded-md border border-slate-300 p-1 text-slate-600 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-slate-400",
-      mutedText: "text-slate-500",
-      gridLine: "border-slate-200",
-      columnBorder: "border-slate-200",
-      slotHover: "hover:bg-slate-50",
-      todayColumn: "bg-slate-50",
-      monthCellBase: "bg-white text-slate-700",
-      monthCellMuted: "bg-slate-50 text-slate-400",
-      agendaRow: "border-slate-200"
+      container: "ark:flex ark:w-full ark:flex-col ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:text-fg ark:shadow-sm",
+      headerText: "ark:text-sm ark:font-semibold ark:text-fg",
+      navButton: "ark:rounded-md ark:border ark:border-border-strong ark:p-1 ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring",
+      mutedText: "ark:text-fg-muted",
+      gridLine: "ark:border-border",
+      columnBorder: "ark:border-border",
+      slotHover: "ark:hover:bg-surface-muted",
+      todayColumn: "ark:bg-surface-muted/60",
+      monthCellBase: "ark:bg-surface ark:text-fg-soft",
+      monthCellMuted: "ark:bg-surface-muted ark:text-fg-muted",
+      agendaRow: "ark:border-border"
     };
   }
 
@@ -418,15 +380,15 @@ export class ArkScheduler extends HTMLElement {
 
   private buildHeader(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
     const header = document.createElement("div");
-    header.className = `flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3 ${palette.gridLine}`;
+    header.className = `ark:flex ark:flex-wrap ark:items-center ark:justify-between ark:gap-3 ark:border-b ark:px-4 ark:py-3 ${palette.gridLine}`;
     applyTestHooks(this, "scheduler", header, "header");
 
     const left = document.createElement("div");
-    left.className = "flex items-center gap-2";
+    left.className = "ark:flex ark:items-center ark:gap-2";
 
     const todayBtn = document.createElement("button");
     todayBtn.type = "button";
-    todayBtn.className = `${palette.navButton} px-3 text-xs font-medium`;
+    todayBtn.className = `${palette.navButton} ark:px-3 ark:text-xs ark:font-medium`;
     todayBtn.textContent = loc.today;
     todayBtn.addEventListener("click", () => this.goToToday());
     applyTestHooks(this, "scheduler", todayBtn, "today");
@@ -448,7 +410,7 @@ export class ArkScheduler extends HTMLElement {
     applyTestHooks(this, "scheduler", nextBtn, "next");
 
     const title = document.createElement("h2");
-    title.className = `${palette.headerText} ml-1`;
+    title.className = `${palette.headerText} ark:ml-1`;
     title.setAttribute("aria-live", "polite");
     title.textContent = this.getTitle();
     applyTestHooks(this, "scheduler", title, "title");
@@ -497,19 +459,21 @@ export class ArkScheduler extends HTMLElement {
   private buildEventButton(event: ArkSchedulerEvent, timeLabel: string, compact: boolean): HTMLButtonElement {
     const button = document.createElement("button");
     button.type = "button";
-    button.style.backgroundColor = this.eventColor(event);
+    const colors = this.eventColors(event);
+    button.style.backgroundColor = colors.bg;
+    button.style.color = colors.fg;
     button.className = compact
-      ? "flex w-full items-center gap-1 truncate rounded px-1 py-0.5 text-left text-[10px] font-medium text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-1"
-      : "flex h-full w-full flex-col overflow-hidden rounded-md px-1.5 py-1 text-left text-[11px] leading-tight text-white transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-1";
+      ? "ark:flex ark:w-full ark:items-center ark:gap-1 ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-left ark:text-[10px] ark:font-medium ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1"
+      : "ark:flex ark:h-full ark:w-full ark:flex-col ark:overflow-hidden ark:rounded-md ark:px-1.5 ark:py-1 ark:text-left ark:text-[11px] ark:leading-tight ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1";
 
     const title = document.createElement("span");
-    title.className = "truncate font-semibold";
+    title.className = "ark:truncate ark:font-semibold";
     title.textContent = event.title;
     button.appendChild(title);
 
     if (!compact) {
       const time = document.createElement("span");
-      time.className = "truncate opacity-90";
+      time.className = "ark:truncate ark:opacity-90";
       time.textContent = event.location ? `${timeLabel} · ${event.location}` : timeLabel;
       button.appendChild(time);
     }
@@ -541,31 +505,31 @@ export class ArkScheduler extends HTMLElement {
     const today = new Date();
 
     const wrapper = document.createElement("div");
-    wrapper.className = "flex flex-col";
+    wrapper.className = "ark:flex ark:flex-col";
 
     // Cabeçalho dos dias + faixa de eventos de dia inteiro.
     const daysHeader = document.createElement("div");
-    daysHeader.className = `flex border-b ${palette.gridLine}`;
+    daysHeader.className = `ark:flex ark:border-b ${palette.gridLine}`;
 
     const headerGutter = document.createElement("div");
-    headerGutter.className = "w-14 shrink-0";
+    headerGutter.className = "ark:w-14 ark:shrink-0";
     daysHeader.appendChild(headerGutter);
 
     let hasAllDay = false;
     for (const day of days) {
       const isToday = isSameDay(day, today);
       const column = document.createElement("div");
-      column.className = `flex-1 border-l px-2 py-2 ${palette.columnBorder} ${isToday ? palette.todayColumn : ""}`;
+      column.className = `ark:flex-1 ark:border-l ark:px-2 ark:py-2 ${palette.columnBorder} ${isToday ? palette.todayColumn : ""}`;
 
       const label = document.createElement("div");
-      label.className = `text-center text-xs font-medium ${isToday ? "" : palette.mutedText}`;
+      label.className = `ark:text-center ark:text-xs ark:font-medium ${isToday ? "" : palette.mutedText}`;
       label.textContent = `${loc.weekdaysShort[day.getDay()]} ${day.getDate()}`;
       column.appendChild(label);
 
       const allDayEvents = this.eventsForDay(day, true);
       if (allDayEvents.length > 0) hasAllDay = true;
       const allDayWrap = document.createElement("div");
-      allDayWrap.className = "mt-1 flex flex-col gap-0.5";
+      allDayWrap.className = "ark:mt-1 ark:flex ark:flex-col ark:gap-0.5";
       applyTestHooks(this, "scheduler", allDayWrap, "allday");
       for (const event of allDayEvents) {
         allDayWrap.appendChild(this.buildEventButton(event, loc.allDay, true));
@@ -577,7 +541,7 @@ export class ArkScheduler extends HTMLElement {
 
     if (hasAllDay) {
       const gutterLabel = document.createElement("span");
-      gutterLabel.className = `block pt-8 text-center text-[10px] ${palette.mutedText}`;
+      gutterLabel.className = `ark:block ark:pt-8 ark:text-center ark:text-[10px] ${palette.mutedText}`;
       gutterLabel.textContent = loc.allDay;
       headerGutter.appendChild(gutterLabel);
     }
@@ -586,20 +550,20 @@ export class ArkScheduler extends HTMLElement {
 
     // Corpo rolável com a régua de horas e as colunas de dia.
     const scroller = document.createElement("div");
-    scroller.className = "relative flex max-h-[32rem] overflow-y-auto";
+    scroller.className = "ark:relative ark:flex ark:max-h-[32rem] ark:overflow-y-auto";
     applyTestHooks(this, "scheduler", scroller, "scroller");
 
     const gutter = document.createElement("div");
-    gutter.className = "w-14 shrink-0";
+    gutter.className = "ark:w-14 ark:shrink-0";
     gutter.style.height = `${bodyHeight}px`;
 
     for (let hour = hourStart; hour < hourEnd; hour++) {
       const slot = document.createElement("div");
-      slot.className = `relative ${palette.mutedText}`;
+      slot.className = `ark:relative ${palette.mutedText}`;
       slot.style.height = `${HOUR_HEIGHT_PX}px`;
 
       const label = document.createElement("span");
-      label.className = "absolute -top-2 right-2 text-[10px]";
+      label.className = "ark:absolute ark:-top-2 ark:right-2 ark:text-[10px]";
       label.textContent = this.formatHour(hour);
       slot.appendChild(label);
       gutter.appendChild(slot);
@@ -609,7 +573,7 @@ export class ArkScheduler extends HTMLElement {
     for (const day of days) {
       const isToday = isSameDay(day, today);
       const column = document.createElement("div");
-      column.className = `relative flex-1 border-l ${palette.columnBorder} ${isToday ? palette.todayColumn : ""}`;
+      column.className = `ark:relative ark:flex-1 ark:border-l ${palette.columnBorder} ${isToday ? palette.todayColumn : ""}`;
       column.style.height = `${bodyHeight}px`;
       column.setAttribute("data-date", formatISODate(day));
       applyTestHooks(this, "scheduler", column, "day");
@@ -618,7 +582,7 @@ export class ArkScheduler extends HTMLElement {
       for (let minute = 0; minute < totalMinutes; minute += slotMinutes) {
         const slot = document.createElement("div");
         const isHourLine = (hourStart * 60 + minute) % 60 === 0;
-        slot.className = `border-t ${isHourLine ? palette.gridLine : "border-transparent"} ${palette.slotHover} cursor-pointer`;
+        slot.className = `ark:border-t ${isHourLine ? palette.gridLine : "ark:border-transparent"} ${palette.slotHover} ark:cursor-pointer`;
         slot.style.height = `${(slotMinutes / 60) * HOUR_HEIGHT_PX}px`;
 
         const slotStart = new Date(day.getFullYear(), day.getMonth(), day.getDate(), hourStart, minute);
@@ -639,7 +603,7 @@ export class ArkScheduler extends HTMLElement {
         if (rawHeight <= 0) continue;
 
         const holder = document.createElement("div");
-        holder.className = "absolute px-0.5";
+        holder.className = "ark:absolute ark:px-0.5";
         holder.style.top = `${top}px`;
         holder.style.height = `${Math.max(rawHeight, 18)}px`;
         holder.style.left = `${(item.column / item.columns) * 100}%`;
@@ -653,14 +617,14 @@ export class ArkScheduler extends HTMLElement {
         const nowMinutes = minutesSinceMidnight(today);
         if (nowMinutes >= hourStart * 60 && nowMinutes <= hourEnd * 60) {
           const line = document.createElement("div");
-          line.className = "pointer-events-none absolute left-0 right-0 z-10 flex items-center";
+          line.className = "ark:pointer-events-none ark:absolute ark:left-0 ark:right-0 ark:z-10 ark:flex ark:items-center";
           line.style.top = `${((nowMinutes - hourStart * 60) / totalMinutes) * bodyHeight}px`;
           applyTestHooks(this, "scheduler", line, "now");
 
           const dot = document.createElement("span");
-          dot.className = "-ml-1 h-2 w-2 rounded-full bg-red-500";
+          dot.className = "ark:-ml-1 ark:h-2 ark:w-2 ark:rounded-full ark:bg-danger";
           const rule = document.createElement("span");
-          rule.className = "h-px flex-1 bg-red-500";
+          rule.className = "ark:h-px ark:flex-1 ark:bg-danger";
           line.appendChild(dot);
           line.appendChild(rule);
           column.appendChild(line);
@@ -703,14 +667,14 @@ export class ArkScheduler extends HTMLElement {
 
   private buildMonthGrid(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
     const wrapper = document.createElement("div");
-    wrapper.className = "flex flex-col";
+    wrapper.className = "ark:flex ark:flex-col";
 
     const weekRow = document.createElement("div");
-    weekRow.className = `grid grid-cols-7 border-b ${palette.gridLine}`;
+    weekRow.className = `ark:grid ark:grid-cols-7 ark:border-b ${palette.gridLine}`;
     for (let i = 0; i < 7; i++) {
       const idx = (loc.firstDayOfWeek + i) % 7;
       const cell = document.createElement("div");
-      cell.className = `py-2 text-center text-xs font-medium ${palette.mutedText}`;
+      cell.className = `ark:py-2 ark:text-center ark:text-xs ark:font-medium ${palette.mutedText}`;
       cell.setAttribute("title", loc.weekdays[idx]);
       cell.textContent = loc.weekdaysShort[idx];
       weekRow.appendChild(cell);
@@ -727,7 +691,7 @@ export class ArkScheduler extends HTMLElement {
     const totalCells = Math.ceil((startOffset + lastOfMonth.getDate()) / 7) * 7;
 
     const grid = document.createElement("div");
-    grid.className = "grid grid-cols-7";
+    grid.className = "ark:grid ark:grid-cols-7";
     applyTestHooks(this, "scheduler", grid, "grid");
 
     const today = new Date();
@@ -739,15 +703,15 @@ export class ArkScheduler extends HTMLElement {
       const isToday = isSameDay(cellDate, today);
 
       const cell = document.createElement("div");
-      cell.className = `min-h-24 border-b border-r p-1 ${palette.columnBorder} ${inMonth ? palette.monthCellBase : palette.monthCellMuted}`;
+      cell.className = `ark:min-h-24 ark:border-b ark:border-r ark:p-1 ${palette.columnBorder} ${inMonth ? palette.monthCellBase : palette.monthCellMuted}`;
       cell.setAttribute("data-date", formatISODate(cellDate));
       applyTestHooks(this, "scheduler", cell, "day");
 
       const dayButton = document.createElement("button");
       dayButton.type = "button";
       dayButton.className = isToday
-        ? "mb-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-red-500 px-1 text-xs font-semibold text-white"
-        : `mb-1 inline-flex h-6 min-w-6 items-center justify-center rounded-full px-1 text-xs transition hover:bg-black/5 ${inMonth ? "" : palette.mutedText}`;
+        ? "ark:mb-1 ark:inline-flex ark:h-6 ark:min-w-6 ark:items-center ark:justify-center ark:rounded-full ark:bg-danger ark:px-1 ark:text-xs ark:font-semibold ark:text-danger-fg"
+        : `ark:mb-1 ark:inline-flex ark:h-6 ark:min-w-6 ark:items-center ark:justify-center ark:rounded-full ark:px-1 ark:text-xs ark:transition ark:hover:bg-surface-strong ${inMonth ? "" : palette.mutedText}`;
       dayButton.textContent = String(cellDate.getDate());
       dayButton.setAttribute("aria-label", `${cellDate.getDate()} ${loc.months[cellDate.getMonth()]} ${cellDate.getFullYear()}`);
       dayButton.addEventListener("click", () => this.emitSlotClick(startOfDay(cellDate), startOfDay(cellDate), true));
@@ -761,7 +725,7 @@ export class ArkScheduler extends HTMLElement {
       if (dayEvents.length > maxChips) {
         const more = document.createElement("button");
         more.type = "button";
-        more.className = `mt-0.5 block w-full px-1 text-left text-[10px] ${palette.mutedText} hover:underline`;
+        more.className = `ark:mt-0.5 ark:block ark:w-full ark:px-1 ark:text-left ark:text-[10px] ${palette.mutedText} ark:hover:underline`;
         more.textContent = `+${dayEvents.length - maxChips}`;
         applyTestHooks(this, "scheduler", more, "event-more");
         // Ver todos: abre o dia clicado na view "day".
@@ -783,7 +747,7 @@ export class ArkScheduler extends HTMLElement {
 
   private buildAgenda(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
     const wrapper = document.createElement("div");
-    wrapper.className = "flex max-h-[32rem] flex-col overflow-y-auto";
+    wrapper.className = "ark:flex ark:max-h-[32rem] ark:flex-col ark:overflow-y-auto";
     applyTestHooks(this, "scheduler", wrapper, "scroller");
 
     const { days } = this.getRange();
@@ -796,41 +760,41 @@ export class ArkScheduler extends HTMLElement {
       rendered++;
 
       const row = document.createElement("div");
-      row.className = `flex gap-4 border-b px-4 py-3 ${palette.agendaRow}`;
+      row.className = `ark:flex ark:gap-4 ark:border-b ark:px-4 ark:py-3 ${palette.agendaRow}`;
       row.setAttribute("data-date", formatISODate(day));
       applyTestHooks(this, "scheduler", row, "day");
 
       const dayLabel = document.createElement("div");
-      dayLabel.className = "w-24 shrink-0";
+      dayLabel.className = "ark:w-24 ark:shrink-0";
       const dayNumber = document.createElement("div");
-      dayNumber.className = isSameDay(day, today) ? "text-lg font-semibold text-red-500" : "text-lg font-semibold";
+      dayNumber.className = isSameDay(day, today) ? "ark:text-lg ark:font-semibold ark:text-danger" : "ark:text-lg ark:font-semibold";
       dayNumber.textContent = String(day.getDate());
       const dayName = document.createElement("div");
-      dayName.className = `text-xs ${palette.mutedText}`;
+      dayName.className = `ark:text-xs ${palette.mutedText}`;
       dayName.textContent = `${loc.weekdaysShort[day.getDay()]} · ${loc.monthsShort[day.getMonth()]}`;
       dayLabel.appendChild(dayNumber);
       dayLabel.appendChild(dayName);
 
       const list = document.createElement("div");
-      list.className = "flex flex-1 flex-col gap-1";
+      list.className = "ark:flex ark:flex-1 ark:flex-col ark:gap-1";
 
       for (const event of dayEvents) {
         const item = document.createElement("button");
         item.type = "button";
-        item.className = `flex items-center gap-2 rounded-md px-2 py-1.5 text-left text-sm transition ${palette.slotHover} focus:outline-none focus:ring-2 focus:ring-offset-1`;
+        item.className = `ark:flex ark:items-center ark:gap-2 ark:rounded-md ark:px-2 ark:py-1.5 ark:text-left ark:text-sm ark:transition ${palette.slotHover} ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-offset-1`;
         if (event.id) item.setAttribute("data-event-id", event.id);
         applyTestHooks(this, "scheduler", item, "event");
 
         const dot = document.createElement("span");
-        dot.className = "h-2.5 w-2.5 shrink-0 rounded-full";
-        dot.style.backgroundColor = this.eventColor(event);
+        dot.className = "ark:h-2.5 ark:w-2.5 ark:shrink-0 ark:rounded-full";
+        dot.style.backgroundColor = this.eventColors(event).bg;
 
         const time = document.createElement("span");
-        time.className = `w-28 shrink-0 text-xs ${palette.mutedText}`;
+        time.className = `ark:w-28 ark:shrink-0 ark:text-xs ${palette.mutedText}`;
         time.textContent = this.eventTimeLabel(event, loc);
 
         const title = document.createElement("span");
-        title.className = "truncate font-medium";
+        title.className = "ark:truncate ark:font-medium";
         title.textContent = event.title;
 
         item.setAttribute("aria-label", `${event.title}, ${this.eventTimeLabel(event, loc)}`);
@@ -848,7 +812,7 @@ export class ArkScheduler extends HTMLElement {
 
     if (rendered === 0) {
       const empty = document.createElement("p");
-      empty.className = `px-4 py-10 text-center text-sm ${palette.mutedText}`;
+      empty.className = `ark:px-4 ark:py-10 ark:text-center ark:text-sm ${palette.mutedText}`;
       empty.textContent = loc.noEvents;
       applyTestHooks(this, "scheduler", empty, "empty");
       wrapper.appendChild(empty);
@@ -879,8 +843,7 @@ export class ArkScheduler extends HTMLElement {
   private build(): void {
     if (!this.locale) this.locale = this.getLocale();
     const loc = this.locale;
-    const theme = this.getTheme();
-    const palette = this.getPalette(theme);
+    const palette = this.getPalette();
     const view = this.view;
 
     this.root?.remove();
@@ -894,7 +857,7 @@ export class ArkScheduler extends HTMLElement {
     container.appendChild(this.buildHeader(palette, loc));
 
     const body = document.createElement("div");
-    body.className = "flex flex-col";
+    body.className = "ark:flex ark:flex-col";
     applyTestHooks(this, "scheduler", body, "body");
 
     const { days } = this.getRange();
