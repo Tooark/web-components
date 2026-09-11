@@ -21,6 +21,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Lint, formatação e ordem de imports (Biome), antes do build.
+      - name: Lint (Biome)
+        run: pnpm exec biome ci .
+
       # Build de todos os pacotes: além de validar TypeScript/rollup, roda o
       # smoke test do CSS gerado (scripts/check-css.mjs) — garante que o
       # styles.css publicado foi compilado pelo Tailwind e contém as classes.

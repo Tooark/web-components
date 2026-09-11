@@ -47,9 +47,14 @@
     "version:sync": "node scripts/sync-versions.mjs",
     "build": "pnpm -r build",
     "dev:storybook": "pnpm --filter storybook storybook",
-    "clean": "pnpm -r run clean"
+    "clean": "pnpm -r run clean",
+    "lint": "biome lint .",
+    "format": "biome format --write .",
+    "check": "biome check .",
+    "check:fix": "biome check --write ."
   },
   "devDependencies": {
+    "@biomejs/biome": "2.5.13",
     "@rollup/plugin-commonjs": "^28.0.9",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",

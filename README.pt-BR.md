@@ -256,9 +256,13 @@ pnpm install          # instala as dependências do workspace
 pnpm build            # compila todos os pacotes
 pnpm dev:storybook    # roda o Storybook em http://localhost:6006
 pnpm clean            # remove os artefatos de build
+pnpm check            # lint, formatação e ordem de imports (Biome)
+pnpm check:fix        # aplica as correções e a formatação do Biome
 ```
 
 Os pacotes de biblioteca compilam com Rollup (`tsc` nos wrappers React e Vue, `ng-packagr` no Angular). `@tooark/core` e `@tooark/web-components` também compilam seu entry CSS (`src/styles/index.css`) com o Tailwind CLI para `dist/styles.css` e em seguida rodam `scripts/check-css.mjs`, um smoke test que derruba o build se a folha de estilo não foi compilada ou não contém as classes esperadas. As classes dos componentes devem ser escritas com o prefixo `ark:` (`ark:flex`, `ark:hover:bg-surface-muted`); utilities sem prefixo não são geradas. O Storybook processa o mesmo CSS pelo plugin `@tailwindcss/vite`, então não existe configuração de PostCSS no repositório.
+
+Lint, formatação e ordenação de imports ficam a cargo do [Biome](https://biomejs.dev/) (`biome.json` na raiz: linhas de 120 colunas, aspas duplas, sem vírgulas finais). O CI roda `biome ci` antes do build, então rode `pnpm check:fix` antes de commitar.
 
 ### Testes
 
