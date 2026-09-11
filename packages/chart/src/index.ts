@@ -1,16 +1,16 @@
 // Tipos
-export type {
-  ArkChartType,
-  ArkChartTheme,
-  ArkChartRenderer,
-  ArkChartOptions,
-  EChartsOption
-} from "./types";
+
+// Custom Element
+export { ArkChart } from "./components";
 
 // Engine imperativo (uso avançado / sem Custom Element)
 export type { ArkChartInstance } from "./engine";
 export { createChart, resolveChartTheme } from "./engine";
-
-// Custom Element
-export { ArkChart } from "./components";
 export { registerTooarkChart } from "./register";
+export type {
+  ArkChartOptions,
+  ArkChartRenderer,
+  ArkChartTheme,
+  ArkChartType,
+  EChartsOption
+} from "./types";

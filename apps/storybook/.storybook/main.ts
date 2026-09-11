@@ -1,7 +1,7 @@
 import path, { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import tailwindcss from "@tailwindcss/vite";
 import type { StorybookConfig } from "@storybook/web-components-vite";
+import tailwindcss from "@tailwindcss/vite";
 
 const config: StorybookConfig = {
   framework: getAbsolutePath("@storybook/web-components-vite"),
@@ -26,14 +26,14 @@ const config: StorybookConfig = {
     viteConfig.resolve = viteConfig.resolve || {};
     viteConfig.resolve.alias = {
       ...(viteConfig.resolve.alias || {}),
-        // Subpath CSS deve vir antes do alias geral de tokens (Vite casa na ordem).
-        "@tooark/tokens/tokens.css": path.resolve(rootDir, "packages/tokens/tokens.css"),
-        "@tooark/tokens": path.resolve(rootDir, "packages/tokens/src/index.ts"),
-        "@tooark/core": path.resolve(rootDir, "packages/core/src/index.ts"),
-        "@tooark/motion": path.resolve(rootDir, "packages/motion/src/index.ts"),
-        "@tooark/web-components": path.resolve(rootDir, "packages/web-components/src/index.ts"),
-        "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
-        "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts")
+      // Subpath CSS deve vir antes do alias geral de tokens (Vite casa na ordem).
+      "@tooark/tokens/tokens.css": path.resolve(rootDir, "packages/tokens/tokens.css"),
+      "@tooark/tokens": path.resolve(rootDir, "packages/tokens/src/index.ts"),
+      "@tooark/core": path.resolve(rootDir, "packages/core/src/index.ts"),
+      "@tooark/motion": path.resolve(rootDir, "packages/motion/src/index.ts"),
+      "@tooark/web-components": path.resolve(rootDir, "packages/web-components/src/index.ts"),
+      "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
+      "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts")
     };
 
     return viteConfig;
@@ -42,6 +42,7 @@ const config: StorybookConfig = {
 
 export default config;
 
+// biome-ignore lint/suspicious/noExplicitAny: o campo framework exige o literal do nome, como no template do Storybook
 function getAbsolutePath(value: string): any {
   return dirname(fileURLToPath(import.meta.resolve(`${value}/package.json`)));
 }

@@ -1,4 +1,14 @@
-import { AfterViewInit, Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, OnDestroy, Output, ViewChild } from "@angular/core";
+import {
+  type AfterViewInit,
+  Component,
+  CUSTOM_ELEMENTS_SCHEMA,
+  type ElementRef,
+  EventEmitter,
+  Input,
+  type OnDestroy,
+  Output,
+  ViewChild
+} from "@angular/core";
 import type { ArkCarouselSnap, ArkIntent, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -27,7 +37,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-carousel>`
 })
 export class ArkCarouselComponent implements AfterViewInit, OnDestroy {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 

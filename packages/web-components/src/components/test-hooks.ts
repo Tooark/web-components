@@ -17,7 +17,7 @@
  * o hook do pai tem precedência: o host só recebe o próprio `data-ark` se ainda
  * não tiver um, e nunca apaga um `data-testid` que não foi ele quem pôs.
  */
-export function applyTestHooks (host: HTMLElement, component: string, el: Element, part?: string): void {
+export function applyTestHooks(host: HTMLElement, component: string, el: Element, part?: string): void {
   const suffix = part ? `-${part}` : "";
   const isHost = el === host;
 

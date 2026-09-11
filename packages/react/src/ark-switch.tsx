@@ -1,6 +1,5 @@
-import React, { createElement, useEffect } from "react";
-
 import type { ArkSwitchStyleOptions } from "@tooark/core";
+import React, { createElement, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkSwitchProps = ArkSwitchStyleOptions & {
@@ -39,7 +38,7 @@ export function ArkSwitch(props: ArkSwitchProps): React.JSX.Element {
     labels: labels ? "" : undefined,
     icons: icons ? "" : undefined,
     "label-on": labelOn,
-    "label-off": labelOff,
+    "label-off": labelOff
   };
 
   return createElement("ark-switch", attrs);

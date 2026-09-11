@@ -1,5 +1,5 @@
-import { ARK_DURATION_MS, ARK_MOTION_DISTANCE, prefersReducedMotion } from "@tooark/core";
 import type { ArkDuration, ArkEasing, ArkMotionPreset } from "@tooark/core";
+import { ARK_DURATION_MS, ARK_MOTION_DISTANCE, prefersReducedMotion } from "@tooark/core";
 import type { ArkMotionTargets } from "./types";
 
 /** Curvas dos tokens --ark-ease-* no formato aceito pela lib Motion. */
@@ -42,7 +42,8 @@ export function resolveDistancePx(element: HTMLElement | undefined, distance?: s
   if (!Number.isFinite(amount)) return 12;
 
   if (value.endsWith("rem")) {
-    const rootSize = typeof document !== "undefined" ? Number.parseFloat(getComputedStyle(document.documentElement).fontSize) : 16;
+    const rootSize =
+      typeof document !== "undefined" ? Number.parseFloat(getComputedStyle(document.documentElement).fontSize) : 16;
     return amount * (rootSize || 16);
   }
   if (value.endsWith("em") && element) {

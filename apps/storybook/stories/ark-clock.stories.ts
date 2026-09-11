@@ -1,5 +1,5 @@
-import { expect, userEvent } from "storybook/test";
 import type { ArkIntent, ArkTheme } from "@tooark/core";
+import { expect, userEvent } from "storybook/test";
 
 const meta = {
   title: "Core/ArkClock",
@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Superficie de selecao de hora com colunas digitais rolaveis (estilo DigitalClock do MUI). O valor e sempre 24h no formato HH:mm:ss; `hours-format=\"12\"` muda apenas a exibicao, adicionando a coluna AM/PM. Emite `ark-change` com `detail: { value }`."
+          'Superficie de selecao de hora com colunas digitais rolaveis (estilo DigitalClock do MUI). O valor e sempre 24h no formato HH:mm:ss; `hours-format="12"` muda apenas a exibicao, adicionando a coluna AM/PM. Emite `ark-change` com `detail: { value }`.'
       }
     }
   },
@@ -19,7 +19,11 @@ const meta = {
       description: "Intervalo da coluna de minutos (1 a 30; valores fora da faixa sao ajustados)"
     },
     hoursFormat: { control: "inline-radio", options: ["24", "12"], description: "12 adiciona a coluna AM/PM" },
-    lang: { control: "select", options: ["en", "pt", "es"], description: "Rotulos das colunas (Horas/Minutos/Segundos)" },
+    lang: {
+      control: "select",
+      options: ["en", "pt", "es"],
+      description: "Rotulos das colunas (Horas/Minutos/Segundos)"
+    },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     testid: { control: "text", description: "Propaga data-testid para o relogio e cada coluna (<testid>-hours etc.)" }
@@ -90,7 +94,9 @@ export const SelectsTime = {
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const clock = canvasElement.querySelector("ark-clock")!;
     const hour = canvasElement.querySelector<HTMLButtonElement>('[data-ark="clock-hours"] button[data-value="9"]')!;
-    const minute = canvasElement.querySelector<HTMLButtonElement>('[data-ark="clock-minutes"] button[data-value="30"]')!;
+    const minute = canvasElement.querySelector<HTMLButtonElement>(
+      '[data-ark="clock-minutes"] button[data-value="30"]'
+    )!;
 
     await userEvent.click(hour);
     await expect(clock).toHaveAttribute("value", "09:00:00");

@@ -1,5 +1,5 @@
-import { expect, userEvent } from "storybook/test";
 import type { ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkTheme } from "@tooark/core";
+import { expect, userEvent } from "storybook/test";
 
 const meta = {
   title: "Core/ArkScheduler",
@@ -12,16 +12,41 @@ const meta = {
     }
   },
   argTypes: {
-    view: { control: "inline-radio", options: ["day", "week", "month", "agenda"], description: "View ativa; sincronizada ao clicar no seletor do cabecalho" },
+    view: {
+      control: "inline-radio",
+      options: ["day", "week", "month", "agenda"],
+      description: "View ativa; sincronizada ao clicar no seletor do cabecalho"
+    },
     date: { control: "text", description: "Data de referencia (YYYY-MM-DD); vazio usa hoje. Muda ao navegar" },
-    views: { control: "text", description: 'Limita as views do seletor, separadas por virgula (ex.: "day,week"). Vazio mostra as quatro' },
-    lang: { control: "select", options: ["en", "pt", "es", "custom"], description: "Locale embutido ou 'custom' para usar o locale-json" },
-    localeJson: { control: "text", description: "JSON com sobrescritas parciais do locale (usado quando lang='custom')" },
+    views: {
+      control: "text",
+      description: 'Limita as views do seletor, separadas por virgula (ex.: "day,week"). Vazio mostra as quatro'
+    },
+    lang: {
+      control: "select",
+      options: ["en", "pt", "es", "custom"],
+      description: "Locale embutido ou 'custom' para usar o locale-json"
+    },
+    localeJson: {
+      control: "text",
+      description: "JSON com sobrescritas parciais do locale (usado quando lang='custom')"
+    },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"], description: "Cor padrao dos eventos sem color/intent proprios" },
+    intent: {
+      control: "select",
+      options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"],
+      description: "Cor padrao dos eventos sem color/intent proprios"
+    },
     hourStart: { control: { type: "number", min: 0, max: 23 }, description: "Primeira hora da timeline (0 a 23)" },
-    hourEnd: { control: { type: "number", min: 1, max: 24 }, description: "Ultima hora da timeline (sempre maior que hourStart)" },
-    slotMinutes: { control: "inline-radio", options: [15, 30, 60], description: "Granularidade dos slots clicaveis (15 a 60)" },
+    hourEnd: {
+      control: { type: "number", min: 1, max: 24 },
+      description: "Ultima hora da timeline (sempre maior que hourStart)"
+    },
+    slotMinutes: {
+      control: "inline-radio",
+      options: [15, 30, 60],
+      description: "Granularidade dos slots clicaveis (15 a 60)"
+    },
     hoursFormat: { control: "inline-radio", options: ["24", "12"], description: "12 exibe as horas com AM/PM" },
     testid: { control: "text", description: "Propaga data-testid para a agenda e suas partes" }
   },
@@ -61,13 +86,13 @@ type StoryArgs = {
 // Semana da data de referência fixa, para as histórias serem estáveis.
 const REFERENCE = new Date();
 
-function at (dayOffset: number, hour: number, minute = 0): string {
+function at(dayOffset: number, hour: number, minute = 0): string {
   const base = new Date(REFERENCE.getFullYear(), REFERENCE.getMonth(), REFERENCE.getDate() + dayOffset, hour, minute);
   const pad = (n: number): string => String(n).padStart(2, "0");
   return `${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}T${pad(base.getHours())}:${pad(base.getMinutes())}`;
 }
 
-function day (dayOffset: number): string {
+function day(dayOffset: number): string {
   const base = new Date(REFERENCE.getFullYear(), REFERENCE.getMonth(), REFERENCE.getDate() + dayOffset);
   const pad = (n: number): string => String(n).padStart(2, "0");
   return `${base.getFullYear()}-${pad(base.getMonth() + 1)}-${pad(base.getDate())}`;
@@ -84,7 +109,7 @@ const SAMPLE_EVENTS: ArkSchedulerEvent[] = [
   { id: "8", title: "Retro", start: at(-1, 16), end: at(-1, 17) }
 ];
 
-function createScheduler (args: Partial<StoryArgs> & { events?: ArkSchedulerEvent[] }): HTMLElement {
+function createScheduler(args: Partial<StoryArgs> & { events?: ArkSchedulerEvent[] }): HTMLElement {
   const el = document.createElement("ark-scheduler");
   el.setAttribute("view", args.view || "week");
   el.setAttribute("lang", args.lang || "pt");
@@ -167,8 +192,9 @@ export const OverlappingEvents = {
     const column = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-day"]')!;
     // O holder posicionado é o pai direto de cada botão de evento (hook estável,
     // independente das classes utilitárias).
-    const holders = Array.from(column.querySelectorAll<HTMLElement>('[data-ark="scheduler-event"]'))
-      .map((el) => el.parentElement as HTMLElement);
+    const holders = Array.from(column.querySelectorAll<HTMLElement>('[data-ark="scheduler-event"]')).map(
+      (el) => el.parentElement as HTMLElement
+    );
 
     const shared = holders.filter((el) => el.style.width !== "100%");
     await expect(shared.length).toBeGreaterThanOrEqual(2);

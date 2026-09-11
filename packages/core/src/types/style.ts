@@ -1,11 +1,18 @@
 // Primitivas de design vêm de @tooark/tokens (reexportadas para compatibilidade).
 import type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected } from "@tooark/tokens";
+
 export type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected };
 
 // Exports types globais (específicos de comportamento de componente)
 export type ArkCarouselSnap = "mandatory" | "proximity";
 export type ArkToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
-export type ArkToastPosition = "top-left" | "top-center" | "top-right" | "bottom-left" | "bottom-center" | "bottom-right";
+export type ArkToastPosition =
+  | "top-left"
+  | "top-center"
+  | "top-right"
+  | "bottom-left"
+  | "bottom-center"
+  | "bottom-right";
 
 // Exports types específicos do componente button
 export type ArkButtonType = "button" | "submit" | "reset";

@@ -195,14 +195,8 @@
 .ark-animate-slide-out-right,
 .ark-animate-scale-in,
 .ark-animate-scale-out {
-  animation-duration: var(
-    --ark-animate-duration,
-    var(--ark-duration-normal, 250ms)
-  );
-  animation-timing-function: var(
-    --ark-animate-ease,
-    var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1))
-  );
+  animation-duration: var(--ark-animate-duration, var(--ark-duration-normal, 250ms));
+  animation-timing-function: var(--ark-animate-ease, var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1)));
   animation-fill-mode: both;
 }
 
@@ -244,8 +238,7 @@
 }
 
 .ark-animate-shake {
-  animation: ark-shake var(--ark-duration-slow, 400ms)
-    var(--ark-ease-in-out, ease-in-out);
+  animation: ark-shake var(--ark-duration-slow, 400ms) var(--ark-ease-in-out, ease-in-out);
 }
 
 .ark-animate-spin {
@@ -259,11 +252,7 @@
 /* Skeleton de loading — bloco pulsante neutro */
 .ark-skeleton {
   animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
-  background-color: color-mix(
-    in oklch,
-    var(--ark-color-muted, oklch(0.7 0.02 264)) 30%,
-    transparent
-  );
+  background-color: color-mix(in oklch, var(--ark-color-muted, oklch(0.7 0.02 264)) 30%, transparent);
   border-radius: var(--ark-radius-md, 0.5rem);
 }
 

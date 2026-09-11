@@ -1,5 +1,5 @@
 import type { EChartsOption } from "echarts";
-import { createChart, type ArkChartInstance } from "../engine";
+import { type ArkChartInstance, createChart } from "../engine";
 import type { ArkChartRenderer, ArkChartTheme } from "../types";
 
 /**

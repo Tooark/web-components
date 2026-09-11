@@ -1,4 +1,4 @@
-import type { ArkSize, ArkIntent } from "@tooark/core";
+import type { ArkIntent, ArkSize } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSwitchPalette = {
@@ -19,8 +19,10 @@ type ArkSwitchSizing = {
   label: string;
 };
 
-const CHECK_SVG = "<svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M2.5 6.5l2.5 2.5 4.5-5\"></path></svg>";
-const CROSS_SVG = "<svg viewBox=\"0 0 12 12\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 3l6 6M9 3L3 9\"></path></svg>";
+const CHECK_SVG =
+  '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2.5 6.5l2.5 2.5 4.5-5"></path></svg>';
+const CROSS_SVG =
+  '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9"></path></svg>';
 
 export class ArkSwitch extends HTMLElement {
   static readonly tagName = "ark-switch";
@@ -31,11 +33,27 @@ export class ArkSwitch extends HTMLElement {
   private labelOffEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
 
-  static get observedAttributes (): string[] {
-    return ["checked", "disabled", "size", "intent", "theme", "color", "labels", "label-on", "label-off", "icons", "name", "value", "label", "aria-label", "testid"];
+  static get observedAttributes(): string[] {
+    return [
+      "checked",
+      "disabled",
+      "size",
+      "intent",
+      "theme",
+      "color",
+      "labels",
+      "label-on",
+      "label-off",
+      "icons",
+      "name",
+      "value",
+      "label",
+      "aria-label",
+      "testid"
+    ];
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     if (!this.trackEl) {
       this.render();
     }
@@ -43,16 +61,16 @@ export class ArkSwitch extends HTMLElement {
     this.updateAppearance();
   }
 
-  attributeChangedCallback (): void {
+  attributeChangedCallback(): void {
     if (!this.trackEl) return;
     this.updateAppearance();
   }
 
-  get checked (): boolean {
+  get checked(): boolean {
     return this.hasAttribute("checked");
   }
 
-  set checked (value: boolean) {
+  set checked(value: boolean) {
     if (value) {
       this.setAttribute("checked", "");
     } else {
@@ -60,53 +78,137 @@ export class ArkSwitch extends HTMLElement {
     }
   }
 
-  toggle (): void {
+  toggle(): void {
     if (this.hasAttribute("disabled")) return;
 
     this.checked = !this.checked;
-    this.dispatchEvent(new CustomEvent("change", {
-      detail: { checked: this.checked },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        detail: { checked: this.checked },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
-  private getIntent (): ArkIntent {
+  private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private getPalette (intent: ArkIntent): ArkSwitchPalette {
+  private getPalette(intent: ArkIntent): ArkSwitchPalette {
     const palettes: Record<ArkIntent, ArkSwitchPalette> = {
-      primary: { focusRing: "ark:focus-visible:ring-primary-ring", onTrack: "ark:bg-primary", thumbOn: "ark:bg-primary-fg", iconOn: "ark:text-primary", labelOn: "ark:text-primary-fg" },
-      secondary: { focusRing: "ark:focus-visible:ring-secondary-ring", onTrack: "ark:bg-secondary", thumbOn: "ark:bg-secondary-fg", iconOn: "ark:text-secondary", labelOn: "ark:text-secondary-fg" },
-      success: { focusRing: "ark:focus-visible:ring-success-ring", onTrack: "ark:bg-success", thumbOn: "ark:bg-success-fg", iconOn: "ark:text-success", labelOn: "ark:text-success-fg" },
-      warning: { focusRing: "ark:focus-visible:ring-warning-ring", onTrack: "ark:bg-warning", thumbOn: "ark:bg-warning-fg", iconOn: "ark:text-warning", labelOn: "ark:text-warning-fg" },
-      danger: { focusRing: "ark:focus-visible:ring-danger-ring", onTrack: "ark:bg-danger", thumbOn: "ark:bg-danger-fg", iconOn: "ark:text-danger", labelOn: "ark:text-danger-fg" },
-      info: { focusRing: "ark:focus-visible:ring-info-ring", onTrack: "ark:bg-info", thumbOn: "ark:bg-info-fg", iconOn: "ark:text-info", labelOn: "ark:text-info-fg" },
-      neutral: { focusRing: "ark:focus-visible:ring-neutral-ring", onTrack: "ark:bg-neutral", thumbOn: "ark:bg-neutral-fg", iconOn: "ark:text-neutral", labelOn: "ark:text-neutral-fg" }
+      primary: {
+        focusRing: "ark:focus-visible:ring-primary-ring",
+        onTrack: "ark:bg-primary",
+        thumbOn: "ark:bg-primary-fg",
+        iconOn: "ark:text-primary",
+        labelOn: "ark:text-primary-fg"
+      },
+      secondary: {
+        focusRing: "ark:focus-visible:ring-secondary-ring",
+        onTrack: "ark:bg-secondary",
+        thumbOn: "ark:bg-secondary-fg",
+        iconOn: "ark:text-secondary",
+        labelOn: "ark:text-secondary-fg"
+      },
+      success: {
+        focusRing: "ark:focus-visible:ring-success-ring",
+        onTrack: "ark:bg-success",
+        thumbOn: "ark:bg-success-fg",
+        iconOn: "ark:text-success",
+        labelOn: "ark:text-success-fg"
+      },
+      warning: {
+        focusRing: "ark:focus-visible:ring-warning-ring",
+        onTrack: "ark:bg-warning",
+        thumbOn: "ark:bg-warning-fg",
+        iconOn: "ark:text-warning",
+        labelOn: "ark:text-warning-fg"
+      },
+      danger: {
+        focusRing: "ark:focus-visible:ring-danger-ring",
+        onTrack: "ark:bg-danger",
+        thumbOn: "ark:bg-danger-fg",
+        iconOn: "ark:text-danger",
+        labelOn: "ark:text-danger-fg"
+      },
+      info: {
+        focusRing: "ark:focus-visible:ring-info-ring",
+        onTrack: "ark:bg-info",
+        thumbOn: "ark:bg-info-fg",
+        iconOn: "ark:text-info",
+        labelOn: "ark:text-info-fg"
+      },
+      neutral: {
+        focusRing: "ark:focus-visible:ring-neutral-ring",
+        onTrack: "ark:bg-neutral",
+        thumbOn: "ark:bg-neutral-fg",
+        iconOn: "ark:text-neutral",
+        labelOn: "ark:text-neutral-fg"
+      }
     };
 
     return palettes[intent];
   }
 
-  private getSizing (): ArkSwitchSizing {
+  private getSizing(): ArkSwitchSizing {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
 
     const sizes: Record<ArkSize, ArkSwitchSizing> = {
-      sm: { track: "ark:h-4 ark:w-7", trackLabels: "ark:h-4 ark:w-12", thumb: "ark:h-3 ark:w-3", translate: "ark:translate-x-3", translateLabels: "ark:translate-x-8", icon: "ark:h-2 ark:w-2", label: "ark:text-[7px]" },
-      md: { track: "ark:h-6 ark:w-11", trackLabels: "ark:h-6 ark:w-16", thumb: "ark:h-5 ark:w-5", translate: "ark:translate-x-5", translateLabels: "ark:translate-x-10", icon: "ark:h-2.5 ark:w-2.5", label: "ark:text-[9px]" },
-      lg: { track: "ark:h-7 ark:w-12", trackLabels: "ark:h-7 ark:w-20", thumb: "ark:h-6 ark:w-6", translate: "ark:translate-x-5", translateLabels: "ark:translate-x-[3.25rem]", icon: "ark:h-3 ark:w-3", label: "ark:text-[11px]" },
-      xl: { track: "ark:h-8 ark:w-14", trackLabels: "ark:h-8 ark:w-24", thumb: "ark:h-7 ark:w-7", translate: "ark:translate-x-6", translateLabels: "ark:translate-x-16", icon: "ark:h-3.5 ark:w-3.5", label: "ark:text-xs" }
+      sm: {
+        track: "ark:h-4 ark:w-7",
+        trackLabels: "ark:h-4 ark:w-12",
+        thumb: "ark:h-3 ark:w-3",
+        translate: "ark:translate-x-3",
+        translateLabels: "ark:translate-x-8",
+        icon: "ark:h-2 ark:w-2",
+        label: "ark:text-[7px]"
+      },
+      md: {
+        track: "ark:h-6 ark:w-11",
+        trackLabels: "ark:h-6 ark:w-16",
+        thumb: "ark:h-5 ark:w-5",
+        translate: "ark:translate-x-5",
+        translateLabels: "ark:translate-x-10",
+        icon: "ark:h-2.5 ark:w-2.5",
+        label: "ark:text-[9px]"
+      },
+      lg: {
+        track: "ark:h-7 ark:w-12",
+        trackLabels: "ark:h-7 ark:w-20",
+        thumb: "ark:h-6 ark:w-6",
+        translate: "ark:translate-x-5",
+        translateLabels: "ark:translate-x-[3.25rem]",
+        icon: "ark:h-3 ark:w-3",
+        label: "ark:text-[11px]"
+      },
+      xl: {
+        track: "ark:h-8 ark:w-14",
+        trackLabels: "ark:h-8 ark:w-24",
+        thumb: "ark:h-7 ark:w-7",
+        translate: "ark:translate-x-6",
+        translateLabels: "ark:translate-x-16",
+        icon: "ark:h-3.5 ark:w-3.5",
+        label: "ark:text-xs"
+      }
     };
 
     return sizes[size] ?? sizes.md;
   }
 
-  private render (): void {
+  private render(): void {
     const track = document.createElement("button");
     track.type = "button";
     track.setAttribute("part", "switch");
@@ -145,7 +247,7 @@ export class ArkSwitch extends HTMLElement {
     this.inputEl = input;
   }
 
-  private updateAppearance (): void {
+  private updateAppearance(): void {
     if (!this.trackEl || !this.thumbEl || !this.labelOnEl || !this.labelOffEl || !this.inputEl) return;
 
     const palette = this.getPalette(this.getIntent());
@@ -200,9 +302,22 @@ export class ArkSwitch extends HTMLElement {
       delete this.thumbEl.dataset.icon;
     }
 
-    const labelBase = "ark:pointer-events-none ark:absolute ark:top-0 ark:flex ark:h-full ark:items-center ark:font-bold ark:uppercase ark:tracking-wide ark:transition-opacity ark:select-none";
-    this.labelOnEl.className = [labelBase, "ark:left-0 ark:pl-2", sizing.label, palette.labelOn, labels && checked ? "ark:opacity-100" : "ark:opacity-0"].join(" ");
-    this.labelOffEl.className = [labelBase, "ark:right-0 ark:pr-2", sizing.label, labelOffColor, labels && !checked ? "ark:opacity-100" : "ark:opacity-0"].join(" ");
+    const labelBase =
+      "ark:pointer-events-none ark:absolute ark:top-0 ark:flex ark:h-full ark:items-center ark:font-bold ark:uppercase ark:tracking-wide ark:transition-opacity ark:select-none";
+    this.labelOnEl.className = [
+      labelBase,
+      "ark:left-0 ark:pl-2",
+      sizing.label,
+      palette.labelOn,
+      labels && checked ? "ark:opacity-100" : "ark:opacity-0"
+    ].join(" ");
+    this.labelOffEl.className = [
+      labelBase,
+      "ark:right-0 ark:pr-2",
+      sizing.label,
+      labelOffColor,
+      labels && !checked ? "ark:opacity-100" : "ark:opacity-0"
+    ].join(" ");
     this.labelOnEl.textContent = this.getAttribute("label-on") || "ON";
     this.labelOffEl.textContent = this.getAttribute("label-off") || "OFF";
 

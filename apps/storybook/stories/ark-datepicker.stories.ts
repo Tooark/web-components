@@ -1,5 +1,5 @@
-import { expect, userEvent, waitFor } from "storybook/test";
 import type { ArkDatepickerLang, ArkDatepickerStyleOptions } from "@tooark/core";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 const meta = {
   title: "Core/ArkDatepicker",
@@ -35,7 +35,8 @@ const meta = {
     },
     format: {
       control: "text",
-      description: "Mascara de exibicao e digitacao com tokens YYYY MM DD HH mm ss (sensivel a maiusculas). Vazio = MM/DD/YYYY HH:mm em en e DD/MM/YYYY HH:mm nos demais"
+      description:
+        "Mascara de exibicao e digitacao com tokens YYYY MM DD HH mm ss (sensivel a maiusculas). Vazio = MM/DD/YYYY HH:mm em en e DD/MM/YYYY HH:mm nos demais"
     },
     seconds: {
       control: "boolean",
@@ -137,7 +138,7 @@ type StoryArgs = {
   testid: string;
 };
 
-function createDatepicker (args: Partial<StoryArgs>): HTMLElement {
+function createDatepicker(args: Partial<StoryArgs>): HTMLElement {
   const el = document.createElement("ark-datepicker");
   el.setAttribute("mode", args.mode || "datetime");
   el.setAttribute("lang", args.lang || "en");
@@ -193,8 +194,18 @@ export const CustomLocale = {
     mode: "date",
     localeJson: JSON.stringify({
       months: [
-        "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
-        "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
+        "Yanvar",
+        "Fevral",
+        "Mart",
+        "Aprel",
+        "May",
+        "İyun",
+        "İyul",
+        "Avqust",
+        "Sentyabr",
+        "Oktyabr",
+        "Noyabr",
+        "Dekabr"
       ],
       weekdaysMin: ["B", "BE", "ÇA", "Ç", "CA", "C", "Ş"],
       today: "Bu gün",
@@ -366,8 +377,16 @@ export const WithCalendarEvents = {
     mode: "date",
     eventDisplay: "dots",
     events: JSON.stringify([
-      { date: new Date(new Date().getFullYear(), new Date().getMonth(), 5).toISOString().slice(0, 10), label: "Reunião", intent: "info" },
-      { date: new Date(new Date().getFullYear(), new Date().getMonth(), 18).toISOString().slice(0, 10), label: "Entrega", intent: "danger" }
+      {
+        date: new Date(new Date().getFullYear(), new Date().getMonth(), 5).toISOString().slice(0, 10),
+        label: "Reunião",
+        intent: "info"
+      },
+      {
+        date: new Date(new Date().getFullYear(), new Date().getMonth(), 18).toISOString().slice(0, 10),
+        label: "Entrega",
+        intent: "danger"
+      }
     ])
   },
   render: Playground.render

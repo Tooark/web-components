@@ -1,4 +1,4 @@
-import { createWysiwygViewer, type ArkWysiwygInstance } from "../engine";
+import { type ArkWysiwygInstance, createWysiwygViewer } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
 

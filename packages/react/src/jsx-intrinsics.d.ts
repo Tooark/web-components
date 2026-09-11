@@ -1,5 +1,15 @@
+import type {
+  ArkButtonType,
+  ArkButtonVariant,
+  ArkCarouselSnap,
+  ArkDatepickerLang,
+  ArkIntent,
+  ArkRounded,
+  ArkSize,
+  ArkTheme,
+  ArkToastPosition
+} from "@tooark/core";
 import React from "react";
-import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkDatepickerLang, ArkIntent, ArkRounded, ArkTheme, ArkCarouselSnap, ArkToastPosition } from "@tooark/core";
 
 declare global {
   namespace JSX {
@@ -160,5 +170,3 @@ declare global {
     }
   }
 }
-
-export { };

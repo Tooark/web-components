@@ -1,5 +1,5 @@
+import type { ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
-import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export const ArkButton = defineComponent({

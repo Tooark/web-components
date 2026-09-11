@@ -1,5 +1,5 @@
-import { defineComponent, h, type PropType } from "vue";
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
+import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export const ArkInput = defineComponent({

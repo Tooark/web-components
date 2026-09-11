@@ -1,4 +1,4 @@
-import type { ArkSize, ArkIntent } from "@tooark/core";
+import type { ArkIntent, ArkSize } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkTogglePalette = {
@@ -18,22 +18,22 @@ export class ArkToggle extends HTMLElement {
   private ownClasses: string[] = [];
   private syncingClass = false;
 
-  static get observedAttributes (): string[] {
+  static get observedAttributes(): string[] {
     return ["pressed", "disabled", "size", "intent", "theme", "value", "class", "testid"];
   }
 
-  constructor () {
+  constructor() {
     super();
     this.addEventListener("click", this.handleClick);
     this.addEventListener("keydown", this.handleKeydown);
     this.addEventListener("keyup", this.handleKeyup);
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     this.updateAppearance();
   }
 
-  attributeChangedCallback (name: string): void {
+  attributeChangedCallback(name: string): void {
     if (name === "class") {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
@@ -42,35 +42,37 @@ export class ArkToggle extends HTMLElement {
     this.updateAppearance();
   }
 
-  get pressed (): boolean {
+  get pressed(): boolean {
     return this.hasAttribute("pressed");
   }
 
-  set pressed (value: boolean) {
+  set pressed(value: boolean) {
     this.toggleAttribute("pressed", Boolean(value));
   }
 
-  get disabled (): boolean {
+  get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
 
-  set disabled (value: boolean) {
+  set disabled(value: boolean) {
     this.toggleAttribute("disabled", Boolean(value));
   }
 
-  get value (): string {
+  get value(): string {
     return this.getAttribute("value") || "";
   }
 
-  toggle (): void {
+  toggle(): void {
     if (this.disabled) return;
 
     this.pressed = !this.pressed;
-    this.dispatchEvent(new CustomEvent("change", {
-      detail: { pressed: this.pressed, value: this.value },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        detail: { pressed: this.pressed, value: this.value },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private readonly handleClick = (event: MouseEvent): void => {
@@ -100,19 +102,27 @@ export class ArkToggle extends HTMLElement {
     }
   };
 
-  private isInGroup (): boolean {
+  private isInGroup(): boolean {
     return this.closest("ark-toggle-group") !== null;
   }
 
-  private getIntent (): ArkIntent {
+  private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private getPalette (intent: ArkIntent): ArkTogglePalette {
+  private getPalette(intent: ArkIntent): ArkTogglePalette {
     // Dentro de um ark-toggle-group o visual é de segmented control:
     // fundo transparente e o item ativo "elevado" na superfície.
     if (this.isInGroup()) {
@@ -125,20 +135,49 @@ export class ArkToggle extends HTMLElement {
 
     const base = "ark:border-border-strong ark:bg-transparent ark:text-fg-soft ark:hover:bg-surface-muted";
     const palettes: Record<ArkIntent, ArkTogglePalette> = {
-      primary: { focusRing: "ark:ring-primary-ring", base, pressed: "ark:border-border-strong ark:bg-surface-strong ark:text-fg" },
-      secondary: { focusRing: "ark:ring-secondary-ring", base, pressed: "ark:border-border-strong ark:bg-surface-muted ark:text-fg-soft" },
-      success: { focusRing: "ark:ring-success-ring", base, pressed: "ark:border-success-border ark:bg-success-soft ark:text-success-soft-fg" },
-      warning: { focusRing: "ark:ring-warning-ring", base, pressed: "ark:border-warning-border ark:bg-warning-soft ark:text-warning-soft-fg" },
-      danger: { focusRing: "ark:ring-danger-ring", base, pressed: "ark:border-danger-border ark:bg-danger-soft ark:text-danger-soft-fg" },
-      info: { focusRing: "ark:ring-info-ring", base, pressed: "ark:border-info-border ark:bg-info-soft ark:text-info-soft-fg" },
-      neutral: { focusRing: "ark:ring-neutral-ring", base, pressed: "ark:border-neutral-border ark:bg-neutral-soft ark:text-neutral-soft-fg" }
+      primary: {
+        focusRing: "ark:ring-primary-ring",
+        base,
+        pressed: "ark:border-border-strong ark:bg-surface-strong ark:text-fg"
+      },
+      secondary: {
+        focusRing: "ark:ring-secondary-ring",
+        base,
+        pressed: "ark:border-border-strong ark:bg-surface-muted ark:text-fg-soft"
+      },
+      success: {
+        focusRing: "ark:ring-success-ring",
+        base,
+        pressed: "ark:border-success-border ark:bg-success-soft ark:text-success-soft-fg"
+      },
+      warning: {
+        focusRing: "ark:ring-warning-ring",
+        base,
+        pressed: "ark:border-warning-border ark:bg-warning-soft ark:text-warning-soft-fg"
+      },
+      danger: {
+        focusRing: "ark:ring-danger-ring",
+        base,
+        pressed: "ark:border-danger-border ark:bg-danger-soft ark:text-danger-soft-fg"
+      },
+      info: {
+        focusRing: "ark:ring-info-ring",
+        base,
+        pressed: "ark:border-info-border ark:bg-info-soft ark:text-info-soft-fg"
+      },
+      neutral: {
+        focusRing: "ark:ring-neutral-ring",
+        base,
+        pressed: "ark:border-neutral-border ark:bg-neutral-soft ark:text-neutral-soft-fg"
+      }
     };
 
     return palettes[intent];
   }
 
-  private computeClasses (): string[] {
-    const base = "ark:inline-flex ark:items-center ark:justify-center ark:gap-2 ark:rounded-md ark:border ark:font-semibold ark:transition ark:select-none ark:cursor-pointer ark:outline-none ark:focus-visible:ring-2 ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none";
+  private computeClasses(): string[] {
+    const base =
+      "ark:inline-flex ark:items-center ark:justify-center ark:gap-2 ark:rounded-md ark:border ark:font-semibold ark:transition ark:select-none ark:cursor-pointer ark:outline-none ark:focus-visible:ring-2 ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none";
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const palette = this.getPalette(this.getIntent());
 
@@ -155,7 +194,7 @@ export class ArkToggle extends HTMLElement {
       .filter(Boolean);
   }
 
-  private applyOwnClasses (next: string[]): void {
+  private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
       if (!next.includes(cls)) this.classList.remove(cls);
@@ -167,7 +206,7 @@ export class ArkToggle extends HTMLElement {
     this.syncingClass = false;
   }
 
-  private updateAppearance (): void {
+  private updateAppearance(): void {
     const disabled = this.disabled;
     this.setAttribute("role", "button");
     this.setAttribute("aria-pressed", this.pressed ? "true" : "false");

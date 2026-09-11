@@ -1,5 +1,5 @@
+import type { ArkCalendarStyleOptions, ArkDatepickerLang } from "@tooark/core";
 import { expect, userEvent } from "storybook/test";
-import type { ArkDatepickerLang, ArkCalendarStyleOptions } from "@tooark/core";
 
 const meta = {
   title: "Core/ArkCalendar",
@@ -23,7 +23,10 @@ const meta = {
     },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
-    accentColor: { control: "color", description: "Cor custom dos estados selecionado/hoje (tem precedencia sobre intent)" },
+    accentColor: {
+      control: "color",
+      description: "Cor custom dos estados selecionado/hoje (tem precedencia sobre intent)"
+    },
     value: { control: "text", description: "Selected date in YYYY-MM-DD format" },
     min: { control: "text", description: "Menor data selecionavel (YYYY-MM-DD)" },
     max: { control: "text", description: "Maior data selecionavel (YYYY-MM-DD)" },
@@ -69,7 +72,7 @@ type StoryArgs = {
   testid: string;
 };
 
-function createCalendar (args: Partial<StoryArgs>): HTMLElement {
+function createCalendar(args: Partial<StoryArgs>): HTMLElement {
   const el = document.createElement("ark-calendar");
   el.setAttribute("lang", args.lang || "en");
   el.setAttribute("theme", args.theme || "auto");
@@ -108,8 +111,18 @@ export const CustomLocale = {
     lang: "custom",
     localeJson: JSON.stringify({
       months: [
-        "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
-        "İyul", "Avqust", "Sentyabr", "Oktyabr", "Noyabr", "Dekabr"
+        "Yanvar",
+        "Fevral",
+        "Mart",
+        "Aprel",
+        "May",
+        "İyun",
+        "İyul",
+        "Avqust",
+        "Sentyabr",
+        "Oktyabr",
+        "Noyabr",
+        "Dekabr"
       ],
       weekdaysMin: ["B", "BE", "ÇA", "Ç", "CA", "C", "Ş"],
       today: "Bu gün",
@@ -136,7 +149,7 @@ export const SelectsClickedDay = {
   }
 };
 
-function sampleEvents (): string {
+function sampleEvents(): string {
   const now = new Date();
   const iso = (day: number): string => {
     const d = new Date(now.getFullYear(), now.getMonth(), day);
@@ -203,7 +216,9 @@ export const ViewsNavigation = {
 
     // ano → meses → mês → dias
     await userEvent.click(year!);
-    await userEvent.click(canvasElement.querySelector<HTMLButtonElement>('[data-ark="calendar-month"][data-month="2"]')!);
+    await userEvent.click(
+      canvasElement.querySelector<HTMLButtonElement>('[data-ark="calendar-month"][data-month="2"]')!
+    );
     const day = canvasElement.querySelector('[data-ark="calendar-day"][data-date$="-03-01"]');
     await expect(day).not.toBeNull();
   }

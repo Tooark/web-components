@@ -1,5 +1,5 @@
-import React, { createElement, PropsWithChildren, useEffect } from "react";
 import type { ArkInputStyleOptions } from "@tooark/core";
+import React, { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkInputProps = PropsWithChildren<
@@ -51,7 +51,7 @@ export function ArkInput(props: ArkInputProps): React.JSX.Element {
     error: error ? "" : undefined,
     disabled: disabled ? "" : undefined,
     required: required ? "" : undefined,
-    readonly: readonly ? "" : undefined,
+    readonly: readonly ? "" : undefined
   };
 
   return createElement("ark-input", attrs, children);

@@ -1,5 +1,5 @@
+import type { ArkButtonStyleOptions, ArkButtonType, ArkRounded, ArkSize } from "@tooark/core";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import type { ArkRounded, ArkSize, ArkButtonStyleOptions, ArkButtonType } from "@tooark/core";
 
 const meta = {
   title: "Core/ArkButton",
@@ -57,7 +57,22 @@ type StoryArgs = {
 };
 
 export const Playground = {
-  render: ({ variant, intent, theme, size, rounded, disabled, loading, iconOnly, fullWidth, href, type, color, textColor, label }: StoryArgs) => {
+  render: ({
+    variant,
+    intent,
+    theme,
+    size,
+    rounded,
+    disabled,
+    loading,
+    iconOnly,
+    fullWidth,
+    href,
+    type,
+    color,
+    textColor,
+    label
+  }: StoryArgs) => {
     const element = document.createElement("ark-button");
     element.setAttribute("variant", variant);
     element.setAttribute("intent", intent);

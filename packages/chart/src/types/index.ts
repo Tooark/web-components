@@ -1,5 +1,5 @@
-import type { EChartsOption } from "echarts";
 import type { ArkThemeSelected } from "@tooark/tokens";
+import type { EChartsOption } from "echarts";
 
 /** Tema do gráfico. "auto" segue a preferência do sistema (prefers-color-scheme). */
 export type ArkChartTheme = "auto" | ArkThemeSelected;
@@ -8,15 +8,7 @@ export type ArkChartTheme = "auto" | ArkThemeSelected;
 export type ArkChartRenderer = "canvas" | "svg";
 
 /** Tipos de gráfico de conveniência (atalhos sobre as series do ECharts). */
-export type ArkChartType =
-  | "line"
-  | "bar"
-  | "pie"
-  | "scatter"
-  | "radar"
-  | "gauge"
-  | "candlestick"
-  | "custom";
+export type ArkChartType = "line" | "bar" | "pie" | "scatter" | "radar" | "gauge" | "candlestick" | "custom";
 
 export type ArkChartOptions = {
   /** Opções nativas do ECharts (fonte da verdade da renderização). */

@@ -1,6 +1,5 @@
-import { arkEnter, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView } from "@tooark/core";
-import { intentColors } from "./intent-colors";
+import { type ArkDatepickerLocale, arkEnter, resolveLocale } from "@tooark/core";
 import {
   addDays,
   addMonths,
@@ -14,6 +13,7 @@ import {
   startOfDay,
   startOfWeek
 } from "./date-utils";
+import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSchedulerPalette = {
@@ -62,13 +62,26 @@ export class ArkScheduler extends HTMLElement {
   private syncingAttr = false;
   // Linhas de "agora" vivas na tela: reposicionadas sem rebuild a cada minuto.
   private nowLines: HTMLElement[] = [];
-  private scrollerEl: HTMLDivElement | null = null;
   // Identifica view + período: se não mudou, o rebuild preserva o scroll do usuário.
   private lastRenderKey = "";
   private lastScrollTop = 0;
 
   static get observedAttributes(): string[] {
-    return ["view", "date", "events", "lang", "locale-json", "theme", "intent", "hour-start", "hour-end", "slot-minutes", "hours-format", "views", "testid"];
+    return [
+      "view",
+      "date",
+      "events",
+      "lang",
+      "locale-json",
+      "theme",
+      "intent",
+      "hour-start",
+      "hour-end",
+      "slot-minutes",
+      "hours-format",
+      "views",
+      "testid"
+    ];
   }
 
   connectedCallback(): void {
@@ -143,7 +156,15 @@ export class ArkScheduler extends HTMLElement {
 
   private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
@@ -169,7 +190,10 @@ export class ArkScheduler extends HTMLElement {
     const parsed = raw
       .split(",")
       .map((value) => value.trim().toLowerCase())
-      .filter((value): value is ArkSchedulerView => value === "day" || value === "week" || value === "month" || value === "agenda");
+      .filter(
+        (value): value is ArkSchedulerView =>
+          value === "day" || value === "week" || value === "month" || value === "agenda"
+      );
     return parsed.length > 0 ? parsed : ["day", "week", "month", "agenda"];
   }
 
@@ -210,7 +234,7 @@ export class ArkScheduler extends HTMLElement {
         const end = this.eventEnd(event, start);
         return startOfDay(day) >= startOfDay(start) && startOfDay(day) <= startOfDay(end);
       })
-      .sort((a, b) => (this.eventStart(a)!.getTime() - this.eventStart(b)!.getTime()));
+      .sort((a, b) => this.eventStart(a)!.getTime() - this.eventStart(b)!.getTime());
   }
 
   /**
@@ -262,9 +286,11 @@ export class ArkScheduler extends HTMLElement {
   private getPalette(): ArkSchedulerPalette {
     // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
     return {
-      container: "ark:flex ark:w-full ark:flex-col ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:text-fg ark:shadow-sm",
+      container:
+        "ark:flex ark:w-full ark:flex-col ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:text-fg ark:shadow-sm",
       headerText: "ark:text-sm ark:font-semibold ark:text-fg",
-      navButton: "ark:rounded-md ark:border ark:border-border-strong ark:p-1 ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring",
+      navButton:
+        "ark:rounded-md ark:border ark:border-border-strong ark:p-1 ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring",
       mutedText: "ark:text-fg-muted",
       gridLine: "ark:border-border",
       columnBorder: "ark:border-border",
@@ -296,7 +322,10 @@ export class ArkScheduler extends HTMLElement {
     // month e agenda operam sobre o mês inteiro.
     const start = new Date(this.refDate.getFullYear(), this.refDate.getMonth(), 1);
     const end = new Date(this.refDate.getFullYear(), this.refDate.getMonth() + 1, 0);
-    const days = Array.from({ length: end.getDate() }, (_, i) => new Date(start.getFullYear(), start.getMonth(), i + 1));
+    const days = Array.from(
+      { length: end.getDate() },
+      (_, i) => new Date(start.getFullYear(), start.getMonth(), i + 1)
+    );
     return { start, end, days };
   }
 
@@ -349,31 +378,37 @@ export class ArkScheduler extends HTMLElement {
 
   private emitRangeChange(): void {
     const { start, end } = this.getRange();
-    this.dispatchEvent(new CustomEvent("ark-range-change", {
-      detail: { start: formatISODate(start), end: formatISODate(end), view: this.view },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("ark-range-change", {
+        detail: { start: formatISODate(start), end: formatISODate(end), view: this.view },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private emitEventClick(event: ArkSchedulerEvent): void {
-    this.dispatchEvent(new CustomEvent("ark-event-click", {
-      detail: { event, id: event.id ?? null },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("ark-event-click", {
+        detail: { event, id: event.id ?? null },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private emitSlotClick(start: Date, end: Date, allDay = false): void {
-    this.dispatchEvent(new CustomEvent("ark-slot-click", {
-      detail: {
-        start: allDay ? formatISODate(start) : formatISODateTime(start),
-        end: allDay ? formatISODate(end) : formatISODateTime(end),
-        allDay
-      },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("ark-slot-click", {
+        detail: {
+          start: allDay ? formatISODate(start) : formatISODateTime(start),
+          end: allDay ? formatISODate(end) : formatISODateTime(end),
+          allDay
+        },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   // --- Blocos de UI ---
@@ -448,7 +483,9 @@ export class ArkScheduler extends HTMLElement {
       const detail = (event as CustomEvent<{ value?: string }>).detail;
       if (!detail?.value || detail.value === this.view) return;
       this.setAttribute("view", detail.value);
-      this.dispatchEvent(new CustomEvent("ark-view-change", { detail: { view: detail.value }, bubbles: true, composed: true }));
+      this.dispatchEvent(
+        new CustomEvent("ark-view-change", { detail: { view: detail.value }, bubbles: true, composed: true })
+      );
     });
 
     header.appendChild(left);
@@ -599,7 +636,8 @@ export class ArkScheduler extends HTMLElement {
         const startMinutes = minutesSinceMidnight(item.start);
         const endMinutes = isSameDay(item.end, day) ? minutesSinceMidnight(item.end) : hourEnd * 60;
         const top = ((Math.max(startMinutes, hourStart * 60) - hourStart * 60) / totalMinutes) * bodyHeight;
-        const rawHeight = ((Math.min(endMinutes, hourEnd * 60) - Math.max(startMinutes, hourStart * 60)) / totalMinutes) * bodyHeight;
+        const rawHeight =
+          ((Math.min(endMinutes, hourEnd * 60) - Math.max(startMinutes, hourStart * 60)) / totalMinutes) * bodyHeight;
         if (rawHeight <= 0) continue;
 
         const holder = document.createElement("div");
@@ -617,7 +655,8 @@ export class ArkScheduler extends HTMLElement {
         const nowMinutes = minutesSinceMidnight(today);
         if (nowMinutes >= hourStart * 60 && nowMinutes <= hourEnd * 60) {
           const line = document.createElement("div");
-          line.className = "ark:pointer-events-none ark:absolute ark:left-0 ark:right-0 ark:z-10 ark:flex ark:items-center";
+          line.className =
+            "ark:pointer-events-none ark:absolute ark:left-0 ark:right-0 ark:z-10 ark:flex ark:items-center";
           line.style.top = `${((nowMinutes - hourStart * 60) / totalMinutes) * bodyHeight}px`;
           applyTestHooks(this, "scheduler", line, "now");
 
@@ -636,7 +675,6 @@ export class ArkScheduler extends HTMLElement {
     }
 
     wrapper.appendChild(scroller);
-    this.scrollerEl = scroller;
     scroller.addEventListener("scroll", () => {
       this.lastScrollTop = scroller.scrollTop;
     });
@@ -713,7 +751,10 @@ export class ArkScheduler extends HTMLElement {
         ? "ark:mb-1 ark:inline-flex ark:h-6 ark:min-w-6 ark:items-center ark:justify-center ark:rounded-full ark:bg-danger ark:px-1 ark:text-xs ark:font-semibold ark:text-danger-fg"
         : `ark:mb-1 ark:inline-flex ark:h-6 ark:min-w-6 ark:items-center ark:justify-center ark:rounded-full ark:px-1 ark:text-xs ark:transition ark:hover:bg-surface-strong ${inMonth ? "" : palette.mutedText}`;
       dayButton.textContent = String(cellDate.getDate());
-      dayButton.setAttribute("aria-label", `${cellDate.getDate()} ${loc.months[cellDate.getMonth()]} ${cellDate.getFullYear()}`);
+      dayButton.setAttribute(
+        "aria-label",
+        `${cellDate.getDate()} ${loc.months[cellDate.getMonth()]} ${cellDate.getFullYear()}`
+      );
       dayButton.addEventListener("click", () => this.emitSlotClick(startOfDay(cellDate), startOfDay(cellDate), true));
       cell.appendChild(dayButton);
 
@@ -733,7 +774,9 @@ export class ArkScheduler extends HTMLElement {
           this.refDate = cellDate;
           this.syncDateAttr();
           this.setAttribute("view", "day");
-          this.dispatchEvent(new CustomEvent("ark-view-change", { detail: { view: "day" }, bubbles: true, composed: true }));
+          this.dispatchEvent(
+            new CustomEvent("ark-view-change", { detail: { view: "day" }, bubbles: true, composed: true })
+          );
         });
         cell.appendChild(more);
       }
@@ -767,7 +810,9 @@ export class ArkScheduler extends HTMLElement {
       const dayLabel = document.createElement("div");
       dayLabel.className = "ark:w-24 ark:shrink-0";
       const dayNumber = document.createElement("div");
-      dayNumber.className = isSameDay(day, today) ? "ark:text-lg ark:font-semibold ark:text-danger" : "ark:text-lg ark:font-semibold";
+      dayNumber.className = isSameDay(day, today)
+        ? "ark:text-lg ark:font-semibold ark:text-danger"
+        : "ark:text-lg ark:font-semibold";
       dayNumber.textContent = String(day.getDate());
       const dayName = document.createElement("div");
       dayName.className = `ark:text-xs ${palette.mutedText}`;
@@ -848,7 +893,6 @@ export class ArkScheduler extends HTMLElement {
 
     this.root?.remove();
     this.nowLines = [];
-    this.scrollerEl = null;
 
     const container = document.createElement("div");
     container.className = palette.container;

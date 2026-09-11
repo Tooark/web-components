@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import { createWysiwygEditor, type ArkWysiwygInstance } from "../engine";
+import { type ArkWysiwygInstance, createWysiwygEditor } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme, ArkWysiwygToolbarItem } from "../types";
 
@@ -11,16 +11,66 @@ type ToolbarAction = {
 };
 
 const TOOLBAR_ACTIONS: Record<ArkWysiwygToolbarItem, ToolbarAction> = {
-  bold: { label: "B", title: "Negrito", run: (e) => e.chain().focus().toggleBold().run(), active: (e) => e.isActive("bold") },
-  italic: { label: "I", title: "Itálico", run: (e) => e.chain().focus().toggleItalic().run(), active: (e) => e.isActive("italic") },
-  strike: { label: "S", title: "Tachado", run: (e) => e.chain().focus().toggleStrike().run(), active: (e) => e.isActive("strike") },
-  code: { label: "</>", title: "Código", run: (e) => e.chain().focus().toggleCode().run(), active: (e) => e.isActive("code") },
-  "heading-1": { label: "H1", title: "Título 1", run: (e) => e.chain().focus().toggleHeading({ level: 1 }).run(), active: (e) => e.isActive("heading", { level: 1 }) },
-  "heading-2": { label: "H2", title: "Título 2", run: (e) => e.chain().focus().toggleHeading({ level: 2 }).run(), active: (e) => e.isActive("heading", { level: 2 }) },
-  "heading-3": { label: "H3", title: "Título 3", run: (e) => e.chain().focus().toggleHeading({ level: 3 }).run(), active: (e) => e.isActive("heading", { level: 3 }) },
-  "bullet-list": { label: "• Lista", title: "Lista", run: (e) => e.chain().focus().toggleBulletList().run(), active: (e) => e.isActive("bulletList") },
-  "ordered-list": { label: "1. Lista", title: "Lista numerada", run: (e) => e.chain().focus().toggleOrderedList().run(), active: (e) => e.isActive("orderedList") },
-  blockquote: { label: "❝", title: "Citação", run: (e) => e.chain().focus().toggleBlockquote().run(), active: (e) => e.isActive("blockquote") },
+  bold: {
+    label: "B",
+    title: "Negrito",
+    run: (e) => e.chain().focus().toggleBold().run(),
+    active: (e) => e.isActive("bold")
+  },
+  italic: {
+    label: "I",
+    title: "Itálico",
+    run: (e) => e.chain().focus().toggleItalic().run(),
+    active: (e) => e.isActive("italic")
+  },
+  strike: {
+    label: "S",
+    title: "Tachado",
+    run: (e) => e.chain().focus().toggleStrike().run(),
+    active: (e) => e.isActive("strike")
+  },
+  code: {
+    label: "</>",
+    title: "Código",
+    run: (e) => e.chain().focus().toggleCode().run(),
+    active: (e) => e.isActive("code")
+  },
+  "heading-1": {
+    label: "H1",
+    title: "Título 1",
+    run: (e) => e.chain().focus().toggleHeading({ level: 1 }).run(),
+    active: (e) => e.isActive("heading", { level: 1 })
+  },
+  "heading-2": {
+    label: "H2",
+    title: "Título 2",
+    run: (e) => e.chain().focus().toggleHeading({ level: 2 }).run(),
+    active: (e) => e.isActive("heading", { level: 2 })
+  },
+  "heading-3": {
+    label: "H3",
+    title: "Título 3",
+    run: (e) => e.chain().focus().toggleHeading({ level: 3 }).run(),
+    active: (e) => e.isActive("heading", { level: 3 })
+  },
+  "bullet-list": {
+    label: "• Lista",
+    title: "Lista",
+    run: (e) => e.chain().focus().toggleBulletList().run(),
+    active: (e) => e.isActive("bulletList")
+  },
+  "ordered-list": {
+    label: "1. Lista",
+    title: "Lista numerada",
+    run: (e) => e.chain().focus().toggleOrderedList().run(),
+    active: (e) => e.isActive("orderedList")
+  },
+  blockquote: {
+    label: "❝",
+    title: "Citação",
+    run: (e) => e.chain().focus().toggleBlockquote().run(),
+    active: (e) => e.isActive("blockquote")
+  },
   "horizontal-rule": { label: "―", title: "Linha", run: (e) => e.chain().focus().setHorizontalRule().run() },
   undo: { label: "↶", title: "Desfazer", run: (e) => e.chain().focus().undo().run() },
   redo: { label: "↷", title: "Refazer", run: (e) => e.chain().focus().redo().run() }

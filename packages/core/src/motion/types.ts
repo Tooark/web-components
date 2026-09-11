@@ -1,13 +1,7 @@
 import type { ArkDuration, ArkEasing } from "@tooark/tokens";
 
 /** Presets de transição de entrada/saída. */
-export type ArkMotionPreset =
-  | "fade"
-  | "slide-up"
-  | "slide-down"
-  | "slide-left"
-  | "slide-right"
-  | "scale";
+export type ArkMotionPreset = "fade" | "slide-up" | "slide-down" | "slide-left" | "slide-right" | "scale";
 
 /** Opções de uma animação de entrada/saída. */
 export type ArkMotionOptions = {

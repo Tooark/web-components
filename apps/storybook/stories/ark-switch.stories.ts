@@ -1,5 +1,5 @@
-import { expect, userEvent, within } from "storybook/test";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import { expect, userEvent, within } from "storybook/test";
 
 const meta = {
   title: "Core/ArkSwitch",
@@ -44,7 +44,7 @@ type StoryArgs = {
   color: string;
 };
 
-function createSwitch (args: Partial<StoryArgs> & { label?: string }): HTMLElement {
+function createSwitch(args: Partial<StoryArgs> & { label?: string }): HTMLElement {
   const el = document.createElement("ark-switch");
   el.setAttribute("intent", args.intent || "primary");
   el.setAttribute("theme", args.theme || "auto");
@@ -73,9 +73,21 @@ export const Styles = {
     const rows: Array<{ label: string; off: Partial<StoryArgs>; on: Partial<StoryArgs> }> = [
       { label: "Simples", off: {}, on: { checked: true } },
       { label: "Com texto", off: { labels: true }, on: { labels: true, checked: true } },
-      { label: "Com ícones", off: { icons: true, intent: "success" }, on: { icons: true, intent: "success", checked: true } },
-      { label: "Texto + ícones", off: { labels: true, icons: true, intent: "success" }, on: { labels: true, icons: true, intent: "success", checked: true } },
-      { label: "Danger/Success", off: { icons: true, intent: "danger", checked: true }, on: { icons: true, intent: "success", checked: true } }
+      {
+        label: "Com ícones",
+        off: { icons: true, intent: "success" },
+        on: { icons: true, intent: "success", checked: true }
+      },
+      {
+        label: "Texto + ícones",
+        off: { labels: true, icons: true, intent: "success" },
+        on: { labels: true, icons: true, intent: "success", checked: true }
+      },
+      {
+        label: "Danger/Success",
+        off: { icons: true, intent: "danger", checked: true },
+        on: { icons: true, intent: "success", checked: true }
+      }
     ];
 
     rows.forEach((row) => {

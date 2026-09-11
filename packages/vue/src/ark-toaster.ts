@@ -1,5 +1,5 @@
-import { defineComponent, h, type PropType } from "vue";
 import type { ArkTheme, ArkToastPosition } from "@tooark/core";
+import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export const ArkToaster = defineComponent({

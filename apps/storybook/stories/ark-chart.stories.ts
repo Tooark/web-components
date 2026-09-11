@@ -1,5 +1,4 @@
-import type { ArkChart } from "@tooark/chart";
-import type { EChartsOption } from "@tooark/chart";
+import type { ArkChart, EChartsOption } from "@tooark/chart";
 
 const meta = {
   title: "Chart/ArkChart",

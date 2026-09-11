@@ -2,14 +2,7 @@
 // Compartilhado por todos os componentes e wrappers de framework.
 
 /** Intenções semânticas de cor. */
-export type ArkIntent =
-  | "primary"
-  | "secondary"
-  | "success"
-  | "warning"
-  | "danger"
-  | "info"
-  | "neutral";
+export type ArkIntent = "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral";
 
 /** Escala de tamanho. */
 export type ArkSize = "sm" | "md" | "lg" | "xl";

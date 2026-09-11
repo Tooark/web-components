@@ -1,5 +1,5 @@
-import { arkEnter, arkExit } from "@tooark/core";
 import type { ArkMotionPreset } from "@tooark/core";
+import { arkEnter, arkExit } from "@tooark/core";
 
 const meta = {
   title: "Core/ArkMotion",

@@ -1,5 +1,5 @@
-import { animate } from "motion";
 import { prefersReducedMotion } from "@tooark/core";
+import { animate } from "motion";
 import type { ArkSwipeDirection, ArkSwipeOptions } from "./types";
 
 /**
@@ -35,7 +35,12 @@ export function arkSwipe(element: HTMLElement, options: ArkSwipeOptions): () => 
 
     const damped = delta * (1 - resistance);
     const keyframes = axis === "x" ? { x: [damped, 0] } : { y: [damped, 0] };
-    animate(element, keyframes as never, { type: "spring", stiffness: 420, damping: 34, velocity: -velocity * (1 - resistance) });
+    animate(element, keyframes as never, {
+      type: "spring",
+      stiffness: 420,
+      damping: 34,
+      velocity: -velocity * (1 - resistance)
+    });
   };
 
   const onPointerDown = (event: PointerEvent): void => {

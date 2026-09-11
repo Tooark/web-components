@@ -2,22 +2,20 @@
 // (motion.dev), integrados aos tokens --ark-*. Pacote opt-in: só quem
 // precisa de stagger/reveal/FLIP/swipe paga pela dependência.
 
+// Primitivas da lib Motion para uso avançado, sem precisar instalá-la à parte
+export { animate, hover, inView, press, scroll, spring, stagger } from "motion";
+export { arkFlip } from "./flip";
+export { arkReveal } from "./reveal";
+export { arkStaggerEnter } from "./stagger";
+export { arkSwipe } from "./swipe";
 export type {
+  ArkFlipOptions,
+  ArkMotionPlusOptions,
   ArkMotionPreset,
   ArkMotionTargets,
-  ArkMotionPlusOptions,
-  ArkStaggerOptions,
   ArkRevealOptions,
-  ArkFlipOptions,
+  ArkStaggerOptions,
   ArkSwipeDirection,
   ArkSwipeInfo,
   ArkSwipeOptions
 } from "./types";
-
-export { arkStaggerEnter } from "./stagger";
-export { arkReveal } from "./reveal";
-export { arkFlip } from "./flip";
-export { arkSwipe } from "./swipe";
-
-// Primitivas da lib Motion para uso avançado, sem precisar instalá-la à parte
-export { animate, stagger, inView, scroll, spring, hover, press } from "motion";

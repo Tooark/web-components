@@ -18,7 +18,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-toaster>`
 })
 export class ArkToasterComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 

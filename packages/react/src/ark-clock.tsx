@@ -1,5 +1,5 @@
-import React, { createElement, useEffect } from "react";
 import type { ArkClockStyleOptions, ArkDatepickerLang } from "@tooark/core";
+import React, { createElement, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkClockProps = ArkClockStyleOptions & {
@@ -32,7 +32,7 @@ export function ArkClock(props: ArkClockProps): React.JSX.Element {
     class: className,
     seconds: seconds ? "" : undefined,
     "step-minutes": stepMinutes !== undefined ? String(stepMinutes) : undefined,
-    "hours-format": hoursFormat,
+    "hours-format": hoursFormat
   };
 
   return createElement("ark-clock", attrs);

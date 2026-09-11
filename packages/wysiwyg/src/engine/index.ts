@@ -1,13 +1,9 @@
-import { Editor } from "@tiptap/core";
 import type { Extensions, JSONContent } from "@tiptap/core";
-import StarterKit from "@tiptap/starter-kit";
+import { Editor } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
+import StarterKit from "@tiptap/starter-kit";
 import type { ArkThemeSelected } from "@tooark/tokens";
-import type {
-  ArkWysiwygEditorOptions,
-  ArkWysiwygTheme,
-  ArkWysiwygViewerOptions
-} from "../types";
+import type { ArkWysiwygEditorOptions, ArkWysiwygTheme, ArkWysiwygViewerOptions } from "../types";
 
 /** Documento vazio do ProseMirror (um parágrafo). */
 export const EMPTY_DOC: JSONContent = { type: "doc", content: [{ type: "paragraph" }] };
@@ -97,10 +93,7 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
 }
 
 /** Cria um editor WYSIWYG (editável) dentro de `element`. */
-export function createWysiwygEditor(
-  element: HTMLElement,
-  options: ArkWysiwygEditorOptions = {}
-): ArkWysiwygInstance {
+export function createWysiwygEditor(element: HTMLElement, options: ArkWysiwygEditorOptions = {}): ArkWysiwygInstance {
   return createInstance(element, {
     content: options.content,
     theme: options.theme,
@@ -111,10 +104,7 @@ export function createWysiwygEditor(
 }
 
 /** Cria um viewer (somente leitura) que renderiza o mesmo JSON do editor. */
-export function createWysiwygViewer(
-  element: HTMLElement,
-  options: ArkWysiwygViewerOptions = {}
-): ArkWysiwygInstance {
+export function createWysiwygViewer(element: HTMLElement, options: ArkWysiwygViewerOptions = {}): ArkWysiwygInstance {
   return createInstance(element, {
     content: options.content,
     theme: options.theme,

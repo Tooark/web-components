@@ -23,11 +23,28 @@ export class ArkInput extends HTMLElement {
   private messageEl: HTMLParagraphElement | null = null;
   private observer: MutationObserver | null = null;
 
-  static get observedAttributes (): string[] {
-    return ["type", "label", "placeholder", "value", "name", "size", "intent", "theme", "rounded", "helper", "error", "error-message", "disabled", "required", "readonly", "testid"];
+  static get observedAttributes(): string[] {
+    return [
+      "type",
+      "label",
+      "placeholder",
+      "value",
+      "name",
+      "size",
+      "intent",
+      "theme",
+      "rounded",
+      "helper",
+      "error",
+      "error-message",
+      "disabled",
+      "required",
+      "readonly",
+      "testid"
+    ];
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     if (!this.inputEl) {
       this.render();
     }
@@ -39,12 +56,12 @@ export class ArkInput extends HTMLElement {
     this.updateAppearance();
   }
 
-  disconnectedCallback (): void {
+  disconnectedCallback(): void {
     this.observer?.disconnect();
     this.observer = null;
   }
 
-  attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue === newValue || !this.inputEl) return;
 
     if (name === "value") {
@@ -56,15 +73,15 @@ export class ArkInput extends HTMLElement {
   }
 
   /** O <input> nativo interno, para composição por outros componentes. */
-  get inputElement (): HTMLInputElement | null {
+  get inputElement(): HTMLInputElement | null {
     return this.inputEl;
   }
 
-  get value (): string {
+  get value(): string {
     return this.inputEl?.value ?? this.getAttribute("value") ?? "";
   }
 
-  set value (next: string) {
+  set value(next: string) {
     if (this.inputEl) {
       this.inputEl.value = next;
     } else {
@@ -72,23 +89,31 @@ export class ArkInput extends HTMLElement {
     }
   }
 
-  focus (options?: FocusOptions): void {
+  focus(options?: FocusOptions): void {
     this.inputEl?.focus(options);
   }
 
-  private getIntent (): ArkIntent {
+  private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private getSuffixEl (): HTMLElement | null {
+  private getSuffixEl(): HTMLElement | null {
     return this.querySelector<HTMLElement>(':scope > [slot="suffix"]');
   }
 
-  private render (): void {
+  private render(): void {
     const id = this.getAttribute("id") ? `${this.getAttribute("id")}-input` : `ark-input-${++arkInputIdCounter}`;
 
     const label = document.createElement("label");
@@ -111,7 +136,7 @@ export class ArkInput extends HTMLElement {
     this.messageEl = message;
   }
 
-  private updateAppearance (): void {
+  private updateAppearance(): void {
     if (!this.inputEl || !this.labelEl || !this.messageEl) return;
 
     const intent = this.getIntent();
@@ -167,17 +192,16 @@ export class ArkInput extends HTMLElement {
       surface,
       border,
       focusRing
-    ].join(" ").trim().replace(/\s+/g, " ");
+    ]
+      .join(" ")
+      .trim()
+      .replace(/\s+/g, " ");
 
     // Label
     const labelText = this.getAttribute("label") || "";
     this.labelEl.textContent = labelText;
     this.labelEl.hidden = !labelText;
-    this.labelEl.className = [
-      "ark:mb-1 ark:block ark:font-medium",
-      size.label,
-      "ark:text-fg-soft"
-    ].join(" ");
+    this.labelEl.className = ["ark:mb-1 ark:block ark:font-medium", size.label, "ark:text-fg-soft"].join(" ");
 
     // Mensagem (erro tem precedência sobre helper)
     const errorMessage = this.getAttribute("error-message") || "";

@@ -1,5 +1,5 @@
-import { animate, stagger } from "motion";
 import { prefersReducedMotion } from "@tooark/core";
+import { animate, stagger } from "motion";
 import { hiddenOffset, resolveDistancePx, resolveDurationSec, resolveEase, resolveTargets } from "./internal";
 import type { ArkMotionTargets, ArkStaggerOptions } from "./types";
 

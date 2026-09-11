@@ -1,5 +1,5 @@
-import { expect, userEvent, waitFor } from "storybook/test";
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 const meta = {
   title: "Core/ArkInput",
@@ -7,12 +7,16 @@ const meta = {
     docs: {
       description: {
         component:
-          "Campo de texto padronizado da familia Ark. Serve como componente publico e como base visual de orquestradores (ark-datepicker), que colocam seus botoes na area de sufixo (`slot=\"suffix\"`) e acessam o campo nativo via `inputElement`/`focus()`. O `label` vira um `<label for>` real e a mensagem de erro tem precedencia sobre o helper, refletida em `aria-invalid`/`aria-describedby`."
+          'Campo de texto padronizado da familia Ark. Serve como componente publico e como base visual de orquestradores (ark-datepicker), que colocam seus botoes na area de sufixo (`slot="suffix"`) e acessam o campo nativo via `inputElement`/`focus()`. O `label` vira um `<label for>` real e a mensagem de erro tem precedencia sobre o helper, refletida em `aria-invalid`/`aria-describedby`.'
       }
     }
   },
   argTypes: {
-    type: { control: "select", options: ["text", "password", "email", "number", "tel", "url", "search"], description: "Tipo do input nativo; valores fora da lista caem para text" },
+    type: {
+      control: "select",
+      options: ["text", "password", "email", "number", "tel", "url", "search"],
+      description: "Tipo do input nativo; valores fora da lista caem para text"
+    },
     label: { control: "text", description: "Rotulo acessivel; vazio esconde o label" },
     placeholder: { control: "text" },
     value: { control: "text", description: "Valor inicial do campo (tambem disponivel como propriedade JS)" },
@@ -23,12 +27,19 @@ const meta = {
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     readonly: { control: "boolean", description: "Campo somente leitura" },
-    suffix: { control: "text", description: "Conteudo do slot=\"suffix\" (ex.: um icone); vazio nao renderiza sufixo" },
+    suffix: { control: "text", description: 'Conteudo do slot="suffix" (ex.: um icone); vazio nao renderiza sufixo' },
     size: { control: "inline-radio", options: ["sm", "md", "lg", "xl"] },
-    intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"], description: "Define a cor do anel de foco" },
+    intent: {
+      control: "select",
+      options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"],
+      description: "Define a cor do anel de foco"
+    },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     rounded: { control: "inline-radio", options: ["none", "sm", "md", "lg", "xl", "full"] },
-    testid: { control: "text", description: "Propaga data-testid para o input e suas partes (<testid>-label, -suffix, -helper/-error)" }
+    testid: {
+      control: "text",
+      description: "Propaga data-testid para o input e suas partes (<testid>-label, -suffix, -helper/-error)"
+    }
   },
   args: {
     type: "text",
@@ -73,7 +84,7 @@ type StoryArgs = {
   testid: string;
 };
 
-function createInput (args: Partial<StoryArgs>): HTMLElement {
+function createInput(args: Partial<StoryArgs>): HTMLElement {
   const el = document.createElement("ark-input");
   el.setAttribute("type", args.type || "text");
   el.setAttribute("size", args.size || "md");

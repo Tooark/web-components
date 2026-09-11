@@ -2,9 +2,9 @@
 // pacotes em packages/*. Roda automaticamente no lifecycle "version"
 // (ex.: `pnpm version patch`) ou manualmente via `pnpm version:sync`.
 
-import { readFileSync, writeFileSync, readdirSync, existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const rootPkg = JSON.parse(readFileSync(path.join(rootDir, "package.json"), "utf8"));

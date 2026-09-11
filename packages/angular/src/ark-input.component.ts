@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -28,7 +28,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-input>`
 })
 export class ArkInputComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 

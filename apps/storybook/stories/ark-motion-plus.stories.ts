@@ -1,5 +1,5 @@
-import { arkFlip, arkReveal, arkStaggerEnter, arkSwipe } from "@tooark/motion";
 import type { ArkSwipeDirection } from "@tooark/motion";
+import { arkFlip, arkReveal, arkStaggerEnter, arkSwipe } from "@tooark/motion";
 
 const meta = {
   title: "Motion/ArkMotion",
@@ -18,7 +18,8 @@ export default meta;
 
 function createCard(label: string, hue: number): HTMLElement {
   const card = document.createElement("div");
-  card.className = "flex h-20 select-none items-center justify-center rounded-xl border text-sm font-semibold shadow-sm";
+  card.className =
+    "flex h-20 select-none items-center justify-center rounded-xl border text-sm font-semibold shadow-sm";
   card.style.background = `oklch(0.96 0.03 ${hue})`;
   card.style.borderColor = `oklch(0.85 0.06 ${hue})`;
   card.style.color = `oklch(0.35 0.08 ${hue})`;
@@ -67,7 +68,9 @@ export const Stagger = {
 export const ScrollReveal = {
   parameters: {
     layout: "fullscreen",
-    docs: { description: { story: "arkReveal: anima a entrada de cada bloco quando ele aparece na viewport (role a pagina)." } }
+    docs: {
+      description: { story: "arkReveal: anima a entrada de cada bloco quando ele aparece na viewport (role a pagina)." }
+    }
   },
   render: (): HTMLElement => {
     const page = document.createElement("div");
@@ -96,7 +99,11 @@ export const ScrollReveal = {
 
 export const FlipReorder = {
   parameters: {
-    docs: { description: { story: "arkFlip: embaralha a lista mudando o DOM e anima cada item da posicao antiga para a nova com spring." } }
+    docs: {
+      description: {
+        story: "arkFlip: embaralha a lista mudando o DOM e anima cada item da posicao antiga para a nova com spring."
+      }
+    }
   },
   render: (): HTMLElement => {
     const container = document.createElement("div");
@@ -123,7 +130,12 @@ export const FlipReorder = {
 
 export const Swipe = {
   parameters: {
-    docs: { description: { story: "arkSwipe: gesto de arrastar com feedback visual, deteccao por distancia/velocidade e retorno com spring." } }
+    docs: {
+      description: {
+        story:
+          "arkSwipe: gesto de arrastar com feedback visual, deteccao por distancia/velocidade e retorno com spring."
+      }
+    }
   },
   render: (): HTMLElement => {
     const container = document.createElement("div");

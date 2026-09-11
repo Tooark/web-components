@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -20,7 +20,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-toggle>`
 })
 export class ArkToggleComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 
@@ -33,7 +33,7 @@ export class ArkToggleComponent {
   @Input() value: string | undefined;
   @Output() changed = new EventEmitter<CustomEvent<{ pressed: boolean; value: string }>>();
 
-  onChange (event: Event): void {
+  onChange(event: Event): void {
     this.changed.emit(event as CustomEvent<{ pressed: boolean; value: string }>);
   }
 }
@@ -56,7 +56,7 @@ export class ArkToggleComponent {
   </ark-toggle-group>`
 })
 export class ArkToggleGroupComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 
@@ -69,7 +69,7 @@ export class ArkToggleGroupComponent {
   @Input() size: ArkSize | undefined;
   @Output() changed = new EventEmitter<CustomEvent<{ value?: string; values?: string[] }>>();
 
-  onChange (event: Event): void {
+  onChange(event: Event): void {
     this.changed.emit(event as CustomEvent<{ value?: string; values?: string[] }>);
   }
 }

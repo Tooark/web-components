@@ -1,4 +1,4 @@
-import { ArkToggle } from "./ark-toggle";
+import type { ArkToggle } from "./ark-toggle";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -14,16 +14,16 @@ export class ArkToggleGroup extends HTMLElement {
   private ownClasses: string[] = [];
   private syncingClass = false;
 
-  static get observedAttributes (): string[] {
+  static get observedAttributes(): string[] {
     return ["value", "multiple", "disabled", "size", "intent", "theme", "class", "testid"];
   }
 
-  constructor () {
+  constructor() {
     super();
     this.addEventListener("change", this.handleToggleChange);
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncToggles());
       this.observer.observe(this, { childList: true, subtree: true });
@@ -33,12 +33,12 @@ export class ArkToggleGroup extends HTMLElement {
     this.syncToggles();
   }
 
-  disconnectedCallback (): void {
+  disconnectedCallback(): void {
     this.observer?.disconnect();
     this.observer = null;
   }
 
-  attributeChangedCallback (name: string): void {
+  attributeChangedCallback(name: string): void {
     if (name === "class") {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
@@ -54,11 +54,11 @@ export class ArkToggleGroup extends HTMLElement {
     }
   }
 
-  get value (): string {
+  get value(): string {
     return this.getAttribute("value") || "";
   }
 
-  set value (next: string) {
+  set value(next: string) {
     if (next) {
       this.setAttribute("value", next);
     } else {
@@ -66,15 +66,18 @@ export class ArkToggleGroup extends HTMLElement {
     }
   }
 
-  get values (): string[] {
-    return this.value.split(",").map((v) => v.trim()).filter(Boolean);
+  get values(): string[] {
+    return this.value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
   }
 
-  private isMultiple (): boolean {
+  private isMultiple(): boolean {
     return this.hasAttribute("multiple");
   }
 
-  private getToggles (): ArkToggle[] {
+  private getToggles(): ArkToggle[] {
     return Array.from(this.querySelectorAll("ark-toggle")) as ArkToggle[];
   }
 
@@ -95,7 +98,10 @@ export class ArkToggleGroup extends HTMLElement {
       });
     }
 
-    const pressedValues = this.getToggles().filter((t) => t.pressed).map((t) => t.value).filter(Boolean);
+    const pressedValues = this.getToggles()
+      .filter((t) => t.pressed)
+      .map((t) => t.value)
+      .filter(Boolean);
     const nextValue = this.isMultiple() ? pressedValues.join(",") : pressedValues[0] || "";
 
     this.syncingValue = true;
@@ -106,14 +112,16 @@ export class ArkToggleGroup extends HTMLElement {
     }
     this.syncingValue = false;
 
-    this.dispatchEvent(new CustomEvent("change", {
-      detail: this.isMultiple() ? { values: pressedValues } : { value: nextValue },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("change", {
+        detail: this.isMultiple() ? { values: pressedValues } : { value: nextValue },
+        bubbles: true,
+        composed: true
+      })
+    );
   };
 
-  private applyValueToToggles (): void {
+  private applyValueToToggles(): void {
     const values = this.values;
     this.getToggles().forEach((toggle) => {
       toggle.pressed = values.includes(toggle.value);
@@ -121,7 +129,7 @@ export class ArkToggleGroup extends HTMLElement {
   }
 
   // Propaga size/intent/theme/disabled do grupo para os itens.
-  private syncToggles (): void {
+  private syncToggles(): void {
     const size = this.getAttribute("size");
     const intent = this.getAttribute("intent");
     const theme = this.getAttribute("theme");
@@ -146,7 +154,7 @@ export class ArkToggleGroup extends HTMLElement {
     }
   }
 
-  private applyOwnClasses (next: string[]): void {
+  private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
       if (!next.includes(cls)) this.classList.remove(cls);
@@ -158,9 +166,11 @@ export class ArkToggleGroup extends HTMLElement {
     this.syncingClass = false;
   }
 
-  private updateAppearance (): void {
+  private updateAppearance(): void {
     this.setAttribute("role", "group");
-    this.applyOwnClasses("ark:inline-flex ark:items-center ark:gap-1 ark:rounded-lg ark:bg-surface-muted ark:p-1".split(/\s+/));
+    this.applyOwnClasses(
+      "ark:inline-flex ark:items-center ark:gap-1 ark:rounded-lg ark:bg-surface-muted ark:p-1".split(/\s+/)
+    );
 
     applyTestHooks(this, "toggle-group", this);
   }

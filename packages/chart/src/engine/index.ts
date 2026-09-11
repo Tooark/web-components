@@ -1,6 +1,6 @@
-import * as echarts from "echarts";
-import type { EChartsType, EChartsOption } from "echarts";
 import type { ArkThemeSelected } from "@tooark/tokens";
+import type { EChartsOption, EChartsType } from "echarts";
+import * as echarts from "echarts";
 import type { ArkChartOptions, ArkChartTheme } from "../types";
 
 export type ArkChartInstance = {

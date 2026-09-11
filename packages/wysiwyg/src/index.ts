@@ -1,25 +1,24 @@
 // Tipos
-export type {
-  ArkWysiwygTheme,
-  ArkWysiwygContent,
-  ArkWysiwygToolbarItem,
-  ArkWysiwygEditorOptions,
-  ArkWysiwygViewerOptions,
-  JSONContent
-} from "./types";
+
+// Custom Elements
+export { ArkWysiwygEditor, ArkWysiwygViewer } from "./components";
 
 // Engine imperativo (uso avançado / sem Custom Element)
 export type { ArkWysiwygInstance } from "./engine";
 export {
   createWysiwygEditor,
   createWysiwygViewer,
-  resolveWysiwygTheme,
-  EMPTY_DOC
+  EMPTY_DOC,
+  resolveWysiwygTheme
 } from "./engine";
-
-// Estilos
-export { ensureWysiwygStyles, wysiwygCss, WYSIWYG_STYLE_ID } from "./styles";
-
-// Custom Elements
-export { ArkWysiwygEditor, ArkWysiwygViewer } from "./components";
 export { registerTooarkWysiwyg } from "./register";
+// Estilos
+export { ensureWysiwygStyles, WYSIWYG_STYLE_ID, wysiwygCss } from "./styles";
+export type {
+  ArkWysiwygContent,
+  ArkWysiwygEditorOptions,
+  ArkWysiwygTheme,
+  ArkWysiwygToolbarItem,
+  ArkWysiwygViewerOptions,
+  JSONContent
+} from "./types";

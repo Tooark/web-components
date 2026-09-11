@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Input } from "@angular/core";
-import type { ArkSize, ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkTheme } from "@tooark/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import type { ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -27,7 +27,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-button>`
 })
 export class ArkButtonComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 

@@ -1,5 +1,5 @@
-import { expect, userEvent, waitFor, within } from "storybook/test";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
   title: "Core/ArkToggle",
@@ -32,7 +32,17 @@ type StoryArgs = {
   label: string;
 };
 
-function createToggle (label: string, options: { pressed?: boolean; disabled?: boolean; value?: string; intent?: string; theme?: string; size?: string } = {}): HTMLElement {
+function createToggle(
+  label: string,
+  options: {
+    pressed?: boolean;
+    disabled?: boolean;
+    value?: string;
+    intent?: string;
+    theme?: string;
+    size?: string;
+  } = {}
+): HTMLElement {
   const el = document.createElement("ark-toggle");
   if (options.intent) el.setAttribute("intent", options.intent);
   if (options.theme) el.setAttribute("theme", options.theme);

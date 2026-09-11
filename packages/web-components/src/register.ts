@@ -1,4 +1,16 @@
-import { ArkButton, ArkCalendar, ArkCarousel, ArkClock, ArkDatepicker, ArkInput, ArkScheduler, ArkSwitch, ArkToaster, ArkToggle, ArkToggleGroup } from "./components";
+import {
+  ArkButton,
+  ArkCalendar,
+  ArkCarousel,
+  ArkClock,
+  ArkDatepicker,
+  ArkInput,
+  ArkScheduler,
+  ArkSwitch,
+  ArkToaster,
+  ArkToggle,
+  ArkToggleGroup
+} from "./components";
 
 /**
  * Registra os componentes personalizados do Tooark no navegador.

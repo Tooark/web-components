@@ -1,6 +1,5 @@
-import React, { createElement, PropsWithChildren, useEffect } from "react";
-
 import type { ArkToggleGroupStyleOptions, ArkToggleStyleOptions } from "@tooark/core";
+import React, { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkToggleProps = PropsWithChildren<
@@ -34,7 +33,7 @@ export function ArkToggle(props: ArkToggleProps): React.JSX.Element {
     ref,
     class: className,
     pressed: pressed ? "" : undefined,
-    disabled: disabled ? "" : undefined,
+    disabled: disabled ? "" : undefined
   };
 
   return createElement("ark-toggle", attrs, children);
@@ -71,7 +70,7 @@ export function ArkToggleGroup(props: ArkToggleGroupProps): React.JSX.Element {
     ref,
     class: className,
     multiple: multiple ? "" : undefined,
-    disabled: disabled ? "" : undefined,
+    disabled: disabled ? "" : undefined
   };
 
   return createElement("ark-toggle-group", attrs, children);

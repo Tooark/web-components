@@ -1,6 +1,6 @@
-import React, { createElement, PropsWithChildren, useEffect } from "react";
-
 import type { ArkButtonStyleOptions, ArkButtonType } from "@tooark/core";
+import type React from "react";
+import { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkButtonProps = PropsWithChildren<
@@ -25,7 +25,7 @@ export function ArkButton(props: ArkButtonProps): React.JSX.Element {
     disabled: disabled ? "" : undefined,
     loading: loading ? "" : undefined,
     "icon-only": iconOnly ? "" : undefined,
-    "full-width": fullWidth ? "" : undefined,
+    "full-width": fullWidth ? "" : undefined
   };
 
   return createElement("ark-button", attrs, children);

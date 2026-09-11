@@ -1,8 +1,8 @@
 // Tailwind das stories (app consumidor) e CSS da lib, como um consumidor importaria.
 import "./preview.css";
 import "../../../packages/web-components/src/styles/index.css";
-import { registerTooarkComponents } from "@tooark/web-components";
 import { registerTooarkChart } from "@tooark/chart";
+import { registerTooarkComponents } from "@tooark/web-components";
 import { registerTooarkWysiwyg } from "@tooark/wysiwyg";
 
 registerTooarkComponents();

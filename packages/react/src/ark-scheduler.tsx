@@ -1,5 +1,5 @@
-import React, { createElement, useEffect } from "react";
 import type { ArkDatepickerLang, ArkSchedulerEvent, ArkSchedulerStyleOptions } from "@tooark/core";
+import React, { createElement, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkSchedulerProps = ArkSchedulerStyleOptions & {
@@ -63,7 +63,7 @@ export function ArkScheduler(props: ArkSchedulerProps): React.JSX.Element {
     "hour-start": hourStart !== undefined ? String(hourStart) : undefined,
     "hour-end": hourEnd !== undefined ? String(hourEnd) : undefined,
     "slot-minutes": slotMinutes !== undefined ? String(slotMinutes) : undefined,
-    "hours-format": hoursFormat,
+    "hours-format": hoursFormat
   };
 
   return createElement("ark-scheduler", attrs);

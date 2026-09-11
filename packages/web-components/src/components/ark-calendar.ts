@@ -1,5 +1,5 @@
-import { arkEnter, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
 import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
+import { type ArkDatepickerLocale, arkEnter, resolveLocale } from "@tooark/core";
 import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -43,7 +43,19 @@ export class ArkCalendar extends HTMLElement {
   private justSelectedISO: string | null = null;
 
   static get observedAttributes(): string[] {
-    return ["lang", "locale-json", "value", "min", "max", "theme", "intent", "accent-color", "events", "event-display", "testid"];
+    return [
+      "lang",
+      "locale-json",
+      "value",
+      "min",
+      "max",
+      "theme",
+      "intent",
+      "accent-color",
+      "events",
+      "event-display",
+      "testid"
+    ];
   }
 
   connectedCallback(): void {
@@ -126,10 +138,8 @@ export class ArkCalendar extends HTMLElement {
   private parseDate(value: string | null | undefined): Date | null {
     if (!value) return null;
     const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value.trim());
-    const parsed = match
-      ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
-      : new Date(value);
-    return isNaN(parsed.getTime()) ? null : parsed;
+    const parsed = match ? new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3])) : new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
   }
 
   private startOfDay(d: Date): Date {
@@ -144,7 +154,15 @@ export class ArkCalendar extends HTMLElement {
 
   private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
@@ -160,22 +178,26 @@ export class ArkCalendar extends HTMLElement {
     const byIntent: Record<ArkIntent, { selected: string; today: string; footer: string }> = {
       primary: {
         selected: "ark:bg-primary ark:font-semibold ark:text-primary-fg ark:hover:bg-primary-hover",
-        today: "ark:font-semibold ark:text-primary-soft-fg ark:ring-1 ark:ring-primary-border ark:hover:bg-primary-soft",
+        today:
+          "ark:font-semibold ark:text-primary-soft-fg ark:ring-1 ark:ring-primary-border ark:hover:bg-primary-soft",
         footer: "ark:text-primary-soft-fg ark:hover:bg-primary-soft"
       },
       secondary: {
         selected: "ark:bg-secondary ark:font-semibold ark:text-secondary-fg ark:hover:bg-secondary-hover",
-        today: "ark:font-semibold ark:text-secondary-soft-fg ark:ring-1 ark:ring-secondary-border ark:hover:bg-secondary-soft",
+        today:
+          "ark:font-semibold ark:text-secondary-soft-fg ark:ring-1 ark:ring-secondary-border ark:hover:bg-secondary-soft",
         footer: "ark:text-secondary-soft-fg ark:hover:bg-secondary-soft"
       },
       success: {
         selected: "ark:bg-success ark:font-semibold ark:text-success-fg ark:hover:bg-success-hover",
-        today: "ark:font-semibold ark:text-success-soft-fg ark:ring-1 ark:ring-success-border ark:hover:bg-success-soft",
+        today:
+          "ark:font-semibold ark:text-success-soft-fg ark:ring-1 ark:ring-success-border ark:hover:bg-success-soft",
         footer: "ark:text-success-soft-fg ark:hover:bg-success-soft"
       },
       warning: {
         selected: "ark:bg-warning ark:font-semibold ark:text-warning-fg ark:hover:bg-warning-hover",
-        today: "ark:font-semibold ark:text-warning-soft-fg ark:ring-1 ark:ring-warning-border ark:hover:bg-warning-soft",
+        today:
+          "ark:font-semibold ark:text-warning-soft-fg ark:ring-1 ark:ring-warning-border ark:hover:bg-warning-soft",
         footer: "ark:text-warning-soft-fg ark:hover:bg-warning-soft"
       },
       danger: {
@@ -190,7 +212,8 @@ export class ArkCalendar extends HTMLElement {
       },
       neutral: {
         selected: "ark:bg-neutral ark:font-semibold ark:text-neutral-fg ark:hover:bg-neutral-hover",
-        today: "ark:font-semibold ark:text-neutral-soft-fg ark:ring-1 ark:ring-neutral-border ark:hover:bg-neutral-soft",
+        today:
+          "ark:font-semibold ark:text-neutral-soft-fg ark:ring-1 ark:ring-neutral-border ark:hover:bg-neutral-soft",
         footer: "ark:text-neutral-soft-fg ark:hover:bg-neutral-soft"
       }
     };
@@ -199,7 +222,8 @@ export class ArkCalendar extends HTMLElement {
     const intentStyles = byIntent[intent];
 
     return {
-      container: "ark:inline-block ark:select-none ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-4 ark:shadow-sm",
+      container:
+        "ark:inline-block ark:select-none ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-4 ark:shadow-sm",
       headerText: "ark:text-sm ark:font-semibold ark:text-fg",
       navButton: `ark:rounded ark:p-1 ark:text-fg-soft ark:hover:bg-surface-muted ark:focus:outline-none ark:focus:ring-2 ${focusRing}`,
       weekdayText: "ark:py-1 ark:text-center ark:text-xs ark:font-medium ark:text-fg-muted",
@@ -257,7 +281,9 @@ export class ArkCalendar extends HTMLElement {
     this.syncingValue = false;
 
     const events = this.eventsByDay().get(iso) || [];
-    this.dispatchEvent(new CustomEvent("ark-change", { detail: { value: iso, date, events }, bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent("ark-change", { detail: { value: iso, date, events }, bubbles: true, composed: true })
+    );
     this.pendingFocusISO = iso;
     this.justSelectedISO = iso;
     this.build();
@@ -271,7 +297,8 @@ export class ArkCalendar extends HTMLElement {
 
   private focusDay(date: Date): void {
     const iso = this.formatISO(date);
-    const sameMonth = date.getFullYear() === this.viewDate.getFullYear() && date.getMonth() === this.viewDate.getMonth();
+    const sameMonth =
+      date.getFullYear() === this.viewDate.getFullYear() && date.getMonth() === this.viewDate.getMonth();
 
     if (!sameMonth) {
       this.viewDate = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -294,15 +321,32 @@ export class ArkCalendar extends HTMLElement {
     let next: Date;
 
     switch (event.key) {
-      case "ArrowLeft": next = move(-1); break;
-      case "ArrowRight": next = move(1); break;
-      case "ArrowUp": next = move(-7); break;
-      case "ArrowDown": next = move(7); break;
-      case "Home": next = new Date(current.getFullYear(), current.getMonth(), 1); break;
-      case "End": next = new Date(current.getFullYear(), current.getMonth() + 1, 0); break;
-      case "PageUp": next = this.addMonths(current, -1); break;
-      case "PageDown": next = this.addMonths(current, 1); break;
-      default: return;
+      case "ArrowLeft":
+        next = move(-1);
+        break;
+      case "ArrowRight":
+        next = move(1);
+        break;
+      case "ArrowUp":
+        next = move(-7);
+        break;
+      case "ArrowDown":
+        next = move(7);
+        break;
+      case "Home":
+        next = new Date(current.getFullYear(), current.getMonth(), 1);
+        break;
+      case "End":
+        next = new Date(current.getFullYear(), current.getMonth() + 1, 0);
+        break;
+      case "PageUp":
+        next = this.addMonths(current, -1);
+        break;
+      case "PageDown":
+        next = this.addMonths(current, 1);
+        break;
+      default:
+        return;
     }
 
     event.preventDefault();
@@ -330,7 +374,8 @@ export class ArkCalendar extends HTMLElement {
       button.setAttribute("aria-label", `${loc.months[m]} ${year}`);
       applyTestHooks(this, "calendar", button, "month");
 
-      const isSelected = this.selectedDate !== null && this.selectedDate.getFullYear() === year && this.selectedDate.getMonth() === m;
+      const isSelected =
+        this.selectedDate !== null && this.selectedDate.getFullYear() === year && this.selectedDate.getMonth() === m;
       const isCurrent = now.getFullYear() === year && now.getMonth() === m;
       const state = isSelected ? palette.daySelected : isCurrent ? palette.dayToday : palette.dayDefault;
       button.className = `ark:rounded-md ark:px-2 ark:py-3 ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing} ${state}`;
@@ -407,7 +452,8 @@ export class ArkCalendar extends HTMLElement {
 
     const container = document.createElement("div");
     container.setAttribute("part", "container");
-    container.className = eventDisplay === "list" ? `${palette.container} ark:w-full ark:min-w-[30rem]` : palette.container;
+    container.className =
+      eventDisplay === "list" ? `${palette.container} ark:w-full ark:min-w-[30rem]` : palette.container;
     applyTestHooks(this, "calendar", container);
 
     // --- Header: prev / título (alterna view) / next ---
@@ -517,14 +563,16 @@ export class ArkCalendar extends HTMLElement {
     const rows = Math.ceil(totalCells / 7);
 
     const grid = document.createElement("div");
-    grid.className = eventDisplay === "list" ? "ark:grid ark:grid-cols-7 ark:gap-1" : "ark:grid ark:grid-cols-7 ark:gap-0";
+    grid.className =
+      eventDisplay === "list" ? "ark:grid ark:grid-cols-7 ark:gap-1" : "ark:grid ark:grid-cols-7 ark:gap-0";
     applyTestHooks(this, "calendar", grid, "grid");
     grid.addEventListener("keydown", this.handleGridKeydown);
 
     // Roving tabindex: só um dia participa da ordem de Tab; setas movem o foco.
-    const selectedInView = this.selectedDate && this.selectedDate.getFullYear() === year && this.selectedDate.getMonth() === month
-      ? this.selectedDate
-      : null;
+    const selectedInView =
+      this.selectedDate && this.selectedDate.getFullYear() === year && this.selectedDate.getMonth() === month
+        ? this.selectedDate
+        : null;
     const now = new Date();
     const todayInView = now.getFullYear() === year && now.getMonth() === month ? now : null;
     const tabStopISO = this.formatISO(selectedInView || todayInView || firstOfMonth);
@@ -591,7 +639,8 @@ export class ArkCalendar extends HTMLElement {
 
           if (dayEvents.length > 0 && eventDisplay === "dots") {
             const dots = document.createElement("span");
-            dots.className = "ark:pointer-events-none ark:absolute ark:bottom-0.5 ark:left-1/2 ark:flex ark:-translate-x-1/2 ark:gap-0.5";
+            dots.className =
+              "ark:pointer-events-none ark:absolute ark:bottom-0.5 ark:left-1/2 ark:flex ark:-translate-x-1/2 ark:gap-0.5";
             applyTestHooks(this, "calendar", dots, "event");
             for (const event of dayEvents.slice(0, 3)) {
               const dot = document.createElement("span");
@@ -604,7 +653,8 @@ export class ArkCalendar extends HTMLElement {
 
           if (dayEvents.length > 0 && eventDisplay === "count") {
             const badge = document.createElement("span");
-            badge.className = "ark:pointer-events-none ark:absolute ark:-right-1 ark:-top-1 ark:flex ark:h-3.5 ark:min-w-3.5 ark:items-center ark:justify-center ark:rounded-full ark:px-0.5 ark:text-[9px] ark:font-semibold";
+            badge.className =
+              "ark:pointer-events-none ark:absolute ark:-right-1 ark:-top-1 ark:flex ark:h-3.5 ark:min-w-3.5 ark:items-center ark:justify-center ark:rounded-full ark:px-0.5 ark:text-[9px] ark:font-semibold";
             const badgeColors = this.eventColors(dayEvents[0]);
             badge.style.backgroundColor = badgeColors.bg;
             badge.style.color = badgeColors.fg;
@@ -671,7 +721,13 @@ export class ArkCalendar extends HTMLElement {
       this.syncingValue = true;
       this.removeAttribute("value");
       this.syncingValue = false;
-      this.dispatchEvent(new CustomEvent("ark-change", { detail: { value: null, date: null, events: [] }, bubbles: true, composed: true }));
+      this.dispatchEvent(
+        new CustomEvent("ark-change", {
+          detail: { value: null, date: null, events: [] },
+          bubbles: true,
+          composed: true
+        })
+      );
       this.build();
     });
 

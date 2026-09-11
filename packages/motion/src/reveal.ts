@@ -1,7 +1,7 @@
-import { inView } from "motion";
 import { prefersReducedMotion } from "@tooark/core";
-import { arkStaggerEnter } from "./stagger";
+import { inView } from "motion";
 import { resolveTargets } from "./internal";
+import { arkStaggerEnter } from "./stagger";
 import type { ArkMotionTargets, ArkRevealOptions } from "./types";
 
 /**

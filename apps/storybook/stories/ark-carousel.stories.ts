@@ -1,5 +1,5 @@
-import { expect, userEvent, waitFor } from "storybook/test";
 import type { ArkCarouselSnap, ArkCarouselStyleOptions } from "@tooark/core";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 const meta = {
   title: "Core/ArkCarousel",
@@ -103,14 +103,34 @@ function renderCarousel(args: StoryArgs): HTMLElement {
   if (args.dragFree) el.setAttribute("drag-free", "");
 
   const slides = [
-    createSlide("Lago Azul", "Colecao de paisagens autorais", "linear-gradient(130deg, #bae6fd 0%, #7dd3fc 45%, #0ea5e9 100%)"),
-    createSlide("Studio Portrait", "Retratos com contraste cinematografico", "linear-gradient(130deg, #fecdd3 0%, #fda4af 45%, #fb7185 100%)"),
-    createSlide("Editorial Neon", "Moodboard para campanha urbana", "linear-gradient(130deg, #d8b4fe 0%, #c084fc 45%, #a855f7 100%)"),
-    createSlide("Deserto Dourado", "Texturas e tons quentes para branding", "linear-gradient(130deg, #fde68a 0%, #fbbf24 45%, #d97706 100%)"),
-    createSlide("Minimal Product", "Composicao clean para catalogo digital", "linear-gradient(130deg, #bbf7d0 0%, #4ade80 45%, #16a34a 100%)")
+    createSlide(
+      "Lago Azul",
+      "Colecao de paisagens autorais",
+      "linear-gradient(130deg, #bae6fd 0%, #7dd3fc 45%, #0ea5e9 100%)"
+    ),
+    createSlide(
+      "Studio Portrait",
+      "Retratos com contraste cinematografico",
+      "linear-gradient(130deg, #fecdd3 0%, #fda4af 45%, #fb7185 100%)"
+    ),
+    createSlide(
+      "Editorial Neon",
+      "Moodboard para campanha urbana",
+      "linear-gradient(130deg, #d8b4fe 0%, #c084fc 45%, #a855f7 100%)"
+    ),
+    createSlide(
+      "Deserto Dourado",
+      "Texturas e tons quentes para branding",
+      "linear-gradient(130deg, #fde68a 0%, #fbbf24 45%, #d97706 100%)"
+    ),
+    createSlide(
+      "Minimal Product",
+      "Composicao clean para catalogo digital",
+      "linear-gradient(130deg, #bbf7d0 0%, #4ade80 45%, #16a34a 100%)"
+    )
   ];
 
-  slides.forEach((slide) => el.appendChild(slide));
+  for (const slide of slides) el.appendChild(slide);
   el.style.maxWidth = "860px";
 
   el.addEventListener("ark-slide-change", (event) => {

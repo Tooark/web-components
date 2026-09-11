@@ -1,6 +1,6 @@
-import { expect, userEvent, waitFor, within } from "storybook/test";
-import { toast } from "@tooark/core";
 import type { ArkTheme, ArkToastPosition } from "@tooark/core";
+import { toast } from "@tooark/core";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
   title: "Core/ArkToaster",

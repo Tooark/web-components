@@ -1,5 +1,5 @@
-import { animate } from "motion";
 import { prefersReducedMotion } from "@tooark/core";
+import { animate } from "motion";
 import { resolveTargets } from "./internal";
 import type { ArkFlipOptions, ArkMotionTargets } from "./types";
 
@@ -8,7 +8,11 @@ import type { ArkFlipOptions, ArkMotionTargets } from "./types";
  * (reordenar, inserir, filtrar) e anima cada item da posição antiga para
  * a nova com física de spring.
  */
-export async function arkFlip(targets: ArkMotionTargets, mutate: () => void, options: ArkFlipOptions = {}): Promise<void> {
+export async function arkFlip(
+  targets: ArkMotionTargets,
+  mutate: () => void,
+  options: ArkFlipOptions = {}
+): Promise<void> {
   const elements = resolveTargets(targets);
 
   if (elements.length === 0 || prefersReducedMotion()) {

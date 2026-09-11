@@ -1,4 +1,4 @@
-import type { ArkWysiwygEditor, ArkWysiwygViewer, ArkWysiwygContent } from "@tooark/wysiwyg";
+import type { ArkWysiwygContent, ArkWysiwygEditor, ArkWysiwygViewer } from "@tooark/wysiwyg";
 
 const meta = {
   title: "Wysiwyg/ArkWysiwyg",

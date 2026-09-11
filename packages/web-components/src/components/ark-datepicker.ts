@@ -1,12 +1,22 @@
-import { arkEnter, arkExit, resolveLocale, type ArkDatepickerLocale } from "@tooark/core";
 import type { ArkDatepickerLang, ArkDatepickerMode } from "@tooark/core";
+import { type ArkDatepickerLocale, arkEnter, arkExit, resolveLocale } from "@tooark/core";
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
 import { applyTestHooks } from "./test-hooks";
 
 // Atributos repassados aos componentes internos.
-const CALENDAR_ATTRS = ["lang", "locale-json", "theme", "intent", "accent-color", "min", "max", "events", "event-display"];
+const CALENDAR_ATTRS = [
+  "lang",
+  "locale-json",
+  "theme",
+  "intent",
+  "accent-color",
+  "min",
+  "max",
+  "events",
+  "event-display"
+];
 const CLOCK_ATTRS = ["lang", "theme", "intent", "seconds", "step-minutes", "hours-format"];
 
 const CALENDAR_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
@@ -40,7 +50,22 @@ export class ArkDatepicker extends HTMLElement {
   private timeISO: string | null = null;
 
   static get observedAttributes(): string[] {
-    return ["mode", "input", "value", "placeholder", "name", "format", "seconds", "disabled", "testid", ...CALENDAR_ATTRS.filter((a) => a !== "events" && a !== "event-display"), "events", "event-display", "step-minutes", "hours-format"];
+    return [
+      "mode",
+      "input",
+      "value",
+      "placeholder",
+      "name",
+      "format",
+      "seconds",
+      "disabled",
+      "testid",
+      ...CALENDAR_ATTRS.filter((a) => a !== "events" && a !== "event-display"),
+      "events",
+      "event-display",
+      "step-minutes",
+      "hours-format"
+    ];
   }
 
   connectedCallback(): void {
@@ -171,7 +196,14 @@ export class ArkDatepicker extends HTMLElement {
     if (mode === "time") {
       if (!time) return null;
       const now = new Date();
-      return new Date(now.getFullYear(), now.getMonth(), now.getDate(), Number(time[1]), Number(time[2]), Number(time[3]));
+      return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        Number(time[1]),
+        Number(time[2]),
+        Number(time[3])
+      );
     }
 
     if (!pad) return null;
@@ -243,7 +275,10 @@ export class ArkDatepicker extends HTMLElement {
 
     if (tokens.includes("YYYY")) {
       const candidate = new Date(parts.YYYY, (parts.MM || 1) - 1, parts.DD || 1);
-      const valid = candidate.getFullYear() === parts.YYYY && candidate.getMonth() === (parts.MM || 1) - 1 && candidate.getDate() === (parts.DD || 1);
+      const valid =
+        candidate.getFullYear() === parts.YYYY &&
+        candidate.getMonth() === (parts.MM || 1) - 1 &&
+        candidate.getDate() === (parts.DD || 1);
       if (!valid) return null;
       dateISO = `${parts.YYYY}-${pad(parts.MM || 1)}-${pad(parts.DD || 1)}`;
     }
@@ -453,7 +488,8 @@ export class ArkDatepicker extends HTMLElement {
 
     this.toggleEl.disabled = disabled;
     this.toggleEl.setAttribute("aria-label", loc.openCalendar);
-    this.toggleEl.className = "ark:rounded ark:p-0.5 ark:text-fg-muted ark:transition ark:hover:text-fg-soft ark:disabled:cursor-not-allowed ark:disabled:opacity-50";
+    this.toggleEl.className =
+      "ark:rounded ark:p-0.5 ark:text-fg-muted ark:transition ark:hover:text-fg-soft ark:disabled:cursor-not-allowed ark:disabled:opacity-50";
 
     this.popupEl.setAttribute("aria-label", loc.openCalendar);
     this.inputComp.inputElement?.setAttribute("aria-haspopup", "dialog");
@@ -485,11 +521,13 @@ export class ArkDatepicker extends HTMLElement {
     if (this.hiddenInputEl) this.hiddenInputEl.value = value;
     this.updateInputDisplay();
 
-    this.dispatchEvent(new CustomEvent("ark-change", {
-      detail: { value: value || null, date: this.toDate() },
-      bubbles: true,
-      composed: true
-    }));
+    this.dispatchEvent(
+      new CustomEvent("ark-change", {
+        detail: { value: value || null, date: this.toDate() },
+        bubbles: true,
+        composed: true
+      })
+    );
   }
 
   private readonly handleCalendarChange = (event: Event): void => {
@@ -565,9 +603,10 @@ export class ArkDatepicker extends HTMLElement {
 
   private focusPanel(): void {
     if (!this.popupEl) return;
-    const target = this.getMode() === "time"
-      ? this.popupEl.querySelector<HTMLElement>('[data-ark="clock-hours"] button[tabindex="0"]')
-      : this.popupEl.querySelector<HTMLElement>('[data-ark="calendar-day"][tabindex="0"]');
+    const target =
+      this.getMode() === "time"
+        ? this.popupEl.querySelector<HTMLElement>('[data-ark="clock-hours"] button[tabindex="0"]')
+        : this.popupEl.querySelector<HTMLElement>('[data-ark="calendar-day"][tabindex="0"]');
     target?.focus();
   }
 
@@ -576,7 +615,7 @@ export class ArkDatepicker extends HTMLElement {
     this.popupOpen = true;
 
     // Cancela animações anteriores (o fill "forwards" do exit deixaria opacity 0).
-    this.popupEl.getAnimations().forEach((animation) => animation.cancel());
+    for (const animation of this.popupEl.getAnimations()) animation.cancel();
     this.popupEl.hidden = false;
     this.inputComp?.inputElement?.setAttribute("aria-expanded", "true");
     document.addEventListener("pointerdown", this.handleOutsidePointer, true);

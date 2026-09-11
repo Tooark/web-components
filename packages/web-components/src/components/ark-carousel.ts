@@ -1,5 +1,5 @@
-import { prefersReducedMotion } from "@tooark/core";
 import type { ArkCarouselSnap, ArkIntent } from "@tooark/core";
+import { prefersReducedMotion } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCarouselPalette = {
@@ -42,7 +42,7 @@ export class ArkCarousel extends HTMLElement {
   private dragStartScroll = 0;
   private dragMoved = false;
 
-  static get observedAttributes (): string[] {
+  static get observedAttributes(): string[] {
     return [
       "theme",
       "intent",
@@ -62,7 +62,7 @@ export class ArkCarousel extends HTMLElement {
     ];
   }
 
-  constructor () {
+  constructor() {
     super();
     this.addEventListener("scroll", this.handleScroll, { passive: true });
     this.addEventListener("pointerdown", this.handlePointerDown);
@@ -87,14 +87,16 @@ export class ArkCarousel extends HTMLElement {
     this.addEventListener("focusout", this.handleMouseLeave);
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     this.build();
 
     if (!this.observer) {
       this.observer = new MutationObserver((records) => {
         // Só reage a slides do usuário; ignora as mutações do próprio overlay.
         const relevant = records.some((record) =>
-          [...record.addedNodes, ...record.removedNodes].some((node) => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR))
+          [...record.addedNodes, ...record.removedNodes].some(
+            (node) => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR)
+          )
         );
         if (relevant) this.handleSlidesChanged();
       });
@@ -117,7 +119,7 @@ export class ArkCarousel extends HTMLElement {
     });
   }
 
-  disconnectedCallback (): void {
+  disconnectedCallback(): void {
     this.stopAutoplay();
     this.observer?.disconnect();
     this.observer = null;
@@ -129,7 +131,7 @@ export class ArkCarousel extends HTMLElement {
     }
   }
 
-  attributeChangedCallback (name: string): void {
+  attributeChangedCallback(name: string): void {
     if (name === "class") {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
@@ -146,90 +148,100 @@ export class ArkCarousel extends HTMLElement {
   }
 
   /** Índice do slide atual (primeiro visível). */
-  get index (): number {
+  get index(): number {
     return this.currentIndex;
   }
 
   /** Slides do usuário: filhos diretos que não são o overlay do componente. */
-  get slides (): HTMLElement[] {
-    return Array.from(this.children).filter((node): node is HTMLElement => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR));
+  get slides(): HTMLElement[] {
+    return Array.from(this.children).filter(
+      (node): node is HTMLElement => node instanceof HTMLElement && !node.hasAttribute(CHROME_ATTR)
+    );
   }
 
-  next (): void {
+  next(): void {
     this.stopAutoplay();
     this.goTo(this.currentIndex + 1, { emit: true });
   }
 
-  prev (): void {
+  prev(): void {
     this.stopAutoplay();
     this.goTo(this.currentIndex - 1, { emit: true });
   }
 
   // --- Atributos ---
 
-  private getIntent (): ArkIntent {
+  private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "primary").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private getAccentColor (): string | null {
+  private getAccentColor(): string | null {
     const color = this.getAttribute("accent-color")?.trim();
     return color || null;
   }
 
-  private getSlidesPerView (): number {
+  private getSlidesPerView(): number {
     const parsed = Number(this.getAttribute("slides-per-view") || "1");
     if (!Number.isFinite(parsed)) return 1;
     return Math.max(1, Math.floor(parsed));
   }
 
-  private getGap (): number {
+  private getGap(): number {
     const parsed = Number(this.getAttribute("gap") || "12");
     if (!Number.isFinite(parsed)) return 12;
     return Math.max(0, parsed);
   }
 
-  private getStartIndex (): number {
+  private getStartIndex(): number {
     const parsed = Number(this.getAttribute("start-index") || "0");
     if (!Number.isFinite(parsed)) return 0;
     return Math.max(0, Math.floor(parsed));
   }
 
-  private isLoopEnabled (): boolean {
+  private isLoopEnabled(): boolean {
     return this.hasAttribute("loop");
   }
 
-  private isAutoplayEnabled (): boolean {
+  private isAutoplayEnabled(): boolean {
     return this.hasAttribute("autoplay");
   }
 
-  private getAutoplayDelay (): number {
+  private getAutoplayDelay(): number {
     const parsed = Number(this.getAttribute("autoplay-delay") || "4200");
     if (!Number.isFinite(parsed)) return 4200;
     return Math.max(1200, parsed);
   }
 
-  private shouldShowDots (): boolean {
+  private shouldShowDots(): boolean {
     return !this.hasAttribute("show-dots") || this.getAttribute("show-dots") !== "false";
   }
 
-  private shouldShowArrows (): boolean {
+  private shouldShowArrows(): boolean {
     return !this.hasAttribute("show-arrows") || this.getAttribute("show-arrows") !== "false";
   }
 
-  private getSnapMode (): ArkCarouselSnap {
+  private getSnapMode(): ArkCarouselSnap {
     const value = (this.getAttribute("snap") || "mandatory").toLowerCase();
     return value === "proximity" ? "proximity" : "mandatory";
   }
 
-  private getMaxIndex (): number {
+  private getMaxIndex(): number {
     return Math.max(0, this.slides.length - this.getSlidesPerView());
   }
 
-  private normalizeIndex (index: number): number {
+  private normalizeIndex(index: number): number {
     const maxIndex = this.getMaxIndex();
     if (maxIndex <= 0) return 0;
 
@@ -242,7 +254,7 @@ export class ArkCarousel extends HTMLElement {
     return Math.min(maxIndex, Math.max(0, index));
   }
 
-  private getPalette (intent: ArkIntent): ArkCarouselPalette {
+  private getPalette(intent: ArkIntent): ArkCarouselPalette {
     const byIntent: Record<ArkIntent, { dotActive: string; frameBorder: string }> = {
       primary: { dotActive: "ark:bg-primary", frameBorder: "ark:border-border" },
       secondary: { dotActive: "ark:bg-secondary", frameBorder: "ark:border-border" },
@@ -256,7 +268,8 @@ export class ArkCarousel extends HTMLElement {
     const intentStyles = byIntent[intent];
     return {
       frame: `ark:rounded-2xl ark:border ark:bg-surface-muted ark:shadow-lg ${intentStyles.frameBorder}`,
-      arrowButton: "ark:inline-flex ark:h-9 ark:w-9 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-border-strong ark:bg-surface ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-ring ark:disabled:opacity-40 ark:disabled:cursor-not-allowed",
+      arrowButton:
+        "ark:inline-flex ark:h-9 ark:w-9 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-border-strong ark:bg-surface ark:text-fg-soft ark:transition ark:hover:bg-surface-muted ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-ring ark:disabled:opacity-40 ark:disabled:cursor-not-allowed",
       dotButton: "ark:h-2.5 ark:w-2.5 ark:rounded-full ark:bg-muted ark:transition ark:hover:bg-fg-placeholder",
       dotActive: intentStyles.dotActive
     };
@@ -264,12 +277,12 @@ export class ArkCarousel extends HTMLElement {
 
   // --- Navegação ---
 
-  private slideOffset (index: number): number {
+  private slideOffset(index: number): number {
     const slide = this.slides[index];
     return slide ? slide.offsetLeft : 0;
   }
 
-  private goTo (index: number, options?: { emit?: boolean; behavior?: ScrollBehavior }): void {
+  private goTo(index: number, options?: { emit?: boolean; behavior?: ScrollBehavior }): void {
     const nextIndex = this.normalizeIndex(index);
     const changed = nextIndex !== this.currentIndex;
     this.currentIndex = nextIndex;
@@ -288,7 +301,7 @@ export class ArkCarousel extends HTMLElement {
     }
   }
 
-  private emitSlideChange (): void {
+  private emitSlideChange(): void {
     this.dispatchEvent(
       new CustomEvent("ark-slide-change", {
         detail: { index: this.currentIndex },
@@ -299,7 +312,7 @@ export class ArkCarousel extends HTMLElement {
   }
 
   // Índice do slide mais próximo da borda esquerda visível.
-  private indexFromScroll (): number {
+  private indexFromScroll(): number {
     const slides = this.slides;
     if (slides.length === 0) return 0;
     const left = this.scrollLeft;
@@ -330,8 +343,10 @@ export class ArkCarousel extends HTMLElement {
     }, 80);
   };
 
-  private handleSlidesChanged (): void {
-    this.slides.forEach((slide, index) => applyTestHooks(this, "carousel", slide, `slide-${index}`));
+  private handleSlidesChanged(): void {
+    this.slides.forEach((slide, index) => {
+      applyTestHooks(this, "carousel", slide, `slide-${index}`);
+    });
     this.currentIndex = this.normalizeIndex(this.currentIndex);
     this.renderDots();
     this.syncArrowState();
@@ -380,7 +395,7 @@ export class ArkCarousel extends HTMLElement {
     this.startAutoplay();
   };
 
-  private startAutoplay (): void {
+  private startAutoplay(): void {
     this.stopAutoplay();
 
     // Movimento automático contínuo é desligado com prefers-reduced-motion.
@@ -392,7 +407,7 @@ export class ArkCarousel extends HTMLElement {
     }, this.getAutoplayDelay());
   }
 
-  private stopAutoplay (): void {
+  private stopAutoplay(): void {
     if (this.autoplayId !== null) {
       window.clearInterval(this.autoplayId);
       this.autoplayId = null;
@@ -401,7 +416,7 @@ export class ArkCarousel extends HTMLElement {
 
   // --- Overlay: setas e dots ---
 
-  private syncArrowState (): void {
+  private syncArrowState(): void {
     if (!this.arrowPrevEl || !this.arrowNextEl) return;
 
     if (this.isLoopEnabled()) {
@@ -415,7 +430,7 @@ export class ArkCarousel extends HTMLElement {
     this.arrowNextEl.disabled = this.currentIndex >= max;
   }
 
-  private renderDots (): void {
+  private renderDots(): void {
     if (!this.dotsEl) return;
 
     this.dotsEl.replaceChildren();
@@ -447,7 +462,7 @@ export class ArkCarousel extends HTMLElement {
     }
   }
 
-  private applyOwnClasses (next: string[]): void {
+  private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
       if (!next.includes(cls)) this.classList.remove(cls);
@@ -459,7 +474,7 @@ export class ArkCarousel extends HTMLElement {
     this.syncingClass = false;
   }
 
-  private build (): void {
+  private build(): void {
     const palette = this.getPalette(this.getIntent());
     const accentColor = this.getAccentColor();
 
@@ -473,7 +488,9 @@ export class ArkCarousel extends HTMLElement {
       this.removeAttribute("data-ark-snap");
     }
     applyTestHooks(this, "carousel", this);
-    this.slides.forEach((slide, index) => applyTestHooks(this, "carousel", slide, `slide-${index}`));
+    this.slides.forEach((slide, index) => {
+      applyTestHooks(this, "carousel", slide, `slide-${index}`);
+    });
 
     // Overlay sticky: sempre o PRIMEIRO filho, cobrindo a área visível.
     if (!this.overlayEl) {
@@ -518,7 +535,8 @@ export class ArkCarousel extends HTMLElement {
     }
 
     const dots = document.createElement("div");
-    dots.className = "ark:pointer-events-auto ark:absolute ark:left-1/2 ark:top-full ark:mt-3 ark:flex ark:-translate-x-1/2 ark:items-center ark:gap-2";
+    dots.className =
+      "ark:pointer-events-auto ark:absolute ark:left-1/2 ark:top-full ark:mt-3 ark:flex ark:-translate-x-1/2 ark:items-center ark:gap-2";
     applyTestHooks(this, "carousel", dots, "dots");
     overlay.appendChild(dots);
     this.dotsEl = dots;

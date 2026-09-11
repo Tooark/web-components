@@ -2,12 +2,12 @@
 // tokens. Não exigem CSS importado: leem as custom properties --ark-* do
 // elemento e caem nos valores canônicos de @tooark/tokens quando ausentes.
 
-import { ARK_DURATION_MS, ARK_EASING_CSS, ARK_MOTION_DISTANCE } from "@tooark/tokens";
 import type { ArkDuration, ArkEasing } from "@tooark/tokens";
+import { ARK_DURATION_MS, ARK_EASING_CSS, ARK_MOTION_DISTANCE } from "@tooark/tokens";
 import type { ArkMotionOptions, ArkMotionPreset } from "./types";
 
 /** Indica se o usuário pediu movimento reduzido no sistema. */
-export function prefersReducedMotion (): boolean {
+export function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
@@ -15,19 +15,19 @@ export function prefersReducedMotion (): boolean {
   );
 }
 
-function readToken (element: HTMLElement, name: string): string {
+function readToken(element: HTMLElement, name: string): string {
   if (typeof window === "undefined" || typeof window.getComputedStyle !== "function") return "";
   return window.getComputedStyle(element).getPropertyValue(name).trim();
 }
 
-function parseCssDuration (value: string): number | null {
+function parseCssDuration(value: string): number | null {
   const match = /^(-?\d*\.?\d+)(ms|s)$/.exec(value);
   if (!match) return null;
   const amount = Number(match[1]);
   return match[2] === "s" ? amount * 1000 : amount;
 }
 
-function resolveDuration (element: HTMLElement, duration: ArkDuration | number): number {
+function resolveDuration(element: HTMLElement, duration: ArkDuration | number): number {
   if (prefersReducedMotion()) return 0;
   if (typeof duration === "number") return Math.max(0, duration);
 
@@ -35,18 +35,18 @@ function resolveDuration (element: HTMLElement, duration: ArkDuration | number):
   return fromCss ?? ARK_DURATION_MS[duration];
 }
 
-function resolveEasing (element: HTMLElement, easing: ArkEasing | string): string {
+function resolveEasing(element: HTMLElement, easing: ArkEasing | string): string {
   if (easing in ARK_EASING_CSS) {
     return readToken(element, `--ark-ease-${easing}`) || ARK_EASING_CSS[easing as ArkEasing];
   }
   return easing;
 }
 
-function resolveDistance (element: HTMLElement, distance?: string): string {
+function resolveDistance(element: HTMLElement, distance?: string): string {
   return distance || readToken(element, "--ark-motion-distance") || ARK_MOTION_DISTANCE;
 }
 
-function hiddenTransform (preset: ArkMotionPreset, distance: string): string {
+function hiddenTransform(preset: ArkMotionPreset, distance: string): string {
   if (preset === "slide-up") return `translateY(${distance})`;
   if (preset === "slide-down") return `translateY(calc(${distance} * -1))`;
   if (preset === "slide-left") return `translateX(calc(${distance} * -1))`;
@@ -55,14 +55,14 @@ function hiddenTransform (preset: ArkMotionPreset, distance: string): string {
   return "none";
 }
 
-function afterAnimation (animation: Animation): Promise<void> {
+function afterAnimation(animation: Animation): Promise<void> {
   return animation.finished.then(
     () => undefined,
     () => undefined
   );
 }
 
-function runAnimation (
+function runAnimation(
   element: HTMLElement,
   keyframes: Keyframe[],
   options: ArkMotionOptions,
@@ -84,7 +84,7 @@ function runAnimation (
  * Anima a entrada de um elemento (estado oculto do preset → estado natural).
  * Resolve quando a animação termina (imediatamente com movimento reduzido).
  */
-export function arkEnter (
+export function arkEnter(
   element: HTMLElement,
   preset: ArkMotionPreset = "fade",
   options: ArkMotionOptions = {}
@@ -101,7 +101,7 @@ export function arkEnter (
  * Anima a saída de um elemento (estado natural → estado oculto do preset).
  * O elemento permanece no DOM oculto (fill forwards) até o caller removê-lo.
  */
-export function arkExit (
+export function arkExit(
   element: HTMLElement,
   preset: ArkMotionPreset = "fade",
   options: ArkMotionOptions = {}

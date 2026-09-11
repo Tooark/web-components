@@ -1,5 +1,5 @@
-import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
+import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
 import dts from "rollup-plugin-dts";
 
@@ -13,7 +13,17 @@ export default [
       { file: "dist/index.js", format: "esm", sourcemap: true },
       { file: "dist/index.cjs", format: "cjs", sourcemap: true, exports: "named" }
     ],
-    plugins: [resolve({ extensions: [".js", ".ts"] }), commonjs(), typescript({ tsconfig: "./tsconfig.json", outDir: "dist", declaration: false, declarationMap: false, declarationDir: undefined })],
+    plugins: [
+      resolve({ extensions: [".js", ".ts"] }),
+      commonjs(),
+      typescript({
+        tsconfig: "./tsconfig.json",
+        outDir: "dist",
+        declaration: false,
+        declarationMap: false,
+        declarationDir: undefined
+      })
+    ],
     external: isExternal
   },
   {

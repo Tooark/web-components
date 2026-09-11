@@ -1,4 +1,4 @@
-import type { ArkButtonType, ArkRounded, ArkSize, ArkStyleVariant, ArkIntent } from "@tooark/core";
+import type { ArkButtonType, ArkIntent, ArkRounded, ArkSize, ArkStyleVariant } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkButtonPalette = {
@@ -8,7 +8,8 @@ type ArkButtonPalette = {
   ghost: string;
 };
 
-const SPINNER_SVG = "<svg class=\"ark:h-[1em] ark:w-[1em] ark:animate-spin\" viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><circle class=\"ark:opacity-25\" cx=\"12\" cy=\"12\" r=\"10\" stroke=\"currentColor\" stroke-width=\"4\"></circle><path class=\"ark:opacity-75\" fill=\"currentColor\" d=\"M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z\"></path></svg>";
+const SPINNER_SVG =
+  '<svg class="ark:h-[1em] ark:w-[1em] ark:animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="ark:opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="ark:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>';
 
 let arkButtonIdCounter = 0;
 
@@ -33,11 +34,28 @@ export class ArkButton extends HTMLElement {
   private syncingClass = false;
   private formDisabled = false;
 
-  static get observedAttributes (): string[] {
-    return ["disabled", "type", "variant", "size", "intent", "theme", "color", "text-color", "class", "rounded", "loading", "icon-only", "full-width", "href", "target", "testid"];
+  static get observedAttributes(): string[] {
+    return [
+      "disabled",
+      "type",
+      "variant",
+      "size",
+      "intent",
+      "theme",
+      "color",
+      "text-color",
+      "class",
+      "rounded",
+      "loading",
+      "icon-only",
+      "full-width",
+      "href",
+      "target",
+      "testid"
+    ];
   }
 
-  constructor () {
+  constructor() {
     super();
     this.internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
 
@@ -58,11 +76,11 @@ export class ArkButton extends HTMLElement {
     this.addEventListener("keyup", this.handleKeyup);
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     this.updateAppearance();
   }
 
-  attributeChangedCallback (name: string): void {
+  attributeChangedCallback(name: string): void {
     if (name === "class") {
       // Um framework pode reescrever o atributo class inteiro (React/Vue
       // setam `class` do zero): reaplica só as classes do próprio componente.
@@ -74,34 +92,34 @@ export class ArkButton extends HTMLElement {
   }
 
   /** Chamado pelo navegador quando um <fieldset disabled> ancestral muda. */
-  formDisabledCallback (disabled: boolean): void {
+  formDisabledCallback(disabled: boolean): void {
     this.formDisabled = disabled;
     this.updateAppearance();
   }
 
-  get disabled (): boolean {
+  get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
 
-  set disabled (value: boolean) {
+  set disabled(value: boolean) {
     this.toggleAttribute("disabled", Boolean(value));
   }
 
-  get loading (): boolean {
+  get loading(): boolean {
     return this.hasAttribute("loading");
   }
 
-  set loading (value: boolean) {
+  set loading(value: boolean) {
     this.toggleAttribute("loading", Boolean(value));
   }
 
-  get type (): ArkButtonType {
+  get type(): ArkButtonType {
     const type = this.getAttribute("type");
     return type === "submit" || type === "reset" ? type : "button";
   }
 
   /** Formulário ao qual o botão pertence (via ElementInternals). */
-  get form (): HTMLFormElement | null {
+  get form(): HTMLFormElement | null {
     return this.internals?.form ?? this.closest("form");
   }
 
@@ -145,15 +163,23 @@ export class ArkButton extends HTMLElement {
 
   // --- Estilo ---
 
-  private normalizeIntent (value: string | null): ArkIntent {
+  private normalizeIntent(value: string | null): ArkIntent {
     const intent = (value || "").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private resolveVariantAndIntent (): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
+  private resolveVariantAndIntent(): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
     const variant = (this.getAttribute("variant") || "primary").toLowerCase();
     const attrIntent = this.getAttribute("intent");
 
@@ -164,7 +190,14 @@ export class ArkButton extends HTMLElement {
       };
     }
 
-    if (variant === "primary" || variant === "secondary" || variant === "success" || variant === "warning" || variant === "danger" || variant === "info") {
+    if (
+      variant === "primary" ||
+      variant === "secondary" ||
+      variant === "success" ||
+      variant === "warning" ||
+      variant === "danger" ||
+      variant === "info"
+    ) {
       return {
         styleVariant: "solid",
         intent: this.normalizeIntent(attrIntent || variant)
@@ -177,7 +210,7 @@ export class ArkButton extends HTMLElement {
     };
   }
 
-  private getPalette (intent: ArkIntent): ArkButtonPalette {
+  private getPalette(intent: ArkIntent): ArkButtonPalette {
     // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
     const palettes: Record<ArkIntent, ArkButtonPalette> = {
       primary: {
@@ -190,7 +223,8 @@ export class ArkButton extends HTMLElement {
         focusRing: "ark:ring-secondary-ring",
         // "Solid" secundário é a superfície com borda (botão neutro de apoio).
         solid: "ark:bg-surface ark:text-fg ark:border-border-strong ark:hover:bg-surface-muted",
-        outline: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-secondary-border ark:hover:bg-secondary-soft",
+        outline:
+          "ark:bg-transparent ark:text-secondary-soft-fg ark:border-secondary-border ark:hover:bg-secondary-soft",
         ghost: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-transparent ark:hover:bg-secondary-soft"
       },
       success: {
@@ -228,11 +262,11 @@ export class ArkButton extends HTMLElement {
     return palettes[intent];
   }
 
-  private isDisabled (): boolean {
+  private isDisabled(): boolean {
     return this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("loading");
   }
 
-  private computeClasses (): string[] {
+  private computeClasses(): string[] {
     const isLink = this.anchorEl !== null;
     const base = [
       this.hasAttribute("full-width") ? "ark:flex ark:w-full" : "ark:inline-flex",
@@ -278,7 +312,7 @@ export class ArkButton extends HTMLElement {
     const rounded = (this.getAttribute("rounded") || "md").toLowerCase() as ArkRounded;
 
     const iconOnly = this.hasAttribute("icon-only");
-    const sizeClasses = iconOnly ? iconOnlySizes[size] ?? iconOnlySizes.md : sizes[size] ?? sizes.md;
+    const sizeClasses = iconOnly ? (iconOnlySizes[size] ?? iconOnlySizes.md) : (sizes[size] ?? sizes.md);
 
     return [base, roundedMap[rounded] ?? roundedMap.md, palette.focusRing, variantClasses[styleVariant], sizeClasses]
       .join(" ")
@@ -287,7 +321,7 @@ export class ArkButton extends HTMLElement {
   }
 
   // Troca as classes do componente no host sem tocar nas classes do usuário.
-  private applyOwnClasses (next: string[]): void {
+  private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
       if (!next.includes(cls)) this.classList.remove(cls);
@@ -299,7 +333,7 @@ export class ArkButton extends HTMLElement {
     this.syncingClass = false;
   }
 
-  private applyCustomColors (): void {
+  private applyCustomColors(): void {
     this.style.backgroundColor = "";
     this.style.borderColor = "";
     this.style.color = "";
@@ -321,7 +355,7 @@ export class ArkButton extends HTMLElement {
     this.style.color = textColor || color;
   }
 
-  private syncLoading (): void {
+  private syncLoading(): void {
     const loading = this.hasAttribute("loading");
 
     if (loading && !this.spinnerEl) {
@@ -341,13 +375,13 @@ export class ArkButton extends HTMLElement {
     }
   }
 
-  private ensureId (): string {
+  private ensureId(): string {
     if (!this.id) this.id = `ark-button-${++arkButtonIdCounter}`;
     return this.id;
   }
 
   // Modo link: cria/remove o <a> esticado conforme `href` entra/sai.
-  private syncAnchor (): void {
+  private syncAnchor(): void {
     const wantsAnchor = this.getAttribute("href") !== null;
 
     if (wantsAnchor && !this.anchorEl) {
@@ -391,7 +425,7 @@ export class ArkButton extends HTMLElement {
     }
   }
 
-  private syncHostSemantics (): void {
+  private syncHostSemantics(): void {
     const disabled = this.isDisabled();
 
     if (this.anchorEl) {
@@ -416,7 +450,7 @@ export class ArkButton extends HTMLElement {
     }
   }
 
-  private updateAppearance (): void {
+  private updateAppearance(): void {
     this.syncAnchor();
     this.syncHostSemantics();
     this.applyOwnClasses(this.computeClasses());

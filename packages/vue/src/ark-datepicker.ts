@@ -1,5 +1,5 @@
-import { defineComponent, h, onBeforeUnmount, onMounted, ref, type PropType } from "vue";
 import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
+import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export const ArkDatepicker = defineComponent({

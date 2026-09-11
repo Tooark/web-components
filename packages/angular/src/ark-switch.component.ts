@@ -1,4 +1,4 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -26,7 +26,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   </ark-switch>`
 })
 export class ArkSwitchComponent {
-  constructor () {
+  constructor() {
     ensureTooarkComponentsRegistered();
   }
 
@@ -46,7 +46,7 @@ export class ArkSwitchComponent {
   @Input() labelOff: string | undefined;
   @Output() changed = new EventEmitter<CustomEvent<{ checked: boolean }>>();
 
-  onChange (event: Event): void {
+  onChange(event: Event): void {
     this.changed.emit(event as CustomEvent<{ checked: boolean }>);
   }
 }

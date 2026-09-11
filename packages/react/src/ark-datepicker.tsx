@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect } from "react";
 import type { ArkDatepickerLang, ArkDatepickerLocale, ArkDatepickerStyleOptions } from "@tooark/core";
+import React, { useCallback, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
@@ -13,7 +13,30 @@ export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
 };
 
 export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
-  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid, mode, input, placeholder, name, format, seconds, disabled, events, eventDisplay, stepMinutes, hoursFormat } = props;
+  const {
+    lang,
+    localeJson,
+    theme,
+    intent,
+    accentColor,
+    value,
+    min,
+    max,
+    onChange,
+    className,
+    testid,
+    mode,
+    input,
+    placeholder,
+    name,
+    format,
+    seconds,
+    disabled,
+    events,
+    eventDisplay,
+    stepMinutes,
+    hoursFormat
+  } = props;
   const ref = React.useRef<HTMLElement>(null);
 
   useEffect(() => {

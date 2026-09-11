@@ -1,5 +1,5 @@
-import { resolveLocale } from "@tooark/core";
 import type { ArkDatepickerLang, ArkIntent } from "@tooark/core";
+import { resolveLocale } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkClockColumn = "hours" | "minutes" | "seconds" | "meridiem";
@@ -24,15 +24,15 @@ export class ArkClock extends HTMLElement {
   private columnEls = new Map<ArkClockColumn, HTMLDivElement>();
   private syncingValue = false;
 
-  static get observedAttributes (): string[] {
+  static get observedAttributes(): string[] {
     return ["value", "seconds", "step-minutes", "hours-format", "lang", "theme", "intent", "testid"];
   }
 
-  connectedCallback (): void {
+  connectedCallback(): void {
     this.build();
   }
 
-  attributeChangedCallback (name: string, oldValue: string | null, newValue: string | null): void {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (oldValue === newValue || !this.root) return;
     if (this.syncingValue && name === "value") return;
 
@@ -45,33 +45,41 @@ export class ArkClock extends HTMLElement {
     this.build();
   }
 
-  get value (): string {
+  get value(): string {
     return this.getAttribute("value") || "";
   }
 
-  private getIntent (): ArkIntent {
+  private getIntent(): ArkIntent {
     const intent = (this.getAttribute("intent") || "").toLowerCase();
-    if (intent === "primary" || intent === "secondary" || intent === "success" || intent === "warning" || intent === "danger" || intent === "info" || intent === "neutral") {
+    if (
+      intent === "primary" ||
+      intent === "secondary" ||
+      intent === "success" ||
+      intent === "warning" ||
+      intent === "danger" ||
+      intent === "info" ||
+      intent === "neutral"
+    ) {
       return intent;
     }
     return "primary";
   }
 
-  private showSeconds (): boolean {
+  private showSeconds(): boolean {
     return this.hasAttribute("seconds");
   }
 
-  private is12h (): boolean {
+  private is12h(): boolean {
     return this.getAttribute("hours-format") === "12";
   }
 
-  private getStepMinutes (): number {
+  private getStepMinutes(): number {
     const parsed = Number(this.getAttribute("step-minutes") || "1");
     if (!Number.isFinite(parsed)) return 1;
     return Math.min(30, Math.max(1, Math.floor(parsed)));
   }
 
-  private parseValue (): { h: number; m: number; s: number } | null {
+  private parseValue(): { h: number; m: number; s: number } | null {
     const value = this.getAttribute("value");
     if (!value) return null;
     const match = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/.exec(value.trim());
@@ -83,7 +91,7 @@ export class ArkClock extends HTMLElement {
     return { h, m, s };
   }
 
-  private getPalette (intent: ArkIntent): ArkClockPalette {
+  private getPalette(intent: ArkIntent): ArkClockPalette {
     const selectedByIntent: Record<ArkIntent, string> = {
       primary: "ark:bg-primary ark:text-primary-fg",
       secondary: "ark:bg-secondary ark:text-secondary-fg",
@@ -95,15 +103,17 @@ export class ArkClock extends HTMLElement {
     };
 
     return {
-      container: "ark:inline-flex ark:flex-col ark:gap-1 ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-2 ark:shadow-sm",
-      columnLabel: "ark:px-1 ark:pb-1 ark:text-center ark:text-[10px] ark:font-medium ark:uppercase ark:tracking-wide ark:text-fg-muted",
+      container:
+        "ark:inline-flex ark:flex-col ark:gap-1 ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-2 ark:shadow-sm",
+      columnLabel:
+        "ark:px-1 ark:pb-1 ark:text-center ark:text-[10px] ark:font-medium ark:uppercase ark:tracking-wide ark:text-fg-muted",
       option: "ark:text-fg-soft ark:hover:bg-surface-muted",
       optionSelected: `${selectedByIntent[intent]} ark:font-semibold`,
       focusRing: "ark:focus:ring-ring"
     };
   }
 
-  private selectPart (column: ArkClockColumn, optionValue: number): void {
+  private selectPart(column: ArkClockColumn, optionValue: number): void {
     const current = this.parseValue() || { h: 0, m: 0, s: 0 };
 
     if (column === "hours") {
@@ -128,7 +138,7 @@ export class ArkClock extends HTMLElement {
     this.dispatchEvent(new CustomEvent("ark-change", { detail: { value }, bubbles: true, composed: true }));
   }
 
-  private selectedValueFor (column: ArkClockColumn): number | null {
+  private selectedValueFor(column: ArkClockColumn): number | null {
     const parsed = this.parseValue();
     if (!parsed) return null;
     if (column === "hours") return this.is12h() ? parsed.h % 12 : parsed.h;
@@ -138,7 +148,7 @@ export class ArkClock extends HTMLElement {
   }
 
   // Atualiza classes/aria das opções sem reconstruir (evita saltos de scroll).
-  private updateSelection (scrollIntoView: boolean): void {
+  private updateSelection(scrollIntoView: boolean): void {
     const palette = this.getPalette(this.getIntent());
     const base = `ark:w-12 ark:shrink-0 ark:rounded-md ark:px-1 ark:py-1.5 ark:text-center ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing}`;
 
@@ -158,13 +168,13 @@ export class ArkClock extends HTMLElement {
     }
   }
 
-  private centerOption (columnEl: HTMLElement, option: HTMLElement): void {
+  private centerOption(columnEl: HTMLElement, option: HTMLElement): void {
     columnEl.scrollTop = option.offsetTop - columnEl.clientHeight / 2 + option.clientHeight / 2;
   }
 
   private readonly handleColumnKeydown = (event: KeyboardEvent): void => {
     const target = event.target as HTMLElement | null;
-    if (!target || target.tagName !== "BUTTON") return;
+    if (target?.tagName !== "BUTTON") return;
 
     let next: Element | null = null;
     if (event.key === "ArrowDown") next = target.nextElementSibling;
@@ -177,7 +187,7 @@ export class ArkClock extends HTMLElement {
     (next as HTMLElement | null)?.focus();
   };
 
-  private build (): void {
+  private build(): void {
     const palette = this.getPalette(this.getIntent());
     const loc = resolveLocale((this.getAttribute("lang") || "en") as ArkDatepickerLang, undefined);
 
@@ -191,7 +201,8 @@ export class ArkClock extends HTMLElement {
     const columnsRow = document.createElement("div");
     columnsRow.className = "ark:flex ark:gap-1";
 
-    const columns: Array<{ column: ArkClockColumn; label: string; options: Array<{ value: number; text: string }> }> = [];
+    const columns: Array<{ column: ArkClockColumn; label: string; options: Array<{ value: number; text: string }> }> =
+      [];
 
     if (this.is12h()) {
       columns.push({
@@ -211,7 +222,10 @@ export class ArkClock extends HTMLElement {
     columns.push({
       column: "minutes",
       label: loc.minutes,
-      options: Array.from({ length: Math.ceil(60 / step) }, (_, i) => ({ value: i * step, text: String(i * step).padStart(2, "0") }))
+      options: Array.from({ length: Math.ceil(60 / step) }, (_, i) => ({
+        value: i * step,
+        text: String(i * step).padStart(2, "0")
+      }))
     });
 
     if (this.showSeconds()) {
@@ -226,7 +240,10 @@ export class ArkClock extends HTMLElement {
       columns.push({
         column: "meridiem",
         label: "AM/PM",
-        options: [{ value: 0, text: "AM" }, { value: 1, text: "PM" }]
+        options: [
+          { value: 0, text: "AM" },
+          { value: 1, text: "PM" }
+        ]
       });
     }
 

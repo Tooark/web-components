@@ -1,5 +1,5 @@
-import React, { createElement, useCallback, useEffect } from "react";
 import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkDatepickerLocale } from "@tooark/core";
+import React, { createElement, useCallback, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkCalendarProps = ArkCalendarStyleOptions & {
@@ -13,7 +13,21 @@ export type ArkCalendarProps = ArkCalendarStyleOptions & {
 };
 
 export function ArkCalendar(props: ArkCalendarProps): React.JSX.Element {
-  const { lang, localeJson, theme, intent, accentColor, value, min, max, onChange, className, testid, events, eventDisplay } = props;
+  const {
+    lang,
+    localeJson,
+    theme,
+    intent,
+    accentColor,
+    value,
+    min,
+    max,
+    onChange,
+    className,
+    testid,
+    events,
+    eventDisplay
+  } = props;
   const ref = React.useRef<HTMLElement>(null);
 
   useEffect(() => {
