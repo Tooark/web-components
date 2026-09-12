@@ -37,13 +37,16 @@ export type ArkRevealOptions = ArkMotionPlusOptions & {
 
 /** Opções de animação FLIP (reordenação de listas). */
 export type ArkFlipOptions = {
-  /** Física de spring da acomodação. */
+  /** Rigidez do spring da acomodação; maior = mais rápido. Padrão: 350. */
   stiffness?: number;
+  /** Amortecimento do spring; maior = menos oscilação. Padrão: 32. */
   damping?: number;
 };
 
+/** Direções possíveis de swipe. */
 export type ArkSwipeDirection = "left" | "right" | "up" | "down";
 
+/** Medidas do gesto entregues ao callback de swipe. */
 export type ArkSwipeInfo = {
   /** Deslocamento total do gesto em px (eixo configurado). */
   delta: number;

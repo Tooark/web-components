@@ -7,40 +7,73 @@ import type { ArkFlipOptions, ArkMotionTargets } from "./types";
  * Animação FLIP: mede a posição dos elementos, aplica a mutação de DOM
  * (reordenar, inserir, filtrar) e anima cada item da posição antiga para
  * a nova com física de spring.
+ * @param targets Os elementos a serem animados.
+ * @param mutate A função que aplica a mutação de DOM.
+ * @param options As opções de animação FLIP.
+ * @returns Uma Promise que resolve quando todas as animações terminarem.
  */
 export async function arkFlip(
   targets: ArkMotionTargets,
   mutate: () => void,
   options: ArkFlipOptions = {}
 ): Promise<void> {
+  // Resolve os elementos alvo da animação.
   const elements = resolveTargets(targets);
 
+  // Se não houver elementos ou se o usuário preferir animações reduzidas, aplica a mutação e retorna.
   if (elements.length === 0 || prefersReducedMotion()) {
     mutate();
     return;
   }
 
+  // Mapa para armazenar a posição inicial de cada elemento.
   const first = new Map<HTMLElement, DOMRect>();
+
+  // Captura a posição inicial de cada elemento.
   for (const el of elements) {
     first.set(el, el.getBoundingClientRect());
   }
 
+  // Aplica a mutação de DOM para que possamos medir a nova posição dos elementos.
   mutate();
 
+  // Captura a posição final de cada elemento após a mutação.
   const animations: Array<Promise<unknown>> = [];
-  for (const el of elements) {
-    const before = first.get(el);
-    if (!before || !el.isConnected) continue;
 
+  // Itera sobre cada elemento para calcular a diferença de posição e criar as animações.
+  for (const el of elements) {
+    // Pega a posição inicial do elemento antes da mutação.
+    const before = first.get(el);
+
+    // Se não houver posição inicial ou o elemento não estiver mais conectado ao DOM, pula a animação.
+    if (!before || !el.isConnected) {
+      continue;
+    }
+
+    // Captura a posição final do elemento após a mutação.
     const after = el.getBoundingClientRect();
+
+    // Calcula a diferença de posição entre a posição inicial e final.
     const dx = before.left - after.left;
     const dy = before.top - after.top;
-    if (dx === 0 && dy === 0) continue;
 
+    // Se não houver diferença de posição, pula a animação.
+    if (dx === 0 && dy === 0) {
+      continue;
+    }
+
+    // Cria os keyframes para a animação com base na diferença de posição.
     const keyframes: Record<string, [number, number]> = {};
-    if (dx !== 0) keyframes.x = [dx, 0];
-    if (dy !== 0) keyframes.y = [dy, 0];
 
+    // Adiciona os keyframes apenas se houver diferença de posição em x ou y.
+    if (dx !== 0) {
+      keyframes.x = [dx, 0];
+    }
+    if (dy !== 0) {
+      keyframes.y = [dy, 0];
+    }
+
+    // Adiciona a animação à lista de animações a serem aguardadas.
     animations.push(
       Promise.resolve(
         animate(el, keyframes, {
@@ -52,5 +85,6 @@ export async function arkFlip(
     );
   }
 
+  // Aguarda todas as animações terminarem antes de continuar.
   await Promise.all(animations);
 }
