@@ -60,9 +60,9 @@ export class ArkScheduler extends HTMLElement {
   private nowTimer: number | null = null;
   private navDirection: "prev" | "next" | null = null;
   private syncingAttr = false;
-  // Linhas de "agora" vivas na tela: reposicionadas sem rebuild a cada minuto.
+  /** Linhas de "agora" vivas na tela: reposicionadas sem rebuild a cada minuto. */
   private nowLines: HTMLElement[] = [];
-  // Identifica view + período: se não mudou, o rebuild preserva o scroll do usuário.
+  /** Identifica view + período: se não mudou, o rebuild preserva o scroll do usuário. */
   private lastRenderKey = "";
   private lastScrollTop = 0;
 
@@ -866,7 +866,7 @@ export class ArkScheduler extends HTMLElement {
     return wrapper;
   }
 
-  // Move só a linha de "agora"; rebuildar a cada minuto custaria o scroll e o foco.
+  /** Move só a linha de "agora"; rebuildar a cada minuto custaria o scroll e o foco. */
   private updateNowIndicator(): void {
     if (this.nowLines.length === 0) return;
 

@@ -9,8 +9,10 @@ type ArkCarouselPalette = {
   dotActive: string;
 };
 
-// Marca os nós criados pelo componente (overlay de setas/dots) para
-// distingui-los dos slides do usuário sem tocar nestes.
+/**
+ * Marca os nós criados pelo componente (overlay de setas/dots) para
+ * distingui-los dos slides do usuário sem tocar nestes.
+ */
 const CHROME_ATTR = "data-ark-chrome";
 
 /**
@@ -311,7 +313,7 @@ export class ArkCarousel extends HTMLElement {
     );
   }
 
-  // Índice do slide mais próximo da borda esquerda visível.
+  /** Índice do slide mais próximo da borda esquerda visível. */
   private indexFromScroll(): number {
     const slides = this.slides;
     if (slides.length === 0) return 0;

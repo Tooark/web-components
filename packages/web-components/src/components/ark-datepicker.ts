@@ -5,7 +5,7 @@ import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
 import { applyTestHooks } from "./test-hooks";
 
-// Atributos repassados aos componentes internos.
+/** Atributos repassados aos componentes internos. */
 const CALENDAR_ATTRS = [
   "lang",
   "locale-json",
@@ -471,7 +471,7 @@ export class ArkDatepicker extends HTMLElement {
     this.syncingChild = false;
   }
 
-  // Sincroniza aparência/estado do campo com os atributos atuais.
+  /** Sincroniza aparência/estado do campo com os atributos atuais. */
   private syncField(): void {
     if (!this.isInputMode() || !this.inputComp || !this.toggleEl || !this.hiddenInputEl || !this.popupEl) return;
 

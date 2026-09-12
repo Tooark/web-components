@@ -37,9 +37,9 @@ export class ArkCalendar extends HTMLElement {
   private pendingFocusISO: string | null = null;
   private view: ArkCalendarView = "days";
   private eventsProp: ArkCalendarEvent[] | null = null;
-  // Direção da navegação de mês por clique nas setas: dirige o slide do grid.
+  /** Direção da navegação de mês por clique nas setas: dirige o slide do grid. */
   private navDirection: "prev" | "next" | null = null;
-  // Última seleção feita pelo usuário: recebe um "pop" de entrada.
+  /** Última seleção feita pelo usuário: recebe um "pop" de entrada. */
   private justSelectedISO: string | null = null;
 
   static get observedAttributes(): string[] {
@@ -270,7 +270,7 @@ export class ArkCalendar extends HTMLElement {
     return `${y}-${m}-${day}`;
   }
 
-  // Caminho único de seleção usado pelo clique no dia e pelo botão "Hoje".
+  /** Caminho único de seleção usado pelo clique no dia e pelo botão "Hoje". */
   private selectDate(date: Date): void {
     const iso = this.formatISO(date);
     this.selectedDate = date;
@@ -311,7 +311,7 @@ export class ArkCalendar extends HTMLElement {
     this.root?.querySelector<HTMLElement>(`[data-date="${iso}"]`)?.focus();
   }
 
-  // Navegação por teclado no grid (padrão WAI-ARIA de grade de datas).
+  /** Navegação por teclado no grid (padrão WAI-ARIA de grade de datas). */
   private readonly handleGridKeydown = (event: KeyboardEvent): void => {
     const target = event.target as HTMLElement | null;
     const current = this.parseDate(target?.getAttribute("data-date"));

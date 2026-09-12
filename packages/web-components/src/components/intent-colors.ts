@@ -2,6 +2,7 @@ import type { ArkIntent } from "@tooark/core";
 
 const INTENTS: ArkIntent[] = ["primary", "secondary", "success", "warning", "danger", "info", "neutral"];
 
+/** Devolve um ArkIntent válido a partir de um atributo, caindo no fallback quando não reconhece. */
 export function normalizeIntent(value: string | null | undefined, fallback: ArkIntent = "primary"): ArkIntent {
   const intent = (value || "").toLowerCase() as ArkIntent;
   return INTENTS.includes(intent) ? intent : fallback;

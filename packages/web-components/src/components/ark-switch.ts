@@ -24,6 +24,12 @@ const CHECK_SVG =
 const CROSS_SVG =
   '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9"></path></svg>';
 
+/**
+ * Interruptor liga/desliga com trilho e polegar. O trilho é um <button>
+ * `role="switch"`; um checkbox oculto espelha o estado para o formulário,
+ * submetendo `name`/`value` apenas quando marcado. Tem tabela de proporções
+ * própria, em vez da escala de altura dos demais controles.
+ */
 export class ArkSwitch extends HTMLElement {
   static readonly tagName = "ark-switch";
 

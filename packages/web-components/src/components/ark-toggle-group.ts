@@ -128,7 +128,7 @@ export class ArkToggleGroup extends HTMLElement {
     });
   }
 
-  // Propaga size/intent/theme/disabled do grupo para os itens.
+  /** Propaga size/intent/theme/disabled do grupo para os itens. */
   private syncToggles(): void {
     const size = this.getAttribute("size");
     const intent = this.getAttribute("intent");

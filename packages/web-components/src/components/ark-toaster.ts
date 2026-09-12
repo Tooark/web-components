@@ -19,6 +19,12 @@ type ArkToasterPalette = {
   icon: string;
 };
 
+/**
+ * Pilha de toasts da página. Não é chamado diretamente: escuta `ark-toast` e
+ * `ark-toast-dismiss` em window, disparados pelo serviço `toast` do
+ * @tooark/core, o que mantém serviço e elemento desacoplados. Mostra até
+ * `max-visible` de cada vez e enfileira o excedente.
+ */
 export class ArkToaster extends HTMLElement {
   static readonly tagName = "ark-toaster";
 

@@ -147,7 +147,7 @@ export class ArkClock extends HTMLElement {
     return parsed.h >= 12 ? 1 : 0;
   }
 
-  // Atualiza classes/aria das opções sem reconstruir (evita saltos de scroll).
+  /** Atualiza classes/aria das opções sem reconstruir (evita saltos de scroll). */
   private updateSelection(scrollIntoView: boolean): void {
     const palette = this.getPalette(this.getIntent());
     const base = `ark:w-12 ark:shrink-0 ark:rounded-md ark:px-1 ark:py-1.5 ark:text-center ark:text-sm ark:transition ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing}`;
