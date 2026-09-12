@@ -8,6 +8,12 @@ pnpm monorepo for **Tooark Web Components**: framework-agnostic Custom Elements 
 
 Requirements: Node >= 22, pnpm 11 (pinned via `packageManager`). Lint, formatting and import ordering are enforced by Biome (`biome.json` at the root: 120-column lines, double quotes, no trailing commas, `organizeImports` on, `noNonNullAssertion` off). The formatter cannot keep a space before the function parenthesis, so `name(): void` is the style. Suppress a deliberate violation in place with `// biome-ignore lint/<group>/<rule>: reason` (CSS uses the `/* */` form). Type checking is `tsc --strict` inside each package build.
 
+### Comment convention
+
+`/** */` documents a **symbol** — anything named that shows in the editor tooltip and survives into the bundled `.d.ts`: exported types/functions/constants, component classes, class members (including private ones), and each property of an `Ark*Options` type. `//` is everything else: the "why" behind a line or block inside a function body, the file header, and labels that group several declarations (`// --- Interação ---` in long component files, the `// Exports types ...` groupings in `packages/core/src/types/style.ts`). A label covering more than one declaration stays `//`; as JSDoc it would attach to just the first.
+
+No JSDoc tags — `@param`/`@returns`/`@example` appear nowhere in the repo and the TS signature already states the shapes. Prose only, in Portuguese, on one line (`/** ... */`) when it fits the 120-column limit. Option types state defaults inline per property (`/** Intervalo entre itens em ms. Padrão: 60. */`), as in `packages/motion/src/types.ts`. There is no typedoc/api-extractor, so the whole payoff is the tooltip and the `.d.ts` the consumer gets; Biome has no rule for this, so it is convention plus review.
+
 ## Commands
 
 ```bash
