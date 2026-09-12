@@ -59,21 +59,21 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 
 ## Componentes
 
-| Elemento           | Pacote         | Destaques                                                                                                                                     |
-| ------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ark-button`       | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width` e modo link (`href`).  |
-| `ark-calendar`     | web-components | Grid de mês inline: localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).               |
-| `ark-carousel`     | web-components | CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.                                                                                   |
-| `ark-clock`        | web-components | Seleção de hora em colunas digitais (hora/minuto/segundo), 24h/12h, step de minutos, localizado.                                              |
-| `ark-datepicker`   | web-components | Compõe `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (padrão)/date/time, inline ou campo+popup, parse de digitação, formulário. |
-| `ark-input`        | web-components | Campo de texto padronizado: label, helper/erro com aria, sufixo via `slot="suffix"`, tamanhos, intents, `rounded`.                            |
-| `ark-scheduler`    | web-components | Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.            |
-| `ark-switch`       | web-components | Switch on/off acessível (`role="switch"`): texto ON/OFF e ícones ✓/✕ opcionais, intents, participação em formulário via checkbox oculto.      |
-| `ark-toaster`      | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.                  |
-| `ark-toggle`       | web-components | Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.                                   |
-| `ark-toggle-group` | web-components | Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.        |
-| `ark-chart`        | chart          | Tipos de gráfico do ECharts com suporte a temas.                                                                                              |
-| `ark-wysiwyg`      | wysiwyg        | Editor + viewer somente leitura baseados em Tiptap.                                                                                           |
+| Elemento           | Pacote         | Destaques                                                                                                                                                          |
+| ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `ark-button`       | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width` e modo link (`href`).                       |
+| `ark-calendar`     | web-components | Grid de mês inline: localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).                                    |
+| `ark-carousel`     | web-components | CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos. |
+| `ark-clock`        | web-components | Seleção de hora em colunas digitais (hora/minuto/segundo), 24h/12h, step de minutos, localizado.                                                                   |
+| `ark-datepicker`   | web-components | Compõe `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (padrão)/date/time, inline ou campo+popup, parse de digitação, formulário.                      |
+| `ark-input`        | web-components | Campo de texto padronizado: label, helper/erro com aria, sufixo via `slot="suffix"`, tamanhos, intents, `rounded`.                                                 |
+| `ark-scheduler`    | web-components | Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.                                 |
+| `ark-switch`       | web-components | Switch on/off acessível (`role="switch"`): texto ON/OFF e ícones ✓/✕ opcionais, intents, participação em formulário via checkbox oculto.                           |
+| `ark-toaster`      | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.                                       |
+| `ark-toggle`       | web-components | Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.                                                        |
+| `ark-toggle-group` | web-components | Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.                             |
+| `ark-chart`        | chart          | Tipos de gráfico do ECharts com suporte a temas.                                                                                                                   |
+| `ark-wysiwyg`      | wysiwyg        | Editor + viewer somente leitura baseados em Tiptap.                                                                                                                |
 
 ### Atributos principais
 
@@ -129,9 +129,7 @@ registerTooarkComponents();
 
 ```html
 <ark-button intent="primary" size="md">Salvar</ark-button>
-<ark-button icon-only rounded="full" intent="success" aria-label="Confirmar"
-  >✓</ark-button
->
+<ark-button icon-only rounded="full" intent="success" aria-label="Confirmar">✓</ark-button>
 
 <ark-switch labels icons intent="success" label="Notificações"></ark-switch>
 
@@ -141,11 +139,7 @@ registerTooarkComponents();
   <ark-toggle value="mes">Mês</ark-toggle>
 </ark-toggle-group>
 
-<ark-input
-  label="Nome"
-  placeholder="Seu nome completo"
-  helper="Como no documento"
-></ark-input>
+<ark-input label="Nome" placeholder="Seu nome completo" helper="Como no documento"></ark-input>
 
 <!-- Campo + popup; o formulário recebe o valor ISO em name="data" -->
 <ark-datepicker input mode="date" lang="pt" name="data"></ark-datepicker>
@@ -157,12 +151,7 @@ registerTooarkComponents();
 
 <ark-clock hours-format="12" step-minutes="15"></ark-clock>
 
-<ark-scheduler
-  view="week"
-  lang="pt"
-  hour-start="8"
-  hour-end="18"
-></ark-scheduler>
+<ark-scheduler view="week" lang="pt" hour-start="8" hour-end="18"></ark-scheduler>
 
 <ark-toaster position="bottom-right" lang="pt"></ark-toaster>
 ```
@@ -190,12 +179,7 @@ toast.success("Salvo", { description: "Suas alterações foram publicadas." });
 ### React
 
 ```tsx
-import {
-  ArkButton,
-  ArkDatepicker,
-  ArkScheduler,
-  ArkToaster,
-} from "@tooark/react";
+import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/react";
 ```
 
 As props dos wrappers são camelCase e tipadas (`eventDisplay`, `stepMinutes`, `hoursFormat`, `hourStart`…); props de objeto (`events`, `localeJson`) são serializadas para o atributo automaticamente e os eventos customizados chegam como `onChange`/`onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` recebendo o `detail`.
@@ -203,12 +187,7 @@ As props dos wrappers são camelCase e tipadas (`eventDisplay`, `stepMinutes`, `
 ### Vue 3
 
 ```ts
-import {
-  ArkButton,
-  ArkDatepicker,
-  ArkScheduler,
-  ArkToaster,
-} from "@tooark/vue";
+import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/vue";
 ```
 
 Os eventos mantêm o nome nativo (`@ark-change`, `@ark-event-click`, …) e entregam o `detail` diretamente.
@@ -296,16 +275,14 @@ Todo elemento interno criado por um componente carrega hooks estáveis para test
 // Playwright
 await page.getByTestId("notificacoes").click();
 await expect(page.locator('[data-ark="switch-thumb"]')).toBeVisible();
-await page
-  .locator('[data-ark="datepicker-day"][data-date="2026-09-15"]')
-  .click();
+await page.locator('[data-ark="datepicker-day"][data-date="2026-09-15"]').click();
 ```
 
 Hooks por componente:
 
 | Componente         | Elemento principal | Partes internas                                                                                                                                                                                                                                                                                                                                                                               |
 | ------------------ | ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ark-button`       | `button`           | `button-spinner`, `button-link` (modo href)                                                                                                                                                                                                                                                                                                                                                                             |
+| `ark-button`       | `button`           | `button-spinner`, `button-link` (modo href)                                                                                                                                                                                                                                                                                                                                                   |
 | `ark-scheduler`    | `scheduler`        | `scheduler-header`, `scheduler-today`, `scheduler-prev`, `scheduler-next`, `scheduler-title`, `scheduler-views`, `scheduler-view-{view}`, `scheduler-body`, `scheduler-scroller`, `scheduler-grid`, `scheduler-day` (+ `data-date`), `scheduler-slot` (+ `data-start`), `scheduler-event` (+ `data-event-id`), `scheduler-event-more`, `scheduler-allday`, `scheduler-now`, `scheduler-empty` |
 | `ark-switch`       | `switch`           | `switch-thumb`, `switch-label-on`, `switch-label-off`, `switch-input`                                                                                                                                                                                                                                                                                                                         |
 | `ark-toggle`       | `toggle`           | —                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -313,7 +290,7 @@ Hooks por componente:
 | `ark-calendar`     | `calendar`         | `calendar-prev`, `calendar-next`, `calendar-title`, `calendar-grid`, `calendar-day` (+ `data-date`), `calendar-months`/`calendar-month` (+ `data-month`), `calendar-years`/`calendar-year` (+ `data-year`), `calendar-event`, `calendar-event-more`, `calendar-today`, `calendar-clear`                                                                                                       |
 | `ark-clock`        | `clock`            | `clock-hours`, `clock-minutes`, `clock-seconds`, `clock-meridiem` (opções via `data-value`)                                                                                                                                                                                                                                                                                                   |
 | `ark-input`        | `input`            | `input-label`, `input-suffix`, `input-helper`/`input-error`                                                                                                                                                                                                                                                                                                                                   |
-| `ark-carousel`     | `carousel`         | `carousel-overlay`, `carousel-slide-{i}` (nos seus próprios elementos de slide), `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                                                |
+| `ark-carousel`     | `carousel`         | `carousel-overlay`, `carousel-slide-{i}` (nos seus próprios elementos de slide), `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                            |
 | `ark-datepicker`   | `datepicker`       | Composição: o campo carrega os hooks do `ark-input` (testid repassado), painéis internos recebem testid `-calendar`/`-clock`; próprios: `datepicker-toggle`, `datepicker-popup`.                                                                                                                                                                                                              |
 | `ark-toaster`      | `toaster`          | `toaster-toast` (+ `data-toast-id`), `toaster-toast-title`, `toaster-toast-description`, `toaster-toast-close`, `toaster-toast-action`, `toaster-toast-cancel`                                                                                                                                                                                                                                |
 

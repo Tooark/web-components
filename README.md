@@ -63,7 +63,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 | ------------------ | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `ark-button`       | web-components | Intents, sizes, style variants (solid/outline/ghost), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, link mode (`href`).                           |
 | `ark-calendar`     | web-components | Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`). |
-| `ark-carousel`     | web-components | Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.                                                                                                                 |
+| `ark-carousel`     | web-components | Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.                      |
 | `ark-clock`        | web-components | Time selection with scrollable digital columns (hours/minutes/seconds), 24h/12h, minute step, localized.                                                                 |
 | `ark-datepicker`   | web-components | Date picker: inline (embeds `ark-calendar`) or `input` mode with field + popup, localized formatting, typed input parsing, forms.                                        |
 | `ark-input`        | web-components | Standardized text field: label, helper/error with aria, suffix via `slot="suffix"`, sizes, intents, `rounded`.                                                           |
@@ -129,9 +129,7 @@ registerTooarkComponents();
 
 ```html
 <ark-button intent="primary" size="md">Save</ark-button>
-<ark-button icon-only rounded="full" intent="success" aria-label="Confirm"
-  >✓</ark-button
->
+<ark-button icon-only rounded="full" intent="success" aria-label="Confirm">✓</ark-button>
 
 <ark-switch labels icons intent="success" label="Notifications"></ark-switch>
 
@@ -141,11 +139,7 @@ registerTooarkComponents();
   <ark-toggle value="month">Month</ark-toggle>
 </ark-toggle-group>
 
-<ark-input
-  label="Name"
-  placeholder="Your full name"
-  helper="As on your ID"
-></ark-input>
+<ark-input label="Name" placeholder="Your full name" helper="As on your ID"></ark-input>
 
 <!-- Field + popup; the form receives the ISO value under name="date" -->
 <ark-datepicker input mode="date" lang="en" name="date"></ark-datepicker>
@@ -157,12 +151,7 @@ registerTooarkComponents();
 
 <ark-clock hours-format="12" step-minutes="15"></ark-clock>
 
-<ark-scheduler
-  view="week"
-  lang="en"
-  hour-start="8"
-  hour-end="18"
-></ark-scheduler>
+<ark-scheduler view="week" lang="en" hour-start="8" hour-end="18"></ark-scheduler>
 
 <ark-toaster position="bottom-right" lang="pt"></ark-toaster>
 ```
@@ -190,12 +179,7 @@ toast.success("Saved", { description: "Your changes were published." });
 ### React
 
 ```tsx
-import {
-  ArkButton,
-  ArkDatepicker,
-  ArkScheduler,
-  ArkToaster,
-} from "@tooark/react";
+import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/react";
 ```
 
 Wrapper props are camelCase and typed (`eventDisplay`, `stepMinutes`, `hoursFormat`, `hourStart`…); object props (`events`, `localeJson`) are serialized to the attribute for you, and custom events arrive as `onChange`/`onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` receiving the event `detail`.
@@ -203,12 +187,7 @@ Wrapper props are camelCase and typed (`eventDisplay`, `stepMinutes`, `hoursForm
 ### Vue 3
 
 ```ts
-import {
-  ArkButton,
-  ArkDatepicker,
-  ArkScheduler,
-  ArkToaster,
-} from "@tooark/vue";
+import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/vue";
 ```
 
 Events keep their native names (`@ark-change`, `@ark-event-click`, …) and deliver the `detail` directly.
@@ -296,16 +275,14 @@ Every internal element a component creates carries stable hooks for end-to-end t
 // Playwright
 await page.getByTestId("notifications").click();
 await expect(page.locator('[data-ark="switch-thumb"]')).toBeVisible();
-await page
-  .locator('[data-ark="datepicker-day"][data-date="2026-09-15"]')
-  .click();
+await page.locator('[data-ark="datepicker-day"][data-date="2026-09-15"]').click();
 ```
 
 Hooks per component:
 
 | Component          | Main element   | Internal parts                                                                                                                                                                                                                                                                                                                                                                                |
 | ------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ark-button`       | `button`       | `button-spinner`, `button-link` (href mode)                                                                                                                                                                                                                                                                                                                                                                             |
+| `ark-button`       | `button`       | `button-spinner`, `button-link` (href mode)                                                                                                                                                                                                                                                                                                                                                   |
 | `ark-scheduler`    | `scheduler`    | `scheduler-header`, `scheduler-today`, `scheduler-prev`, `scheduler-next`, `scheduler-title`, `scheduler-views`, `scheduler-view-{view}`, `scheduler-body`, `scheduler-scroller`, `scheduler-grid`, `scheduler-day` (+ `data-date`), `scheduler-slot` (+ `data-start`), `scheduler-event` (+ `data-event-id`), `scheduler-event-more`, `scheduler-allday`, `scheduler-now`, `scheduler-empty` |
 | `ark-switch`       | `switch`       | `switch-thumb`, `switch-label-on`, `switch-label-off`, `switch-input`                                                                                                                                                                                                                                                                                                                         |
 | `ark-toggle`       | `toggle`       | —                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -313,7 +290,7 @@ Hooks per component:
 | `ark-calendar`     | `calendar`     | `calendar-prev`, `calendar-next`, `calendar-title`, `calendar-grid`, `calendar-day` (+ `data-date`), `calendar-months`/`calendar-month` (+ `data-month`), `calendar-years`/`calendar-year` (+ `data-year`), `calendar-event`, `calendar-event-more`, `calendar-today`, `calendar-clear`                                                                                                       |
 | `ark-clock`        | `clock`        | `clock-hours`, `clock-minutes`, `clock-seconds`, `clock-meridiem` (options via `data-value`)                                                                                                                                                                                                                                                                                                  |
 | `ark-input`        | `input`        | `input-label`, `input-suffix`, `input-helper`/`input-error`                                                                                                                                                                                                                                                                                                                                   |
-| `ark-carousel`     | `carousel`     | `carousel-overlay`, `carousel-slide-{i}` (on your own slide elements), `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                                                |
+| `ark-carousel`     | `carousel`     | `carousel-overlay`, `carousel-slide-{i}` (on your own slide elements), `carousel-arrow-prev`, `carousel-arrow-next`, `carousel-dots`, `carousel-dot-{i}`                                                                                                                                                                                                                                      |
 | `ark-datepicker`   | `datepicker`   | Composition: the field carries the `ark-input` hooks (testid forwarded), inner panels get testid suffixed `-calendar`/`-clock`; its own: `datepicker-toggle`, `datepicker-popup`.                                                                                                                                                                                                             |
 | `ark-toaster`      | `toaster`      | `toaster-toast` (+ `data-toast-id`), `toaster-toast-title`, `toaster-toast-description`, `toaster-toast-close`, `toaster-toast-action`, `toaster-toast-cancel`                                                                                                                                                                                                                                |
 
