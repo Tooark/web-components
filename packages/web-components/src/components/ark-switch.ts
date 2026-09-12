@@ -167,6 +167,15 @@ export class ArkSwitch extends HTMLElement {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
 
     const sizes: Record<ArkSize, ArkSwitchSizing> = {
+      xs: {
+        track: "ark:h-3.5 ark:w-6",
+        trackLabels: "ark:h-3.5 ark:w-10",
+        thumb: "ark:h-2.5 ark:w-2.5",
+        translate: "ark:translate-x-2.5",
+        translateLabels: "ark:translate-x-[1.625rem]",
+        icon: "ark:h-1.5 ark:w-1.5",
+        label: "ark:text-[6px]"
+      },
       sm: {
         track: "ark:h-4 ark:w-7",
         trackLabels: "ark:h-4 ark:w-12",

@@ -28,14 +28,14 @@ const meta = {
     required: { control: "boolean" },
     readonly: { control: "boolean", description: "Campo somente leitura" },
     suffix: { control: "text", description: 'Conteudo do slot="suffix" (ex.: um icone); vazio nao renderiza sufixo' },
-    size: { control: "inline-radio", options: ["sm", "md", "lg", "xl"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     intent: {
       control: "select",
       options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"],
       description: "Define a cor do anel de foco"
     },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    rounded: { control: "inline-radio", options: ["none", "sm", "md", "lg", "xl", "full"] },
+    rounded: { control: "inline-radio", options: ["none", "xs", "sm", "md", "lg", "xl", "full"] },
     testid: {
       control: "text",
       description: "Propaga data-testid para o input e suas partes (<testid>-label, -suffix, -helper/-error)"
@@ -154,7 +154,7 @@ export const Sizes = {
     wrap.style.gap = "12px";
     wrap.style.maxWidth = "280px";
 
-    ["sm", "md", "lg", "xl"].forEach((size) => {
+    ["xs", "sm", "md", "lg", "xl"].forEach((size) => {
       const el = document.createElement("ark-input");
       el.setAttribute("size", size);
       el.setAttribute("placeholder", size);

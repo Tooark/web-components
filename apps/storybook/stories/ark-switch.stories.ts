@@ -8,7 +8,7 @@ const meta = {
     disabled: { control: "boolean" },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg", "xl"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     labels: { control: "boolean" },
     labelOn: { control: "text" },
     labelOff: { control: "text" },
@@ -119,7 +119,7 @@ export const Sizes = {
     wrap.style.alignItems = "center";
     wrap.style.gap = "16px";
 
-    ["sm", "md", "lg", "xl"].forEach((size) => {
+    ["xs", "sm", "md", "lg", "xl"].forEach((size) => {
       wrap.appendChild(createSwitch({ size: size as ArkSize, checked: true, label: size }));
     });
 

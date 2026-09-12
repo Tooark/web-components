@@ -4,14 +4,14 @@
 /** Intenções semânticas de cor. */
 export type ArkIntent = "primary" | "secondary" | "success" | "warning" | "danger" | "info" | "neutral";
 
-/** Escala de tamanho. */
-export type ArkSize = "sm" | "md" | "lg" | "xl";
+/** Escala de tamanho dos controles (altura mínima via --size-*). */
+export type ArkSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 /** Variantes de estilo visual. */
 export type ArkStyleVariant = "solid" | "outline" | "ghost";
 
 /** Escala de arredondamento de borda ("full" transforma quadrados em círculos). */
-export type ArkRounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
+export type ArkRounded = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "full";
 
 /** Escala de duração de animações. */
 export type ArkDuration = "none" | "instant" | "quick" | "default" | "moderate" | "gentle" | "slow" | "long";

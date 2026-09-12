@@ -7,8 +7,8 @@ const meta = {
     variant: { control: "select", options: ["solid", "outline", "ghost"] },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg", "xl"] },
-    rounded: { control: "inline-radio", options: ["none", "sm", "md", "lg", "xl", "full"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
+    rounded: { control: "inline-radio", options: ["none", "xs", "sm", "md", "lg", "xl", "full"] },
     disabled: { control: "boolean" },
     loading: { control: "boolean" },
     iconOnly: { control: "boolean" },
@@ -143,6 +143,72 @@ export const IntentsDark = {
   }
 };
 
+export const Sizes = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.flexDirection = "column";
+    wrap.style.gap = "16px";
+
+    (["xs", "sm", "md", "lg", "xl"] as ArkSize[]).forEach((size) => {
+      const row = document.createElement("div");
+      row.dataset.size = size;
+      row.style.display = "flex";
+      row.style.alignItems = "center";
+      row.style.gap = "12px";
+
+      const button = document.createElement("ark-button");
+      button.setAttribute("size", size);
+      button.textContent = `Botao ${size}`;
+
+      const iconOnly = document.createElement("ark-button");
+      iconOnly.setAttribute("size", size);
+      iconOnly.setAttribute("icon-only", "");
+      iconOnly.setAttribute("rounded", "full");
+      iconOnly.setAttribute("aria-label", `Icone ${size}`);
+      iconOnly.textContent = "+";
+
+      const toggle = document.createElement("ark-toggle");
+      toggle.setAttribute("size", size);
+      toggle.textContent = `Toggle ${size}`;
+
+      const input = document.createElement("ark-input");
+      input.setAttribute("size", size);
+      input.setAttribute("placeholder", `Input ${size}`);
+
+      row.append(button, iconOnly, toggle, input);
+      wrap.appendChild(row);
+    });
+
+    return wrap;
+  },
+  // Controles do mesmo size compartilham a altura do token --ark-size-* (min-height);
+  // o botao so de icone tambem e quadrado.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const heights: Record<ArkSize, number> = { xs: 24, sm: 28, md: 36, lg: 44, xl: 52 };
+
+    for (const [size, height] of Object.entries(heights) as [ArkSize, number][]) {
+      const row = canvasElement.querySelector<HTMLElement>(`[data-size="${size}"]`);
+      if (!row) throw new Error(`linha ${size} nao encontrada`);
+
+      const controls = [
+        row.querySelector<HTMLElement>("ark-button:not([icon-only])"),
+        row.querySelector<HTMLElement>("ark-button[icon-only]"),
+        row.querySelector<HTMLElement>("ark-toggle"),
+        row.querySelector<HTMLElement>("ark-input input")
+      ];
+
+      for (const control of controls) {
+        expect(control).not.toBeNull();
+        expect(Math.round((control as HTMLElement).getBoundingClientRect().height)).toBe(height);
+      }
+
+      const circle = row.querySelector<HTMLElement>("ark-button[icon-only]") as HTMLElement;
+      expect(Math.round(circle.getBoundingClientRect().width)).toBe(height);
+    }
+  }
+};
+
 export const Rounded = {
   render: () => {
     const wrap = document.createElement("div");
@@ -151,7 +217,7 @@ export const Rounded = {
     wrap.style.alignItems = "center";
     wrap.style.gap = "12px";
 
-    ["none", "sm", "md", "lg", "xl", "full"].forEach((rounded) => {
+    ["none", "xs", "sm", "md", "lg", "xl", "full"].forEach((rounded) => {
       const el = document.createElement("ark-button");
       el.setAttribute("rounded", rounded);
       el.textContent = rounded;

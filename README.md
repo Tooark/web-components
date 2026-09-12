@@ -77,7 +77,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 
 ### Key attributes
 
-**`ark-button`** — the host element itself is the control (`role="button"`, focus, keyboard, form participation via ElementInternals), so `aria-label`, `class` and `id` on `<ark-button>` apply directly and its children are never moved. `variant` (`solid`/`outline`/`ghost` or an intent), `intent`, `size` (`sm`–`xl`), `rounded` (`none`/`sm`/`md`/`lg`/`xl`/`full` — combined with `icon-only`, `full` yields a circular button), `loading` (spinner + `aria-busy` + blocked clicks), `icon-only` (symmetric padding), `full-width`, `href`/`target` (a stretched `<a>` covers the host, takes the focus and is named by the host content; `_blank` gets `rel="noopener noreferrer"`), `disabled`, `type`, `theme`, `color`/`text-color`.
+**`ark-button`** — the host element itself is the control (`role="button"`, focus, keyboard, form participation via ElementInternals), so `aria-label`, `class` and `id` on `<ark-button>` apply directly and its children are never moved. `variant` (`solid`/`outline`/`ghost` or an intent), `intent`, `size` (`xs`–`xl`), `rounded` (`none`/`xs`/`sm`/`md`/`lg`/`xl`/`full` — combined with `icon-only`, `full` yields a circular button), `loading` (spinner + `aria-busy` + blocked clicks), `icon-only` (square: `min-width` equals the size token), `full-width`, `href`/`target` (a stretched `<a>` covers the host, takes the focus and is named by the host content; `_blank` gets `rel="noopener noreferrer"`), `disabled`, `type`, `theme`, `color`/`text-color`.
 
 **`ark-calendar`** — `value` (`YYYY-MM-DD`, parsed in the LOCAL timezone), `min`/`max`, `lang` (`en`/`pt`/`es`/`custom` + `locale-json`), `theme`, `intent`, `accent-color`. Clickable title cycles days → months → years. Events: `events` attribute (JSON) or JS `events` property with `{ date, label?, color?, intent? }`, rendered per `event-display` (`dots` default, `count`, `list`). Emits `ark-change` with `detail: { value, date, events }`. Keyboard navigation: arrows move between days (crossing months), `Home`/`End` jump to month start/end, `PageUp`/`PageDown` switch months.
 
@@ -238,6 +238,11 @@ Every color the components use is a semantic token with a light and a dark value
 ```
 
 Each intent (`primary`, `secondary`, `success`, `warning`, `danger`, `info`, `neutral`) has `<intent>`, `-fg`, `-hover`, `-soft`, `-soft-fg`, `-border` and `-ring`; neutral surfaces are `surface`, `surface-muted`, `surface-strong`, `surface-raised`, `fg`, `fg-soft`, `fg-muted`, `fg-faint`, `fg-placeholder`, `border`, `border-strong`, `muted` and `ring`. The full list with its roles lives in [tokens.css](packages/tokens/tokens.css).
+
+Two more scales are shared by the form controls:
+
+- **`size`** (`xs`/`sm`/`md`/`lg`/`xl`) maps to the `--ark-size-*` tokens (1.5 / 1.75 / 2.25 / 2.75 / 3.25 rem, i.e. 24 to 52 px). `ark-button`, `ark-input` and `ark-toggle` apply the token as `min-height` (and as `min-width` on icon-only buttons), so controls of the same size line up in a row and overriding `--ark-size-md` resizes every control at once; `ark-switch` uses proportional track dimensions instead.
+- **`rounded`** (`none`/`xs`/`sm`/`md`/`lg`/`xl`/`full`) maps to Tailwind's radius scale (`--ark-radius-xs` … `--ark-radius-xl`, 0.125 to 0.75 rem).
 
 To reuse the same tokens as utilities (`bg-primary`, `text-fg-muted`, …) in your own Tailwind v4 project, import them in your CSS entry:
 

@@ -152,16 +152,39 @@ export class ArkInput extends HTMLElement {
     this.inputEl.required = this.hasAttribute("required");
     this.inputEl.readOnly = this.hasAttribute("readonly");
 
+    // Altura do campo pelo token --ark-size-* (min-height), igual ao ark-button.
     const sizes: Record<ArkSize, { input: string; label: string; suffixPad: string }> = {
-      sm: { input: "ark:px-2.5 ark:py-1.5 ark:text-xs", label: "ark:text-[11px]", suffixPad: "ark:pr-8" },
-      md: { input: "ark:px-3 ark:py-2 ark:text-sm", label: "ark:text-xs", suffixPad: "ark:pr-9" },
-      lg: { input: "ark:px-4 ark:py-2.5 ark:text-base", label: "ark:text-sm", suffixPad: "ark:pr-10" },
-      xl: { input: "ark:px-5 ark:py-3 ark:text-lg", label: "ark:text-base", suffixPad: "ark:pr-12" }
+      xs: {
+        input: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs",
+        label: "ark:text-[10px]",
+        suffixPad: "ark:pr-7"
+      },
+      sm: {
+        input: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs",
+        label: "ark:text-[11px]",
+        suffixPad: "ark:pr-8"
+      },
+      md: {
+        input: "ark:min-h-(--ark-size-md) ark:px-3 ark:py-1.5 ark:text-sm",
+        label: "ark:text-xs",
+        suffixPad: "ark:pr-9"
+      },
+      lg: {
+        input: "ark:min-h-(--ark-size-lg) ark:px-4 ark:py-2 ark:text-base",
+        label: "ark:text-sm",
+        suffixPad: "ark:pr-10"
+      },
+      xl: {
+        input: "ark:min-h-(--ark-size-xl) ark:px-5 ark:py-2.5 ark:text-lg",
+        label: "ark:text-base",
+        suffixPad: "ark:pr-12"
+      }
     };
     const size = sizes[(this.getAttribute("size") || "md").toLowerCase() as ArkSize] ?? sizes.md;
 
     const roundedMap: Record<ArkRounded, string> = {
       none: "ark:rounded-none",
+      xs: "ark:rounded-xs",
       sm: "ark:rounded-sm",
       md: "ark:rounded-md",
       lg: "ark:rounded-lg",

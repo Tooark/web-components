@@ -127,7 +127,8 @@
   --color-muted: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
   --color-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
 
-  /* Escala de tamanho (ex.: altura de controles) */
+  /* Escala de tamanho: altura mínima dos controles (button, input e toggle aplicam como min-height) */
+  --size-xs: 1.5rem;
   --size-sm: 1.75rem;
   --size-md: 2.25rem;
   --size-lg: 2.75rem;
@@ -139,11 +140,6 @@
  * qualquer build (consumidas pelos presets do @tooark/core e por WAAPI).
  */
 :root {
-  /* Raio de borda */
-  --ark-radius-sm: 0.25rem;
-  --ark-radius-md: 0.5rem;
-  --ark-radius-lg: 0.75rem;
-
   /* Durações — escala de 8 passos (uso previsto de cada token documentado no README, "Motion system") */
   --ark-duration-none: 0ms;
   --ark-duration-instant: 75ms;

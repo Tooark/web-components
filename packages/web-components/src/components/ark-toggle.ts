@@ -181,11 +181,13 @@ export class ArkToggle extends HTMLElement {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const palette = this.getPalette(this.getIntent());
 
+    // Mesma regra do ark-button: altura pelo token --ark-size-* (min-height).
     const sizes: Record<ArkSize, string> = {
-      sm: "ark:px-3 ark:py-1.5 ark:text-xs",
-      md: "ark:px-4 ark:py-2 ark:text-sm",
-      lg: "ark:px-5 ark:py-3 ark:text-base",
-      xl: "ark:px-6 ark:py-4 ark:text-lg"
+      xs: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs",
+      sm: "ark:min-h-(--ark-size-sm) ark:px-3 ark:py-1 ark:text-xs",
+      md: "ark:min-h-(--ark-size-md) ark:px-4 ark:py-1.5 ark:text-sm",
+      lg: "ark:min-h-(--ark-size-lg) ark:px-5 ark:py-2 ark:text-base",
+      xl: "ark:min-h-(--ark-size-xl) ark:px-6 ark:py-2.5 ark:text-lg"
     };
 
     return [base, palette.focusRing, this.pressed ? palette.pressed : palette.base, sizes[size] ?? sizes.md]

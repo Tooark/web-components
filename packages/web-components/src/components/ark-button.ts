@@ -286,23 +286,28 @@ export class ArkButton extends HTMLElement {
       ghost: palette.ghost
     };
 
+    // A altura vem do token --ark-size-* (min-height); o padding vertical fica
+    // abaixo dele para o token governar e controles do mesmo size alinharem.
     const sizes: Record<ArkSize, string> = {
-      sm: "ark:px-3 ark:py-1.5 ark:text-xs",
-      md: "ark:px-4 ark:py-2 ark:text-sm",
-      lg: "ark:px-5 ark:py-3 ark:text-base",
-      xl: "ark:px-6 ark:py-4 ark:text-lg"
+      xs: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs",
+      sm: "ark:min-h-(--ark-size-sm) ark:px-3 ark:py-1 ark:text-xs",
+      md: "ark:min-h-(--ark-size-md) ark:px-4 ark:py-1.5 ark:text-sm",
+      lg: "ark:min-h-(--ark-size-lg) ark:px-5 ark:py-2 ark:text-base",
+      xl: "ark:min-h-(--ark-size-xl) ark:px-6 ark:py-2.5 ark:text-lg"
     };
 
-    // Padding simétrico para botão só de ícone (quadrado; vira círculo com rounded="full").
+    // Botão só de ícone: quadrado (min-width = min-height = token); vira círculo com rounded="full".
     const iconOnlySizes: Record<ArkSize, string> = {
-      sm: "ark:p-1.5 ark:text-xs",
-      md: "ark:p-2 ark:text-sm",
-      lg: "ark:p-3 ark:text-base",
-      xl: "ark:p-4 ark:text-lg"
+      xs: "ark:min-h-(--ark-size-xs) ark:min-w-(--ark-size-xs) ark:p-0.5 ark:text-xs",
+      sm: "ark:min-h-(--ark-size-sm) ark:min-w-(--ark-size-sm) ark:p-1 ark:text-xs",
+      md: "ark:min-h-(--ark-size-md) ark:min-w-(--ark-size-md) ark:p-1.5 ark:text-sm",
+      lg: "ark:min-h-(--ark-size-lg) ark:min-w-(--ark-size-lg) ark:p-2 ark:text-base",
+      xl: "ark:min-h-(--ark-size-xl) ark:min-w-(--ark-size-xl) ark:p-2.5 ark:text-lg"
     };
 
     const roundedMap: Record<ArkRounded, string> = {
       none: "ark:rounded-none",
+      xs: "ark:rounded-xs",
       sm: "ark:rounded-sm",
       md: "ark:rounded-md",
       lg: "ark:rounded-lg",

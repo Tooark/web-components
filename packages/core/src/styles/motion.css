@@ -253,7 +253,7 @@
 .ark-skeleton {
   animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
   background-color: color-mix(in oklch, var(--ark-color-muted, oklch(0.7 0.02 264)) 30%, transparent);
-  border-radius: var(--ark-radius-md, 0.5rem);
+  border-radius: var(--ark-radius-lg, 0.5rem);
 }
 
 /* Loading contínuos não devem rodar com movimento reduzido */

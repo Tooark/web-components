@@ -8,7 +8,7 @@ const meta = {
     disabled: { control: "boolean" },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg", "xl"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     label: { control: "text" }
   },
   args: {
