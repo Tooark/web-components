@@ -1,5 +1,6 @@
 import type { ArkDatepickerLocale } from "./types";
 
+/** Strings de calendário em português. */
 export const pt: ArkDatepickerLocale = {
   months: [
     "Janeiro",
@@ -16,6 +17,7 @@ export const pt: ArkDatepickerLocale = {
     "Dezembro"
   ],
   monthsShort: ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"],
+  monthsMin: ["J", "F", "M", "A", "M", "J", "J", "A", "S", "O", "N", "D"],
   weekdays: ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
   weekdaysShort: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
   weekdaysMin: ["D", "S", "T", "Q", "Q", "S", "S"],
@@ -34,6 +36,7 @@ export const pt: ArkDatepickerLocale = {
   day: "Dia",
   month: "Mês",
   agenda: "Agenda",
+  holiday: "Feriado",
   allDay: "Dia inteiro",
   noEvents: "Sem eventos"
 };
