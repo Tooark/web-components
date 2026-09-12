@@ -1,11 +1,18 @@
 // Primitivas de design vêm de @tooark/tokens (reexportadas para compatibilidade).
 import type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected } from "@tooark/tokens";
 
+// Reexporta tipos primitivos de design do pacote @tooark/tokens.
 export type { ArkIntent, ArkRounded, ArkSize, ArkStyleVariant, ArkTheme, ArkThemeSelected };
 
 // Exports types globais (específicos de comportamento de componente)
+
+/** Rigidez do encaixe do carrossel: "mandatory" sempre encaixa, "proximity" só quando o slide está perto. */
 export type ArkCarouselSnap = "mandatory" | "proximity";
+
+/** Tipo do toast, que define o ícone e a cor do card. */
 export type ArkToastType = "default" | "success" | "info" | "warning" | "error" | "loading";
+
+/** Canto da tela onde a pilha de toasts é ancorada. */
 export type ArkToastPosition =
   | "top-left"
   | "top-center"
@@ -15,182 +22,322 @@ export type ArkToastPosition =
   | "bottom-right";
 
 // Exports types específicos do componente button
+
+/** Papel do botão no formulário, como o type do <button> nativo. */
 export type ArkButtonType = "button" | "submit" | "reset";
+
+/** Aparência do botão: uma variante de estilo ou um intent semântico. */
 export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 
 // Exports types específicos do componente datepicker
+
+/** Idioma dos rótulos; "custom" usa as strings fornecidas em locale-json. */
 export type ArkDatepickerLang = "en" | "pt" | "es" | "custom";
 
+// Exports types específicos de estilo do componente button
+
+/** Props de estilo e comportamento do ark-button. */
 export type ArkButtonStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Aparência: variante de estilo ou intent. Padrão: "primary". */
   variant?: ArkButtonVariant;
+  /** Intenção semântica de cor. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Altura do controle via token --ark-size-*. Padrão: "md". */
   size?: ArkSize;
+  /** Arredondamento da borda. Padrão: "md" ("full" com iconOnly gera um botão circular). */
   rounded?: ArkRounded;
+  /** Mostra o spinner, marca aria-busy e bloqueia o clique. */
   loading?: boolean;
+  /** Botão quadrado, com min-width igual ao token de tamanho. */
   iconOnly?: boolean;
+  /** Ocupa toda a largura disponível. */
   fullWidth?: boolean;
+  /** Vira link: um <a> esticado cobre o host e recebe o foco. */
   href?: string;
+  /** Alvo do link; "_blank" ganha rel="noopener noreferrer" automaticamente. */
   target?: string;
+  /** Cor de fundo CSS custom, com precedência sobre variant/intent. */
   color?: string;
+  /** Cor do texto CSS custom, usada junto de color. */
   textColor?: string;
 };
 
+/** Props de estilo e comportamento do ark-switch. */
 export type ArkSwitchStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Intenção semântica de cor do trilho ligado. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Tamanho do switch, que tem tabela de proporções própria. Padrão: "md". */
   size?: ArkSize;
+  /** Estado ligado. */
   checked?: boolean;
+  /** Mostra os rótulos de estado dentro do trilho. */
   labels?: boolean;
+  /** Texto do estado ligado quando labels está ativo. Padrão: "ON". */
   labelOn?: string;
+  /** Texto do estado desligado quando labels está ativo. Padrão: "OFF". */
   labelOff?: string;
+  /** Mostra os ícones de check/cruz no polegar. */
   icons?: boolean;
+  /** Cor CSS custom do trilho ligado, com precedência sobre intent. */
   color?: string;
 };
 
+/** Props de estilo e comportamento do ark-toggle. */
 export type ArkToggleStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Intenção semântica de cor. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Altura do controle via token --ark-size-*. Padrão: "md". */
   size?: ArkSize;
+  /** Estado pressionado (aria-pressed). */
   pressed?: boolean;
+  /** Valor que identifica o item dentro de um ark-toggle-group. */
   value?: string;
 };
 
+/** Props de estilo e comportamento do ark-toggle-group. */
 export type ArkToggleGroupStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Intenção semântica de cor, propagada aos itens. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Altura dos itens via token --ark-size-*, propagada a eles. Padrão: "md". */
   size?: ArkSize;
+  /** Valor selecionado; lista separada por vírgula quando multiple está ativo. */
   value?: string;
+  /** Permite mais de um item selecionado. Padrão: seleção exclusiva. */
   multiple?: boolean;
 };
 
+/** Evento exibido como marcador num dia do ark-calendar. */
 export type ArkCalendarEvent = {
   /** Data do evento em YYYY-MM-DD. */
   date: string;
+  /** Texto do evento, mostrado no modo "list" e no title do marcador. */
   label?: string;
   /** Cor CSS custom do marcador; tem precedência sobre intent. */
   color?: string;
+  /** Intenção semântica de cor do marcador. Padrão: "primary". */
   intent?: ArkIntent;
 };
 
+/** Forma de exibir os eventos de um dia na grade do calendário. */
 export type ArkCalendarEventDisplay = "dots" | "count" | "list";
 
+/** Props de estilo e comportamento do ark-calendar. */
 export type ArkCalendarStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor da seleção e do dia de hoje. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Cor CSS custom de destaque, com precedência sobre intent. */
   accentColor?: string;
+  /** Eventos exibidos na grade; equivale ao atributo events em JSON. */
   events?: ArkCalendarEvent[];
+  /** Forma de exibir os eventos do dia. Padrão: "dots". */
   eventDisplay?: ArkCalendarEventDisplay;
 };
 
+/** Partes editáveis do datepicker, que definem o formato do valor emitido. */
 export type ArkDatepickerMode = "datetime" | "date" | "time";
 
+/** Props de estilo e comportamento do ark-datepicker. */
 export type ArkDatepickerStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor, repassada aos painéis internos. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Cor CSS custom de destaque, com precedência sobre intent. */
   accentColor?: string;
+  /** Partes editáveis. Padrão: "datetime", com valor YYYY-MM-DDTHH:mm:ss. */
   mode?: ArkDatepickerMode;
+  /** Renderiza campo + popup; sem isso, os painéis ficam inline. */
   input?: boolean;
+  /** Texto do campo vazio; só tem efeito com input. */
   placeholder?: string;
+  /** Nome no formulário; o valor ISO é submetido por um input hidden. */
   name?: string;
+  /**
+   * Formato de exibição do campo, com os tokens YYYY MM DD HH mm ss (sensível a
+   * maiúsculas). Padrão: "MM/DD/YYYY HH:mm" em en e "DD/MM/YYYY HH:mm" nos demais.
+   */
   format?: string;
+  /** Inclui segundos no valor e na coluna de tempo. */
   seconds?: boolean;
+  /** Bloqueia a interação no campo e nos painéis. */
   disabled?: boolean;
-  /** Repassados ao ark-calendar interno. */
+  /** Eventos repassados ao ark-calendar interno. */
   events?: ArkCalendarEvent[];
+  /** Forma de exibição dos eventos, repassada ao ark-calendar interno. Padrão: "dots". */
   eventDisplay?: ArkCalendarEventDisplay;
-  /** Repassados ao ark-clock interno. */
+  /** Passo da coluna de minutos do ark-clock interno. Padrão: 1. */
   stepMinutes?: number;
+  /** Exibição das horas no ark-clock interno; o valor continua em 24h. Padrão: "24". */
   hoursFormat?: "24" | "12";
 };
 
+/** Modo de visualização da agenda. */
 export type ArkSchedulerView = "week" | "day" | "month" | "agenda";
 
+/** Evento posicionado na grade do ark-scheduler. */
 export type ArkSchedulerEvent = {
+  /** Identificador devolvido em ark-event-click. */
   id?: string;
+  /** Título mostrado no bloco do evento. */
   title: string;
   /** Início: "YYYY-MM-DDTHH:mm" (ou "YYYY-MM-DD" quando allDay). */
   start: string;
   /** Fim; ausente equivale a 1 hora após o início. */
   end?: string;
+  /** Evento de dia inteiro: vai para a faixa acima da grade de horas. */
   allDay?: boolean;
+  /** Local mostrado junto do título quando há espaço no bloco. */
   location?: string;
   /** Cor CSS custom; tem precedência sobre intent. */
   color?: string;
+  /** Intenção semântica de cor do bloco. Padrão: "primary". */
   intent?: ArkIntent;
 };
 
+/** Props de estilo e comportamento do ark-scheduler. */
 export type ArkSchedulerStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor dos eventos e da linha de agora. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Visualização atual, sincronizada ao trocar pelo seletor. Padrão: "week". */
   view?: ArkSchedulerView;
+  /** Data de referência em YYYY-MM-DD, sincronizada ao navegar. */
   date?: string;
+  /** Eventos da agenda; equivale ao atributo events em JSON. */
   events?: ArkSchedulerEvent[];
+  /** Primeira hora visível nas views de horário. Padrão: 0. */
   hourStart?: number;
+  /** Última hora visível nas views de horário. Padrão: 24. */
   hourEnd?: number;
+  /** Duração de cada faixa da grade em minutos, de 15 a 60. Padrão: 60. */
   slotMinutes?: number;
+  /** Exibição das horas na régua. Padrão: "24". */
   hoursFormat?: "24" | "12";
+  /** Limita o seletor de views, separadas por vírgula (ex.: "day,week"). */
   views?: string;
 };
 
+/** Props de estilo do ark-input. */
 export type ArkInputStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor do foco e da borda. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Altura do campo via token --ark-size-*. Padrão: "md". */
   size?: ArkSize;
+  /** Arredondamento da borda do campo. Padrão: "lg". */
   rounded?: ArkRounded;
 };
 
+/** Props de estilo e comportamento do ark-clock. */
 export type ArkClockStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor da opção selecionada. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Mostra a coluna de segundos. */
   seconds?: boolean;
+  /** Passo da coluna de minutos. Padrão: 1. */
   stepMinutes?: number;
+  /** "12" adiciona a coluna AM/PM; o valor continua em 24h. Padrão: "24". */
   hoursFormat?: "24" | "12";
 };
 
+/** Props de estilo e comportamento do ark-carousel. */
 export type ArkCarouselStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Intenção semântica de cor das setas e dos dots. Padrão: "primary". */
   intent?: ArkIntent;
+  /** Cor CSS custom de destaque, com precedência sobre intent. */
   accentColor?: string;
+  /** Slides visíveis por vez. Padrão: 1. */
   slidesPerView?: number;
+  /** Espaço entre slides em px. Padrão: 12. */
   gap?: number;
+  /** Slide mostrado na montagem. Padrão: 0. */
   startIndex?: number;
+  /** Volta ao primeiro slide ao passar do último. */
   loop?: boolean;
+  /** Avança sozinho; pausa em hover/foco e desliga com prefers-reduced-motion. */
   autoplay?: boolean;
+  /** Intervalo do autoplay em ms. Padrão: 4200. */
   autoplayDelay?: number;
+  /** Mostra os indicadores de slide. Padrão: true. */
   showDots?: boolean;
+  /** Mostra as setas de navegação. Padrão: true. */
   showArrows?: boolean;
+  /** Arrasto livre, sem encaixar no slide mais próximo ao soltar. */
   dragFree?: boolean;
+  /** Rigidez do encaixe da rolagem. Padrão: "mandatory". */
   snap?: ArkCarouselSnap;
 };
 
+/** Props de estilo e comportamento do ark-toaster. */
 export type ArkToasterStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
   testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Canto da tela onde a pilha é ancorada. Padrão: "bottom-right". */
   position?: ArkToastPosition;
+  /** Colore o card inteiro conforme o tipo, em vez de só o ícone. */
   richColors?: boolean;
+  /** Mostra o botão de fechar em cada toast. Padrão: true. */
   closeButton?: boolean;
+  /** Toasts visíveis ao mesmo tempo; o excedente espera na fila. Padrão: 4. */
   maxVisible?: number;
+  /** Tempo em tela em ms; 0 mantém o toast até ser fechado. Padrão: 4000. */
   duration?: number;
 };
 
+/** Conteúdo e comportamento de um toast disparado pelo serviço toast. */
 export type ArkToastOptions = {
+  /** Identificador para dispensar depois; gerado automaticamente quando ausente. */
   id?: string;
+  /** Texto principal do toast. */
   title: string;
+  /** Texto secundário, abaixo do título. */
   description?: string;
+  /** Tipo, que define o ícone e a cor. Padrão: "default". */
   type?: ArkToastType;
+  /** Sobrescreve a duração do toaster em ms; 0 mantém até ser fechado. */
   duration?: number;
+  /** Rótulo do botão de ação; sem ele o botão não aparece. */
   actionLabel?: string;
+  /** Devolvido em ark-toast-action ao clicar na ação. */
   actionId?: string;
+  /** Rótulo do botão de cancelar, que apenas dispensa o toast. */
   cancelLabel?: string;
 };
