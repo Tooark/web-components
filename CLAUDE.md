@@ -66,7 +66,7 @@ Rollup builds ESM + CJS + a bundled `.d.ts` for tokens/core/web-components/chart
 
 ### Tokens and theming
 
-`packages/tokens/tokens.css` defines a `@theme static` block of semantic colors (`primary|secondary|success|warning|danger|info|neutral` x `-fg/-hover/-soft/-soft-fg/-border/-ring`, plus `surface*`, `fg*`, `border*`, `muted`, `ring`), sizes, radii and motion tokens (`--ark-duration-*`, `--ark-ease-*`, `--ark-motion-distance`, zeroed under `prefers-reduced-motion`). Every color is `light-dark(...)`, so theme switching is pure CSS. Inside the component build these become `--ark-color-*` variables and `ark:bg-primary`-style utilities. `src/motion.ts` mirrors the motion tokens as JS constants used as WAAPI fallbacks. Custom properties outside `@theme` use the `--ark-` prefix.
+`packages/tokens/tokens.css` defines a `@theme static` block of semantic colors (`primary|secondary|success|warning|danger|info|neutral` x `-fg/-hover/-soft/-soft-fg/-border/-ring`, plus `surface*`, `fg*`, `border*`, `muted`, `ring`), sizes, radii and motion tokens (`--ark-duration-*` on the eight-step scale `none|instant|quick|default|moderate|gentle|slow|long` = 0/75/150/250/350/500/700/1000 ms, `--ark-ease-linear|standard|in|out|in-out|overshoot`, `--ark-motion-distance`, zeroed under `prefers-reduced-motion`). Every color is `light-dark(...)`, so theme switching is pure CSS. Inside the component build these become `--ark-color-*` variables and `ark:bg-primary`-style utilities. `src/motion.ts` mirrors the motion tokens as JS constants used as WAAPI fallbacks. Custom properties outside `@theme` use the `--ark-` prefix.
 
 ### Component authoring pattern (`packages/web-components/src/components`)
 

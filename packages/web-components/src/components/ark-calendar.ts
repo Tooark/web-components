@@ -746,7 +746,7 @@ export class ArkCalendar extends HTMLElement {
     // Slide direcional do grid só na navegação por clique nas setas — a troca de
     // mês via teclado é instantânea para não atrasar o movimento do foco.
     if (this.navDirection) {
-      arkEnter(grid, this.navDirection === "next" ? "slide-left" : "slide-right", { duration: "fast" });
+      arkEnter(grid, this.navDirection === "next" ? "slide-left" : "slide-right", { duration: "quick" });
       this.navDirection = null;
     }
 
@@ -754,7 +754,7 @@ export class ArkCalendar extends HTMLElement {
     if (this.justSelectedISO) {
       const selectedCell = container.querySelector<HTMLElement>(`[data-date="${this.justSelectedISO}"]`);
       if (selectedCell) {
-        arkEnter(selectedCell, "scale", { duration: "fast" });
+        arkEnter(selectedCell, "scale", { duration: "quick" });
       }
       this.justSelectedISO = null;
     }

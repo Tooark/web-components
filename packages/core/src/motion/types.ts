@@ -5,7 +5,7 @@ export type ArkMotionPreset = "fade" | "slide-up" | "slide-down" | "slide-left" 
 
 /** Opções de uma animação de entrada/saída. */
 export type ArkMotionOptions = {
-  /** Token de duração ou valor em ms. Padrão: "normal". */
+  /** Token de duração ou valor em ms. Padrão: "default". */
   duration?: ArkDuration | number;
   /** Token de easing ou string CSS (ex.: "ease-in-out"). Padrão: "out". */
   easing?: ArkEasing | string;

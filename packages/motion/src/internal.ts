@@ -2,13 +2,14 @@ import type { ArkDuration, ArkEasing, ArkMotionPreset } from "@tooark/core";
 import { ARK_DURATION_MS, ARK_MOTION_DISTANCE, prefersReducedMotion } from "@tooark/core";
 import type { ArkMotionTargets } from "./types";
 
-/** Curvas dos tokens --ark-ease-* no formato aceito pela lib Motion. */
+/** Curvas dos tokens --ark-ease-* no formato aceito pela lib Motion (linear = bezier identidade). */
 export const ARK_EASE_BEZIER: Record<ArkEasing, [number, number, number, number]> = {
+  linear: [0, 0, 1, 1],
   standard: [0.2, 0, 0, 1],
   in: [0.4, 0, 1, 1],
   out: [0, 0, 0.2, 1],
   "in-out": [0.4, 0, 0.2, 1],
-  spring: [0.34, 1.56, 0.64, 1]
+  overshoot: [0.34, 1.56, 0.64, 1]
 };
 
 export function resolveTargets(targets: ArkMotionTargets): HTMLElement[] {

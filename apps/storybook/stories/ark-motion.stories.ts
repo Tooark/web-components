@@ -1,5 +1,5 @@
-import type { ArkMotionPreset } from "@tooark/core";
-import { arkEnter, arkExit } from "@tooark/core";
+import type { ArkDuration, ArkEasing, ArkMotionPreset } from "@tooark/core";
+import { ARK_DURATION_MS, ARK_EASING_CSS, arkEnter, arkExit } from "@tooark/core";
 
 const meta = {
   title: "Core/ArkMotion",
@@ -141,7 +141,7 @@ export const Tokens = {
 
     const durations = createSection("Duracoes — clique em uma barra para ver a duracao");
     durations.grid.className = "flex flex-col gap-2";
-    for (const name of ["instant", "fast", "normal", "slow", "slower"]) {
+    for (const name of Object.keys(ARK_DURATION_MS) as ArkDuration[]) {
       const row = document.createElement("button");
       row.type = "button";
       row.className =
@@ -151,6 +151,11 @@ export const Tokens = {
       label.className = "w-44 shrink-0";
       label.textContent = `--ark-duration-${name}`;
       row.appendChild(label);
+
+      const value = document.createElement("span");
+      value.className = "w-14 shrink-0 tabular-nums text-slate-400";
+      value.textContent = `${ARK_DURATION_MS[name]}ms`;
+      row.appendChild(value);
 
       const track = document.createElement("div");
       track.className = "relative h-2 flex-1 rounded-full bg-slate-100";
@@ -174,9 +179,10 @@ export const Tokens = {
 
     const easings = createSection("Easings — clique para comparar as curvas");
     easings.grid.className = "flex flex-col gap-2";
-    for (const name of ["standard", "in", "out", "in-out", "spring"]) {
+    for (const name of Object.keys(ARK_EASING_CSS) as ArkEasing[]) {
       const row = document.createElement("button");
       row.type = "button";
+      row.title = ARK_EASING_CSS[name];
       row.className =
         "flex items-center gap-3 rounded-lg border border-slate-200 bg-white p-3 text-left text-xs text-slate-600 shadow-sm";
 
@@ -191,7 +197,7 @@ export const Tokens = {
       dot.className = "absolute left-0 top-0 h-4 w-4 rounded-full bg-slate-700";
       dot.style.transitionProperty = "left";
       dot.style.transitionTimingFunction = `var(--ark-ease-${name})`;
-      dot.style.transitionDuration = "var(--ark-duration-slower)";
+      dot.style.transitionDuration = "var(--ark-duration-slow)";
       track.appendChild(dot);
       row.appendChild(track);
 

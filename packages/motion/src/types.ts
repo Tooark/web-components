@@ -9,7 +9,7 @@ export type ArkMotionTargets = string | Element | Element[] | NodeListOf<Element
 export type ArkMotionPlusOptions = {
   /** Preset de transição. Padrão: "slide-up". */
   preset?: ArkMotionPreset;
-  /** Token de duração ou valor em ms. Padrão: "normal". */
+  /** Token de duração ou valor em ms. Padrão: "default". */
   duration?: ArkDuration | number;
   /** Token de easing ou curva custom (array cubic-bezier ou nome da lib Motion). */
   ease?: ArkEasing | number[] | string;

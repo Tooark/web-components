@@ -922,7 +922,7 @@ export class ArkScheduler extends HTMLElement {
     // Motion: slide direcional ao navegar no período (tokens zeram a duração
     // quando o usuário pede movimento reduzido).
     if (this.navDirection) {
-      arkEnter(body, this.navDirection === "next" ? "slide-left" : "slide-right", { duration: "fast" });
+      arkEnter(body, this.navDirection === "next" ? "slide-left" : "slide-right", { duration: "quick" });
       this.navDirection = null;
     }
   }

@@ -105,9 +105,33 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 
 O motion é desenhado em três camadas para que os componentes permaneçam livres de dependências:
 
-1. **Tokens** (`@tooark/tokens`) — durações (`--ark-duration-instant…slower`), curvas de easing (`--ark-ease-standard/in/out/in-out/spring`) e a distância de slide. `prefers-reduced-motion` zera todas as durações na camada de tokens, cobrindo o sistema inteiro de uma vez.
+1. **Tokens** (`@tooark/tokens`) — durações (`--ark-duration-none/instant/quick/default/moderate/gentle/slow/long`, 0–1000 ms), curvas de easing (`--ark-ease-linear/standard/in/out/in-out/overshoot`) e a distância de slide. `prefers-reduced-motion` zera todas as durações na camada de tokens, cobrindo o sistema inteiro de uma vez.
 2. **Presets** (`@tooark/core`) — keyframes/classes CSS sem dependência (`.ark-animate-*`, `.ark-skeleton`) e helpers WAAPI (`arkEnter`, `arkExit`) usados pelos próprios componentes (ex.: entrada/saída dos toasts).
 3. **`@tooark/motion`** (opt-in) — `arkStaggerEnter`, `arkReveal`, `arkFlip` e `arkSwipe` sobre a lib Motion, para física de spring e efeitos dirigidos por scroll. Só os projetos que instalam este pacote pagam pela lib.
+
+Escala de duração (`ArkDuration` no TypeScript, `--ark-duration-*` no CSS, `ARK_DURATION_MS` como espelho em JS). Todos os helpers (`arkEnter`, `arkExit`, `@tooark/motion`) aceitam tanto o nome do token quanto um número em milissegundos:
+
+| Token      | Valor   | Uso previsto                                                                                     |
+| ---------- | ------- | ------------------------------------------------------------------------------------------------ |
+| `none`     | 0 ms    | Desliga a transição (o valor de todos os tokens sob `prefers-reduced-motion`).                   |
+| `instant`  | 75 ms   | Microfeedback: hover, anel de foco, estado pressionado.                                          |
+| `quick`    | 150 ms  | Elementos pequenos entrando/saindo (popups, tooltips, grade do calendário); padrão do `arkExit`. |
+| `default`  | 250 ms  | Padrão do `arkEnter`, do `arkStaggerEnter` e dos presets `.ark-animate-*`.                       |
+| `moderate` | 350 ms  | Feedback enfático (`.ark-animate-shake`) e superfícies médias.                                   |
+| `gentle`   | 500 ms  | Superfícies grandes: painéis, drawers, transições de página.                                     |
+| `slow`     | 700 ms  | Sequências orquestradas e listas escalonadas.                                                    |
+| `long`     | 1000 ms | Movimento ambiente: loaders, progresso, loops de atenção.                                        |
+
+Curvas de easing (`ArkEasing` no TypeScript, `--ark-ease-*` no CSS, `ARK_EASING_CSS` como espelho em JS). Os helpers também aceitam qualquer timing function CSS em string, e o `@tooark/motion` aceita um array cubic-bezier ou um nome de easing da lib Motion:
+
+| Token       | Curva                               | Uso previsto                                                                                                            |
+| ----------- | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `linear`    | `linear`                            | Movimento contínuo: spinners, progresso, marquee (`.ark-animate-spin`).                                                 |
+| `standard`  | `cubic-bezier(0.2, 0, 0, 1)`        | Transições gerais entre estados na tela.                                                                                |
+| `in`        | `cubic-bezier(0.4, 0, 1, 1)`        | Saídas acelerando; padrão do `arkExit`.                                                                                 |
+| `out`       | `cubic-bezier(0, 0, 0.2, 1)`        | Entradas desacelerando; padrão do `arkEnter`, do `arkStaggerEnter` e dos presets `.ark-animate-*`.                      |
+| `in-out`    | `cubic-bezier(0.4, 0, 0.2, 1)`      | Mudanças de estado simétricas: shake, pulse, skeleton.                                                                  |
+| `overshoot` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Entradas lúdicas que passam do ponto e acomodam (`backOut` do Motion). Para física de mola real use o `@tooark/motion`. |
 
 ---
 

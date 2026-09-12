@@ -619,7 +619,7 @@ export class ArkDatepicker extends HTMLElement {
     this.popupEl.hidden = false;
     this.inputComp?.inputElement?.setAttribute("aria-expanded", "true");
     document.addEventListener("pointerdown", this.handleOutsidePointer, true);
-    arkEnter(this.popupEl, "slide-down", { duration: "fast", distance: "0.5rem" });
+    arkEnter(this.popupEl, "slide-down", { duration: "quick", distance: "0.5rem" });
   }
 
   private closePopup(focusInput = false): void {
@@ -629,7 +629,7 @@ export class ArkDatepicker extends HTMLElement {
     document.removeEventListener("pointerdown", this.handleOutsidePointer, true);
 
     const popup = this.popupEl;
-    arkExit(popup, "fade", { duration: "fast" }).then(() => {
+    arkExit(popup, "fade", { duration: "quick" }).then(() => {
       if (!this.popupOpen) popup.hidden = true;
     });
 

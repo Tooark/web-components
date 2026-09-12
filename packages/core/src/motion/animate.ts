@@ -94,7 +94,7 @@ export function arkEnter(
     { opacity: 0, transform: hiddenTransform(preset, distance) },
     { opacity: 1, transform: "none" }
   ];
-  return runAnimation(element, keyframes, options, { duration: "normal", easing: "out" }, "backwards");
+  return runAnimation(element, keyframes, options, { duration: "default", easing: "out" }, "backwards");
 }
 
 /**
@@ -111,5 +111,5 @@ export function arkExit(
     { opacity: 1, transform: "none" },
     { opacity: 0, transform: hiddenTransform(preset, distance) }
   ];
-  return runAnimation(element, keyframes, options, { duration: "fast", easing: "in" }, "forwards");
+  return runAnimation(element, keyframes, options, { duration: "quick", easing: "in" }, "forwards");
 }

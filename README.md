@@ -105,9 +105,33 @@ The monorepo is organized in layers — each package only depends on the layers 
 
 Motion is designed in three layers so the components stay dependency-free:
 
-1. **Tokens** (`@tooark/tokens`) — durations (`--ark-duration-instant…slower`), easing curves (`--ark-ease-standard/in/out/in-out/spring`) and the slide distance. `prefers-reduced-motion` zeroes every duration at the token level, covering the whole system at once.
+1. **Tokens** (`@tooark/tokens`) — durations (`--ark-duration-none/instant/quick/default/moderate/gentle/slow/long`, 0–1000 ms), easing curves (`--ark-ease-linear/standard/in/out/in-out/overshoot`) and the slide distance. `prefers-reduced-motion` zeroes every duration at the token level, covering the whole system at once.
 2. **Presets** (`@tooark/core`) — zero-dependency CSS keyframes/classes (`.ark-animate-*`, `.ark-skeleton`) and WAAPI helpers (`arkEnter`, `arkExit`) used by the components themselves (e.g. toast enter/exit).
 3. **`@tooark/motion`** (opt-in) — `arkStaggerEnter`, `arkReveal`, `arkFlip` and `arkSwipe` on top of the Motion library, for spring physics and scroll-driven effects. Only projects that install this package pay for the library.
+
+Duration scale (`ArkDuration` in TypeScript, `--ark-duration-*` in CSS, `ARK_DURATION_MS` as the JS mirror). Every helper (`arkEnter`, `arkExit`, `@tooark/motion`) accepts either a token name or a raw number in milliseconds:
+
+| Token      | Value   | Intended use                                                                              |
+| ---------- | ------- | ----------------------------------------------------------------------------------------- |
+| `none`     | 0 ms    | Disables the transition (what every token becomes under `prefers-reduced-motion`).        |
+| `instant`  | 75 ms   | Micro-feedback: hover, focus ring, pressed state.                                         |
+| `quick`    | 150 ms  | Small elements entering/leaving (popups, tooltips, calendar grid); default for `arkExit`. |
+| `default`  | 250 ms  | Default for `arkEnter`, `arkStaggerEnter` and the `.ark-animate-*` presets.               |
+| `moderate` | 350 ms  | Emphatic feedback (`.ark-animate-shake`) and medium-sized surfaces.                       |
+| `gentle`   | 500 ms  | Large surfaces: panels, drawers, page-level transitions.                                  |
+| `slow`     | 700 ms  | Orchestrated sequences and staggered lists.                                               |
+| `long`     | 1000 ms | Ambient motion: loaders, progress, attention loops.                                       |
+
+Easing curves (`ArkEasing` in TypeScript, `--ark-ease-*` in CSS, `ARK_EASING_CSS` as the JS mirror). The helpers also accept any CSS timing function as a string, and `@tooark/motion` accepts a cubic-bezier array or a Motion easing name:
+
+| Token       | Curve                               | Intended use                                                                                                 |
+| ----------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `linear`    | `linear`                            | Continuous motion: spinners, progress, marquee (`.ark-animate-spin`).                                        |
+| `standard`  | `cubic-bezier(0.2, 0, 0, 1)`        | General-purpose transitions between on-screen states.                                                        |
+| `in`        | `cubic-bezier(0.4, 0, 1, 1)`        | Accelerating exits; default for `arkExit`.                                                                   |
+| `out`       | `cubic-bezier(0, 0, 0.2, 1)`        | Decelerating enters; default for `arkEnter`, `arkStaggerEnter` and the `.ark-animate-*` presets.             |
+| `in-out`    | `cubic-bezier(0.4, 0, 0.2, 1)`      | Symmetric state changes: shake, pulse, skeleton.                                                             |
+| `overshoot` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Playful enters that overshoot and settle (Motion's `backOut`). For real spring physics use `@tooark/motion`. |
 
 ---
 

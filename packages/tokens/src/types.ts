@@ -14,10 +14,10 @@ export type ArkStyleVariant = "solid" | "outline" | "ghost";
 export type ArkRounded = "none" | "sm" | "md" | "lg" | "xl" | "full";
 
 /** Escala de duração de animações. */
-export type ArkDuration = "instant" | "fast" | "normal" | "slow" | "slower";
+export type ArkDuration = "none" | "instant" | "quick" | "default" | "moderate" | "gentle" | "slow" | "long";
 
 /** Curvas de easing de animações. */
-export type ArkEasing = "standard" | "in" | "out" | "in-out" | "spring";
+export type ArkEasing = "linear" | "standard" | "in" | "out" | "in-out" | "overshoot";
 
 /** Tema resolvido (sem "auto"). */
 export type ArkThemeSelected = "light" | "dark";

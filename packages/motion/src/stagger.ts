@@ -29,7 +29,7 @@ export async function arkStaggerEnter(targets: ArkMotionTargets, options: ArkSta
   if (offset.scale !== undefined) keyframes.scale = [offset.scale, 1];
 
   await animate(elements, keyframes, {
-    duration: resolveDurationSec(options.duration, "normal"),
+    duration: resolveDurationSec(options.duration, "default"),
     ease: resolveEase(options.ease) as never,
     delay: stagger((options.interval ?? 60) / 1000, { from: options.from ?? "first" })
   });
