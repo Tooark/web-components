@@ -33,28 +33,28 @@
  *   border / border-strong / muted (controles apagados) / ring (foco padrão)
  */
 @theme static {
-  /* ---------- primary (slate) ---------- */
-  --color-primary: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
-  --color-primary-fg: light-dark(#fff, oklch(20.8% 0.042 265.755));
-  --color-primary-hover: light-dark(oklch(27.9% 0.041 260.031), #fff);
-  --color-primary-soft: light-dark(oklch(98.4% 0.003 247.858), oklch(27.9% 0.041 260.031));
-  --color-primary-soft-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
-  --color-primary-border: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
-  --color-primary-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
+  /* ---------- primary (amber, cor do Tooark: themes/tooark.css) ---------- */
+  --color-primary: light-dark(#b45309, #f59e0b);
+  --color-primary-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
+  --color-primary-hover: light-dark(#92400e, #fbbf24);
+  --color-primary-soft: light-dark(#fffbeb, color-mix(in oklab, #78350f 40%, transparent));
+  --color-primary-soft-fg: light-dark(#b45309, #fbbf24);
+  --color-primary-border: light-dark(#d97706, #f59e0b);
+  --color-primary-ring: light-dark(#d97706, #f59e0b);
 
-  /* ---------- secondary (slate, tom médio) ---------- */
-  --color-secondary: light-dark(oklch(37.2% 0.044 257.287), oklch(86.9% 0.022 252.894));
+  /* ---------- secondary (slate, "tinta": era o primary) ---------- */
+  --color-secondary: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
   --color-secondary-fg: light-dark(#fff, oklch(20.8% 0.042 265.755));
-  --color-secondary-hover: light-dark(oklch(44.6% 0.043 257.281), oklch(92.9% 0.013 255.508));
+  --color-secondary-hover: light-dark(oklch(27.9% 0.041 260.031), #fff);
   --color-secondary-soft: light-dark(oklch(98.4% 0.003 247.858), oklch(27.9% 0.041 260.031));
-  --color-secondary-soft-fg: light-dark(oklch(37.2% 0.044 257.287), oklch(92.9% 0.013 255.508));
+  --color-secondary-soft-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(96.8% 0.007 247.896));
   --color-secondary-border: light-dark(oklch(86.9% 0.022 252.894), oklch(44.6% 0.043 257.281));
   --color-secondary-ring: light-dark(oklch(70.4% 0.04 256.788), oklch(55.4% 0.046 257.417));
 
   /* ---------- success (emerald) ---------- */
-  --color-success: light-dark(oklch(59.6% 0.145 163.225), oklch(69.6% 0.17 162.48));
+  --color-success: light-dark(oklch(50.8% 0.118 165.612), oklch(69.6% 0.17 162.48));
   --color-success-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
-  --color-success-hover: light-dark(oklch(69.6% 0.17 162.48), oklch(76.5% 0.177 163.223));
+  --color-success-hover: light-dark(oklch(59.6% 0.145 163.225), oklch(76.5% 0.177 163.223));
   --color-success-soft: light-dark(
     oklch(97.9% 0.021 166.113),
     color-mix(in oklab, oklch(26.2% 0.051 172.552) 40%, transparent)
@@ -63,21 +63,21 @@
   --color-success-border: light-dark(oklch(84.5% 0.143 164.978), oklch(59.6% 0.145 163.225));
   --color-success-ring: light-dark(oklch(76.5% 0.177 163.223), oklch(69.6% 0.17 162.48));
 
-  /* ---------- warning (amber) ---------- */
-  --color-warning: light-dark(oklch(76.9% 0.188 70.08), oklch(82.8% 0.189 84.429));
+  /* ---------- warning (yellow) ---------- */
+  --color-warning: light-dark(oklch(79.5% 0.184 86.047), oklch(85.2% 0.199 91.936));
   --color-warning-fg: light-dark(oklch(20.8% 0.042 265.755), oklch(12.9% 0.042 264.695));
-  --color-warning-hover: light-dark(oklch(82.8% 0.189 84.429), oklch(87.9% 0.169 91.605));
+  --color-warning-hover: light-dark(oklch(85.2% 0.199 91.936), oklch(90.5% 0.182 98.111));
   --color-warning-soft: light-dark(
-    oklch(98.7% 0.022 95.277),
-    color-mix(in oklab, oklch(27.9% 0.077 45.635) 40%, transparent)
+    oklch(98.7% 0.026 102.212),
+    color-mix(in oklab, oklch(42.1% 0.095 57.708) 40%, transparent)
   );
-  --color-warning-soft-fg: light-dark(oklch(55.5% 0.163 48.998), oklch(87.9% 0.169 91.605));
-  --color-warning-border: light-dark(oklch(87.9% 0.169 91.605), oklch(66.6% 0.179 58.318));
-  --color-warning-ring: light-dark(oklch(82.8% 0.189 84.429), oklch(76.9% 0.188 70.08));
+  --color-warning-soft-fg: light-dark(oklch(55.4% 0.135 66.442), oklch(90.5% 0.182 98.111));
+  --color-warning-border: light-dark(oklch(90.5% 0.182 98.111), oklch(68.1% 0.162 75.834));
+  --color-warning-ring: light-dark(oklch(85.2% 0.199 91.936), oklch(79.5% 0.184 86.047));
 
   /* ---------- danger (red) ---------- */
   --color-danger: light-dark(oklch(57.7% 0.245 27.325), oklch(63.7% 0.237 25.331));
-  --color-danger-fg: #fff;
+  --color-danger-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
   --color-danger-hover: light-dark(oklch(63.7% 0.237 25.331), oklch(70.4% 0.191 22.216));
   --color-danger-soft: light-dark(
     oklch(97.1% 0.013 17.38),
