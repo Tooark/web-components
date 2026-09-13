@@ -133,6 +133,17 @@ Curvas de easing (`ArkEasing` no TypeScript, `--ark-ease-*` no CSS, `ARK_EASING_
 | `in-out`    | `cubic-bezier(0.4, 0, 0.2, 1)`      | Mudanças de estado simétricas: shake, pulse, skeleton.                                                                  |
 | `overshoot` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Entradas lúdicas que passam do ponto e acomodam (`backOut` do Motion). Para física de mola real use o `@tooark/motion`. |
 
+Os motion tokens são sobrescritos como os tokens de cor, com uma regra: mantenha overrides de duração dentro de `@media (prefers-reduced-motion: no-preference)`. Sob `reduce` tudo o que a lib anima para: os presets `.ark-animate-*` e os helpers JS rodam a 0 ms independentemente de `--ark-animate-duration` ou de um token redefinido em uma subárvore, e os tokens da raiz são zerados com `!important`, então um override em `:root` escrito fora dessa media query não reativa o seu próprio CSS baseado em tokens por acidente. Para manter movimento de propósito sob movimento reduzido, declare o token com `!important` (ou sobrescreva o `animation-duration` do preset) dentro do seu próprio bloco `@media (prefers-reduced-motion: reduce)`.
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --ark-duration-default: 180ms;
+    --ark-duration-gentle: 400ms;
+  }
+}
+```
+
 ---
 
 ## Começando

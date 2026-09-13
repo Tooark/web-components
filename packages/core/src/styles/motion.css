@@ -6,7 +6,8 @@
  *   --ark-animate-duration, --ark-animate-ease, --ark-motion-distance
  *
  * prefers-reduced-motion é respeitado automaticamente: os tokens de duração
- * zeram via media query em @tooark/tokens.
+ * zeram via media query em @tooark/tokens e, abaixo, os presets fixam 0ms
+ * ignorando overrides locais, como já fazem os helpers WAAPI em JS.
  */
 
 /* ---------- Enter ---------- */
@@ -256,7 +257,7 @@
   border-radius: var(--ark-radius-lg, 0.5rem);
 }
 
-/* Loading contínuos não devem rodar com movimento reduzido */
+/* Movimento reduzido: loading contínuos não rodam e enter/exit pulam ao estado final */
 @media (prefers-reduced-motion: reduce) {
   .ark-animate-spin,
   .ark-animate-shake {
@@ -267,5 +268,26 @@
   .ark-skeleton {
     animation: none;
     opacity: 0.7;
+  }
+
+  /*
+   * 0ms fixo, não o token: ignora --ark-animate-duration no elemento e tokens
+   * redefinidos em subárvores. O fill-mode "both" mantém o estado final e o
+   * animationend ainda dispara, então quem espera o fim da animação continua
+   * funcionando.
+   */
+  .ark-animate-fade-in,
+  .ark-animate-fade-out,
+  .ark-animate-slide-in-up,
+  .ark-animate-slide-in-down,
+  .ark-animate-slide-in-left,
+  .ark-animate-slide-in-right,
+  .ark-animate-slide-out-up,
+  .ark-animate-slide-out-down,
+  .ark-animate-slide-out-left,
+  .ark-animate-slide-out-right,
+  .ark-animate-scale-in,
+  .ark-animate-scale-out {
+    animation-duration: 0ms;
   }
 }

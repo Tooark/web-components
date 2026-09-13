@@ -133,6 +133,17 @@ Easing curves (`ArkEasing` in TypeScript, `--ark-ease-*` in CSS, `ARK_EASING_CSS
 | `in-out`    | `cubic-bezier(0.4, 0, 0.2, 1)`      | Symmetric state changes: shake, pulse, skeleton.                                                             |
 | `overshoot` | `cubic-bezier(0.34, 1.56, 0.64, 1)` | Playful enters that overshoot and settle (Motion's `backOut`). For real spring physics use `@tooark/motion`. |
 
+Motion tokens are overridden like the color tokens, with one rule: keep duration overrides inside `@media (prefers-reduced-motion: no-preference)`. Under `reduce` everything the library animates stops: the `.ark-animate-*` presets and the JS helpers run at 0 ms regardless of `--ark-animate-duration` or of a token redefined on a subtree, and the root tokens are zeroed with `!important`, so a `:root` override written outside that media query cannot re-enable your own token-driven CSS by accident. To deliberately keep motion under reduced motion, declare the token with `!important` (or override the preset's `animation-duration`) inside your own `@media (prefers-reduced-motion: reduce)` block.
+
+```css
+@media (prefers-reduced-motion: no-preference) {
+  :root {
+    --ark-duration-default: 180ms;
+    --ark-duration-gentle: 400ms;
+  }
+}
+```
+
 ---
 
 ## Getting started
