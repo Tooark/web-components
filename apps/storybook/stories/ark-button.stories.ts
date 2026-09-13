@@ -99,7 +99,9 @@ export const Variants = {
     theme: "light",
     disabled: false
   },
-  render: () => {
+  // Aplica o theme dos args: sem ele o host fica em color-scheme "light dark" e segue o sistema,
+  // e num SO escuro os tokens resolvem o lado dark sobre o canvas claro do Storybook.
+  render: ({ theme, disabled }: Pick<StoryArgs, "theme" | "disabled">) => {
     const wrap = document.createElement("div");
     wrap.style.display = "flex";
     wrap.style.flexWrap = "wrap";
@@ -108,6 +110,8 @@ export const Variants = {
     ["primary", "secondary", "success", "warning", "danger", "info", "outline", "ghost"].forEach((v) => {
       const el = document.createElement("ark-button");
       el.setAttribute("variant", v);
+      el.setAttribute("theme", theme);
+      if (disabled) el.setAttribute("disabled", "");
       el.textContent = v;
       wrap.appendChild(el);
     });
@@ -168,22 +172,14 @@ export const Sizes = {
       iconOnly.setAttribute("aria-label", `Icone ${size}`);
       iconOnly.textContent = "+";
 
-      const toggle = document.createElement("ark-toggle");
-      toggle.setAttribute("size", size);
-      toggle.textContent = `Toggle ${size}`;
-
-      const input = document.createElement("ark-input");
-      input.setAttribute("size", size);
-      input.setAttribute("placeholder", `Input ${size}`);
-
-      row.append(button, iconOnly, toggle, input);
+      row.append(button, iconOnly);
       wrap.appendChild(row);
     });
 
     return wrap;
   },
-  // Controles do mesmo size compartilham a altura do token --ark-size-* (min-height);
-  // o botao so de icone tambem e quadrado.
+  // A altura vem do token --ark-size-* (min-height); o botao so de icone tambem e quadrado.
+  // O alinhamento com os outros controles do mesmo size fica em alignment.stories.ts.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const heights: Record<ArkSize, number> = { xs: 24, sm: 28, md: 36, lg: 44, xl: 52 };
 
@@ -193,9 +189,7 @@ export const Sizes = {
 
       const controls = [
         row.querySelector<HTMLElement>("ark-button:not([icon-only])"),
-        row.querySelector<HTMLElement>("ark-button[icon-only]"),
-        row.querySelector<HTMLElement>("ark-toggle"),
-        row.querySelector<HTMLElement>("ark-input input")
+        row.querySelector<HTMLElement>("ark-button[icon-only]")
       ];
 
       for (const control of controls) {
@@ -329,7 +323,7 @@ export const HostIsTheControl = {
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
-    const host = canvasElement.querySelector("ark-button")!;
+    const host = canvasElement.querySelector<HTMLElement>("ark-button")!;
 
     // O host é o botão acessível: role, foco e hook de teste no próprio elemento.
     const control = canvas.getByRole("button", { name: "Salvar" });
@@ -355,7 +349,7 @@ export const ChildrenStayInHost = {
     return el;
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    const host = canvasElement.querySelector("ark-button")!;
+    const host = canvasElement.querySelector<HTMLElement>("ark-button")!;
     const text = Array.from(host.childNodes).find((node) => node.nodeType === Node.TEXT_NODE)!;
 
     // Simula o que React/Vue fazem ao reconciliar filhos: inserir antes de um
@@ -381,6 +375,7 @@ export const SubmitsForm = {
     const form = document.createElement("form");
     const input = document.createElement("input");
     input.name = "q";
+    input.setAttribute("aria-label", "Busca");
     input.value = "tooark";
     form.appendChild(input);
 
@@ -406,7 +401,7 @@ export const SubmitsForm = {
 export const LinkIsFocusable = {
   render: AsLink.render,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    const host = canvasElement.querySelector("ark-button")!;
+    const host = canvasElement.querySelector<HTMLElement>("ark-button")!;
     const link = within(canvasElement).getByRole("link", { name: "Abrir no GitHub" });
 
     await expect(link).toHaveAttribute("href", "https://github.com/tooark");
