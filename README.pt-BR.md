@@ -226,7 +226,7 @@ O pacote é compilado com `ng-packagr` em partial compilation (Ivy), então func
 
 Toda cor usada pelos componentes é um token semântico com valor claro e escuro (`light-dark()`), então o tema é CSS puro:
 
-- **Tema**: por padrão os componentes seguem o sistema (`color-scheme: light dark`); `theme="light"` ou `theme="dark"` num elemento força um lado para ele e seus descendentes. Não há JavaScript envolvido, e a troca de tema do sistema é refletida na hora.
+- **Tema**: por padrão os componentes herdam o `color-scheme` da página, como os controles nativos: uma página clara recebe componentes claros mesmo num sistema escuro, e um app que declara `:root { color-scheme: light dark }` segue o sistema. `theme="light"` ou `theme="dark"` num elemento força um lado para ele e seus descendentes. Não há JavaScript envolvido.
 - **Marca**: sobrescreva os tokens no seu CSS. Dentro da folha de estilo dos componentes eles têm o prefixo `ark`:
 
 ```css

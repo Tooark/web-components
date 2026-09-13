@@ -9,7 +9,7 @@
  *
  * Todas as cores são SEMÂNTICAS e resolvem claro/escuro sozinhas via
  * light-dark(): o tema é decidido pela propriedade `color-scheme` do elemento
- * (os componentes Ark usam `light dark` por padrão e `theme="light|dark"`
+ * (os componentes Ark herdam o da página por padrão e `theme="light|dark"`
  * força um lado). Para trocar a marca, sobrescreva os tokens no seu CSS —
  * dentro do CSS dos componentes eles têm o prefixo "ark":
  *

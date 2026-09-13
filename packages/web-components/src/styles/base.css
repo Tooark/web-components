@@ -12,26 +12,12 @@
 @layer base {
   /*
    * Tema. As cores dos tokens usam light-dark(), então o tema é só a
-   * propriedade color-scheme: "auto" (padrão) segue o sistema e o atributo
-   * theme="light|dark" força um lado. Nada de JavaScript envolvido, e a troca
-   * de tema do sistema é refletida na hora.
+   * propriedade color-scheme. Sem o atributo theme o host não declara nada e
+   * herda o color-scheme da página, como os controles nativos: uma página
+   * clara recebe componentes claros mesmo num sistema escuro, e um app com
+   * `:root { color-scheme: light dark }` segue o sistema. theme="light|dark"
+   * força um lado para o host e seus descendentes. Nada de JavaScript.
    */
-  :where(
-    ark-button,
-    ark-calendar,
-    ark-carousel,
-    ark-clock,
-    ark-datepicker,
-    ark-input,
-    ark-scheduler,
-    ark-switch,
-    ark-toaster,
-    ark-toggle,
-    ark-toggle-group
-  ) {
-    color-scheme: light dark;
-  }
-
   :where(
     ark-button,
     ark-calendar,

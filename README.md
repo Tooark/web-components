@@ -226,7 +226,7 @@ The package is built with `ng-packagr` in partial Ivy compilation, so it works i
 
 Every color the components use is a semantic token with a light and a dark value (`light-dark()`), so theming is pure CSS:
 
-- **Theme**: components follow the system by default (`color-scheme: light dark`); `theme="light"` or `theme="dark"` on an element forces one side for it and its descendants. No JavaScript is involved, and OS theme changes are reflected instantly.
+- **Theme**: by default components inherit the page's `color-scheme`, like native controls: a light page gets light components even on a dark OS, and an app that declares `:root { color-scheme: light dark }` follows the system. `theme="light"` or `theme="dark"` on an element forces one side for it and its descendants. No JavaScript is involved.
 - **Brand**: override the tokens in your own CSS. Inside the component stylesheet they carry the `ark` prefix:
 
 ```css

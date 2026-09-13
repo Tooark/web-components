@@ -22,5 +22,5 @@ export type ArkEasing = "linear" | "standard" | "in" | "out" | "in-out" | "overs
 /** Tema resolvido (sem "auto"). */
 export type ArkThemeSelected = "light" | "dark";
 
-/** Tema, incluindo resolução automática via preferência do sistema. */
+/** Tema; "auto" herda o color-scheme da página. */
 export type ArkTheme = "auto" | ArkThemeSelected;
