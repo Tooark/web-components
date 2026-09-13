@@ -35,7 +35,7 @@ pnpm exec playwright install chromium                                  # once
 pnpm --filter storybook test                                           # whole suite
 pnpm --filter storybook exec vitest run --project storybook --coverage # what CI runs
 pnpm --filter storybook exec vitest run --project storybook stories/ark-switch.stories.ts           # one file
-pnpm --filter storybook exec vitest run --project storybook stories/ark-switch.stories.ts -t TogglesOnClick # one story by export name
+pnpm --filter storybook exec vitest run --project storybook stories/ark-switch.stories.ts -t "Toggles On Click" # one story by its display name (export split into words; the export name itself matches nothing and silently skips)
 ```
 
 CI (`.github/workflows/tests.yml`) runs `biome ci .`, then `pnpm -r build` (which includes the CSS smoke test), then the suite above.
