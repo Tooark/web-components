@@ -163,6 +163,22 @@
     )
     :where(img, svg, video, canvas) {
     display: block;
+  }
+
+  :where(
+      ark-button,
+      ark-calendar,
+      ark-carousel,
+      ark-clock,
+      ark-datepicker,
+      ark-input,
+      ark-scheduler,
+      ark-switch,
+      ark-toaster,
+      ark-toggle,
+      ark-toggle-group
+    )
+    :where(img, svg, video, canvas) {
     vertical-align: middle;
   }
 
