@@ -1,6 +1,10 @@
 import type { ArkButtonType, ArkIntent, ArkRounded, ArkSize, ArkStyleVariant } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
+/**
+ * Paleta de cores do botão Ark.
+ * Define as cores para os diferentes estados e variantes do botão.
+ */
 type ArkButtonPalette = {
   focusRing: string;
   solid: string;
@@ -8,8 +12,14 @@ type ArkButtonPalette = {
   ghost: string;
 };
 
-const SPINNER_SVG =
-  '<svg class="ark:h-[1em] ark:w-[1em] ark:animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle class="ark:opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="ark:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path></svg>';
+/**
+ * SVG do spinner de carregamento do botão Ark.
+ */
+const SPINNER_SVG = `
+  <svg class="ark:h-[1em] ark:w-[1em] ark:animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <circle class="ark:opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+    <path class="ark:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+  </svg>`;
 
 let arkButtonIdCounter = 0;
 
@@ -34,6 +44,10 @@ export class ArkButton extends HTMLElement {
   private syncingClass = false;
   private formDisabled = false;
 
+  /**
+   * Observa os atributos do elemento para reagir a mudanças.
+   * @returns Uma lista de atributos observados pelo componente.
+   */
   static get observedAttributes(): string[] {
     return [
       "disabled",
@@ -55,6 +69,9 @@ export class ArkButton extends HTMLElement {
     ];
   }
 
+  /**
+   * Inicializa uma nova instância do botão Ark.
+   */
   constructor() {
     super();
     this.internals = typeof this.attachInternals === "function" ? this.attachInternals() : null;
@@ -76,64 +93,120 @@ export class ArkButton extends HTMLElement {
     this.addEventListener("keyup", this.handleKeyup);
   }
 
+  /**
+   * Chamado pelo navegador quando o elemento é adicionado ao DOM.
+   */
   connectedCallback(): void {
     this.updateAppearance();
   }
 
+  /**
+   * Chamado pelo navegador quando um atributo observado do elemento é alterado.
+   * @param name O nome do atributo que foi alterado.
+   */
   attributeChangedCallback(name: string): void {
+    // Se o atributo alterado for "class", reaplica apenas as classes próprias do componente.
     if (name === "class") {
       // Um framework pode reescrever o atributo class inteiro (React/Vue
       // setam `class` do zero): reaplica só as classes do próprio componente.
-      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      if (!this.syncingClass) {
+        this.applyOwnClasses(this.ownClasses);
+      }
+
       return;
     }
-    if (!this.isConnected) return;
+
+    // Se o elemento ainda não estiver conectado ao DOM, não atualiza a aparência.
+    if (!this.isConnected) {
+      return;
+    }
+
+    // Atualiza a aparência do botão quando qualquer outro atributo observado muda.
     this.updateAppearance();
   }
 
-  /** Chamado pelo navegador quando um <fieldset disabled> ancestral muda. */
+  /**
+   * Chamado pelo navegador quando um <fieldset disabled> ancestral muda.
+   * @param disabled Indica se o <fieldset> ancestral está desabilitado.
+   */
   formDisabledCallback(disabled: boolean): void {
     this.formDisabled = disabled;
     this.updateAppearance();
   }
 
+  /**
+   * Indica se o botão está desabilitado.
+   */
   get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
 
+  /**
+   * Define se o botão está desabilitado.
+   */
   set disabled(value: boolean) {
     this.toggleAttribute("disabled", Boolean(value));
   }
 
+  /**
+   * Indica se o botão está em estado de carregamento.
+   */
   get loading(): boolean {
     return this.hasAttribute("loading");
   }
 
+  /**
+   * Define se o botão está em estado de carregamento.
+   */
   set loading(value: boolean) {
     this.toggleAttribute("loading", Boolean(value));
   }
 
+  /**
+   * Indica o tipo do botão.
+   */
   get type(): ArkButtonType {
     const type = this.getAttribute("type");
     return type === "submit" || type === "reset" ? type : "button";
   }
 
-  /** Formulário ao qual o botão pertence (via ElementInternals). */
+  /**
+   * Formulário ao qual o botão pertence (via ElementInternals).
+   */
   get form(): HTMLFormElement | null {
     return this.internals?.form ?? this.closest("form");
   }
 
   // --- Interação ---
 
+  /**
+   * Manipula o clique no botão, tratando submissão e reset de formulários.
+   * @param event Evento de clique no botão.
+   */
   private readonly handleClick = (event: MouseEvent): void => {
-    if (this.anchorEl || this.type === "button") return;
+    // Se o botão é um link ou do tipo "button", não faz nada.
+    if (this.anchorEl || this.type === "button") {
+      return;
+    }
+
+    // Obtém o formulário ao qual o botão pertence.
     const form = this.form;
-    if (!form) return;
+
+    // Se não houver formulário, não faz nada.
+    if (!form) {
+      return;
+    }
+
     // Submissão como ação padrão: só depois de todos os listeners (inclusive
     // os delegados na raiz, como os do React) terem tido a chance de
     // preventDefault(), igual a um <button type="submit"> nativo.
     window.setTimeout(() => {
-      if (event.defaultPrevented) return;
+      // Se o evento foi prevenido, não faz nada.
+      if (event.defaultPrevented) {
+        return;
+      }
+
+      // Executa a ação do botão com base no seu tipo.
       if (this.type === "reset") {
         form.reset();
       } else {
@@ -142,8 +215,17 @@ export class ArkButton extends HTMLElement {
     }, 0);
   };
 
+  /**
+   * Manipula o pressionamento de tecla no botão, tratando Enter e Espaço.
+   * @param event Evento de teclado no botão.
+   */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
-    if (this.anchorEl || event.target !== this || this.isDisabled()) return;
+    // Se o botão é um link, não é o alvo do evento ou está desabilitado, não faz nada.
+    if (this.anchorEl || event.target !== this || this.isDisabled()) {
+      return;
+    }
+
+    // Trata a tecla Enter: dispara o clique imediatamente.
     if (event.key === "Enter") {
       event.preventDefault();
       this.click();
@@ -153,8 +235,18 @@ export class ArkButton extends HTMLElement {
     }
   };
 
+  /**
+   * Manipula o keyup no botão, tratando a tecla Espaço.
+   * @param event Evento de teclado no botão.
+   * @returns void
+   */
   private readonly handleKeyup = (event: KeyboardEvent): void => {
-    if (this.anchorEl || event.target !== this || this.isDisabled()) return;
+    // Se o botão é um link, não é o alvo do evento ou está desabilitado, não faz nada.
+    if (this.anchorEl || event.target !== this || this.isDisabled()) {
+      return;
+    }
+
+    // Trata a tecla Espaço: dispara o clique no keyup, como no nativo.
     if (event.key === " ") {
       event.preventDefault();
       this.click();
@@ -163,8 +255,15 @@ export class ArkButton extends HTMLElement {
 
   // --- Estilo ---
 
+  /**
+   * Normaliza o valor do intent, garantindo que seja um dos valores válidos.
+   * @param value Valor do intent.
+   * @returns Intent normalizado.
+   */
   private normalizeIntent(value: string | null): ArkIntent {
     const intent = (value || "").toLowerCase();
+
+    // Verifica se o intent é válido. Se for, retorna o intent normalizado. Caso contrário, retorna "primary".
     if (
       intent === "primary" ||
       intent === "secondary" ||
@@ -176,13 +275,19 @@ export class ArkButton extends HTMLElement {
     ) {
       return intent;
     }
+
     return "primary";
   }
 
+  /**
+   * Resolve a variante e o intent do botão com base nos atributos.
+   * @returns Objeto contendo a variante de estilo e o intent.
+   */
   private resolveVariantAndIntent(): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
     const variant = (this.getAttribute("variant") || "primary").toLowerCase();
     const attrIntent = this.getAttribute("intent");
 
+    // Normaliza o intent antes de resolver a variante e o intent.
     if (variant === "outline" || variant === "ghost" || variant === "solid") {
       return {
         styleVariant: variant,
@@ -190,6 +295,7 @@ export class ArkButton extends HTMLElement {
       };
     }
 
+    // Se a variante não é "outline", "ghost" ou "solid", verifica se é uma variante de estilo baseada no intent.
     if (
       variant === "primary" ||
       variant === "secondary" ||
@@ -204,12 +310,18 @@ export class ArkButton extends HTMLElement {
       };
     }
 
+    // Se nenhuma das condições anteriores for atendida, retorna a variante sólida com o intent normalizado.
     return {
       styleVariant: "solid",
       intent: this.normalizeIntent(attrIntent)
     };
   }
 
+  /**
+   * Obtém a paleta de estilos do botão com base no intent.
+   * @param intent Intent do botão.
+   * @returns Paleta de estilos correspondente ao intent.
+   */
   private getPalette(intent: ArkIntent): ArkButtonPalette {
     // Tokens semânticos (light-dark nos tokens): uma paleta única serve claro e escuro.
     const palettes: Record<ArkIntent, ArkButtonPalette> = {
@@ -325,7 +437,7 @@ export class ArkButton extends HTMLElement {
       .filter(Boolean);
   }
 
-  // Troca as classes do componente no host sem tocar nas classes do usuário.
+  /** Troca as classes do componente no host sem tocar nas classes do usuário. */
   private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
@@ -385,7 +497,7 @@ export class ArkButton extends HTMLElement {
     return this.id;
   }
 
-  // Modo link: cria/remove o <a> esticado conforme `href` entra/sai.
+  /** Modo link: cria/remove o <a> esticado conforme `href` entra/sai. */
   private syncAnchor(): void {
     const wantsAnchor = this.getAttribute("href") !== null;
 
