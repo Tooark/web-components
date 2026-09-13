@@ -1,5 +1,6 @@
 import type { ArkDuration, ArkEasing, ArkMotionPreset } from "@tooark/core";
 import { ARK_DURATION_MS, ARK_EASING_CSS, arkEnter, arkExit } from "@tooark/core";
+import { expect } from "storybook/test";
 
 const meta = {
   title: "Core/ArkMotion",
@@ -212,5 +213,95 @@ export const Tokens = {
     container.appendChild(easings.section);
 
     return container;
+  }
+};
+
+// Todas as regras `@media (prefers-reduced-motion: reduce)` do documento: zeramento dos tokens e presets.
+function findReducedMotionRules(): CSSMediaRule[] {
+  const found: CSSMediaRule[] = [];
+
+  for (const sheet of Array.from(document.styleSheets)) {
+    let rules: CSSRuleList;
+    try {
+      rules = sheet.cssRules;
+    } catch {
+      continue;
+    }
+
+    for (const rule of Array.from(rules)) {
+      if (!(rule instanceof CSSMediaRule)) continue;
+      if (rule.media.mediaText.replaceAll(" ", "").includes("prefers-reduced-motion:reduce")) found.push(rule);
+    }
+  }
+
+  return found;
+}
+
+export const ReducedMotionOverride = {
+  render: (): HTMLElement => {
+    const container = document.createElement("div");
+    container.className = "mx-auto max-w-3xl";
+
+    const section = createSection("Movimento reduzido vence os overrides de duracao do app");
+    section.grid.className = "flex flex-col gap-2 text-xs text-slate-600";
+
+    const text = document.createElement("p");
+    text.textContent =
+      "Nem um `:root { --ark-duration-default: 180ms }` escrito depois do CSS da lib, fora de media query, nem um --ark-animate-duration no proprio elemento reativam os presets sob prefers-reduced-motion: os tokens zeram com !important e os presets fixam 0ms. A play desta story reproduz o cenario forcando as media queries a casar.";
+    section.grid.appendChild(text);
+
+    const tile = createTile(".ark-animate-fade-in com --ark-animate-duration: 300ms");
+    tile.style.setProperty("--ark-animate-duration", "300ms");
+    tile.addEventListener("click", () => replayClass(tile, "ark-animate-fade-in"));
+    replayClass(tile, "ark-animate-fade-in");
+    section.grid.appendChild(tile);
+
+    container.appendChild(section.section);
+    return container;
+  },
+  // Os overrides valem sem a preferencia e perdem para o zeramento quando ela esta ativa.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const rules = findReducedMotionRules();
+    expect(rules.length).toBeGreaterThan(0);
+
+    const tile = canvasElement.querySelector<HTMLElement>(".ark-animate-fade-in");
+    expect(tile).not.toBeNull();
+
+    const readDefault = (): number =>
+      Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--ark-duration-default"));
+    const readTile = (): string => getComputedStyle(tile as HTMLElement).animationDuration;
+
+    // Override do app: depois do CSS da lib, fora de qualquer media query.
+    const override = document.createElement("style");
+    override.textContent = ":root { --ark-duration-default: 180ms; }";
+    document.head.appendChild(override);
+
+    const originalMedia = rules.map((rule) => rule.media.mediaText);
+    try {
+      expect(readDefault()).toBe(180);
+      expect(readTile()).toBe("0.3s");
+
+      // O Chromium dos testes roda sem movimento reduzido; força as media queries a casar.
+      for (const rule of rules) rule.media.mediaText = "all";
+      expect(readDefault()).toBe(0);
+      expect(readTile()).toBe("0s");
+    } finally {
+      rules.forEach((rule, index) => {
+        rule.media.mediaText = originalMedia[index];
+      });
+      override.remove();
+    }
+
+    // O que garante a vitoria do token acima e a prioridade da declaracao, nao a ordem das folhas.
+    const root = rules
+      .flatMap((rule) => Array.from(rule.cssRules))
+      .find(
+        (inner): inner is CSSStyleRule =>
+          inner instanceof CSSStyleRule &&
+          inner.selectorText === ":root" &&
+          inner.style.getPropertyValue("--ark-duration-default") !== ""
+      );
+    expect(root).toBeDefined();
+    expect((root as CSSStyleRule).style.getPropertyPriority("--ark-duration-default")).toBe("important");
   }
 };
