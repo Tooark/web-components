@@ -162,15 +162,20 @@
   --ark-motion-distance: 0.75rem;
 }
 
-/* Acessibilidade: zera todas as durações quando o usuário reduz movimento */
+/*
+ * Acessibilidade: zera todas as durações quando o usuário reduz movimento.
+ * Com !important para evitar que seja sobrescrita por um override do app.
+ */
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --ark-duration-instant: 0ms;
-    --ark-duration-quick: 0ms;
-    --ark-duration-default: 0ms;
-    --ark-duration-moderate: 0ms;
-    --ark-duration-gentle: 0ms;
-    --ark-duration-slow: 0ms;
-    --ark-duration-long: 0ms;
+    /* biome-ignore-start lint/complexity/noImportantStyles: preferência do usuário deve vencer override de :root do app */
+    --ark-duration-instant: 0ms !important;
+    --ark-duration-quick: 0ms !important;
+    --ark-duration-default: 0ms !important;
+    --ark-duration-moderate: 0ms !important;
+    --ark-duration-gentle: 0ms !important;
+    --ark-duration-slow: 0ms !important;
+    --ark-duration-long: 0ms !important;
+    /* biome-ignore-end lint/complexity/noImportantStyles: preferência do usuário deve vencer override de :root do app */
   }
 }
