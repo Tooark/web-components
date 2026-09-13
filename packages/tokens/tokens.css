@@ -88,9 +88,9 @@
   --color-danger-ring: light-dark(oklch(70.4% 0.191 22.216), oklch(63.7% 0.237 25.331));
 
   /* ---------- info (sky) ---------- */
-  --color-info: light-dark(oklch(58.8% 0.158 241.966), oklch(68.5% 0.169 237.323));
+  --color-info: light-dark(oklch(50% 0.134 242.749), oklch(68.5% 0.169 237.323));
   --color-info-fg: light-dark(#fff, oklch(12.9% 0.042 264.695));
-  --color-info-hover: light-dark(oklch(68.5% 0.169 237.323), oklch(74.6% 0.16 232.661));
+  --color-info-hover: light-dark(oklch(58.8% 0.158 241.966), oklch(74.6% 0.16 232.661));
   --color-info-soft: light-dark(
     oklch(97.7% 0.013 236.62),
     color-mix(in oklab, oklch(29.3% 0.066 243.157) 40%, transparent)
