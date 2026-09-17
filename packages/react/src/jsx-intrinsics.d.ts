@@ -9,6 +9,8 @@ import type {
   ArkLang,
   ArkRounded,
   ArkSize,
+  ArkTabsFill,
+  ArkTabsVariant,
   ArkTextareaResize,
   ArkTheme,
   ArkToastPosition
@@ -184,6 +186,27 @@ declare global {
         max?: number | string;
         step?: number | string;
         spellcheck?: boolean | "true" | "false";
+      };
+      "ark-tabs": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        variant?: ArkTabsVariant;
+        size?: ArkSize;
+        intent?: ArkIntent;
+        rounded?: ArkRounded;
+        fill?: ArkTabsFill;
+        theme?: ArkTheme;
+        label?: string;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
+      "ark-tab": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        disabled?: boolean;
+        controls?: string;
+        closable?: boolean;
+        dirty?: boolean;
       };
       "ark-textarea": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

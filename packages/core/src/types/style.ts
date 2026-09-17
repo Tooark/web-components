@@ -313,6 +313,42 @@ export type ArkSelectStyleOptions = {
   rounded?: ArkRounded;
 };
 
+// Exports types específicos do componente tabs
+
+/** Estilo da faixa de abas: sublinhado, chips de filtro ou abas de editor (fecháveis). */
+export type ArkTabsVariant = "underline" | "chips" | "editor";
+
+/** Pintura da aba ativa: nenhuma, a versão suave do intent ou o intent sólido com texto de contraste. */
+export type ArkTabsFill = "none" | "soft" | "solid";
+
+/** Props de estilo do ark-tabs, propagadas a cada ark-tab. */
+export type ArkTabsStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Estilo da faixa. Padrão: "underline". */
+  variant?: ArkTabsVariant;
+  /** Altura das abas via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Intenção semântica de cor da aba ativa e do anel de foco. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Cantos das abas; em editor só o topo. Padrão: "full" em chips, "none" nas outras variantes. */
+  rounded?: ArkRounded;
+  /** Pintura da aba ativa. Padrão: "soft" em chips, "none" nas outras variantes. */
+  fill?: ArkTabsFill;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos rótulos internos (fechar aba, não salvo). Padrão: "en". */
+  lang?: ArkLang;
+  /** Strings customizadas (JSON) quando lang é "custom". */
+  localeJson?: string;
+};
+
+/** Props de estilo do ark-tab; estilo, tamanho e idioma chegam propagados do ark-tabs. */
+export type ArkTabStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas (close, dirty). */
+  testid?: string;
+};
+
 // Exports types específicos do componente textarea
 
 /** Direções em que o usuário pode redimensionar a área de texto. */

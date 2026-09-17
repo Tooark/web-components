@@ -8,6 +8,8 @@ export * from "./ark-input";
 export * from "./ark-scheduler";
 export * from "./ark-select";
 export * from "./ark-switch";
+export * from "./ark-tab";
+export * from "./ark-tabs";
 export * from "./ark-textarea";
 export * from "./ark-toaster";
 export * from "./ark-toggle";

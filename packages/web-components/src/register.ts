@@ -9,6 +9,8 @@ import {
   ArkScheduler,
   ArkSelect,
   ArkSwitch,
+  ArkTab,
+  ArkTabs,
   ArkTextarea,
   ArkToaster,
   ArkToggle,
@@ -39,6 +41,15 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkTextarea.tagName)) {
     customElements.define(ArkTextarea.tagName, ArkTextarea);
+  }
+
+  // A aba antes da faixa: o ark-tabs coordena abas já upgraded.
+  if (!customElements.get(ArkTab.tagName)) {
+    customElements.define(ArkTab.tagName, ArkTab);
+  }
+
+  if (!customElements.get(ArkTabs.tagName)) {
+    customElements.define(ArkTabs.tagName, ArkTabs);
   }
 
   if (!customElements.get(ArkCalendar.tagName)) {

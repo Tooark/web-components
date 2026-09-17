@@ -70,6 +70,17 @@
     margin-right: var(--ark-input-reveal-offset, 2.25rem);
   }
 
+  /* ---------- ark-tabs: ações do usuário no fim da faixa ---------- */
+
+  ark-tabs > [slot="actions"] {
+    order: 1;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
+    gap: 0.25rem;
+    margin-left: 0.25rem;
+  }
+
   /* ---------- ark-textarea: mesma grid do ark-input ---------- */
 
   ark-textarea {

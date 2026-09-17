@@ -9,6 +9,8 @@ export {
   ArkScheduler,
   ArkSelect,
   ArkSwitch,
+  ArkTab,
+  ArkTabs,
   ArkTextarea,
   ArkToaster,
   ArkToggle,

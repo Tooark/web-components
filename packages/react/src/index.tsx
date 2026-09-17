@@ -19,6 +19,8 @@ export type { ArkSelectProps } from "./ark-select";
 export { ArkSelect } from "./ark-select";
 export type { ArkSwitchProps } from "./ark-switch";
 export { ArkSwitch } from "./ark-switch";
+export type { ArkTabProps, ArkTabsProps } from "./ark-tabs";
+export { ArkTab, ArkTabs } from "./ark-tabs";
 export type { ArkTextareaProps } from "./ark-textarea";
 export { ArkTextarea } from "./ark-textarea";
 export type { ArkToasterProps } from "./ark-toaster";
