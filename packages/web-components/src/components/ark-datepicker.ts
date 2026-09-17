@@ -1,5 +1,5 @@
 import type { ArkDatepickerLang, ArkDatepickerMode } from "@tooark/core";
-import { type ArkDatepickerLocale, arkEnter, arkExit, resolveLocale } from "@tooark/core";
+import { type ArkLocale, arkEnter, arkExit, resolveLocale } from "@tooark/core";
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
@@ -140,7 +140,7 @@ export class ArkDatepicker extends HTMLElement {
     return this.getMode() !== "date";
   }
 
-  private getLocale(): ArkDatepickerLocale {
+  private getLocale(): ArkLocale {
     const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);

@@ -1,7 +1,7 @@
-import type { ArkDatepickerLocale } from "./types";
+import type { ArkLocale } from "./types";
 
-/** Strings de calendário em inglês; também é o fallback de qualquer lang desconhecido. */
-export const en: ArkDatepickerLocale = {
+/** Strings em inglês; também é o fallback de qualquer lang desconhecido. */
+export const en: ArkLocale = {
   months: [
     "January",
     "February",
@@ -38,5 +38,24 @@ export const en: ArkDatepickerLocale = {
   agenda: "Agenda",
   holiday: "Holiday",
   allDay: "All day",
-  noEvents: "No events"
+  noEvents: "No events",
+  dismiss: "Dismiss",
+  copy: "Copy",
+  copied: "Copied",
+  noResults: "No results",
+  search: "Search",
+  chooseFile: "Choose file",
+  dropHint: "or drag and drop here",
+  noFile: "No file selected",
+  showPassword: "Show password",
+  hidePassword: "Hide password",
+  loading: "Loading",
+  add: "Add",
+  bulkEdit: "Bulk edit",
+  tableEdit: "Table edit",
+  entries: "entries",
+  noEntries: "No entries",
+  deleteRow: "Delete row",
+  unsaved: "Unsaved changes",
+  closeTab: "Close tab"
 };

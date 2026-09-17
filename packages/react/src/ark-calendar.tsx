@@ -1,10 +1,10 @@
-import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkDatepickerLocale } from "@tooark/core";
+import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkLocale } from "@tooark/core";
 import React, { createElement, useCallback, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 export type ArkCalendarProps = ArkCalendarStyleOptions & {
   lang?: ArkDatepickerLang;
-  localeJson?: Partial<ArkDatepickerLocale>;
+  localeJson?: Partial<ArkLocale>;
   value?: string;
   min?: string;
   max?: string;

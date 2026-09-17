@@ -1,5 +1,5 @@
-/** Strings e convenções de calendário de um idioma, usadas por calendar, clock, datepicker e scheduler. */
-export interface ArkDatepickerLocale {
+/** Strings de interface e convenções de calendário de um idioma, compartilhadas por todos os componentes. */
+export interface ArkLocale {
   /** Nomes dos 12 meses por extenso, de janeiro a dezembro. */
   months: string[];
   /** Abreviações dos 12 meses, na mesma ordem. */
@@ -16,7 +16,7 @@ export interface ArkDatepickerLocale {
   today: string;
   /** Rótulo do botão que limpa o valor. */
   clear: string;
-  /** Rótulo acessível do botão de fechar do ark-toaster. */
+  /** Rótulo acessível dos botões de fechar (toaster, dialog, drawer). */
   close: string;
   /** Primeiro dia da semana, de 0 (domingo) a 6 (sábado). */
   firstDayOfWeek: number;
@@ -48,4 +48,45 @@ export interface ArkDatepickerLocale {
   allDay: string;
   /** Texto exibido quando o período não tem nenhum evento. */
   noEvents: string;
+  /** Rótulo acessível do botão que dispensa um alerta. */
+  dismiss: string;
+  /** Rótulo do botão de copiar. */
+  copy: string;
+  /** Texto de confirmação depois de copiar. */
+  copied: string;
+  /** Texto exibido quando uma busca não encontra nada. */
+  noResults: string;
+  /** Placeholder e rótulo do campo de busca. */
+  search: string;
+  /** Rótulo do botão que abre o seletor de arquivos. */
+  chooseFile: string;
+  /** Dica da área de soltar arquivos. */
+  dropHint: string;
+  /** Texto exibido quando nenhum arquivo foi escolhido. */
+  noFile: string;
+  /** Rótulo acessível do botão que revela a senha. */
+  showPassword: string;
+  /** Rótulo acessível do botão que oculta a senha. */
+  hidePassword: string;
+  /** Rótulo acessível do spinner e de estados de carregamento. */
+  loading: string;
+  /** Rótulo do botão de adicionar. */
+  add: string;
+  /** Rótulo do modo de edição em massa do editor chave/valor. */
+  bulkEdit: string;
+  /** Rótulo do modo de edição em tabela do editor chave/valor. */
+  tableEdit: string;
+  /** Palavra "entradas", usada depois da contagem. */
+  entries: string;
+  /** Texto exibido quando o editor chave/valor está vazio. */
+  noEntries: string;
+  /** Rótulo acessível do botão que remove uma linha. */
+  deleteRow: string;
+  /** Rótulo acessível do indicador de alterações não salvas. */
+  unsaved: string;
+  /** Rótulo acessível do botão que fecha uma aba. */
+  closeTab: string;
 }
+
+/** Nome anterior de ArkLocale, mantido por compatibilidade. */
+export type ArkDatepickerLocale = ArkLocale;

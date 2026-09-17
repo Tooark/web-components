@@ -1,5 +1,5 @@
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView } from "@tooark/core";
-import { type ArkDatepickerLocale, arkEnter, resolveLocale } from "@tooark/core";
+import { type ArkLocale, arkEnter, resolveLocale } from "@tooark/core";
 import {
   addDays,
   addMonths,
@@ -54,7 +54,7 @@ export class ArkScheduler extends HTMLElement {
   static readonly tagName = "ark-scheduler";
 
   private root: HTMLDivElement | null = null;
-  private locale: ArkDatepickerLocale | null = null;
+  private locale: ArkLocale | null = null;
   private eventsProp: ArkSchedulerEvent[] | null = null;
   private refDate: Date = new Date();
   private nowTimer: number | null = null;
@@ -148,7 +148,7 @@ export class ArkScheduler extends HTMLElement {
     }
   }
 
-  private getLocale(): ArkDatepickerLocale {
+  private getLocale(): ArkLocale {
     const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
@@ -413,7 +413,7 @@ export class ArkScheduler extends HTMLElement {
 
   // --- Blocos de UI ---
 
-  private buildHeader(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
+  private buildHeader(palette: ArkSchedulerPalette, loc: ArkLocale): HTMLDivElement {
     const header = document.createElement("div");
     header.className = `ark:flex ark:flex-wrap ark:items-center ark:justify-between ark:gap-3 ark:border-b ark:px-4 ark:py-3 ${palette.gridLine}`;
     applyTestHooks(this, "scheduler", header, "header");
@@ -526,7 +526,7 @@ export class ArkScheduler extends HTMLElement {
     return button;
   }
 
-  private eventTimeLabel(event: ArkSchedulerEvent, loc: ArkDatepickerLocale): string {
+  private eventTimeLabel(event: ArkSchedulerEvent, loc: ArkLocale): string {
     const start = this.eventStart(event);
     if (!start) return "";
     if (event.allDay) return loc.allDay;
@@ -534,7 +534,7 @@ export class ArkScheduler extends HTMLElement {
     return `${this.formatHour(start.getHours(), start.getMinutes())} – ${this.formatHour(end.getHours(), end.getMinutes())}`;
   }
 
-  private buildTimeGrid(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale, days: Date[]): HTMLDivElement {
+  private buildTimeGrid(palette: ArkSchedulerPalette, loc: ArkLocale, days: Date[]): HTMLDivElement {
     const { start: hourStart, end: hourEnd } = this.getHourRange();
     const totalMinutes = (hourEnd - hourStart) * 60;
     const bodyHeight = (hourEnd - hourStart) * HOUR_HEIGHT_PX;
@@ -703,7 +703,7 @@ export class ArkScheduler extends HTMLElement {
     return wrapper;
   }
 
-  private buildMonthGrid(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
+  private buildMonthGrid(palette: ArkSchedulerPalette, loc: ArkLocale): HTMLDivElement {
     const wrapper = document.createElement("div");
     wrapper.className = "ark:flex ark:flex-col";
 
@@ -788,7 +788,7 @@ export class ArkScheduler extends HTMLElement {
     return wrapper;
   }
 
-  private buildAgenda(palette: ArkSchedulerPalette, loc: ArkDatepickerLocale): HTMLDivElement {
+  private buildAgenda(palette: ArkSchedulerPalette, loc: ArkLocale): HTMLDivElement {
     const wrapper = document.createElement("div");
     wrapper.className = "ark:flex ark:max-h-[32rem] ark:flex-col ark:overflow-y-auto";
     applyTestHooks(this, "scheduler", wrapper, "scroller");

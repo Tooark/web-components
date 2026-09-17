@@ -1,5 +1,5 @@
 import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
-import { type ArkDatepickerLocale, arkEnter, resolveLocale } from "@tooark/core";
+import { type ArkLocale, arkEnter, resolveLocale } from "@tooark/core";
 import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -32,7 +32,7 @@ export class ArkCalendar extends HTMLElement {
   private root: HTMLDivElement | null = null;
   private viewDate: Date = new Date();
   private selectedDate: Date | null = null;
-  private locale: ArkDatepickerLocale | null = null;
+  private locale: ArkLocale | null = null;
   private syncingValue = false;
   private pendingFocusISO: string | null = null;
   private view: ArkCalendarView = "days";
@@ -146,7 +146,7 @@ export class ArkCalendar extends HTMLElement {
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
 
-  private getLocale(): ArkDatepickerLocale {
+  private getLocale(): ArkLocale {
     const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
@@ -358,7 +358,7 @@ export class ArkCalendar extends HTMLElement {
     return year - (year % 12);
   }
 
-  private buildMonthsGrid(palette: ArkCalendarPalette, loc: ArkDatepickerLocale): HTMLDivElement {
+  private buildMonthsGrid(palette: ArkCalendarPalette, loc: ArkLocale): HTMLDivElement {
     const grid = document.createElement("div");
     grid.className = "ark:grid ark:grid-cols-3 ark:gap-1";
     applyTestHooks(this, "calendar", grid, "months");

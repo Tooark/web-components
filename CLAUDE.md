@@ -84,9 +84,10 @@ Rollup builds ESM + CJS + a bundled `.d.ts` for tokens/core/web-components/chart
 - Colors: use `intentColors()`/`normalizeIntent()` for token-driven inline colors; `ArkIntent`/`ArkSize`/`ArkTheme` types come from `@tooark/core`.
 - Sizes: `size` lookup tables cover `xs..xl`. The control height comes from the token via `ark:min-h-(--ark-size-<size>)` (plus `ark:min-w-(...)` when it must be square) and the vertical padding stays below it, so the token governs and same-size controls align (`alignment.stories.ts` asserts 24/28/36/44/52 px across button, toggle and input). `ark-switch` keeps its own proportional table.
 - Dates: all `YYYY-MM-DD[THH:mm[:ss]]` strings are parsed in the **local** timezone via `date-utils.ts`; never `new Date("YYYY-MM-DD")`.
-- i18n: `resolveLocale(lang, localeJson)` from core; `lang="en|pt|es|custom"` with `locale-json` for custom strings. New UI strings go into `core/src/i18n/{types,en,pt,es}.ts`.
+- i18n: `resolveLocale(lang, localeJson)` from core returns an `ArkLocale` (`ArkDatepickerLocale` is a compatibility alias); `lang="en|pt|es|custom"` with `locale-json` for custom strings, merged over `en`. New UI strings go into `core/src/i18n/{types,en,pt,es}.ts`, all three languages at once.
 - `registerTooarkComponents()` in `register.ts` defines each element guarded by `customElements.get`; order matters where a component composes another (scheduler after toggle/toggle-group).
 - Toasts: `toast()` in core dispatches `ark-toast`/`ark-toast-dismiss` on `window`; `ark-toaster` listens and renders. No direct coupling between the service and the element.
+- Screen-reader announcements go through `announce(text, politeness)` from core: one hidden live-region container in `document.body` (`data-ark="announcer"`, a `role="status"`/`role="alert"` child per politeness). Components never create their own live regions, which would enter the control's accessible name or land outside the host.
 
 ### Framework wrappers
 
