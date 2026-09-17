@@ -544,9 +544,17 @@ export class ArkScheduler extends HTMLElement {
     const wrapper = document.createElement("div");
     wrapper.className = "ark:flex ark:flex-col";
 
-    // Cabeçalho dos dias + faixa de eventos de dia inteiro.
+    // Scroller único: o cabeçalho dos dias fica DENTRO dele, sticky, para dividir a mesma largura útil
+    // com a grade. Fora dele, a barra de rolagem do corpo encolheria só as colunas de baixo e o título
+    // de cada dia sairia do alinhamento com a sua coluna.
+    const scroller = document.createElement("div");
+    scroller.className = "ark:relative ark:flex ark:max-h-[32rem] ark:flex-col ark:overflow-y-auto";
+    applyTestHooks(this, "scheduler", scroller, "scroller");
+
+    // Cabeçalho dos dias + faixa de eventos de dia inteiro. Opaco e acima dos eventos e da linha de "agora".
     const daysHeader = document.createElement("div");
-    daysHeader.className = `ark:flex ark:border-b ${palette.gridLine}`;
+    daysHeader.className = `ark:sticky ark:top-0 ark:z-20 ark:flex ark:shrink-0 ark:border-b ark:bg-surface ${palette.gridLine}`;
+    applyTestHooks(this, "scheduler", daysHeader, "days");
 
     const headerGutter = document.createElement("div");
     headerGutter.className = "ark:w-14 ark:shrink-0";
@@ -583,12 +591,11 @@ export class ArkScheduler extends HTMLElement {
       headerGutter.appendChild(gutterLabel);
     }
 
-    wrapper.appendChild(daysHeader);
+    scroller.appendChild(daysHeader);
 
-    // Corpo rolável com a régua de horas e as colunas de dia.
-    const scroller = document.createElement("div");
-    scroller.className = "ark:relative ark:flex ark:max-h-[32rem] ark:overflow-y-auto";
-    applyTestHooks(this, "scheduler", scroller, "scroller");
+    // Régua de horas e colunas de dia, lado a lado, abaixo do cabeçalho.
+    const body = document.createElement("div");
+    body.className = "ark:relative ark:flex";
 
     const gutter = document.createElement("div");
     gutter.className = "ark:w-14 ark:shrink-0";
@@ -605,7 +612,7 @@ export class ArkScheduler extends HTMLElement {
       slot.appendChild(label);
       gutter.appendChild(slot);
     }
-    scroller.appendChild(gutter);
+    body.appendChild(gutter);
 
     for (const day of days) {
       const isToday = isSameDay(day, today);
@@ -671,9 +678,10 @@ export class ArkScheduler extends HTMLElement {
         }
       }
 
-      scroller.appendChild(column);
+      body.appendChild(column);
     }
 
+    scroller.appendChild(body);
     wrapper.appendChild(scroller);
     scroller.addEventListener("scroll", () => {
       this.lastScrollTop = scroller.scrollTop;

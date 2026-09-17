@@ -223,6 +223,30 @@ export const ClickingEventEmits = {
   }
 };
 
+export const HeaderAlignsWithGrid = {
+  args: { view: "week", hourStart: 0, hourEnd: 24 },
+  render: Playground.render,
+  // A barra de rolagem do corpo nao pode encolher so as colunas de baixo: cabecalho e grade dividem o scroller.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const scroller = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-scroller"]')!;
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+
+    const headerColumns = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>('[data-ark="scheduler-days"] > :not(:first-child)')
+    );
+    const dayColumns = Array.from(canvasElement.querySelectorAll<HTMLElement>('[data-ark="scheduler-day"]'));
+    await expect(headerColumns).toHaveLength(7);
+    await expect(dayColumns).toHaveLength(7);
+
+    headerColumns.forEach((header, index) => {
+      const top = header.getBoundingClientRect();
+      const grid = dayColumns[index].getBoundingClientRect();
+      expect(Math.abs(top.left - grid.left)).toBeLessThan(1);
+      expect(Math.abs(top.width - grid.width)).toBeLessThan(1);
+    });
+  }
+};
+
 export const SwitchingViews = {
   args: { view: "week" },
   render: Playground.render,
