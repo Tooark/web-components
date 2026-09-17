@@ -7,17 +7,12 @@
  * svg em bloco) é aplicado apenas ao DOM interno dos hosts ark-*, dentro de
  * @layer base e com :where() para não ganhar de nenhuma regra do consumidor.
  *
- * Mantenha a lista de hosts em sincronia com register.ts.
+ * A lista de hosts aparece uma única vez: as regras ficam aninhadas nela
+ * (CSS nesting, achatado pelo Tailwind na saída), então adicionar um
+ * componente é acrescentar a tag à lista abaixo. Mantenha-a em sincronia com
+ * register.ts.
  */
 @layer base {
-  /*
-   * Tema. As cores dos tokens usam light-dark(), então o tema é só a
-   * propriedade color-scheme. Sem o atributo theme o host não declara nada e
-   * herda o color-scheme da página, como os controles nativos: uma página
-   * clara recebe componentes claros mesmo num sistema escuro, e um app com
-   * `:root { color-scheme: light dark }` segue o sistema. theme="light|dark"
-   * força um lado para o host e seus descendentes. Nada de JavaScript.
-   */
   :where(
     ark-button,
     ark-calendar,
@@ -30,232 +25,75 @@
     ark-toaster,
     ark-toggle,
     ark-toggle-group
-  )[theme="light"] {
-    color-scheme: light;
-  }
+  ) {
+    /*
+     * Tema. As cores dos tokens usam light-dark(), então o tema é só a
+     * propriedade color-scheme. Sem o atributo theme o host não declara nada e
+     * herda o color-scheme da página, como os controles nativos: uma página
+     * clara recebe componentes claros mesmo num sistema escuro, e um app com
+     * `:root { color-scheme: light dark }` segue o sistema. theme="light|dark"
+     * força um lado para o host e seus descendentes. Nada de JavaScript.
+     */
+    &[theme="light"] {
+      color-scheme: light;
+    }
 
-  :where(
-    ark-button,
-    ark-calendar,
-    ark-carousel,
-    ark-clock,
-    ark-datepicker,
-    ark-input,
-    ark-scheduler,
-    ark-switch,
-    ark-toaster,
-    ark-toggle,
-    ark-toggle-group
-  )[theme="dark"] {
-    color-scheme: dark;
-  }
+    &[theme="dark"] {
+      color-scheme: dark;
+    }
 
-  /* Os hosts entram no reset: vários são o próprio controle estilizado. */
-  :where(
-    ark-button,
-    ark-calendar,
-    ark-carousel,
-    ark-clock,
-    ark-datepicker,
-    ark-input,
-    ark-scheduler,
-    ark-switch,
-    ark-toaster,
-    ark-toggle,
-    ark-toggle-group
-  ),
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    *,
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    *::before,
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    border: 0 solid;
-  }
+    /* Os hosts entram no reset: vários são o próprio controle estilizado. */
+    &,
+    & *,
+    & *::before,
+    & *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      border: 0 solid;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(h1, h2, h3, h4, h5, h6) {
-    font-size: inherit;
-    font-weight: inherit;
-  }
+    & :where(h1, h2, h3, h4, h5, h6) {
+      font-size: inherit;
+      font-weight: inherit;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(a) {
-    color: inherit;
-    text-decoration: inherit;
-  }
+    & :where(a) {
+      color: inherit;
+      text-decoration: inherit;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(img, svg, video, canvas) {
-    display: block;
-  }
+    & :where(img, svg, video, canvas) {
+      display: block;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(img, svg, video, canvas) {
-    vertical-align: middle;
-  }
+    & :where(img, svg, video, canvas) {
+      vertical-align: middle;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(button, input, select, textarea) {
-    font: inherit;
-    font-feature-settings: inherit;
-    font-variation-settings: inherit;
-    letter-spacing: inherit;
-    color: inherit;
-    border-radius: 0;
-    background-color: transparent;
-    opacity: 1;
-  }
+    & :where(button, input, select, textarea) {
+      font: inherit;
+      font-feature-settings: inherit;
+      font-variation-settings: inherit;
+      letter-spacing: inherit;
+      color: inherit;
+      border-radius: 0;
+      background-color: transparent;
+      opacity: 1;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where(button, input:where([type="button"], [type="reset"], [type="submit"])) {
-    appearance: button;
-  }
+    & :where(button, input:where([type="button"], [type="reset"], [type="submit"])) {
+      appearance: button;
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    input::placeholder {
-    opacity: 1;
-    color: color-mix(in oklab, currentcolor 50%, transparent);
-  }
+    & input::placeholder {
+      opacity: 1;
+      color: color-mix(in oklab, currentcolor 50%, transparent);
+    }
 
-  :where(
-      ark-button,
-      ark-calendar,
-      ark-carousel,
-      ark-clock,
-      ark-datepicker,
-      ark-input,
-      ark-scheduler,
-      ark-switch,
-      ark-toaster,
-      ark-toggle,
-      ark-toggle-group
-    )
-    :where([hidden]:not([hidden="until-found"])) {
-    /* biome-ignore lint/complexity/noImportantStyles: espelha o preflight do Tailwind para [hidden] */
-    display: none !important;
+    & :where([hidden]:not([hidden="until-found"])) {
+      /* biome-ignore lint/complexity/noImportantStyles: espelha o preflight do Tailwind para [hidden] */
+      display: none !important;
+    }
   }
 }
