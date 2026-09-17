@@ -106,7 +106,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 O motion é desenhado em três camadas para que os componentes permaneçam livres de dependências:
 
 1. **Tokens** (`@tooark/tokens`) — durações (`--ark-duration-none/instant/quick/default/moderate/gentle/slow/long`, 0–1000 ms), curvas de easing (`--ark-ease-linear/standard/in/out/in-out/overshoot`) e a distância de slide. `prefers-reduced-motion` zera todas as durações na camada de tokens, cobrindo o sistema inteiro de uma vez.
-2. **Presets** (`@tooark/core`) — keyframes/classes CSS sem dependência (`.ark-animate-*`, `.ark-skeleton`) e helpers WAAPI (`arkEnter`, `arkExit`) usados pelos próprios componentes (ex.: entrada/saída dos toasts).
+2. **Presets** (`@tooark/core`) — keyframes/classes CSS sem dependência (`.ark-animate-*`, `.ark-skeleton`, `.ark-skeleton-animated`) e helpers WAAPI (`arkEnter`, `arkExit`) usados pelos próprios componentes (ex.: entrada/saída dos toasts).
 3. **`@tooark/motion`** (opt-in) — `arkStaggerEnter`, `arkReveal`, `arkFlip` e `arkSwipe` sobre a lib Motion, para física de spring e efeitos dirigidos por scroll. Só os projetos que instalam este pacote pagam pela lib.
 
 Escala de duração (`ArkDuration` no TypeScript, `--ark-duration-*` no CSS, `ARK_DURATION_MS` como espelho em JS). Todos os helpers (`arkEnter`, `arkExit`, `@tooark/motion`) aceitam tanto o nome do token quanto um número em milissegundos:
@@ -143,6 +143,8 @@ Os motion tokens são sobrescritos como os tokens de cor, com uma regra: mantenh
   }
 }
 ```
+
+**Loaders contínuos são isentos de movimento reduzido por design.** `.ark-animate-spin` (o spinner dentro do `ark-button`) continua girando sob `prefers-reduced-motion: reduce`: movimento reduzido existe para evitar desconforto vestibular, que uma rotação de 1 em não causa, enquanto um spinner congelado tira o único sinal de que algo está em andamento. Por isso ele também roda com `1s` fixo em vez de um token de duração, que o zeramento congelaria. Os loops de atenção param: `.ark-animate-shake`, `.ark-animate-pulse` e `.ark-skeleton-animated`. O `.ark-skeleton` em si é estático por padrão (um pulso infinito na única região sem nada para ler chama o olho e cai na WCAG 2.2.2); adicione `.ark-skeleton-animated` para optar pelo pulso, e dê `.ark-animate-fade-in` ao conteúdo que substitui um skeleton se quiser que ele entre suavemente.
 
 ---
 
@@ -254,6 +256,52 @@ Mais duas escalas são compartilhadas pelos controles de formulário:
 
 - **`size`** (`xs`/`sm`/`md`/`lg`/`xl`) mapeia para os tokens `--ark-size-*` (1.5 / 1.75 / 2.25 / 2.75 / 3.25 rem, ou seja, 24 a 52 px). `ark-button`, `ark-input` e `ark-toggle` aplicam o token como `min-height` (e como `min-width` nos botões só de ícone), então controles do mesmo tamanho alinham numa linha e sobrescrever `--ark-size-md` redimensiona todos os controles de uma vez; o `ark-switch` usa dimensões proporcionais do track.
 - **`rounded`** (`none`/`xs`/`sm`/`md`/`lg`/`xl`/`full`) mapeia para a escala de raios do Tailwind (`--ark-radius-xs` … `--ark-radius-xl`, 0.125 a 0.75 rem).
+
+#### Integrando com um tema existente
+
+Se o seu app já tem as próprias variáveis de design (um tema gerado, outro design system), faça a ponte delas para os tokens `--ark-*` em vez de duplicar valores. Três coisas decidem a aparência dos componentes:
+
+1. **`color-scheme` na página.** Os tokens são valores `light-dark()`, então os componentes leem o `color-scheme` da página e nada mais: sem uma declaração todo componente renderiza claro, seja qual for a preferência do sistema. Declare-o onde o seu app alterna o tema:
+
+   ```css
+   html {
+     color-scheme: light;
+   }
+   html.dark {
+     color-scheme: dark;
+   } /* ou [data-theme="dark"]; `light dark` segue o sistema */
+   ```
+
+2. **Ponte de marca.** Aponte os tokens para as suas variáveis. `light-dark()` não é necessário quando as suas variáveis já trocam com o tema, e todo token que você não tocar mantém o padrão:
+
+   ```css
+   :root {
+     --ark-color-primary: var(--brand);
+     --ark-color-primary-fg: var(--brand-fg);
+     --ark-color-primary-hover: var(--brand-hover);
+     --ark-color-primary-soft: var(--brand-soft);
+     --ark-color-primary-soft-fg: var(--brand-soft-fg);
+     --ark-color-primary-border: var(--brand-border);
+     --ark-color-primary-ring: var(--brand-ring);
+   }
+   ```
+
+   Se o seu tema também define neutros, faça a ponte de `--ark-color-surface*`, `--ark-color-fg*` e `--ark-color-border*` também; senão os seus cinzas e os cinzas dos componentes vêm de duas fontes.
+
+3. **Densidade.** `--ark-size-*` define a altura dos controles e `--ark-text-xs`/`--ark-text-sm` a maior parte do texto dentro deles (alguns micro-rótulos no calendário, no relógio, na agenda e no switch usam tamanhos fixos em pixel):
+
+   ```css
+   :root {
+     --ark-size-sm: 2rem; /* 32 px */
+     --ark-size-md: 2.5rem; /* 40 px */
+     --ark-size-lg: 3rem; /* 48 px */
+     --ark-text-sm: 0.75rem;
+   }
+   ```
+
+Overrides de duração e easing seguem a regra do [sistema de motion](#sistema-de-motion): mantenha-os dentro de `@media (prefers-reduced-motion: no-preference)`.
+
+`ark-chart` e `ark-wysiwyg` não podem ser tematizados só por CSS (ECharts e Tiptap pintam as próprias cores), então o `theme="auto"` deles resolve o `color-scheme` computado do host quando o elemento é criado: uma página que força `dark` recebe um gráfico escuro, uma página que o deixa em `light dark` (ou sem declarar) segue a preferência do sistema. Essa resolução não roda de novo quando a página troca de tema depois, então um app que alterna o tema em tempo de execução deve dirigir `theme="light|dark"` nesses dois elementos junto com a página.
 
 Para reaproveitar os mesmos tokens como utilities (`bg-primary`, `text-fg-muted`, …) no seu próprio projeto Tailwind v4, importe-os no seu entry CSS:
 

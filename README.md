@@ -106,7 +106,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 Motion is designed in three layers so the components stay dependency-free:
 
 1. **Tokens** (`@tooark/tokens`) — durations (`--ark-duration-none/instant/quick/default/moderate/gentle/slow/long`, 0–1000 ms), easing curves (`--ark-ease-linear/standard/in/out/in-out/overshoot`) and the slide distance. `prefers-reduced-motion` zeroes every duration at the token level, covering the whole system at once.
-2. **Presets** (`@tooark/core`) — zero-dependency CSS keyframes/classes (`.ark-animate-*`, `.ark-skeleton`) and WAAPI helpers (`arkEnter`, `arkExit`) used by the components themselves (e.g. toast enter/exit).
+2. **Presets** (`@tooark/core`) — zero-dependency CSS keyframes/classes (`.ark-animate-*`, `.ark-skeleton`, `.ark-skeleton-animated`) and WAAPI helpers (`arkEnter`, `arkExit`) used by the components themselves (e.g. toast enter/exit).
 3. **`@tooark/motion`** (opt-in) — `arkStaggerEnter`, `arkReveal`, `arkFlip` and `arkSwipe` on top of the Motion library, for spring physics and scroll-driven effects. Only projects that install this package pay for the library.
 
 Duration scale (`ArkDuration` in TypeScript, `--ark-duration-*` in CSS, `ARK_DURATION_MS` as the JS mirror). Every helper (`arkEnter`, `arkExit`, `@tooark/motion`) accepts either a token name or a raw number in milliseconds:
@@ -143,6 +143,8 @@ Motion tokens are overridden like the color tokens, with one rule: keep duration
   }
 }
 ```
+
+**Continuous loaders are exempt from reduced motion by design.** `.ark-animate-spin` (the spinner inside `ark-button`) keeps spinning under `prefers-reduced-motion: reduce`: reduced motion exists to avoid vestibular discomfort, which a 1 em rotation does not cause, while a frozen spinner removes the only sign that something is in progress. That is also why it runs on a fixed `1s` instead of a duration token, which the zeroing would freeze. Attention loops do stop: `.ark-animate-shake`, `.ark-animate-pulse` and `.ark-skeleton-animated`. `.ark-skeleton` itself is static by default (an infinite pulse on the one region with nothing to read draws the eye and falls under WCAG 2.2.2); add `.ark-skeleton-animated` to opt into the pulse, and give the content that replaces a skeleton `.ark-animate-fade-in` if you want it to ease in.
 
 ---
 
@@ -254,6 +256,52 @@ Two more scales are shared by the form controls:
 
 - **`size`** (`xs`/`sm`/`md`/`lg`/`xl`) maps to the `--ark-size-*` tokens (1.5 / 1.75 / 2.25 / 2.75 / 3.25 rem, i.e. 24 to 52 px). `ark-button`, `ark-input` and `ark-toggle` apply the token as `min-height` (and as `min-width` on icon-only buttons), so controls of the same size line up in a row and overriding `--ark-size-md` resizes every control at once; `ark-switch` uses proportional track dimensions instead.
 - **`rounded`** (`none`/`xs`/`sm`/`md`/`lg`/`xl`/`full`) maps to Tailwind's radius scale (`--ark-radius-xs` … `--ark-radius-xl`, 0.125 to 0.75 rem).
+
+#### Integrating with an existing theme
+
+If your app already has its own design variables (a generated theme, another design system), bridge them to the `--ark-*` tokens instead of duplicating values. Three things decide how the components look:
+
+1. **`color-scheme` on the page.** The tokens are `light-dark()` values, so the components read the page's `color-scheme` and nothing else: without a declaration every component renders light, whatever the OS preference. Declare it wherever your app toggles its theme:
+
+   ```css
+   html {
+     color-scheme: light;
+   }
+   html.dark {
+     color-scheme: dark;
+   } /* or [data-theme="dark"]; `light dark` follows the system */
+   ```
+
+2. **Brand bridge.** Point the tokens at your variables. `light-dark()` is not needed when your variables already switch with the theme, and every token you leave alone keeps its default:
+
+   ```css
+   :root {
+     --ark-color-primary: var(--brand);
+     --ark-color-primary-fg: var(--brand-fg);
+     --ark-color-primary-hover: var(--brand-hover);
+     --ark-color-primary-soft: var(--brand-soft);
+     --ark-color-primary-soft-fg: var(--brand-soft-fg);
+     --ark-color-primary-border: var(--brand-border);
+     --ark-color-primary-ring: var(--brand-ring);
+   }
+   ```
+
+   If your theme also defines neutrals, bridge `--ark-color-surface*`, `--ark-color-fg*` and `--ark-color-border*` as well; otherwise your greys and the components' greys come from two sources.
+
+3. **Density.** `--ark-size-*` sets the control heights and `--ark-text-xs`/`--ark-text-sm` most of the text inside the controls (a few micro-labels in the calendar, clock, scheduler and switch use fixed pixel sizes):
+
+   ```css
+   :root {
+     --ark-size-sm: 2rem; /* 32 px */
+     --ark-size-md: 2.5rem; /* 40 px */
+     --ark-size-lg: 3rem; /* 48 px */
+     --ark-text-sm: 0.75rem;
+   }
+   ```
+
+Duration and easing overrides follow the rule from the [motion system](#motion-system): keep them inside `@media (prefers-reduced-motion: no-preference)`.
+
+`ark-chart` and `ark-wysiwyg` cannot be themed by CSS alone (ECharts and Tiptap paint their own colors), so their `theme="auto"` resolves the host's computed `color-scheme` when the element is created: a page that forces `dark` gets a dark chart, a page that leaves it at `light dark` (or undeclared) follows the system preference. That resolution is not re-run when the page toggles later, so an app that switches theme at runtime should drive `theme="light|dark"` on these two elements together with the page.
 
 To reuse the same tokens as utilities (`bg-primary`, `text-fg-muted`, …) in your own Tailwind v4 project, import them in your CSS entry:
 
