@@ -46,7 +46,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 | Package                  | Description                                                                                                                                                                                                  |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `@tooark/tokens`         | Design primitives: semantic colors (intents), size scale, radii and motion tokens (`--ark-duration-*`, `--ark-ease-*`), exposed as CSS custom properties and Tailwind v4 `@theme` values.                    |
-| `@tooark/core`           | Shared foundation: TypeScript types (`ArkIntent`, `ArkSize`, …), i18n locales (`en`, `pt`, `es`), the toast service and the dependency-free motion layer (CSS presets + WAAPI helpers `arkEnter`/`arkExit`). |
+| `@tooark/core`           | Shared foundation: TypeScript types (`ArkIntent`, `ArkSize`, …), i18n locales (`en`, `pt`, `es`), the toast and announce services and the dependency-free motion layer (CSS presets + WAAPI helpers `arkEnter`/`arkExit`). |
 | `@tooark/web-components` | The native Custom Elements: `ark-button`, `ark-calendar`, `ark-carousel`, `ark-clock`, `ark-datepicker`, `ark-input`, `ark-scheduler`, `ark-switch`, `ark-toaster`, `ark-toggle` and `ark-toggle-group`.     |
 | `@tooark/react`          | React wrappers with typed props.                                                                                                                                                                             |
 | `@tooark/vue`            | Vue 3 wrappers.                                                                                                                                                                                              |
@@ -98,6 +98,8 @@ The monorepo is organized in layers — each package only depends on the layers 
 **`ark-carousel`** — the host is the scroll container and your slides are its direct children. `slides-per-view`, `gap` (px), `start-index`, `loop`, `autoplay`/`autoplay-delay` (paused on hover/focus and disabled under `prefers-reduced-motion`), `show-dots`/`show-arrows` (`"false"` hides), `drag-free`, `snap` (`mandatory`/`proximity`), `intent`, `accent-color`, `theme`. JS API: `index`, `slides`, `next()`, `prev()`. Emits `ark-slide-change` with `detail: { index }`.
 
 **`ark-toaster`** — `position` (`top-left` … `bottom-right`), `rich-colors`, `close-button` (`"false"` hides), `max-visible`, `duration` (ms; `0` keeps toasts until dismissed), `lang`, `theme`. Fed by the `toast` service from `@tooark/core` (or the `toast()`/`dismiss()` methods); emits `ark-toast-action` with `detail: { id, actionId }` when an action button is clicked.
+
+**`announce()`** (service, `@tooark/core`) — `announce(text, politeness = "polite")` speaks a message to screen readers through a single hidden live region appended to `document.body` (`data-ark="announcer"`, with a `role="status"` child for `polite` and a `role="alert"` child for `assertive`). Components use it to announce a result in place (a button's `status`, "copied", chosen files) without creating live regions inside the host, where the text would join the control's accessible name. Calling it again with the same text announces it again; it is a no-op without a DOM.
 
 ---
 

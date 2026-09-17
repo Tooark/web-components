@@ -46,7 +46,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 | Pacote                   | Descrição                                                                                                                                                                                                              |
 | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@tooark/tokens`         | Primitivas de design: cores semânticas (intents), escala de tamanhos, raios e motion tokens (`--ark-duration-*`, `--ark-ease-*`), expostos como custom properties CSS e valores `@theme` do Tailwind v4.               |
-| `@tooark/core`           | Fundação compartilhada: tipos TypeScript (`ArkIntent`, `ArkSize`, …), locales de i18n (`en`, `pt`, `es`), o serviço de toast e a camada de motion sem dependências (presets CSS + helpers WAAPI `arkEnter`/`arkExit`). |
+| `@tooark/core`           | Fundação compartilhada: tipos TypeScript (`ArkIntent`, `ArkSize`, …), locales de i18n (`en`, `pt`, `es`), os serviços de toast e announce e a camada de motion sem dependências (presets CSS + helpers WAAPI `arkEnter`/`arkExit`). |
 | `@tooark/web-components` | Os Custom Elements nativos: `ark-button`, `ark-calendar`, `ark-carousel`, `ark-clock`, `ark-datepicker`, `ark-input`, `ark-scheduler`, `ark-switch`, `ark-toaster`, `ark-toggle` e `ark-toggle-group`.                 |
 | `@tooark/react`          | Wrappers React com props tipadas.                                                                                                                                                                                      |
 | `@tooark/vue`            | Wrappers Vue 3.                                                                                                                                                                                                        |
@@ -98,6 +98,8 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 **`ark-carousel`** — o host é o container rolável e seus slides são filhos diretos dele. `slides-per-view`, `gap` (px), `start-index`, `loop`, `autoplay`/`autoplay-delay` (pausa em hover/foco e desliga com `prefers-reduced-motion`), `show-dots`/`show-arrows` (`"false"` esconde), `drag-free`, `snap` (`mandatory`/`proximity`), `intent`, `accent-color`, `theme`. API JS: `index`, `slides`, `next()`, `prev()`. Emite `ark-slide-change` com `detail: { index }`.
 
 **`ark-toaster`** — `position` (`top-left` … `bottom-right`), `rich-colors`, `close-button` (`"false"` esconde), `max-visible`, `duration` (ms; `0` mantém o toast até ser fechado), `lang`, `theme`. Alimentado pelo serviço `toast` do `@tooark/core` (ou pelos métodos `toast()`/`dismiss()`); emite `ark-toast-action` com `detail: { id, actionId }` ao clicar num botão de ação.
+
+**`announce()`** (serviço, `@tooark/core`) — `announce(text, politeness = "polite")` fala uma mensagem para leitores de tela por uma única live region oculta anexada ao `document.body` (`data-ark="announcer"`, com um filho `role="status"` para `polite` e um `role="alert"` para `assertive`). Os componentes o usam para anunciar um resultado no lugar (o `status` de um botão, "copiado", arquivos escolhidos) sem criar live regions dentro do host, onde o texto entraria no nome acessível do controle. Chamar de novo com o mesmo texto anuncia de novo; sem DOM é no-op.
 
 ---
 
