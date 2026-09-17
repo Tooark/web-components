@@ -43,6 +43,44 @@
     margin-right: 0.5rem;
   }
 
+  /* ---------- ark-select: mesma grid do ark-input, chevron sobre o campo ---------- */
+
+  ark-select {
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "label"
+      "field"
+      "message";
+    align-items: center;
+  }
+
+  ark-select > [data-ark="select-label"] {
+    grid-area: label;
+  }
+
+  ark-select > [data-ark="select"] {
+    grid-area: field;
+  }
+
+  ark-select > [data-ark="select-helper"],
+  ark-select > [data-ark="select-error"] {
+    grid-area: message;
+  }
+
+  /* O chevron do componente compartilha a área do campo, encosta na direita e deixa o clique passar. */
+  ark-select > [data-ark="select-chevron"] {
+    grid-area: field;
+    justify-self: end;
+    align-self: center;
+    margin-right: 0.75rem;
+    pointer-events: none;
+  }
+
+  ark-select:has(> select:disabled) > [data-ark="select-chevron"] {
+    opacity: 0.5;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

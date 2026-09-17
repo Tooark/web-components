@@ -15,6 +15,8 @@ export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
 export type { ArkSchedulerProps } from "./ark-scheduler";
 export { ArkScheduler } from "./ark-scheduler";
+export type { ArkSelectProps } from "./ark-select";
+export { ArkSelect } from "./ark-select";
 export type { ArkSwitchProps } from "./ark-switch";
 export { ArkSwitch } from "./ark-switch";
 export type { ArkToasterProps } from "./ark-toaster";

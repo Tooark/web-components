@@ -282,6 +282,34 @@ export type ArkInputStyleOptions = {
   rounded?: ArkRounded;
 };
 
+// Exports types específicos do componente select
+
+/** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */
+export type ArkSelectOption = {
+  /** Valor enviado no formulário e devolvido em `change`. */
+  value: string;
+  /** Texto exibido. */
+  label: string;
+  /** Opção presente mas não selecionável. */
+  disabled?: boolean;
+  /** Rótulo do <optgroup> que agrupa esta opção. */
+  group?: string;
+};
+
+/** Props de estilo do ark-select. */
+export type ArkSelectStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+  testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Intenção semântica de cor do foco e da borda. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Altura do campo via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Arredondamento da borda do campo. Padrão: "lg". */
+  rounded?: ArkRounded;
+};
+
 /** Props de estilo e comportamento do ark-clock. */
 export type ArkClockStyleOptions = {
   /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */

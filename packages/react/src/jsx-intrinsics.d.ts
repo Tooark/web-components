@@ -135,6 +135,23 @@ declare global {
         "slot-minutes"?: number;
         "hours-format"?: "24" | "12";
       };
+      "ark-select": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        label?: string;
+        placeholder?: string;
+        options?: string;
+        value?: string;
+        name?: string;
+        size?: ArkSize;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        rounded?: ArkRounded;
+        helper?: string;
+        error?: boolean;
+        "error-message"?: string;
+        disabled?: boolean;
+        required?: boolean;
+      };
       "ark-input": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         type?: string;

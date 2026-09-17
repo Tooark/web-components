@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Controles do mesmo `size` compartilham a altura do token `--ark-size-*` (min-height), entao alinham lado a lado sem ajuste manual: 24/28/36/44/52 px de xs a xl."
+          "Controles do mesmo `size` (button, toggle, input, select) compartilham a altura do token `--ark-size-*` (min-height), entao alinham lado a lado sem ajuste manual: 24/28/36/44/52 px de xs a xl."
       }
     }
   }
@@ -48,7 +48,12 @@ export const SameSizeControls = {
       input.setAttribute("size", size);
       input.setAttribute("placeholder", `Input ${size}`);
 
-      row.append(button, iconOnly, toggle, input);
+      const select = document.createElement("ark-select");
+      select.setAttribute("size", size);
+      select.setAttribute("placeholder", `Select ${size}`);
+      select.setAttribute("options", JSON.stringify([{ value: "a", label: "Opcao A" }]));
+
+      row.append(button, iconOnly, toggle, input, select);
       wrap.appendChild(row);
     });
 
@@ -66,7 +71,8 @@ export const SameSizeControls = {
         row.querySelector<HTMLElement>("ark-button:not([icon-only])"),
         row.querySelector<HTMLElement>("ark-button[icon-only]"),
         row.querySelector<HTMLElement>("ark-toggle"),
-        row.querySelector<HTMLElement>("ark-input input")
+        row.querySelector<HTMLElement>("ark-input input"),
+        row.querySelector<HTMLElement>("ark-select select")
       ];
 
       for (const control of controls) {

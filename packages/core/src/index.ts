@@ -28,6 +28,8 @@ export type {
   ArkSchedulerEvent,
   ArkSchedulerStyleOptions,
   ArkSchedulerView,
+  ArkSelectOption,
+  ArkSelectStyleOptions,
   ArkSize,
   ArkStyleVariant,
   ArkSwitchStyleOptions,
