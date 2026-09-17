@@ -6,8 +6,10 @@ import type {
   ArkCarouselSnap,
   ArkDatepickerLang,
   ArkIntent,
+  ArkLang,
   ArkRounded,
   ArkSize,
+  ArkTextareaResize,
   ArkTheme,
   ArkToastPosition
 } from "@tooark/core";
@@ -169,6 +171,45 @@ declare global {
         disabled?: boolean;
         required?: boolean;
         readonly?: boolean;
+        reveal?: boolean;
+        lang?: ArkLang;
+        "locale-json"?: string;
+        autocomplete?: string;
+        autofocus?: boolean;
+        inputmode?: string;
+        maxlength?: number | string;
+        minlength?: number | string;
+        pattern?: string;
+        min?: number | string;
+        max?: number | string;
+        step?: number | string;
+        spellcheck?: boolean | "true" | "false";
+      };
+      "ark-textarea": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        label?: string;
+        placeholder?: string;
+        value?: string;
+        name?: string;
+        rows?: number | string;
+        autosize?: boolean;
+        monospace?: boolean;
+        resize?: ArkTextareaResize;
+        size?: ArkSize;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        rounded?: ArkRounded;
+        helper?: string;
+        error?: boolean;
+        "error-message"?: string;
+        disabled?: boolean;
+        required?: boolean;
+        readonly?: boolean;
+        autocomplete?: string;
+        autofocus?: boolean;
+        maxlength?: number | string;
+        minlength?: number | string;
+        spellcheck?: boolean | "true" | "false";
       };
       "ark-carousel": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

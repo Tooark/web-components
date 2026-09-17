@@ -31,8 +31,11 @@ export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 
 // Exports types específicos do componente datepicker
 
-/** Idioma dos rótulos; "custom" usa as strings fornecidas em locale-json. */
-export type ArkDatepickerLang = "en" | "pt" | "es" | "custom";
+/** Idioma dos rótulos dos componentes; "custom" usa as strings fornecidas em locale-json. */
+export type ArkLang = "en" | "pt" | "es" | "custom";
+
+/** Nome anterior de ArkLang, mantido por compatibilidade. */
+export type ArkDatepickerLang = ArkLang;
 
 // Exports types específicos do componente badge
 
@@ -305,6 +308,25 @@ export type ArkSelectStyleOptions = {
   /** Intenção semântica de cor do foco e da borda. Padrão: "primary". */
   intent?: ArkIntent;
   /** Altura do campo via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Arredondamento da borda do campo. Padrão: "lg". */
+  rounded?: ArkRounded;
+};
+
+// Exports types específicos do componente textarea
+
+/** Direções em que o usuário pode redimensionar a área de texto. */
+export type ArkTextareaResize = "none" | "vertical";
+
+/** Props de estilo do ark-textarea. */
+export type ArkTextareaStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+  testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Intenção semântica de cor do foco e da borda. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Fonte, padding e altura mínima (uma linha alinha com o ark-input) via token --ark-size-*. Padrão: "md". */
   size?: ArkSize;
   /** Arredondamento da borda do campo. Padrão: "lg". */
   rounded?: ArkRounded;

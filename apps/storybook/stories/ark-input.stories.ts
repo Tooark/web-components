@@ -27,6 +27,9 @@ const meta = {
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     readonly: { control: "boolean", description: "Campo somente leitura" },
+    reveal: { control: "boolean", description: "Com type=password, botao de mostrar/ocultar na ponta direita" },
+    lang: { control: "select", options: ["en", "pt", "es"], description: "Idioma dos rotulos internos (reveal)" },
+    prefix: { control: "text", description: 'Conteudo do slot="prefix" (ex.: R$); vazio nao renderiza prefixo' },
     suffix: { control: "text", description: 'Conteudo do slot="suffix" (ex.: um icone); vazio nao renderiza sufixo' },
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     intent: {
@@ -53,6 +56,9 @@ const meta = {
     disabled: false,
     required: false,
     readonly: false,
+    reveal: false,
+    lang: "pt",
+    prefix: "",
     suffix: "",
     size: "md",
     intent: "primary",
@@ -76,6 +82,9 @@ type StoryArgs = {
   disabled: boolean;
   required: boolean;
   readonly: boolean;
+  reveal: boolean;
+  lang: string;
+  prefix: string;
   suffix: string;
   size: ArkSize;
   intent: ArkIntent;
@@ -101,7 +110,16 @@ function createInput(args: Partial<StoryArgs>): HTMLElement {
   if (args.disabled) el.setAttribute("disabled", "");
   if (args.required) el.setAttribute("required", "");
   if (args.readonly) el.setAttribute("readonly", "");
+  if (args.reveal) el.setAttribute("reveal", "");
+  if (args.lang) el.setAttribute("lang", args.lang);
   if (args.testid) el.setAttribute("testid", args.testid);
+
+  if (args.prefix) {
+    const prefix = document.createElement("span");
+    prefix.setAttribute("slot", "prefix");
+    prefix.textContent = args.prefix;
+    el.appendChild(prefix);
+  }
 
   if (args.suffix) {
     // O sufixo precisa existir antes do primeiro render (light DOM).
@@ -208,5 +226,102 @@ export const TypingUpdatesValue = {
 
     const host = canvasElement.querySelector("ark-input") as HTMLElement & { value: string };
     await expect(host.value).toBe("Tooark");
+  }
+};
+
+export const WithPrefix = {
+  args: { label: "Preco", placeholder: "0,00", prefix: "R$" },
+  render: Playground.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const prefix = host.querySelector<HTMLElement>('[slot="prefix"]')!;
+    const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+
+    // O prefixo do usuario continua filho direto do host, posicionado por CSS sobre a ponta esquerda.
+    await expect(prefix.parentElement).toBe(host);
+    await expect(prefix).toHaveAttribute("data-ark", "input-prefix");
+
+    const inputRect = input.getBoundingClientRect();
+    const prefixRect = prefix.getBoundingClientRect();
+    await expect(prefixRect.left).toBeGreaterThanOrEqual(inputRect.left);
+    await expect(prefixRect.right).toBeLessThan(inputRect.left + inputRect.width / 2);
+
+    // Prefixo removido depois da montagem: o padding extra some.
+    const paddedLeft = getComputedStyle(input).paddingLeft;
+    prefix.remove();
+    await waitFor(() => expect(getComputedStyle(input).paddingLeft).not.toBe(paddedLeft));
+  }
+};
+
+export const RevealPassword = {
+  args: { type: "password", label: "Senha", value: "segredo", reveal: true, lang: "pt" },
+  render: Playground.render,
+  // O botao alterna o type do input, reflete aria-pressed e fala o idioma do host.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+    const button = host.querySelector<HTMLButtonElement>('[data-ark="input-reveal"]')!;
+
+    await expect(input.type).toBe("password");
+    await expect(button).toHaveAttribute("aria-pressed", "false");
+    await expect(button).toHaveAttribute("aria-label", "Mostrar senha");
+
+    await userEvent.click(button);
+    await expect(input.type).toBe("text");
+    await expect(button).toHaveAttribute("aria-pressed", "true");
+    await expect(button).toHaveAttribute("aria-label", "Ocultar senha");
+    await expect(input.value).toBe("segredo");
+
+    host.setAttribute("lang", "en");
+    await expect(button).toHaveAttribute("aria-label", "Hide password");
+
+    await userEvent.click(button);
+    await expect(input.type).toBe("password");
+
+    // Sem `reveal` o botao some e o campo volta a ser uma senha comum.
+    host.removeAttribute("reveal");
+    await expect(host.querySelector('[data-ark="input-reveal"]')).toBeNull();
+    await expect(input.type).toBe("password");
+  }
+};
+
+export const RevealWithSuffix = {
+  args: { type: "password", label: "Senha", reveal: true, suffix: "🔒" },
+  render: Playground.render,
+  // Sufixo do usuario e botao de revelar convivem: o sufixo abre espaco e nao sobrepoe o botao.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const suffix = host.querySelector<HTMLElement>('[slot="suffix"]')!;
+    const button = host.querySelector<HTMLButtonElement>('[data-ark="input-reveal"]')!;
+
+    const suffixRect = suffix.getBoundingClientRect();
+    const buttonRect = button.getBoundingClientRect();
+    await expect(suffixRect.right).toBeLessThanOrEqual(buttonRect.left + 0.5);
+  }
+};
+
+export const PassThroughAttributes = {
+  render: () => {
+    const el = createInput({ label: "CEP" });
+    el.setAttribute("inputmode", "numeric");
+    el.setAttribute("maxlength", "9");
+    el.setAttribute("pattern", "[0-9-]*");
+    el.setAttribute("autocomplete", "postal-code");
+    el.setAttribute("aria-label", "CEP");
+    return el;
+  },
+  // Atributos nativos do host chegam ao <input> sem interpretacao e somem quando removidos.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+
+    await expect(input).toHaveAttribute("inputmode", "numeric");
+    await expect(input).toHaveAttribute("maxlength", "9");
+    await expect(input).toHaveAttribute("pattern", "[0-9-]*");
+    await expect(input).toHaveAttribute("autocomplete", "postal-code");
+    await expect(input).toHaveAttribute("aria-label", "CEP");
+
+    host.removeAttribute("maxlength");
+    await expect(input).not.toHaveAttribute("maxlength");
   }
 };

@@ -43,6 +43,57 @@
     margin-right: 0.5rem;
   }
 
+  /* O prefixo do usuário espelha o sufixo na ponta esquerda. */
+  ark-input > [slot="prefix"] {
+    grid-area: field;
+    justify-self: start;
+    align-self: center;
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: 0.5rem;
+  }
+
+  /* Botão de revelar senha (nó do componente) na ponta direita; um sufixo do usuário abre espaço para ele. */
+  ark-input > [data-ark="input-reveal"] {
+    grid-area: field;
+    justify-self: end;
+    align-self: center;
+    position: relative;
+    z-index: 1;
+    margin-right: 0.5rem;
+  }
+
+  ark-input:has(> [data-ark="input-reveal"]) > [slot="suffix"] {
+    margin-right: var(--ark-input-reveal-offset, 2.25rem);
+  }
+
+  /* ---------- ark-textarea: mesma grid do ark-input ---------- */
+
+  ark-textarea {
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "label"
+      "field"
+      "message";
+  }
+
+  ark-textarea > [data-ark="textarea-label"] {
+    grid-area: label;
+  }
+
+  ark-textarea > [data-ark="textarea"] {
+    grid-area: field;
+  }
+
+  ark-textarea > [data-ark="textarea-helper"],
+  ark-textarea > [data-ark="textarea-error"] {
+    grid-area: message;
+  }
+
   /* ---------- ark-select: mesma grid do ark-input, chevron sobre o campo ---------- */
 
   ark-select {

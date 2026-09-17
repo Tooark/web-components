@@ -9,6 +9,7 @@ import {
   ArkScheduler,
   ArkSelect,
   ArkSwitch,
+  ArkTextarea,
   ArkToaster,
   ArkToggle,
   ArkToggleGroup
@@ -34,6 +35,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkSelect.tagName)) {
     customElements.define(ArkSelect.tagName, ArkSelect);
+  }
+
+  if (!customElements.get(ArkTextarea.tagName)) {
+    customElements.define(ArkTextarea.tagName, ArkTextarea);
   }
 
   if (!customElements.get(ArkCalendar.tagName)) {

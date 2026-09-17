@@ -9,5 +9,6 @@ export { ArkInputComponent } from "./ark-input.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
 export { ArkSelectComponent } from "./ark-select.component";
 export { ArkSwitchComponent } from "./ark-switch.component";
+export { ArkTextareaComponent } from "./ark-textarea.component";
 export { ArkToasterComponent } from "./ark-toaster.component";
 export { ArkToggleComponent, ArkToggleGroupComponent } from "./ark-toggle.component";

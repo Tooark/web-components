@@ -1,33 +1,31 @@
-import type { ArkInputStyleOptions, ArkLang } from "@tooark/core";
+import type { ArkTextareaResize, ArkTextareaStyleOptions } from "@tooark/core";
 import React, { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register";
 
-export type ArkInputProps = PropsWithChildren<
-  ArkInputStyleOptions & {
-    type?: string;
+export type ArkTextareaProps = PropsWithChildren<
+  ArkTextareaStyleOptions & {
     label?: string;
     placeholder?: string;
     value?: string;
     name?: string;
+    /** Linhas visiveis iniciais. Padrao: 3. */
+    rows?: number;
+    /** Cresce com o conteudo (field-sizing nativo, fallback por JS). */
+    autosize?: boolean;
+    /** Fonte monoespacada, para codigo e dados. */
+    monospace?: boolean;
+    /** Direcoes de redimensionamento pelo usuario. Padrao: "vertical". */
+    resize?: ArkTextareaResize;
     helper?: string;
     error?: boolean;
     errorMessage?: string;
     disabled?: boolean;
     required?: boolean;
     readonly?: boolean;
-    /** Com type="password", botao de mostrar/ocultar na ponta direita. */
-    reveal?: boolean;
-    lang?: ArkLang;
-    localeJson?: string;
     autocomplete?: string;
     autofocus?: boolean;
-    inputmode?: string;
     maxlength?: number;
     minlength?: number;
-    pattern?: string;
-    min?: string | number;
-    max?: string | number;
-    step?: string | number;
     spellcheck?: boolean;
     "aria-label"?: string;
     className?: string;
@@ -41,23 +39,21 @@ function attr(value: string | number | undefined): string | undefined {
   return value === undefined ? undefined : String(value);
 }
 
-export function ArkInput(props: ArkInputProps): React.JSX.Element {
+export function ArkTextarea(props: ArkTextareaProps): React.JSX.Element {
   const {
     children,
     className,
+    rows,
+    autosize,
+    monospace,
     errorMessage,
     error,
     disabled,
     required,
     readonly,
-    reveal,
-    localeJson,
     autofocus,
     maxlength,
     minlength,
-    min,
-    max,
-    step,
     spellcheck,
     onInput,
     onChange,
@@ -87,21 +83,19 @@ export function ArkInput(props: ArkInputProps): React.JSX.Element {
     ...rest,
     ref,
     class: className,
+    rows: attr(rows),
+    autosize: autosize ? "" : undefined,
+    monospace: monospace ? "" : undefined,
     "error-message": errorMessage,
-    "locale-json": localeJson,
     error: error ? "" : undefined,
     disabled: disabled ? "" : undefined,
     required: required ? "" : undefined,
     readonly: readonly ? "" : undefined,
-    reveal: reveal ? "" : undefined,
     autofocus: autofocus ? "" : undefined,
     maxlength: attr(maxlength),
     minlength: attr(minlength),
-    min: attr(min),
-    max: attr(max),
-    step: attr(step),
     spellcheck: spellcheck === undefined ? undefined : spellcheck ? "true" : "false"
   };
 
-  return createElement("ark-input", attrs, children);
+  return createElement("ark-textarea", attrs, children);
 }

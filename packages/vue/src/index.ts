@@ -9,5 +9,6 @@ export { ArkInput } from "./ark-input";
 export { ArkScheduler } from "./ark-scheduler";
 export { ArkSelect } from "./ark-select";
 export { ArkSwitch } from "./ark-switch";
+export { ArkTextarea } from "./ark-textarea";
 export { ArkToaster } from "./ark-toaster";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle";
