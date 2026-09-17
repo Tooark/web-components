@@ -1,7 +1,7 @@
 import type { JSONContent } from "@tiptap/core";
 import type { ArkThemeSelected } from "@tooark/tokens";
 
-/** Tema do editor/viewer. "auto" segue a preferência do sistema. */
+/** Tema do editor/viewer. "auto" segue o color-scheme do host, ou a preferência do sistema sem lado fixo. */
 export type ArkWysiwygTheme = "auto" | ArkThemeSelected;
 
 /**

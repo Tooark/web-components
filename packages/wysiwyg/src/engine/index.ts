@@ -2,7 +2,7 @@ import type { Extensions, JSONContent } from "@tiptap/core";
 import { Editor } from "@tiptap/core";
 import Placeholder from "@tiptap/extension-placeholder";
 import StarterKit from "@tiptap/starter-kit";
-import type { ArkThemeSelected } from "@tooark/tokens";
+import { type ArkThemeSelected, resolveColorScheme } from "@tooark/tokens";
 import type { ArkWysiwygEditorOptions, ArkWysiwygTheme, ArkWysiwygViewerOptions } from "../types";
 
 /** Documento vazio do ProseMirror (um parágrafo). */
@@ -27,19 +27,11 @@ export type ArkWysiwygInstance = {
   destroy(): void;
 };
 
-function prefersDark(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
-}
-
-/** Resolve "auto" para "light"/"dark" conforme a preferência do sistema. */
-export function resolveWysiwygTheme(theme: ArkWysiwygTheme | undefined): ArkThemeSelected {
+/** Resolve "auto" para "light"/"dark" pelo color-scheme computado de `element`, ou pela preferência do sistema. */
+export function resolveWysiwygTheme(theme: ArkWysiwygTheme | undefined, element?: Element | null): ArkThemeSelected {
   if (theme === "dark") return "dark";
   if (theme === "light") return "light";
-  return prefersDark() ? "dark" : "light";
+  return resolveColorScheme(element);
 }
 
 function applyTheme(element: HTMLElement, theme: ArkThemeSelected): void {
@@ -55,7 +47,7 @@ type InternalOptions = {
 };
 
 function createInstance(element: HTMLElement, options: InternalOptions): ArkWysiwygInstance {
-  let resolved = resolveWysiwygTheme(options.theme);
+  let resolved = resolveWysiwygTheme(options.theme, element);
 
   const extensions: Extensions = [StarterKit];
   if (options.placeholder) {
@@ -84,7 +76,7 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
     isActive: (name, attrs) => editor.isActive(name, attrs),
     setEditable: (editable) => editor.setEditable(editable),
     setTheme: (theme) => {
-      resolved = resolveWysiwygTheme(theme);
+      resolved = resolveWysiwygTheme(theme, element);
       applyTheme(element, resolved);
     },
     resolvedTheme: () => resolved,

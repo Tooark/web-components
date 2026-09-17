@@ -1,4 +1,4 @@
-import type { ArkThemeSelected } from "@tooark/tokens";
+import { type ArkThemeSelected, resolveColorScheme } from "@tooark/tokens";
 import type { EChartsOption, EChartsType } from "echarts";
 import * as echarts from "echarts";
 import type { ArkChartOptions, ArkChartTheme } from "../types";
@@ -18,19 +18,11 @@ export type ArkChartInstance = {
   destroy(): void;
 };
 
-function prefersDark(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
-  );
-}
-
-/** Resolve "auto" para "light"/"dark" conforme a preferência do sistema. */
-export function resolveChartTheme(theme: ArkChartTheme | undefined): ArkThemeSelected {
+/** Resolve "auto" para "light"/"dark" pelo color-scheme computado de `element`, ou pela preferência do sistema. */
+export function resolveChartTheme(theme: ArkChartTheme | undefined, element?: Element | null): ArkThemeSelected {
   if (theme === "dark") return "dark";
   if (theme === "light") return "light";
-  return prefersDark() ? "dark" : "light";
+  return resolveColorScheme(element);
 }
 
 /**
@@ -42,7 +34,7 @@ export function resolveChartTheme(theme: ArkChartTheme | undefined): ArkThemeSel
 export function createChart(container: HTMLElement, options: ArkChartOptions): ArkChartInstance {
   const renderer = options.renderer ?? "canvas";
   let currentOption = options.option;
-  let resolved = resolveChartTheme(options.theme);
+  let resolved = resolveChartTheme(options.theme, container);
 
   const init = (): EChartsType => {
     const instance = echarts.init(container, resolved === "dark" ? "dark" : undefined, { renderer });
@@ -61,7 +53,7 @@ export function createChart(container: HTMLElement, options: ArkChartOptions): A
       chart.setOption(option, { notMerge: opts?.notMerge ?? false });
     },
     setTheme: (theme) => {
-      const next = resolveChartTheme(theme);
+      const next = resolveChartTheme(theme, container);
       if (next === resolved && !chart.isDisposed()) return;
       resolved = next;
       chart.dispose();

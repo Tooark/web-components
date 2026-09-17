@@ -1,7 +1,7 @@
 import type { ArkThemeSelected } from "@tooark/tokens";
 import type { EChartsOption } from "echarts";
 
-/** Tema do gráfico. "auto" segue a preferência do sistema (prefers-color-scheme). */
+/** Tema do gráfico. "auto" segue o color-scheme do host, ou a preferência do sistema sem lado fixo. */
 export type ArkChartTheme = "auto" | ArkThemeSelected;
 
 /** Renderer usado pelo ECharts. */
