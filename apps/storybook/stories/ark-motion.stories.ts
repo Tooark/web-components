@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Motion tokens (--ark-duration-*, --ark-ease-*) e presets de animacao do @tooark/core: classes CSS (.ark-animate-*) e helpers WAAPI (arkEnter/arkExit). Respeita prefers-reduced-motion automaticamente."
+          "Motion tokens (--ark-duration-*, --ark-ease-*) e presets de animacao do @tooark/core: classes CSS (.ark-animate-*) e helpers WAAPI (arkEnter/arkExit). Respeita prefers-reduced-motion automaticamente; o skeleton e estatico por padrao (.ark-skeleton-animated pulsa) e o spinner continua girando sob movimento reduzido."
       }
     }
   }
@@ -117,17 +117,20 @@ export const Presets = {
     pulse.classList.add("ark-animate-pulse");
     loading.grid.appendChild(pulse);
 
-    const skeletonTile = createTile("");
-    skeletonTile.title = ".ark-skeleton";
-    const skeletonWrap = document.createElement("div");
-    skeletonWrap.className = "flex w-full flex-col gap-2";
-    for (const width of ["w-full", "w-3/4", "w-1/2"]) {
-      const bar = document.createElement("div");
-      bar.className = `ark-skeleton h-3 ${width}`;
-      skeletonWrap.appendChild(bar);
+    // Skeleton estatico por padrao; o pulso e opt-in.
+    for (const extra of ["", " ark-skeleton-animated"]) {
+      const skeletonTile = createTile("");
+      skeletonTile.title = extra ? ".ark-skeleton.ark-skeleton-animated" : ".ark-skeleton";
+      const skeletonWrap = document.createElement("div");
+      skeletonWrap.className = "flex w-full flex-col gap-2";
+      for (const width of ["w-full", "w-3/4", "w-1/2"]) {
+        const bar = document.createElement("div");
+        bar.className = `ark-skeleton${extra} h-3 ${width}`;
+        skeletonWrap.appendChild(bar);
+      }
+      skeletonTile.appendChild(skeletonWrap);
+      loading.grid.appendChild(skeletonTile);
     }
-    skeletonTile.appendChild(skeletonWrap);
-    loading.grid.appendChild(skeletonTile);
 
     container.appendChild(loading.section);
 
@@ -303,5 +306,68 @@ export const ReducedMotionOverride = {
       );
     expect(root).toBeDefined();
     expect((root as CSSStyleRule).style.getPropertyPriority("--ark-duration-default")).toBe("important");
+  }
+};
+
+export const ReducedMotionLoaders = {
+  render: (): HTMLElement => {
+    const container = document.createElement("div");
+    container.className = "mx-auto max-w-3xl";
+
+    const section = createSection("Loaders continuos sao isentos de movimento reduzido; loops de atencao param");
+    section.grid.className = "flex flex-col gap-2 text-xs text-slate-600";
+
+    const text = document.createElement("p");
+    text.textContent =
+      "O spinner e o unico sinal de progresso e uma rotacao de 1em nao causa desconforto vestibular, entao .ark-animate-spin continua girando sob prefers-reduced-motion (1s fixo, nao token). Shake, pulse e .ark-skeleton-animated param; .ark-skeleton ja e estatico por padrao.";
+    section.grid.appendChild(text);
+
+    const row = document.createElement("div");
+    row.className = "flex items-center gap-6";
+
+    const spinner = document.createElement("div");
+    spinner.className = "ark-animate-spin h-6 w-6 rounded-full border-2 border-slate-300 border-t-slate-700";
+    row.appendChild(spinner);
+
+    const shake = createTile(".ark-animate-shake");
+    shake.classList.add("ark-animate-shake");
+    row.appendChild(shake);
+
+    const skeleton = document.createElement("div");
+    skeleton.className = "ark-skeleton h-3 w-24";
+    row.appendChild(skeleton);
+
+    const animated = document.createElement("div");
+    animated.className = "ark-skeleton ark-skeleton-animated h-3 w-24";
+    row.appendChild(animated);
+
+    section.grid.appendChild(row);
+    container.appendChild(section.section);
+    return container;
+  },
+  // Forca as media queries a casar, como na story acima, e compara o que para com o que continua.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const rules = findReducedMotionRules();
+    expect(rules.length).toBeGreaterThan(0);
+
+    const name = (selector: string): string =>
+      getComputedStyle(canvasElement.querySelector<HTMLElement>(selector) as HTMLElement).animationName;
+
+    expect(name(".ark-animate-spin")).toBe("ark-spin");
+    expect(name(".ark-animate-shake")).toBe("ark-shake");
+    expect(name(".ark-skeleton:not(.ark-skeleton-animated)")).toBe("none");
+    expect(name(".ark-skeleton-animated")).toBe("ark-pulse");
+
+    const originalMedia = rules.map((rule) => rule.media.mediaText);
+    try {
+      for (const rule of rules) rule.media.mediaText = "all";
+      expect(name(".ark-animate-spin")).toBe("ark-spin");
+      expect(name(".ark-animate-shake")).toBe("none");
+      expect(name(".ark-skeleton-animated")).toBe("none");
+    } finally {
+      rules.forEach((rule, index) => {
+        rule.media.mediaText = originalMedia[index];
+      });
+    }
   }
 };

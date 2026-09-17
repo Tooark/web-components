@@ -12,11 +12,9 @@ type ArkButtonPalette = {
   ghost: string;
 };
 
-/**
- * SVG do spinner de carregamento do botão Ark.
- */
+/** SVG do spinner de carregamento: usa o preset `.ark-animate-spin` do core, isento de movimento reduzido. */
 const SPINNER_SVG = `
-  <svg class="ark:h-[1em] ark:w-[1em] ark:animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <svg class="ark:h-[1em] ark:w-[1em] ark-animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <circle class="ark:opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
     <path class="ark:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
   </svg>`;

@@ -7,7 +7,9 @@
  *
  * prefers-reduced-motion é respeitado automaticamente: os tokens de duração
  * zeram via media query em @tooark/tokens e, abaixo, os presets fixam 0ms
- * ignorando overrides locais, como já fazem os helpers WAAPI em JS.
+ * ignorando overrides locais, como já fazem os helpers WAAPI em JS. A única
+ * exceção é o loader contínuo (.ark-animate-spin), isento por design: ver o
+ * bloco de movimento reduzido no fim do arquivo.
  */
 
 /* ---------- Enter ---------- */
@@ -242,6 +244,7 @@
   animation: ark-shake var(--ark-duration-moderate, 350ms) var(--ark-ease-in-out, ease-in-out);
 }
 
+/* 1s fixo, não token: continua girando sob movimento reduzido (ver o bloco no fim). */
 .ark-animate-spin {
   animation: ark-spin 1s var(--ark-ease-linear, linear) infinite;
 }
@@ -250,22 +253,34 @@
   animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
 }
 
-/* Skeleton de loading — bloco pulsante neutro */
+/*
+ * Skeleton de loading — bloco neutro, estático por padrão: um loop infinito
+ * na única região sem nada para ler chama o olho e cai na WCAG 2.2.2. O pulso
+ * é opt-in via .ark-skeleton-animated.
+ */
 .ark-skeleton {
-  animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
   background-color: color-mix(in oklch, var(--ark-color-muted, oklch(0.7 0.02 264)) 30%, transparent);
   border-radius: var(--ark-radius-lg, 0.5rem);
 }
 
-/* Movimento reduzido: loading contínuos não rodam e enter/exit pulam ao estado final */
+.ark-skeleton-animated {
+  animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
+}
+
+/*
+ * Movimento reduzido: loops de atenção param e enter/exit pulam ao estado
+ * final. O spinner (.ark-animate-spin) fica de fora por design: movimento
+ * reduzido existe para evitar desconforto vestibular, que uma rotação de 1em
+ * não causa, e um spinner parado tira o único sinal de progresso. Por isso o
+ * spin usa 1s fixo e não um token, que o zeramento congelaria.
+ */
 @media (prefers-reduced-motion: reduce) {
-  .ark-animate-spin,
-  .ark-animate-shake {
+  .ark-animate-shake,
+  .ark-skeleton-animated {
     animation: none;
   }
 
-  .ark-animate-pulse,
-  .ark-skeleton {
+  .ark-animate-pulse {
     animation: none;
     opacity: 0.7;
   }
