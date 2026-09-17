@@ -1,4 +1,5 @@
 export {
+  ArkBadge,
   ArkButton,
   ArkCalendar,
   ArkCarousel,

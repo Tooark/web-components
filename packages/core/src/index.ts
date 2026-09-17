@@ -7,6 +7,9 @@ export { arkEnter, arkExit, prefersReducedMotion } from "./motion";
 export type { ArkAnnouncePoliteness } from "./services";
 export { announce, dismissToast, showToast, toast } from "./services";
 export type {
+  ArkBadgeSize,
+  ArkBadgeStyleOptions,
+  ArkBadgeVariant,
   ArkButtonStyleOptions,
   ArkButtonType,
   ArkButtonVariant,

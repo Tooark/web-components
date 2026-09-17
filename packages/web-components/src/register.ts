@@ -1,4 +1,5 @@
 import {
+  ArkBadge,
   ArkButton,
   ArkCalendar,
   ArkCarousel,
@@ -18,6 +19,10 @@ import {
  * para garantir que eles estejam disponíveis como elementos personalizados.
  */
 export function registerTooarkComponents(): void {
+  if (!customElements.get(ArkBadge.tagName)) {
+    customElements.define(ArkBadge.tagName, ArkBadge);
+  }
+
   if (!customElements.get(ArkButton.tagName)) {
     customElements.define(ArkButton.tagName, ArkButton);
   }

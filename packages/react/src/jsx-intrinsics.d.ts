@@ -1,4 +1,6 @@
 import type {
+  ArkBadgeSize,
+  ArkBadgeVariant,
   ArkButtonType,
   ArkButtonVariant,
   ArkCarouselSnap,
@@ -14,6 +16,15 @@ import React from "react";
 declare global {
   namespace JSX {
     interface IntrinsicElements {
+      "ark-badge": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        intent?: ArkIntent;
+        variant?: ArkBadgeVariant;
+        size?: ArkBadgeSize;
+        rounded?: ArkRounded;
+        color?: string;
+        theme?: ArkTheme;
+      };
       "ark-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         type?: ArkButtonType;

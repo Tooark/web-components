@@ -34,6 +34,32 @@ export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 /** Idioma dos rótulos; "custom" usa as strings fornecidas em locale-json. */
 export type ArkDatepickerLang = "en" | "pt" | "es" | "custom";
 
+// Exports types específicos do componente badge
+
+/** Preenchimento do badge: fundo suave, sólido ou só contorno. */
+export type ArkBadgeVariant = "soft" | "solid" | "outline";
+
+/** Tamanho do badge; é um rótulo inline, por isso só os três menores. */
+export type ArkBadgeSize = "xs" | "sm" | "md";
+
+/** Props de estilo do ark-badge. */
+export type ArkBadgeStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Intenção semântica de cor. Padrão: "neutral". */
+  intent?: ArkIntent;
+  /** Preenchimento. Padrão: "soft". */
+  variant?: ArkBadgeVariant;
+  /** Tamanho; a altura vem da fonte e do padding, não do token de controle. Padrão: "md". */
+  size?: ArkBadgeSize;
+  /** Raio dos cantos. Padrão: "full". */
+  rounded?: ArkRounded;
+  /** Cor própria (qualquer cor CSS) no lugar do intent: texto na cor, fundo suave e contorno por color-mix. */
+  color?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos de estilo do componente button
 
 /** Props de estilo e comportamento do ark-button. */
