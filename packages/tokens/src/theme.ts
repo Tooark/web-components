@@ -28,8 +28,8 @@ export function resolveColorScheme(element?: Element | null): ArkThemeSelected {
   }
 
   // Se não conseguiu resolver pelo color-scheme do elemento, usa a preferência do sistema.
-  const prefersDark = typeof window.matchMedia === "function" &&
-                      window.matchMedia("(prefers-color-scheme: dark)").matches;
-  
+  const prefersDark =
+    typeof window.matchMedia === "function" && window.matchMedia("(prefers-color-scheme: dark)").matches;
+
   return prefersDark ? "dark" : "light";
 }
