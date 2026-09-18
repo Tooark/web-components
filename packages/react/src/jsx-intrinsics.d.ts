@@ -1,6 +1,7 @@
 import type {
   ArkAlertLive,
   ArkAlertVariant,
+  ArkAvatarShape,
   ArkBadgeSize,
   ArkBadgeVariant,
   ArkButtonStatus,
@@ -38,6 +39,15 @@ declare global {
         theme?: ArkTheme;
         lang?: ArkLang;
         "locale-json"?: string;
+      };
+      "ark-avatar": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        name?: string;
+        src?: string;
+        size?: ArkSize;
+        shape?: ArkAvatarShape;
+        color?: string;
+        theme?: ArkTheme;
       };
       "ark-badge": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

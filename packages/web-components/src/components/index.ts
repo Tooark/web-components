@@ -1,4 +1,5 @@
 export * from "./ark-alert";
+export * from "./ark-avatar";
 export * from "./ark-badge";
 export * from "./ark-button";
 export * from "./ark-calendar";

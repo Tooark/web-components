@@ -1,5 +1,6 @@
 import {
   ArkAlert,
+  ArkAvatar,
   ArkBadge,
   ArkButton,
   ArkCalendar,
@@ -37,6 +38,10 @@ import {
 export function registerTooarkComponents(): void {
   if (!customElements.get(ArkAlert.tagName)) {
     customElements.define(ArkAlert.tagName, ArkAlert);
+  }
+
+  if (!customElements.get(ArkAvatar.tagName)) {
+    customElements.define(ArkAvatar.tagName, ArkAvatar);
   }
 
   if (!customElements.get(ArkBadge.tagName)) {

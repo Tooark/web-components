@@ -15,6 +15,7 @@
 @layer base {
   :where(
     ark-alert,
+    ark-avatar,
     ark-badge,
     ark-button,
     ark-calendar,

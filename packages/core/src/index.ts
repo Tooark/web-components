@@ -19,6 +19,8 @@ export type {
   ArkAlertLive,
   ArkAlertStyleOptions,
   ArkAlertVariant,
+  ArkAvatarShape,
+  ArkAvatarStyleOptions,
   ArkBadgeSize,
   ArkBadgeStyleOptions,
   ArkBadgeVariant,

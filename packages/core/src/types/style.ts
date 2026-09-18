@@ -40,6 +40,25 @@ export type ArkLang = "en" | "pt" | "es" | "custom";
 /** Nome anterior de ArkLang, mantido por compatibilidade. */
 export type ArkDatepickerLang = ArkLang;
 
+// Exports types específicos do componente avatar
+
+/** Forma do ark-avatar. */
+export type ArkAvatarShape = "circle" | "square";
+
+/** Props de estilo do ark-avatar. */
+export type ArkAvatarStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Diâmetro na escala de espaçamento (1.5 a 4 rem). Padrão: "md" (2.5 rem). */
+  size?: ArkSize;
+  /** Círculo ou quadrado de cantos arredondados. Padrão: "circle". */
+  shape?: ArkAvatarShape;
+  /** Cor CSS própria para as iniciais: texto na cor e fundo suave por color-mix. Padrão: o tint primary. */
+  color?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente badge
 
 /** Preenchimento do badge: fundo suave, sólido ou só contorno. */
