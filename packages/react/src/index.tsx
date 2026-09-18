@@ -35,6 +35,8 @@ export type { ArkSelectProps } from "./ark-select";
 export { ArkSelect } from "./ark-select";
 export type { ArkSkeletonProps } from "./ark-skeleton";
 export { ArkSkeleton } from "./ark-skeleton";
+export type { ArkSpinnerProps } from "./ark-spinner";
+export { ArkSpinner } from "./ark-spinner";
 export type { ArkSwitchProps } from "./ark-switch";
 export { ArkSwitch } from "./ark-switch";
 export type { ArkTabProps, ArkTabsProps } from "./ark-tabs";

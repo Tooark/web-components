@@ -59,6 +59,7 @@ export type {
   ArkSelectStyleOptions,
   ArkSize,
   ArkSkeletonStyleOptions,
+  ArkSpinnerStyleOptions,
   ArkStyleVariant,
   ArkSwitchStyleOptions,
   ArkTabStyleOptions,

@@ -101,6 +101,15 @@ declare global {
         value?: string;
         label?: string;
       };
+      "ark-spinner": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        size?: ArkSize;
+        intent?: ArkIntent;
+        label?: string;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-switch": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         checked?: boolean;

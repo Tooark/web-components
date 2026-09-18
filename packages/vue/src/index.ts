@@ -17,6 +17,7 @@ export { ArkRadio } from "./ark-radio";
 export { ArkScheduler } from "./ark-scheduler";
 export { ArkSelect } from "./ark-select";
 export { ArkSkeleton } from "./ark-skeleton";
+export { ArkSpinner } from "./ark-spinner";
 export { ArkSwitch } from "./ark-switch";
 export { ArkTab, ArkTabs } from "./ark-tabs";
 export { ArkTextarea } from "./ark-textarea";

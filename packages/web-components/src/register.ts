@@ -18,6 +18,7 @@ import {
   ArkScheduler,
   ArkSelect,
   ArkSkeleton,
+  ArkSpinner,
   ArkSwitch,
   ArkTab,
   ArkTabs,
@@ -122,6 +123,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkToaster.tagName)) {
     customElements.define(ArkToaster.tagName, ArkToaster);
+  }
+
+  if (!customElements.get(ArkSpinner.tagName)) {
+    customElements.define(ArkSpinner.tagName, ArkSpinner);
   }
 
   if (!customElements.get(ArkSwitch.tagName)) {

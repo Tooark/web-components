@@ -17,6 +17,7 @@ export * from "./ark-radio";
 export * from "./ark-scheduler";
 export * from "./ark-select";
 export * from "./ark-skeleton";
+export * from "./ark-spinner";
 export * from "./ark-switch";
 export * from "./ark-tab";
 export * from "./ark-tabs";

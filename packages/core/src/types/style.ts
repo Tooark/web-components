@@ -136,6 +136,24 @@ export type ArkRadioStyleOptions = {
   checked?: boolean;
 };
 
+// Exports types específicos do componente spinner
+
+/** Props de estilo do ark-spinner. */
+export type ArkSpinnerStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Diâmetro na escala de espaçamento (0.75 a 2 rem). Padrão: "md" (1.25 rem). */
+  size?: ArkSize;
+  /** Cor pelo intent. Padrão: herda a cor do texto ao redor. */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do rótulo padrão para leitores de tela (string `loading`). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 /** Props de estilo e comportamento do ark-switch. */
 export type ArkSwitchStyleOptions = {
   /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
