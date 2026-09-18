@@ -311,6 +311,32 @@ export type ArkDialogStyleOptions = {
   localeJson?: string;
 };
 
+// Exports types específicos do componente menu
+
+/** Alinhamento do menu em relação ao gatilho. */
+export type ArkMenuAlign = "start" | "end";
+
+/** Lado do gatilho onde o menu abre; vira para o outro quando não cabe. */
+export type ArkMenuDirection = "down" | "up";
+
+/** Props de estilo do ark-menu, propagadas a cada ark-menu-item. */
+export type ArkMenuStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Altura dos itens via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+/** Props de estilo do ark-menu-item; size e theme chegam propagados do ark-menu. */
+export type ArkMenuItemStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Cor do texto e do hover; "danger" para ações destrutivas. Padrão: cor de texto e hover neutro. */
+  intent?: ArkIntent;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

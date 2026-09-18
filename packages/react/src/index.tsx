@@ -15,6 +15,8 @@ export type { ArkDialogProps } from "./ark-dialog";
 export { ArkDialog } from "./ark-dialog";
 export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
+export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu";
+export { ArkMenu, ArkMenuItem } from "./ark-menu";
 export type { ArkSchedulerProps } from "./ark-scheduler";
 export { ArkScheduler } from "./ark-scheduler";
 export type { ArkSelectProps } from "./ark-select";

@@ -8,6 +8,8 @@ import type {
   ArkDialogSize,
   ArkIntent,
   ArkLang,
+  ArkMenuAlign,
+  ArkMenuDirection,
   ArkRounded,
   ArkSize,
   ArkTabsFill,
@@ -138,6 +140,24 @@ declare global {
         theme?: ArkTheme;
         lang?: ArkLang;
         "locale-json"?: string;
+      };
+      "ark-menu": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        for?: string;
+        open?: boolean;
+        align?: ArkMenuAlign;
+        direction?: ArkMenuDirection;
+        size?: ArkSize;
+        theme?: ArkTheme;
+      };
+      "ark-menu-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        checked?: boolean | "false";
+        divider?: boolean;
+        static?: boolean;
       };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

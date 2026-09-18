@@ -6,6 +6,8 @@ export * from "./ark-clock";
 export * from "./ark-datepicker";
 export * from "./ark-dialog";
 export * from "./ark-input";
+export * from "./ark-menu";
+export * from "./ark-menu-item";
 export * from "./ark-scheduler";
 export * from "./ark-select";
 export * from "./ark-switch";

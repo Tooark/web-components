@@ -7,6 +7,8 @@ export {
   ArkDatepicker,
   ArkDialog,
   ArkInput,
+  ArkMenu,
+  ArkMenuItem,
   ArkScheduler,
   ArkSelect,
   ArkSwitch,

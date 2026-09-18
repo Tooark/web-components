@@ -213,6 +213,51 @@
     }
   }
 
+  /* ---------- ark-menu: painel ancorado em popover auto; entrada e saída por transição ---------- */
+
+  /*
+   * Um popover auto fecha por light dismiss, que o JS não intercepta para
+   * animar antes de esconder: a saída é uma transição CSS com allow-discrete
+   * (segura display e overlay até o fim) e a entrada vem de @starting-style,
+   * ambas pelos tokens de duração. Sem :popover-open o host fica oculto: um
+   * [popover] com display do autor apareceria fora do top layer.
+   */
+  ark-menu {
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transform: scale(0.95);
+    transition:
+      opacity var(--ark-duration-quick, 150ms) var(--ark-ease-in, cubic-bezier(0.4, 0, 1, 1)),
+      transform var(--ark-duration-quick, 150ms) var(--ark-ease-in, cubic-bezier(0.4, 0, 1, 1)),
+      display var(--ark-duration-quick, 150ms) allow-discrete,
+      overlay var(--ark-duration-quick, 150ms) allow-discrete;
+  }
+
+  ark-menu:popover-open {
+    display: flex;
+    opacity: 1;
+    transform: none;
+    transition-timing-function: var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1));
+  }
+
+  @starting-style {
+    ark-menu:popover-open {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+
+  /* Conteúdo à direita do item (atalho, badge): filho slot="trailing" do usuário. */
+  ark-menu-item > [slot="trailing"] {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding-left: 0.75rem;
+    @apply ark:text-xs ark:text-fg-muted;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

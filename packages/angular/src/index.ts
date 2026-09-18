@@ -7,6 +7,7 @@ export { ArkClockComponent } from "./ark-clock.component";
 export { ArkDatepickerComponent } from "./ark-datepicker.component";
 export { ArkDialogComponent } from "./ark-dialog.component";
 export { ArkInputComponent } from "./ark-input.component";
+export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
 export { ArkSelectComponent } from "./ark-select.component";
 export { ArkSwitchComponent } from "./ark-switch.component";

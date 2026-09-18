@@ -7,6 +7,8 @@ import {
   ArkDatepicker,
   ArkDialog,
   ArkInput,
+  ArkMenu,
+  ArkMenuItem,
   ArkScheduler,
   ArkSelect,
   ArkSwitch,
@@ -67,6 +69,15 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkDialog.tagName)) {
     customElements.define(ArkDialog.tagName, ArkDialog);
+  }
+
+  // O item antes do menu: o ark-menu coordena itens já upgraded.
+  if (!customElements.get(ArkMenuItem.tagName)) {
+    customElements.define(ArkMenuItem.tagName, ArkMenuItem);
+  }
+
+  if (!customElements.get(ArkMenu.tagName)) {
+    customElements.define(ArkMenu.tagName, ArkMenu);
   }
 
   if (!customElements.get(ArkCarousel.tagName)) {

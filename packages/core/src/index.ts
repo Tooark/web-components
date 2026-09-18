@@ -4,8 +4,15 @@ export { en, es, pt, resolveLocale } from "./i18n";
 export type { ArkDatepickerLocale, ArkLocale } from "./i18n/types";
 export type { ArkMotionOptions, ArkMotionPreset } from "./motion";
 export { arkEnter, arkExit, prefersReducedMotion } from "./motion";
-export type { ArkFocusTrapOptions } from "./overlay";
-export { closePopover, focusableElements, isPopoverOpen, openPopover, trapFocus } from "./overlay";
+export type {
+  ArkAnchorAlign,
+  ArkAnchorPlacement,
+  ArkAnchorRect,
+  ArkAnchorSide,
+  ArkFocusTrapOptions,
+  ArkPositionAnchoredOptions
+} from "./overlay";
+export { closePopover, focusableElements, isPopoverOpen, openPopover, positionAnchored, trapFocus } from "./overlay";
 export type { ArkAnnouncePoliteness } from "./services";
 export { announce, dismissToast, showToast, toast } from "./services";
 export type {
@@ -30,6 +37,10 @@ export type {
   ArkInputStyleOptions,
   ArkIntent,
   ArkLang,
+  ArkMenuAlign,
+  ArkMenuDirection,
+  ArkMenuItemStyleOptions,
+  ArkMenuStyleOptions,
   ArkRounded,
   ArkSchedulerEvent,
   ArkSchedulerStyleOptions,
