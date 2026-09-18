@@ -45,6 +45,7 @@ CI (`.github/workflows/tests.yml`) runs `biome ci .`, then `pnpm -r build` (whic
 - pnpm 11 may abort `pnpm run`/`build` in `runDepsStatusCheck` or hang on an interactive purge prompt. Use `$env:CI = "true"` and `pnpm --config.verify-deps-before-run=false --filter <pkg> build`; for installs, `pnpm install --config.confirmModulesPurge=false`.
 - The `@tooark/web-components` build intermittently fails with `EBUSY` on `dist/styles.css`; delete that file and rebuild.
 - `patches/` (gitignored) holds optional pnpm patches that raise Storybook/addon-vitest test-runner timeouts for slow Windows machines. They are **not** wired into `pnpm-workspace.yaml`; the "Run tests" widget inside the Storybook UI may time out on Windows, the CLI is unaffected. Never commit `patchedDependencies` without committing the patch files.
+- The "Run tests" widget in the Storybook UI keeps every story's axe report (addon-a11y) in the dev server; with full reports the server grew past the 4 GB heap and died with `JavaScript heap out of memory` after ~13 minutes (Node `DEP0205` warnings on startup are unrelated). `preview.ts` limits `a11y.options.resultTypes` to violations and incomplete, which lets the run finish (about 4 minutes, server around 2 GB); the CLI never retains the reports and stays near 1 GB. If the UI run still runs out of heap, run the CLI or start with `NODE_OPTIONS=--max-old-space-size=8192`.
 
 ## Architecture
 
