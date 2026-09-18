@@ -318,6 +318,11 @@
     height: 1rem;
   }
 
+  /* Com ratio válido a altura vem da largura pelo aspect-ratio inline. */
+  ark-skeleton[data-ark-ratio]:not([data-ark-rows]) {
+    height: auto;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

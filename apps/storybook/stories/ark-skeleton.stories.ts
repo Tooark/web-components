@@ -17,6 +17,8 @@ const meta = {
     animated: { control: "boolean" },
     rounded: { control: "select", options: ["", "none", "xs", "sm", "md", "lg", "xl", "full"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
+    color: { control: "color", description: "Cor base propria no lugar de muted" },
+    ratio: { control: "text", description: "Proporcao do bloco (16/9, 9/16, 1/1); a altura vem da largura" },
     width: { control: "text", description: "style.width do host" },
     height: { control: "text", description: "style.height do host (so no bloco unico)" }
   },
@@ -25,6 +27,8 @@ const meta = {
     animated: false,
     rounded: "",
     theme: "auto",
+    color: "",
+    ratio: "",
     width: "16rem",
     height: "1rem"
   }
@@ -37,6 +41,8 @@ type StoryArgs = {
   animated: boolean;
   rounded: ArkRounded | "";
   theme: ArkTheme;
+  color: string;
+  ratio: string;
   width: string;
   height: string;
   testid?: string;
@@ -50,9 +56,11 @@ function createSkeleton(args: Partial<StoryArgs>): SkeletonEl {
   if (args.animated) skeleton.setAttribute("animated", "");
   if (args.rounded) skeleton.setAttribute("rounded", args.rounded);
   if (args.theme) skeleton.setAttribute("theme", args.theme);
+  if (args.color) skeleton.setAttribute("color", args.color);
+  if (args.ratio) skeleton.setAttribute("ratio", args.ratio);
   if (args.testid) skeleton.setAttribute("testid", args.testid);
   if (args.width) skeleton.style.width = args.width;
-  if (args.height && !(args.rows && args.rows > 1)) skeleton.style.height = args.height;
+  if (args.height && !(args.rows && args.rows > 1) && !args.ratio) skeleton.style.height = args.height;
   return skeleton;
 }
 
@@ -207,5 +215,67 @@ export const TestHooks = {
     const rows = skeleton.querySelectorAll('[data-ark="skeleton-row"]');
     expect(rows.length).toBe(2);
     await expect(rows[0]).toHaveAttribute("data-testid", "list-loading-row");
+  }
+};
+
+export const ImageAndAvatar = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex items-start gap-4";
+    wrap.appendChild(createSkeleton({ ratio: "16/9", width: "16rem", animated: true }));
+    wrap.appendChild(createSkeleton({ ratio: "9/16", width: "6rem", animated: true }));
+    wrap.appendChild(createSkeleton({ ratio: "1/1", rounded: "full", width: "4rem", animated: true }));
+    return wrap;
+  }
+};
+
+export const Colored = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-4 rounded-xl p-4";
+    wrap.style.background = "oklch(45% 0.2 264)";
+    wrap.appendChild(createSkeleton({ color: "white", rows: 3, animated: true, width: "20rem" }));
+    wrap.appendChild(createSkeleton({ color: "#fbbf24", width: "12rem", height: "1.5rem", animated: true }));
+    return wrap;
+  }
+};
+
+export const ColorAndRatio = {
+  render: () => createSkeleton({ width: "16rem" }),
+  // ratio vira aspect-ratio inline (a altura padrao sai so com ratio valido; com rows e ignorado); color troca o
+  // tint base via --ark-skeleton-color, lida pelo .ark-skeleton e herdada pelas barras.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const skeleton = canvasElement.querySelector("ark-skeleton") as SkeletonEl;
+    const base = getComputedStyle(skeleton).backgroundColor;
+
+    skeleton.setAttribute("ratio", "16/9");
+    expect(skeleton.style.aspectRatio).toBe("16 / 9");
+    expect(skeleton.getBoundingClientRect().height).toBe(144);
+    skeleton.setAttribute("ratio", "16:9");
+    expect(skeleton.getBoundingClientRect().height).toBe(144);
+    skeleton.setAttribute("ratio", "1/1");
+    skeleton.setAttribute("rounded", "full");
+    expect(skeleton.getBoundingClientRect().height).toBe(256);
+    expect(getComputedStyle(skeleton).borderTopLeftRadius).toBe("9999px");
+
+    skeleton.setAttribute("rows", "2");
+    expect(skeleton.style.aspectRatio).toBe("");
+    expect(skeleton.hasAttribute("data-ark-ratio")).toBe(false);
+    skeleton.removeAttribute("rows");
+    skeleton.setAttribute("ratio", "lixo");
+    expect(skeleton.style.aspectRatio).toBe("");
+    expect(skeleton.getBoundingClientRect().height).toBe(16);
+    skeleton.removeAttribute("ratio");
+    skeleton.removeAttribute("rounded");
+
+    skeleton.setAttribute("color", "rgb(59, 130, 246)");
+    expect(skeleton.style.getPropertyValue("--ark-skeleton-color")).toBe("rgb(59, 130, 246)");
+    expect(getComputedStyle(skeleton).backgroundColor).not.toBe(base);
+    skeleton.setAttribute("rows", "2");
+    const row = skeleton.querySelector('[data-ark="skeleton-row"]') as HTMLElement;
+    expect(getComputedStyle(row).backgroundColor).not.toBe(base);
+    skeleton.removeAttribute("color");
+    expect(skeleton.style.getPropertyValue("--ark-skeleton-color")).toBe("");
+    expect(getComputedStyle(row).backgroundColor).toBe(base);
   }
 };

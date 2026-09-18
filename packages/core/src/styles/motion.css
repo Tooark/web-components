@@ -256,10 +256,15 @@
 /*
  * Skeleton de loading — bloco neutro, estático por padrão: um loop infinito
  * na única região sem nada para ler chama o olho e cai na WCAG 2.2.2. O brilho
- * que varre (shimmer) é opt-in via .ark-skeleton-animated.
+ * que varre (shimmer) é opt-in via .ark-skeleton-animated. --ark-skeleton-color
+ * troca a cor base (o ark-skeleton a escreve a partir do atributo color).
  */
 .ark-skeleton {
-  background-color: color-mix(in oklch, var(--ark-color-muted, oklch(0.7 0.02 264)) 30%, transparent);
+  background-color: color-mix(
+    in oklch,
+    var(--ark-skeleton-color, var(--ark-color-muted, oklch(0.7 0.02 264))) 30%,
+    transparent
+  );
   border-radius: var(--ark-radius-lg, 0.5rem);
 }
 

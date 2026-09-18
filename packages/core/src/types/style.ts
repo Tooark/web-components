@@ -379,6 +379,10 @@ export type ArkSkeletonStyleOptions = {
   testid?: string;
   /** Raio dos cantos. Padrão: o do preset .ark-skeleton (lg). */
   rounded?: ArkRounded;
+  /** Cor base própria (qualquer cor CSS) no lugar de muted, para skeletons sobre superfícies coloridas. */
+  color?: string;
+  /** Proporção do bloco ("16/9", "9/16", "1/1", "16:9" ou número): a altura vem da largura. Ignorado com rows. */
+  ratio?: string;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
 };

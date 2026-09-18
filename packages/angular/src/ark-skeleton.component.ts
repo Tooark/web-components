@@ -12,6 +12,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.rows]="rows"
     [attr.animated]="animated ? '' : null"
     [attr.rounded]="rounded"
+    [attr.color]="color"
+    [attr.ratio]="ratio"
     [attr.theme]="theme">
     <ng-content></ng-content>
   </ark-skeleton>`
@@ -28,5 +30,9 @@ export class ArkSkeletonComponent {
   @Input() animated = false;
   /** Raio dos cantos. Padrão: o do preset (lg). */
   @Input() rounded: ArkRounded | undefined;
+  /** Cor base própria (qualquer cor CSS) no lugar de muted. */
+  @Input() color: string | undefined;
+  /** Proporção do bloco ("16/9", "1/1"...): a altura vem da largura. Ignorado com rows. */
+  @Input() ratio: string | undefined;
   @Input() theme: ArkTheme = "auto";
 }

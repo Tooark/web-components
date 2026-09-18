@@ -9,6 +9,8 @@ export const ArkSkeleton = defineComponent({
     rows: { type: Number, default: undefined },
     animated: { type: Boolean, default: false },
     rounded: { type: String as PropType<ArkRounded>, default: undefined },
+    color: { type: String, default: undefined },
+    ratio: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" }
   },
   setup(props, { attrs, slots }) {
@@ -21,6 +23,8 @@ export const ArkSkeleton = defineComponent({
           rows: props.rows,
           animated: props.animated ? "" : undefined,
           rounded: props.rounded,
+          color: props.color,
+          ratio: props.ratio,
           theme: props.theme
         },
         slots.default ? slots.default() : []

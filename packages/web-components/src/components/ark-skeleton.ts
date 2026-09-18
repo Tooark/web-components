@@ -19,8 +19,9 @@ const RADIUS: Record<ArkRounded, string> = {
  * Placeholder de carregamento. O PRÓPRIO host é o bloco (`.ark-skeleton` de
  * core: fundo muted suave e raio), `aria-hidden` porque não há nada para ler.
  * Largura e altura vêm de `class` ou `style` do usuário (padrão 1rem de
- * altura). `rows` acima de 1 troca o bloco por N barras próprias em coluna, a
- * última mais curta. `animated` liga o brilho que varre
+ * altura; `ratio` dá a altura pela largura, para imagem e avatar; `color`
+ * troca o tint base). `rows` acima de 1 troca o bloco por N barras próprias
+ * em coluna, a última mais curta. `animated` liga o brilho que varre
  * (`.ark-skeleton-animated`), com fase sorteada por elemento e escalonada
  * entre as barras, opt-in e parado sob movimento reduzido; o conteúdo que
  * substitui o skeleton
@@ -36,7 +37,7 @@ export class ArkSkeleton extends HTMLElement {
   private readonly phase = Math.random();
 
   static get observedAttributes(): string[] {
-    return ["rows", "animated", "rounded", "theme", "class", "testid"];
+    return ["rows", "animated", "rounded", "color", "ratio", "theme", "class", "testid"];
   }
 
   connectedCallback(): void {
@@ -77,6 +78,20 @@ export class ArkSkeleton extends HTMLElement {
   private getRadius(): string | null {
     const rounded = (this.getAttribute("rounded") || "").toLowerCase() as ArkRounded;
     return RADIUS[rounded] ?? null;
+  }
+
+  /** `ratio` como valor de aspect-ratio: "16/9", "16:9" ou um número; inválido vira null. */
+  private getRatio(): string | null {
+    const raw = (this.getAttribute("ratio") || "").trim();
+    if (!raw) return null;
+    const match = /^(\d+(?:\.\d+)?)\s*[/:]\s*(\d+(?:\.\d+)?)$/.exec(raw);
+    if (match) {
+      const width = Number(match[1]);
+      const height = Number(match[2]);
+      return width > 0 && height > 0 ? `${width} / ${height}` : null;
+    }
+    const single = Number(raw);
+    return Number.isFinite(single) && single > 0 ? String(single) : null;
   }
 
   private skeletonClasses(): string[] {
@@ -128,6 +143,19 @@ export class ArkSkeleton extends HTMLElement {
     this.setAttribute("aria-hidden", "true");
     const rows = this.rows;
     const radius = this.getRadius();
+
+    // Tint próprio: custom property inline no host, herdada pelas barras e lida pelo .ark-skeleton.
+    const color = (this.getAttribute("color") || "").trim();
+    if (color) {
+      this.style.setProperty("--ark-skeleton-color", color);
+    } else {
+      this.style.removeProperty("--ark-skeleton-color");
+    }
+
+    // Proporção só no bloco único: aspect-ratio inline e a altura padrão sai (data-ark-ratio no CSS).
+    const ratio = rows > 1 ? null : this.getRatio();
+    this.style.aspectRatio = ratio ?? "";
+    this.toggleAttribute("data-ark-ratio", ratio !== null);
 
     if (rows > 1) {
       this.setAttribute("data-ark-rows", String(rows));

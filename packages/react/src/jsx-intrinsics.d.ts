@@ -182,6 +182,8 @@ declare global {
         rows?: number | string;
         animated?: boolean;
         rounded?: ArkRounded;
+        color?: string;
+        ratio?: string;
         theme?: ArkTheme;
       };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
