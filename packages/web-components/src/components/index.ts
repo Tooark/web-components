@@ -18,6 +18,7 @@ export * from "./ark-empty";
 export * from "./ark-file-input";
 export * from "./ark-input";
 export * from "./ark-kbd";
+export * from "./ark-kv-editor";
 export * from "./ark-mark";
 export * from "./ark-menu";
 export * from "./ark-menu-item";

@@ -37,6 +37,8 @@ export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
 export type { ArkKbdProps } from "./ark-kbd";
 export { ArkKbd } from "./ark-kbd";
+export type { ArkKvEditorProps } from "./ark-kv-editor";
+export { ArkKvEditor } from "./ark-kv-editor";
 export type { ArkMarkProps } from "./ark-mark";
 export { ArkMark } from "./ark-mark";
 export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu";

@@ -45,6 +45,7 @@ export class ArkSelect extends HTMLElement {
       "error-message",
       "disabled",
       "required",
+      "aria-label",
       "testid"
     ];
   }
@@ -228,6 +229,13 @@ export class ArkSelect extends HTMLElement {
     this.selectEl.name = this.getAttribute("name") || "";
     this.selectEl.disabled = this.hasAttribute("disabled");
     this.selectEl.required = this.hasAttribute("required");
+    // Sem `label` visível o nome vem de um aria-label do host, espelhado no <select> como no ark-input.
+    const ariaLabel = this.getAttribute("aria-label");
+    if (ariaLabel) {
+      this.selectEl.setAttribute("aria-label", ariaLabel);
+    } else {
+      this.selectEl.removeAttribute("aria-label");
+    }
 
     // Altura do campo pelo token --ark-size-* (min-height), igual ao ark-input; o padding direito reserva o chevron.
     const sizes: Record<ArkSize, { field: string; label: string; chevron: string }> = {

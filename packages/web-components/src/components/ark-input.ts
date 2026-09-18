@@ -1,7 +1,7 @@
 import { type ArkIntent, type ArkLocale, type ArkRounded, type ArkSize, resolveLocale } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
-const INPUT_TYPES = ["text", "password", "email", "number", "tel", "url", "search"];
+const INPUT_TYPES = ["text", "password", "email", "number", "tel", "url", "search", "date", "time", "datetime-local"];
 
 /** Atributos do host espelhados no <input> nativo sem interpretação. */
 const PASS_THROUGH_ATTRS = [

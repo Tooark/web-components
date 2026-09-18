@@ -18,6 +18,7 @@ export { ArkEmptyComponent } from "./ark-empty.component";
 export { ArkFileInputComponent } from "./ark-file-input.component";
 export { ArkInputComponent } from "./ark-input.component";
 export { ArkKbdComponent } from "./ark-kbd.component";
+export { ArkKvEditorComponent } from "./ark-kv-editor.component";
 export { ArkMarkComponent } from "./ark-mark.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
 export { ArkProgressComponent } from "./ark-progress.component";

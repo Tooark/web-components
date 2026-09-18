@@ -19,6 +19,7 @@ import {
   ArkFileInput,
   ArkInput,
   ArkKbd,
+  ArkKvEditor,
   ArkMark,
   ArkMenu,
   ArkMenuItem,
@@ -211,5 +212,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkTooltip.tagName)) {
     customElements.define(ArkTooltip.tagName, ArkTooltip);
+  }
+
+  // Por último: compõe checkbox, input, textarea e button, que precisam estar definidos.
+  if (!customElements.get(ArkKvEditor.tagName)) {
+    customElements.define(ArkKvEditor.tagName, ArkKvEditor);
   }
 }

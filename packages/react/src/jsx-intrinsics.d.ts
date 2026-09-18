@@ -282,6 +282,23 @@ declare global {
         size?: ArkSize;
         theme?: ArkTheme;
       };
+      "ark-kv-editor": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        rows?: string;
+        bulk?: boolean;
+        "bulk-format"?: "lines" | "json";
+        types?: string;
+        description?: boolean;
+        secret?: boolean;
+        "key-placeholder"?: string;
+        "value-placeholder"?: string;
+        "description-placeholder"?: string;
+        readonly?: boolean;
+        size?: ArkSize;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-mark": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         shape?: ArkMarkShape;

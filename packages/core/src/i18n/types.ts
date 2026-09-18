@@ -100,6 +100,10 @@ export interface ArkLocale {
   shapeHexagon: string;
   /** Rótulo acessível da alça que redimensiona painéis. */
   resize: string;
+  /** Rótulo acessível da coluna de tipo do editor chave/valor. */
+  type: string;
+  /** Rótulo acessível do cadeado que marca uma linha do editor chave/valor como segredo. */
+  secret: string;
 }
 
 /** Nome anterior de ArkLocale, mantido por compatibilidade. */

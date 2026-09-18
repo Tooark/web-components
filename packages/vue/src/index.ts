@@ -18,6 +18,7 @@ export { ArkEmpty } from "./ark-empty";
 export { ArkFileInput } from "./ark-file-input";
 export { ArkInput } from "./ark-input";
 export { ArkKbd } from "./ark-kbd";
+export { ArkKvEditor } from "./ark-kv-editor";
 export { ArkMark } from "./ark-mark";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";
 export { ArkProgress } from "./ark-progress";

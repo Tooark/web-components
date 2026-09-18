@@ -260,6 +260,43 @@ export type ArkShapePickerStyleOptions = {
   localeJson?: string;
 };
 
+// Exports types específicos do componente kv-editor
+
+/** Formato do modo em massa do ark-kv-editor: `chave:valor` por linha ou um array JSON com todos os campos. */
+export type ArkKvBulkFormat = "lines" | "json";
+
+/** Uma linha do ark-kv-editor. */
+export type ArkKvRow = {
+  /** Identidade estável da linha (o componente gera uma quando falta). */
+  id: string;
+  key: string;
+  value: string;
+  /** Linha ativa; desativada continua na lista, apagada e prefixada por `#` no modo em massa (lines). */
+  enabled: boolean;
+  /** Descrição, editável na coluna que o atributo `description` liga. */
+  description?: string;
+  /** Tipo do valor, escolhido na coluna que o atributo `types` liga; define o `type` do campo de valor. */
+  type?: string;
+  /** Segredo (cadeado fechado, coluna que o atributo `secret` liga): o valor fica mascarado como senha. */
+  secret?: boolean;
+};
+
+/** Props de estilo do ark-kv-editor. */
+export type ArkKvEditorStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Formato do modo em massa: "lines" (`chave:valor` por linha) ou "json" (array com todos os campos). Padrão: "lines". */
+  bulkFormat?: ArkKvBulkFormat;
+  /** Tamanho dos controles compostos (checkbox, inputs, botões). Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos rótulos (add, bulkEdit, tableEdit, entries, noEntries, deleteRow). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente kbd
 
 /** Props de estilo do ark-kbd. */
