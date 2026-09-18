@@ -63,5 +63,6 @@ export const en: ArkLocale = {
   shapeTriangle: "Triangle",
   shapeDiamond: "Diamond",
   shapeStar: "Star",
-  shapeHexagon: "Hexagon"
+  shapeHexagon: "Hexagon",
+  resize: "Resize"
 };

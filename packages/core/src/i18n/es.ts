@@ -63,5 +63,6 @@ export const es: ArkLocale = {
   shapeTriangle: "Triángulo",
   shapeDiamond: "Rombo",
   shapeStar: "Estrella",
-  shapeHexagon: "Hexágono"
+  shapeHexagon: "Hexágono",
+  resize: "Redimensionar"
 };

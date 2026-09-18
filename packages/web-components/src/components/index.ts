@@ -28,6 +28,7 @@ export * from "./ark-select";
 export * from "./ark-shape-picker";
 export * from "./ark-skeleton";
 export * from "./ark-spinner";
+export * from "./ark-split-pane";
 export * from "./ark-status-dot";
 export * from "./ark-switch";
 export * from "./ark-tab";

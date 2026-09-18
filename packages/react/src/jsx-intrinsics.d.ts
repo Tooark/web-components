@@ -123,6 +123,14 @@ declare global {
         lang?: ArkLang;
         "locale-json"?: string;
       };
+      "ark-split-pane": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        direction?: "horizontal" | "vertical";
+        sizes?: string;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-status-dot": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         intent?: ArkIntent;

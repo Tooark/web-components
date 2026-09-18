@@ -98,6 +98,8 @@ export interface ArkLocale {
   shapeStar: string;
   /** Nome da forma hexágono. */
   shapeHexagon: string;
+  /** Rótulo acessível da alça que redimensiona painéis. */
+  resize: string;
 }
 
 /** Nome anterior de ArkLocale, mantido por compatibilidade. */

@@ -670,4 +670,29 @@
     z-index: 1;
     pointer-events: none;
   }
+
+  /* ---------- ark-split-pane: grid painel / alça / painel; as alças são nós próprios ao fim ---------- */
+
+  /*
+   * As faixas (grid-template-columns/rows) vêm inline de `sizes`; as alças
+   * recebem a coluna/linha explícita e os painéis do usuário se auto-posicionam
+   * nas faixas restantes, na ordem do DOM. min-width/min-height 0 deixa a
+   * faixa fr encolher; o overflow de cada painel é do app. (Depois do
+   * carousel: a regra de arrasto tem especificidade maior que os slides dele.)
+   */
+  ark-split-pane {
+    --ark-split-pane-handle: 0.375rem;
+    display: grid;
+  }
+
+  ark-split-pane > :not([data-ark-chrome]) {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  /* Arrastando: nada dentro dos painéis captura o ponteiro nem seleciona texto. */
+  ark-split-pane[data-ark-dragging] > :not([data-ark-chrome]) {
+    pointer-events: none;
+    user-select: none;
+  }
 }

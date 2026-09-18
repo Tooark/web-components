@@ -286,6 +286,25 @@ export type ArkStatusDotStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente split-pane
+
+/** Eixo dos painéis do ark-split-pane. */
+export type ArkSplitPaneDirection = "horizontal" | "vertical";
+
+/** Props de estilo do ark-split-pane. */
+export type ArkSplitPaneStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas alças. */
+  testid?: string;
+  /** Painéis lado a lado (horizontal) ou empilhados (vertical). Padrão: "horizontal". */
+  direction?: ArkSplitPaneDirection;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do rótulo acessível das alças (`resize`). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente spinner
 
 /** Props de estilo do ark-spinner. */

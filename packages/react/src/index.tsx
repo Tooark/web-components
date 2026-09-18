@@ -55,6 +55,8 @@ export type { ArkSkeletonProps } from "./ark-skeleton";
 export { ArkSkeleton } from "./ark-skeleton";
 export type { ArkSpinnerProps } from "./ark-spinner";
 export { ArkSpinner } from "./ark-spinner";
+export type { ArkSplitPaneProps } from "./ark-split-pane";
+export { ArkSplitPane } from "./ark-split-pane";
 export type { ArkStatusDotProps } from "./ark-status-dot";
 export { ArkStatusDot } from "./ark-status-dot";
 export type { ArkSwitchProps } from "./ark-switch";

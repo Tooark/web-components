@@ -76,6 +76,8 @@ export type {
   ArkSize,
   ArkSkeletonStyleOptions,
   ArkSpinnerStyleOptions,
+  ArkSplitPaneDirection,
+  ArkSplitPaneStyleOptions,
   ArkStatusDotStyleOptions,
   ArkStyleVariant,
   ArkSwitchStyleOptions,

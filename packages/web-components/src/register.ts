@@ -29,6 +29,7 @@ import {
   ArkShapePicker,
   ArkSkeleton,
   ArkSpinner,
+  ArkSplitPane,
   ArkStatusDot,
   ArkSwitch,
   ArkTab,
@@ -181,6 +182,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkSpinner.tagName)) {
     customElements.define(ArkSpinner.tagName, ArkSpinner);
+  }
+
+  if (!customElements.get(ArkSplitPane.tagName)) {
+    customElements.define(ArkSplitPane.tagName, ArkSplitPane);
   }
 
   if (!customElements.get(ArkStatusDot.tagName)) {

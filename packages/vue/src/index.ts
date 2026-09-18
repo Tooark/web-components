@@ -27,6 +27,7 @@ export { ArkSelect } from "./ark-select";
 export { ArkShapePicker } from "./ark-shape-picker";
 export { ArkSkeleton } from "./ark-skeleton";
 export { ArkSpinner } from "./ark-spinner";
+export { ArkSplitPane } from "./ark-split-pane";
 export { ArkStatusDot } from "./ark-status-dot";
 export { ArkSwitch } from "./ark-switch";
 export { ArkTab, ArkTabs } from "./ark-tabs";

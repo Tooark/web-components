@@ -27,6 +27,7 @@ export { ArkSelectComponent } from "./ark-select.component";
 export { ArkShapePickerComponent } from "./ark-shape-picker.component";
 export { ArkSkeletonComponent } from "./ark-skeleton.component";
 export { ArkSpinnerComponent } from "./ark-spinner.component";
+export { ArkSplitPaneComponent } from "./ark-split-pane.component";
 export { ArkStatusDotComponent } from "./ark-status-dot.component";
 export { ArkSwitchComponent } from "./ark-switch.component";
 export { ArkTabComponent, ArkTabsComponent } from "./ark-tabs.component";
