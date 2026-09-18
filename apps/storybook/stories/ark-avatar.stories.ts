@@ -35,6 +35,9 @@ type StoryArgs = {
 
 type AvatarEl = HTMLElement & { initials: string };
 
+/** Imagem quebrada sem rede: bytes que nao decodificam disparam `error` na hora (uma URL invalida depende de DNS). */
+const BROKEN = "data:image/png;base64,AAAA";
+
 /** Imagem de exemplo inline (SVG em data URI), sem rede. */
 const PHOTO = `data:image/svg+xml;utf8,${encodeURIComponent(
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" fill="#f59e0b"/><circle cx="32" cy="24" r="12" fill="#fff7ed"/><path d="M8 64c0-14 10-22 24-22s24 8 24 22z" fill="#fff7ed"/></svg>'
@@ -93,7 +96,7 @@ export const WithImage = {
   render: () =>
     row(
       createAvatar({ name: "Ana Lima", src: PHOTO, size: "xl" }),
-      createAvatar({ name: "Ana Lima", src: "https://example.invalid/nao-existe.png", size: "xl" })
+      createAvatar({ name: "Ana Lima", src: BROKEN, size: "xl" })
     )
 };
 
@@ -150,7 +153,7 @@ export const Semantics = {
     await expect(image.alt).toBe("Ana Lima");
     await waitFor(() => expect(initials).not.toBeVisible());
     await expect(image).toBeVisible();
-    avatar.setAttribute("src", "https://example.invalid/nao-existe.png");
+    avatar.setAttribute("src", BROKEN);
     await waitFor(() => expect(image).not.toBeVisible());
     await expect(initials).toBeVisible();
     avatar.removeAttribute("src");

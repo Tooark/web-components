@@ -168,7 +168,8 @@ export class ArkProgress extends HTMLElement {
     }
     const label = this.getAttribute("label");
     if (label) {
-      this.setAttribute("aria-label", label);
+      // Só quando muda: aria-label é observado e um set igual reentraria aqui.
+      if (this.getAttribute("aria-label") !== label) this.setAttribute("aria-label", label);
     } else if (this.getAttribute("aria-label") === "") {
       this.removeAttribute("aria-label");
     }

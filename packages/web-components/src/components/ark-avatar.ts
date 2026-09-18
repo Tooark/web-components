@@ -183,7 +183,8 @@ export class ArkAvatar extends HTMLElement {
     this.setAttribute("role", "img");
     if (name) {
       this.ownLabel = name;
-      this.setAttribute("aria-label", name);
+      // Só quando muda: aria-label é observado e um set igual reentraria aqui.
+      if (this.getAttribute("aria-label") !== name) this.setAttribute("aria-label", name);
       this.removeAttribute("aria-hidden");
     } else {
       if (this.ownLabel && this.getAttribute("aria-label") === this.ownLabel) this.removeAttribute("aria-label");
