@@ -121,6 +121,26 @@ export type ArkButtonStyleOptions = {
   textColor?: string;
 };
 
+// Exports types específicos do componente command-palette
+
+/** Props de estilo do ark-command-palette. */
+export type ArkCommandPaletteStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do placeholder padrão (`search`) e da mensagem de vazio (`noResults`). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
+/** Props de estilo do ark-command-item. */
+export type ArkCommandItemStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+};
+
 // Exports types específicos do componente copy-button
 
 /** Props de estilo do ark-copy-button: o subconjunto do ark-button que faz sentido num botão de copiar. */

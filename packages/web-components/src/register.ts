@@ -9,6 +9,8 @@ import {
   ArkCheckbox,
   ArkClock,
   ArkColorSwatches,
+  ArkCommandItem,
+  ArkCommandPalette,
   ArkCopyButton,
   ArkDatepicker,
   ArkDialog,
@@ -79,6 +81,15 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkInput.tagName)) {
     customElements.define(ArkInput.tagName, ArkInput);
+  }
+
+  // Depois do input (o campo de busca é um ark-input) e o item antes da paleta, que coordena itens já upgraded.
+  if (!customElements.get(ArkCommandItem.tagName)) {
+    customElements.define(ArkCommandItem.tagName, ArkCommandItem);
+  }
+
+  if (!customElements.get(ArkCommandPalette.tagName)) {
+    customElements.define(ArkCommandPalette.tagName, ArkCommandPalette);
   }
 
   if (!customElements.get(ArkFileInput.tagName)) {

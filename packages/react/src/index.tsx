@@ -19,6 +19,8 @@ export type { ArkClockProps } from "./ark-clock";
 export { ArkClock } from "./ark-clock";
 export type { ArkColorSwatchesProps } from "./ark-color-swatches";
 export { ArkColorSwatches } from "./ark-color-swatches";
+export type { ArkCommandItemProps, ArkCommandPaletteProps } from "./ark-command-palette";
+export { ArkCommandItem, ArkCommandPalette } from "./ark-command-palette";
 export type { ArkCopyButtonProps } from "./ark-copy-button";
 export { ArkCopyButton } from "./ark-copy-button";
 export type { ArkDatepickerProps } from "./ark-datepicker";

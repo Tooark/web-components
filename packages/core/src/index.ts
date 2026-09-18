@@ -39,6 +39,8 @@ export type {
   ArkClockStyleOptions,
   ArkColorSwatch,
   ArkColorSwatchesStyleOptions,
+  ArkCommandItemStyleOptions,
+  ArkCommandPaletteStyleOptions,
   ArkCopyButtonStyleOptions,
   ArkDatepickerLang,
   ArkDatepickerMode,

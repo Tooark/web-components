@@ -9,6 +9,7 @@ export { ArkCarousel } from "./ark-carousel";
 export { ArkCheckbox } from "./ark-checkbox";
 export { ArkClock } from "./ark-clock";
 export { ArkColorSwatches } from "./ark-color-swatches";
+export { ArkCommandItem, ArkCommandPalette } from "./ark-command-palette";
 export { ArkCopyButton } from "./ark-copy-button";
 export { ArkDatepicker } from "./ark-datepicker";
 export { ArkDialog } from "./ark-dialog";

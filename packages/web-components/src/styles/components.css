@@ -291,6 +291,79 @@
     }
   }
 
+  /* ---------- ark-command-palette: painel em popover; campo fixo no topo, itens e grupos ordenados ---------- */
+
+  /*
+   * Coluna flex rolável: o ark-input próprio fica sticky no topo, os itens do
+   * usuário e os cabeçalhos de grupo (nós próprios ao fim do host) se ordenam
+   * por `order`, e a mensagem de vazio vai por último. O display fica aqui
+   * pelo mesmo motivo do ark-dialog.
+   */
+  ark-command-palette {
+    display: flex;
+    flex-direction: column;
+  }
+
+  ark-command-palette:not([data-ark-state]) {
+    display: none;
+  }
+
+  ark-command-palette > [data-ark-chrome="input"] {
+    order: -1;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 0.75rem 0.75rem 0.5rem;
+    @apply ark:bg-surface;
+  }
+
+  ark-command-palette > [data-ark-chrome="group"] {
+    padding: 0.5rem 1rem 0.25rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    @apply ark:text-fg-muted;
+  }
+
+  ark-command-palette > [data-ark-chrome="empty"] {
+    order: 2147483647;
+    padding: 1.5rem 1rem;
+    text-align: center;
+    @apply ark:text-sm ark:text-fg-muted;
+  }
+
+  ark-command-palette > [data-ark-chrome="list"] {
+    display: none;
+  }
+
+  /* Atalho ou badge do item vai para a direita. */
+  ark-command-item > [slot="trailing"] {
+    margin-inline-start: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    @apply ark:text-xs ark:text-fg-muted;
+  }
+
+  ark-command-palette::backdrop {
+    background-color: var(--ark-command-palette-scrim, var(--ark-dialog-scrim, oklch(0 0 0 / 0.5)));
+    opacity: 1;
+    transition: opacity var(--ark-duration-default, 250ms) var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1));
+  }
+
+  ark-command-palette[data-ark-state="closing"]::backdrop {
+    opacity: 0;
+    transition-duration: var(--ark-duration-quick, 150ms);
+    transition-timing-function: var(--ark-ease-in, cubic-bezier(0.4, 0, 1, 1));
+  }
+
+  @starting-style {
+    ark-command-palette::backdrop {
+      opacity: 0;
+    }
+  }
+
   /* ---------- ark-menu: painel ancorado em popover auto; entrada e saída por transição ---------- */
 
   /*

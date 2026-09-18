@@ -8,6 +8,8 @@ export * from "./ark-carousel";
 export * from "./ark-checkbox";
 export * from "./ark-clock";
 export * from "./ark-color-swatches";
+export * from "./ark-command-item";
+export * from "./ark-command-palette";
 export * from "./ark-copy-button";
 export * from "./ark-datepicker";
 export * from "./ark-dialog";

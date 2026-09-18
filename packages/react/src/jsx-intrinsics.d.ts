@@ -196,6 +196,25 @@ declare global {
         size?: ArkSize;
         theme?: ArkTheme;
       };
+      "ark-command-palette": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        open?: boolean;
+        placeholder?: string;
+        hotkey?: string;
+        filter?: boolean;
+        "query-delay"?: number | string;
+        label?: string;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
+      "ark-command-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        group?: string;
+        label?: string;
+        disabled?: boolean;
+      };
       "ark-copy-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         value?: string;
