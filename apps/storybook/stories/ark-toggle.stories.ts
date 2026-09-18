@@ -166,3 +166,18 @@ export const GroupExclusiveSelection = {
     await expect(group).toHaveAttribute("value", "center");
   }
 };
+
+export const GroupEmitsOnce = {
+  render: Group.render,
+  // Quem escuta `change` no proprio grupo recebe so o consolidado, nunca o do item.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const group = canvasElement.querySelector("ark-toggle-group")!;
+    const received: string[] = [];
+    group.addEventListener("change", (event) => received.push((event.target as HTMLElement).tagName.toLowerCase()));
+
+    const toggles = Array.from(group.querySelectorAll("ark-toggle"));
+    const next = toggles.find((toggle) => toggle.getAttribute("aria-pressed") !== "true") ?? toggles[0];
+    await userEvent.click(next);
+    await expect(received).toEqual(["ark-toggle-group"]);
+  }
+};

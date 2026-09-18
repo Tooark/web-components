@@ -210,7 +210,7 @@ export const DarkTheme = {
 
 export const ClickSelectsAndEmitsOnce = {
   render: () => createTabs({ value: "params", lang: "pt" }),
-  // O grupo publica um unico `change` com o value; o da aba nao vaza acima dele.
+  // O grupo publica um unico `change` com o value; o da aba nao vaza acima dele nem para quem escuta no grupo.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const tabs = canvasElement.querySelector("ark-tabs")!;
@@ -218,6 +218,8 @@ export const ClickSelectsAndEmitsOnce = {
     canvasElement.addEventListener("change", (event) => {
       received.push(`${(event.target as HTMLElement).tagName.toLowerCase()}:${(event as CustomEvent).detail.value}`);
     });
+    const onHost: string[] = [];
+    tabs.addEventListener("change", (event) => onHost.push((event.target as HTMLElement).tagName.toLowerCase()));
 
     const headers = canvas.getByRole("tab", { name: "Headers" });
     await expect(canvas.getByRole("tab", { name: "Params" })).toHaveAttribute("aria-selected", "true");
@@ -228,6 +230,7 @@ export const ClickSelectsAndEmitsOnce = {
     await expect(canvas.getByRole("tab", { name: "Params" })).toHaveAttribute("aria-selected", "false");
     await expect(tabs).toHaveAttribute("value", "headers");
     await expect(received).toEqual(["ark-tabs:headers"]);
+    await expect(onHost).toEqual(["ark-tabs"]);
 
     // Clicar na aba ativa nao emite de novo; aba desabilitada nao seleciona (pointer-events: none barra o
     // ponteiro real, entao o clique sintetico cobre a guarda do handler).

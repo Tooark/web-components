@@ -85,8 +85,9 @@ export class ArkToggleGroup extends HTMLElement {
     const target = event.target as HTMLElement | null;
     if (!target || target === this || target.tagName.toLowerCase() !== "ark-toggle") return;
 
-    // O evento do item não vaza; o grupo publica o próprio "change" consolidado.
-    event.stopPropagation();
+    // O evento do item não vaza; o grupo publica o próprio "change" consolidado. Imediata porque quem escuta
+    // no próprio host (wrappers) foi registrado depois deste listener e ainda receberia o do item.
+    event.stopImmediatePropagation();
 
     const toggle = target as ArkToggle;
 

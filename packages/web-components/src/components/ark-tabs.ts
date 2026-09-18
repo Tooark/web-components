@@ -109,11 +109,12 @@ export class ArkTabs extends HTMLElement {
     return this.querySelector<HTMLElement>(':scope > [slot="actions"]');
   }
 
-  // O `change` da aba não vaza: o grupo consolida e publica o próprio, com o value ativo.
+  // O `change` da aba não vaza: o grupo consolida e publica o próprio, com o value ativo. Imediata porque quem
+  // escuta no próprio host (wrappers) foi registrado depois deste listener e ainda receberia o da aba.
   private readonly handleTabChange = (event: Event): void => {
     const target = event.target as HTMLElement | null;
     if (!target || target === this || target.tagName.toLowerCase() !== "ark-tab") return;
-    event.stopPropagation();
+    event.stopImmediatePropagation();
 
     if (!this.isEnabled(target)) return;
     this.commitValue(target.getAttribute("value") || "");
