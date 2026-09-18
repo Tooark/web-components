@@ -155,6 +155,32 @@ export type ArkRadioStyleOptions = {
   checked?: boolean;
 };
 
+// Exports types específicos do componente kbd
+
+/** Props de estilo do ark-kbd. */
+export type ArkKbdStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Altura mínima e texto da tecla, na escala de espaçamento. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+// Exports types específicos do componente status-dot
+
+/** Props de estilo do ark-status-dot. */
+export type ArkStatusDotStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Cor do ponto. Padrão: "neutral". */
+  intent?: ArkIntent;
+  /** Diâmetro na escala de espaçamento (0.375 a 1 rem). Padrão: "md" (0.625 rem). */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente spinner
 
 /** Props de estilo do ark-spinner. */

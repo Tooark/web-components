@@ -12,6 +12,7 @@ import {
   ArkDialog,
   ArkEmpty,
   ArkInput,
+  ArkKbd,
   ArkMenu,
   ArkMenuItem,
   ArkProgress,
@@ -20,6 +21,7 @@ import {
   ArkSelect,
   ArkSkeleton,
   ArkSpinner,
+  ArkStatusDot,
   ArkSwitch,
   ArkTab,
   ArkTabs,
@@ -66,6 +68,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkInput.tagName)) {
     customElements.define(ArkInput.tagName, ArkInput);
+  }
+
+  if (!customElements.get(ArkKbd.tagName)) {
+    customElements.define(ArkKbd.tagName, ArkKbd);
   }
 
   if (!customElements.get(ArkSelect.tagName)) {
@@ -132,6 +138,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkSpinner.tagName)) {
     customElements.define(ArkSpinner.tagName, ArkSpinner);
+  }
+
+  if (!customElements.get(ArkStatusDot.tagName)) {
+    customElements.define(ArkStatusDot.tagName, ArkStatusDot);
   }
 
   if (!customElements.get(ArkSwitch.tagName)) {

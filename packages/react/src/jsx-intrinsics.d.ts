@@ -120,6 +120,13 @@ declare global {
         lang?: ArkLang;
         "locale-json"?: string;
       };
+      "ark-status-dot": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        intent?: ArkIntent;
+        label?: string;
+        size?: ArkSize;
+        theme?: ArkTheme;
+      };
       "ark-switch": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         checked?: boolean;
@@ -211,6 +218,11 @@ declare global {
         theme?: ArkTheme;
         lang?: ArkLang;
         "locale-json"?: string;
+      };
+      "ark-kbd": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        size?: ArkSize;
+        theme?: ArkTheme;
       };
       "ark-menu": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
