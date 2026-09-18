@@ -356,7 +356,7 @@ export const ReducedMotionLoaders = {
     expect(name(".ark-animate-spin")).toBe("ark-spin");
     expect(name(".ark-animate-shake")).toBe("ark-shake");
     expect(name(".ark-skeleton:not(.ark-skeleton-animated)")).toBe("none");
-    expect(name(".ark-skeleton-animated")).toBe("ark-pulse");
+    expect(name(".ark-skeleton-animated")).toBe("ark-shimmer");
 
     const originalMedia = rules.map((rule) => rule.media.mediaText);
     try {

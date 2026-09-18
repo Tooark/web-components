@@ -174,6 +174,13 @@ declare global {
         description?: string;
         theme?: ArkTheme;
       };
+      "ark-skeleton": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        rows?: number | string;
+        animated?: boolean;
+        rounded?: ArkRounded;
+        theme?: ArkTheme;
+      };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         view?: "week" | "day" | "month" | "agenda";

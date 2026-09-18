@@ -11,6 +11,7 @@ export { ArkInput } from "./ark-input";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";
 export { ArkScheduler } from "./ark-scheduler";
 export { ArkSelect } from "./ark-select";
+export { ArkSkeleton } from "./ark-skeleton";
 export { ArkSwitch } from "./ark-switch";
 export { ArkTab, ArkTabs } from "./ark-tabs";
 export { ArkTextarea } from "./ark-textarea";

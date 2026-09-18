@@ -255,16 +255,41 @@
 
 /*
  * Skeleton de loading — bloco neutro, estático por padrão: um loop infinito
- * na única região sem nada para ler chama o olho e cai na WCAG 2.2.2. O pulso
- * é opt-in via .ark-skeleton-animated.
+ * na única região sem nada para ler chama o olho e cai na WCAG 2.2.2. O brilho
+ * que varre (shimmer) é opt-in via .ark-skeleton-animated.
  */
 .ark-skeleton {
   background-color: color-mix(in oklch, var(--ark-color-muted, oklch(0.7 0.02 264)) 30%, transparent);
   border-radius: var(--ark-radius-lg, 0.5rem);
 }
 
+/*
+ * Brilho que varre da esquerda para a direita, como "carregando", em vez de
+ * piscar: uma faixa clara no background-image percorre o bloco. A fase vem de
+ * animation-delay negativo (o ark-skeleton escalona barras e blocos), então
+ * vizinhos não varrem juntos. Duração pelo token long, que zera sob movimento
+ * reduzido (ver o bloco no fim).
+ */
+@keyframes ark-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
 .ark-skeleton-animated {
-  animation: ark-pulse 2s var(--ark-ease-in-out, ease-in-out) infinite;
+  --ark-skeleton-duration: calc(var(--ark-duration-long, 1000ms) * 1.6);
+  background-image: linear-gradient(
+    90deg,
+    transparent 40%,
+    color-mix(in oklch, var(--ark-color-surface-raised, #fff) 70%, transparent) 50%,
+    transparent 60%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: ark-shimmer var(--ark-skeleton-duration) linear infinite;
 }
 
 /*
@@ -275,9 +300,13 @@
  * spin usa 1s fixo e não um token, que o zeramento congelaria.
  */
 @media (prefers-reduced-motion: reduce) {
-  .ark-animate-shake,
+  .ark-animate-shake {
+    animation: none;
+  }
+
   .ark-skeleton-animated {
     animation: none;
+    background-image: none;
   }
 
   .ark-animate-pulse {

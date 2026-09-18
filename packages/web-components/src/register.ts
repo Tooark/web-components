@@ -12,6 +12,7 @@ import {
   ArkMenuItem,
   ArkScheduler,
   ArkSelect,
+  ArkSkeleton,
   ArkSwitch,
   ArkTab,
   ArkTabs,
@@ -42,6 +43,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkSelect.tagName)) {
     customElements.define(ArkSelect.tagName, ArkSelect);
+  }
+
+  if (!customElements.get(ArkSkeleton.tagName)) {
+    customElements.define(ArkSkeleton.tagName, ArkSkeleton);
   }
 
   if (!customElements.get(ArkTextarea.tagName)) {

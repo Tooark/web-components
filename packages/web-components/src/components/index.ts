@@ -11,6 +11,7 @@ export * from "./ark-menu";
 export * from "./ark-menu-item";
 export * from "./ark-scheduler";
 export * from "./ark-select";
+export * from "./ark-skeleton";
 export * from "./ark-switch";
 export * from "./ark-tab";
 export * from "./ark-tabs";

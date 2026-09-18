@@ -12,6 +12,7 @@ export {
   ArkMenuItem,
   ArkScheduler,
   ArkSelect,
+  ArkSkeleton,
   ArkSwitch,
   ArkTab,
   ArkTabs,

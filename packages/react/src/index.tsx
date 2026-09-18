@@ -23,6 +23,8 @@ export type { ArkSchedulerProps } from "./ark-scheduler";
 export { ArkScheduler } from "./ark-scheduler";
 export type { ArkSelectProps } from "./ark-select";
 export { ArkSelect } from "./ark-select";
+export type { ArkSkeletonProps } from "./ark-skeleton";
+export { ArkSkeleton } from "./ark-skeleton";
 export type { ArkSwitchProps } from "./ark-switch";
 export { ArkSwitch } from "./ark-switch";
 export type { ArkTabProps, ArkTabsProps } from "./ark-tabs";

@@ -311,6 +311,13 @@
     margin-top: 0.5rem;
   }
 
+  /* ---------- ark-skeleton: altura padrão do bloco único ---------- */
+
+  /* Em @layer components, para class (utilities) e style do usuário vencerem; as barras têm altura própria. */
+  ark-skeleton:not([data-ark-rows]) {
+    height: 1rem;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

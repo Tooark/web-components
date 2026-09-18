@@ -364,6 +364,18 @@ export type ArkEmptyStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente skeleton
+
+/** Props de estilo do ark-skeleton. */
+export type ArkSkeletonStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas barras. */
+  testid?: string;
+  /** Raio dos cantos. Padrão: o do preset .ark-skeleton (lg). */
+  rounded?: ArkRounded;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

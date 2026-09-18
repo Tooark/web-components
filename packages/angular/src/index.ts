@@ -11,6 +11,7 @@ export { ArkInputComponent } from "./ark-input.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
 export { ArkSelectComponent } from "./ark-select.component";
+export { ArkSkeletonComponent } from "./ark-skeleton.component";
 export { ArkSwitchComponent } from "./ark-switch.component";
 export { ArkTabComponent, ArkTabsComponent } from "./ark-tabs.component";
 export { ArkTextareaComponent } from "./ark-textarea.component";
