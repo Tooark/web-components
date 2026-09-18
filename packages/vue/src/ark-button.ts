@@ -1,4 +1,12 @@
-import type { ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
+import type {
+  ArkButtonStatus,
+  ArkButtonType,
+  ArkButtonVariant,
+  ArkIntent,
+  ArkRounded,
+  ArkSize,
+  ArkTheme
+} from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -14,6 +22,8 @@ export const ArkButton = defineComponent({
     type: { type: String as PropType<ArkButtonType>, default: "button" },
     disabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    status: { type: String as PropType<ArkButtonStatus>, default: undefined },
+    statusLabel: { type: String, default: undefined },
     iconOnly: { type: Boolean, default: false },
     fullWidth: { type: Boolean, default: false },
     href: { type: String, default: undefined },
@@ -40,6 +50,8 @@ export const ArkButton = defineComponent({
           "text-color": props.textColor,
           disabled: props.disabled ? "" : undefined,
           loading: props.loading ? "" : undefined,
+          status: props.status,
+          "status-label": props.statusLabel,
           "icon-only": props.iconOnly ? "" : undefined,
           "full-width": props.fullWidth ? "" : undefined
         },

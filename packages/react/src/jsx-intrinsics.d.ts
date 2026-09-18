@@ -1,6 +1,7 @@
 import type {
   ArkBadgeSize,
   ArkBadgeVariant,
+  ArkButtonStatus,
   ArkButtonType,
   ArkButtonVariant,
   ArkCarouselSnap,
@@ -43,6 +44,8 @@ declare global {
         size?: ArkSize;
         rounded?: ArkRounded;
         loading?: boolean;
+        status?: ArkButtonStatus;
+        "status-label"?: string;
         "icon-only"?: boolean;
         "full-width"?: boolean;
         href?: string;

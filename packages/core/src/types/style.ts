@@ -29,6 +29,9 @@ export type ArkButtonType = "button" | "submit" | "reset";
 /** Aparência do botão: uma variante de estilo ou um intent semântico. */
 export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 
+/** Feedback do resultado no botão: nada, check de sucesso ou alerta de erro. */
+export type ArkButtonStatus = "idle" | "success" | "error";
+
 // Exports types específicos do componente datepicker
 
 /** Idioma dos rótulos dos componentes; "custom" usa as strings fornecidas em locale-json. */
@@ -81,6 +84,10 @@ export type ArkButtonStyleOptions = {
   rounded?: ArkRounded;
   /** Mostra o spinner, marca aria-busy e bloqueia o clique. */
   loading?: boolean;
+  /** Feedback do resultado: "success" ou "error" trocam o glifo (loading vence). Padrão: "idle". */
+  status?: ArkButtonStatus;
+  /** Texto anunciado ao leitor de tela (announce do core) quando status vira success ou error. */
+  statusLabel?: string;
   /** Botão quadrado, com min-width igual ao token de tamanho. */
   iconOnly?: boolean;
   /** Ocupa toda a largura disponível. */

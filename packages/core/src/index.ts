@@ -19,6 +19,7 @@ export type {
   ArkBadgeSize,
   ArkBadgeStyleOptions,
   ArkBadgeVariant,
+  ArkButtonStatus,
   ArkButtonStyleOptions,
   ArkButtonType,
   ArkButtonVariant,

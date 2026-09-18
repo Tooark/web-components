@@ -413,3 +413,71 @@ export const LinkIsFocusable = {
     await expect(link).toHaveAttribute("aria-disabled", "true");
   }
 };
+
+export const Status = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.alignItems = "center";
+    wrap.style.gap = "12px";
+
+    for (const [status, label, variant, loading] of [
+      ["success", "Salvo", "solid", false],
+      ["error", "Falhou", "outline", false],
+      ["success", "Carregando vence", "ghost", true]
+    ] as [string, string, string, boolean][]) {
+      const el = document.createElement("ark-button");
+      el.setAttribute("variant", variant);
+      el.setAttribute("status", status);
+      el.setAttribute("status-label", label);
+      if (loading) el.setAttribute("loading", "");
+      el.textContent = label;
+      wrap.appendChild(el);
+    }
+    return wrap;
+  }
+};
+
+export const StatusAnnounces = {
+  render: () => {
+    const el = document.createElement("ark-button");
+    el.textContent = "Enviar";
+    return el;
+  },
+  // success/error trocam o glifo (com fade-in) e anunciam status-label pela live region unica do core; loading
+  // vence o status; nada de live region dentro do host, cujo nome acessivel continua "Enviar".
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-button")!;
+    const icon = (): Element | null => host.querySelector('[data-ark="button-status-icon"]');
+    const region = (politeness: string): HTMLElement | null =>
+      document.querySelector<HTMLElement>(`[data-ark="announcer-${politeness}"]`);
+
+    expect(icon()).toBeNull();
+    host.setAttribute("status-label", "Requisicao enviada");
+    host.setAttribute("status", "success");
+    expect(icon()).not.toBeNull();
+    await expect(icon()).toHaveAttribute("aria-hidden", "true");
+    expect(icon()?.querySelector("svg")?.classList.contains("ark-animate-fade-in")).toBe(true);
+    expect(host.firstElementChild).toBe(icon());
+    await waitFor(() => expect(region("polite")?.textContent).toBe("Requisicao enviada"));
+    expect(host.querySelector('[aria-live], [role="status"], [role="alert"]')).toBeNull();
+    expect(host.textContent?.trim()).toBe("Enviar");
+
+    // Ordem do React (status antes de status-label na mesma passada): o anuncio le o rotulo novo; erro e assertive.
+    const successIcon = icon();
+    host.setAttribute("status", "error");
+    host.setAttribute("status-label", "Falha ao enviar");
+    expect(icon()).not.toBe(successIcon);
+    await waitFor(() => expect(region("assertive")?.textContent).toBe("Falha ao enviar"));
+
+    host.setAttribute("loading", "");
+    expect(icon()).toBeNull();
+    expect(host.querySelector('[data-ark="button-spinner"]')).not.toBeNull();
+    host.removeAttribute("loading");
+    expect(icon()).not.toBeNull();
+
+    // O app limpa o status; o botao so mostra.
+    host.removeAttribute("status");
+    expect(icon()).toBeNull();
+  }
+};

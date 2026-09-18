@@ -12,7 +12,7 @@ export type ArkButtonProps = PropsWithChildren<
 >;
 
 export function ArkButton(props: ArkButtonProps): React.JSX.Element {
-  const { children, className, textColor, loading, iconOnly, fullWidth, disabled, ...rest } = props;
+  const { children, className, textColor, loading, statusLabel, iconOnly, fullWidth, disabled, ...rest } = props;
 
   useEffect(() => {
     ensureTooarkComponentsRegistered();
@@ -24,6 +24,7 @@ export function ArkButton(props: ArkButtonProps): React.JSX.Element {
     "text-color": textColor,
     disabled: disabled ? "" : undefined,
     loading: loading ? "" : undefined,
+    "status-label": statusLabel,
     "icon-only": iconOnly ? "" : undefined,
     "full-width": fullWidth ? "" : undefined
   };

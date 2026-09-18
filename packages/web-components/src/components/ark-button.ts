@@ -1,4 +1,12 @@
-import type { ArkButtonType, ArkIntent, ArkRounded, ArkSize, ArkStyleVariant } from "@tooark/core";
+import {
+  type ArkButtonStatus,
+  type ArkButtonType,
+  type ArkIntent,
+  type ArkRounded,
+  type ArkSize,
+  type ArkStyleVariant,
+  announce
+} from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -19,6 +27,19 @@ const SPINNER_SVG = `
     <path class="ark:opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
   </svg>`;
 
+/** Glifos de status: entram com o preset `.ark-animate-fade-in` do core no lugar do spinner. */
+const STATUS_SVG: Record<Exclude<ArkButtonStatus, "idle">, string> = {
+  success: `
+  <svg class="ark:h-[1em] ark:w-[1em] ark-animate-fade-in" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 10.5l4 4 8-9"></path>
+  </svg>`,
+  error: `
+  <svg class="ark:h-[1em] ark:w-[1em] ark-animate-fade-in" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+    <circle cx="10" cy="10" r="8"></circle>
+    <path d="M10 6v4.5M10 13.5v.5"></path>
+  </svg>`
+};
+
 let arkButtonIdCounter = 0;
 
 /**
@@ -37,6 +58,8 @@ export class ArkButton extends HTMLElement {
 
   private readonly internals: ElementInternals | null;
   private spinnerEl: HTMLSpanElement | null = null;
+  /** Glifo de `status` (check ou alerta), nó próprio na frente do conteúdo; some sob `loading`. */
+  private statusEl: HTMLSpanElement | null = null;
   private anchorEl: HTMLAnchorElement | null = null;
   private ownClasses: string[] = [];
   private syncingClass = false;
@@ -59,6 +82,8 @@ export class ArkButton extends HTMLElement {
       "class",
       "rounded",
       "loading",
+      "status",
+      "status-label",
       "icon-only",
       "full-width",
       "href",
@@ -102,7 +127,7 @@ export class ArkButton extends HTMLElement {
    * Chamado pelo navegador quando um atributo observado do elemento é alterado.
    * @param name O nome do atributo que foi alterado.
    */
-  attributeChangedCallback(name: string): void {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     // Se o atributo alterado for "class", reaplica apenas as classes próprias do componente.
     if (name === "class") {
       // Um framework pode reescrever o atributo class inteiro (React/Vue
@@ -119,8 +144,51 @@ export class ArkButton extends HTMLElement {
       return;
     }
 
+    // Status que vira success/error é anunciado ao leitor de tela pela live region única do core.
+    if (name === "status" && newValue !== oldValue) {
+      this.announceStatus(newValue);
+    }
+
     // Atualiza a aparência do botão quando qualquer outro atributo observado muda.
     this.updateAppearance();
+  }
+
+  /** Feedback do resultado: "success" ou "error" trocam o glifo; "idle" (ou ausente) não mostra nada. */
+  get status(): ArkButtonStatus {
+    const status = (this.getAttribute("status") || "").toLowerCase();
+    return status === "success" || status === "error" ? status : "idle";
+  }
+
+  set status(value: ArkButtonStatus | null | undefined) {
+    if (value === "success" || value === "error") {
+      this.setAttribute("status", value);
+    } else {
+      this.removeAttribute("status");
+    }
+  }
+
+  /** Texto anunciado ao leitor de tela quando o status vira success ou error. */
+  get statusLabel(): string {
+    return this.getAttribute("status-label") || "";
+  }
+
+  set statusLabel(value: string | null | undefined) {
+    if (value) {
+      this.setAttribute("status-label", value);
+    } else {
+      this.removeAttribute("status-label");
+    }
+  }
+
+  // No microtask: um framework que troca `status` e `status-label` na mesma passada seta os dois antes.
+  private announceStatus(next: string | null): void {
+    const status = (next || "").toLowerCase();
+    if (status !== "success" && status !== "error") return;
+    queueMicrotask(() => {
+      if (!this.isConnected || this.status !== status) return;
+      const label = this.statusLabel;
+      if (label) announce(label, status === "error" ? "assertive" : "polite");
+    });
   }
 
   /**
@@ -490,6 +558,30 @@ export class ArkButton extends HTMLElement {
     }
   }
 
+  // Glifo do status na frente do conteúdo, como o spinner; `loading` vence e o esconde. Trocar de success para
+  // error recria o nó, para o fade-in rodar de novo.
+  private syncStatus(): void {
+    const status = this.status;
+    const active = status !== "idle" && !this.hasAttribute("loading");
+
+    if (!active) {
+      this.statusEl?.remove();
+      this.statusEl = null;
+      return;
+    }
+
+    if (this.statusEl && this.statusEl.getAttribute("data-ark-status") === status) return;
+    this.statusEl?.remove();
+
+    const icon = document.createElement("span");
+    icon.setAttribute("aria-hidden", "true");
+    icon.setAttribute("data-ark-status", status);
+    icon.className = "ark:inline-flex ark:items-center";
+    icon.innerHTML = STATUS_SVG[status];
+    this.prepend(icon);
+    this.statusEl = icon;
+  }
+
   private ensureId(): string {
     if (!this.id) this.id = `ark-button-${++arkButtonIdCounter}`;
     return this.id;
@@ -571,10 +663,14 @@ export class ArkButton extends HTMLElement {
     this.applyOwnClasses(this.computeClasses());
     this.applyCustomColors();
     this.syncLoading();
+    this.syncStatus();
 
     applyTestHooks(this, "button", this);
     if (this.spinnerEl) {
       applyTestHooks(this, "button", this.spinnerEl, "spinner");
+    }
+    if (this.statusEl) {
+      applyTestHooks(this, "button", this.statusEl, "status-icon");
     }
     if (this.anchorEl) {
       applyTestHooks(this, "button", this.anchorEl, "link");

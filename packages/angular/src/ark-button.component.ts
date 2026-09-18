@@ -1,5 +1,13 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
-import type { ArkButtonType, ArkButtonVariant, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
+import type {
+  ArkButtonStatus,
+  ArkButtonType,
+  ArkButtonVariant,
+  ArkIntent,
+  ArkRounded,
+  ArkSize,
+  ArkTheme
+} from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -12,6 +20,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.type]="type"
     [attr.disabled]="disabled ? '' : null"
     [attr.loading]="loading ? '' : null"
+    [attr.status]="status"
+    [attr.status-label]="statusLabel"
     [attr.icon-only]="iconOnly ? '' : null"
     [attr.full-width]="fullWidth ? '' : null"
     [attr.variant]="variant"
@@ -35,6 +45,10 @@ export class ArkButtonComponent {
   @Input() type: ArkButtonType = "button";
   @Input() disabled = false;
   @Input() loading = false;
+  /** Feedback do resultado: "success" ou "error" trocam o glifo (loading vence). */
+  @Input() status: ArkButtonStatus | undefined;
+  /** Texto anunciado ao leitor de tela quando status vira success ou error. */
+  @Input() statusLabel: string | undefined;
   @Input() iconOnly = false;
   @Input() fullWidth = false;
   @Input() variant: ArkButtonVariant = "primary";
