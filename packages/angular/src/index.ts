@@ -12,6 +12,7 @@ export { ArkCopyButtonComponent } from "./ark-copy-button.component";
 export { ArkDatepickerComponent } from "./ark-datepicker.component";
 export { ArkDialogComponent } from "./ark-dialog.component";
 export { ArkEmptyComponent } from "./ark-empty.component";
+export { ArkFileInputComponent } from "./ark-file-input.component";
 export { ArkInputComponent } from "./ark-input.component";
 export { ArkKbdComponent } from "./ark-kbd.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";

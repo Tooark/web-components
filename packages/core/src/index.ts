@@ -45,6 +45,7 @@ export type {
   ArkDialogSize,
   ArkDialogStyleOptions,
   ArkEmptyStyleOptions,
+  ArkFileInputStyleOptions,
   ArkInputStyleOptions,
   ArkIntent,
   ArkKbdStyleOptions,

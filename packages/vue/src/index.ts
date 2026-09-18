@@ -12,6 +12,7 @@ export { ArkCopyButton } from "./ark-copy-button";
 export { ArkDatepicker } from "./ark-datepicker";
 export { ArkDialog } from "./ark-dialog";
 export { ArkEmpty } from "./ark-empty";
+export { ArkFileInput } from "./ark-file-input";
 export { ArkInput } from "./ark-input";
 export { ArkKbd } from "./ark-kbd";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";

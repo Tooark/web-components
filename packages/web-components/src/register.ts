@@ -12,6 +12,7 @@ import {
   ArkDatepicker,
   ArkDialog,
   ArkEmpty,
+  ArkFileInput,
   ArkInput,
   ArkKbd,
   ArkMenu,
@@ -74,6 +75,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkInput.tagName)) {
     customElements.define(ArkInput.tagName, ArkInput);
+  }
+
+  if (!customElements.get(ArkFileInput.tagName)) {
+    customElements.define(ArkFileInput.tagName, ArkFileInput);
   }
 
   if (!customElements.get(ArkKbd.tagName)) {

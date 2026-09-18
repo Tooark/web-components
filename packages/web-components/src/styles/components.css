@@ -105,6 +105,30 @@
     grid-area: message;
   }
 
+  /* ---------- ark-file-input: mesma grid do ark-input; a zona de soltar é o campo ---------- */
+
+  ark-file-input {
+    display: inline-grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "label"
+      "field"
+      "message";
+  }
+
+  ark-file-input > [data-ark="file-input-label"] {
+    grid-area: label;
+  }
+
+  ark-file-input > [data-ark="file-input-zone"] {
+    grid-area: field;
+  }
+
+  ark-file-input > [data-ark="file-input-helper"],
+  ark-file-input > [data-ark="file-input-error"] {
+    grid-area: message;
+  }
+
   /* ---------- ark-select: mesma grid do ark-input, chevron sobre o campo ---------- */
 
   ark-select {

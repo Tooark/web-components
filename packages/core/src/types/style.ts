@@ -543,6 +543,26 @@ export type ArkEmptyStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente file-input
+
+/** Props de estilo do ark-file-input. */
+export type ArkFileInputStyleOptions = {
+  /** Propagado como data-testid ao input nativo oculto e sufixado nas partes internas. */
+  testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Intenção semântica de cor do foco, do botão e do realce ao arrastar. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Altura do botão via token --ark-size-* e tamanho dos textos. Padrão: "md". */
+  size?: ArkSize;
+  /** Arredondamento da zona de soltar. Padrão: "lg". */
+  rounded?: ArkRounded;
+  /** Idioma das strings chooseFile/dropHint/noFile. Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente skeleton
 
 /** Props de estilo do ark-skeleton. */

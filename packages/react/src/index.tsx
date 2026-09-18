@@ -25,6 +25,8 @@ export type { ArkDialogProps } from "./ark-dialog";
 export { ArkDialog } from "./ark-dialog";
 export type { ArkEmptyProps } from "./ark-empty";
 export { ArkEmpty } from "./ark-empty";
+export type { ArkFileInputProps } from "./ark-file-input";
+export { ArkFileInput } from "./ark-file-input";
 export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
 export type { ArkKbdProps } from "./ark-kbd";

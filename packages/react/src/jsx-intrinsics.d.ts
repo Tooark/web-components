@@ -322,6 +322,23 @@ declare global {
         disabled?: boolean;
         required?: boolean;
       };
+      "ark-file-input": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        accept?: string;
+        multiple?: boolean;
+        label?: string;
+        helper?: string;
+        "error-message"?: string;
+        disabled?: boolean;
+        required?: boolean;
+        name?: string;
+        intent?: ArkIntent;
+        size?: ArkSize;
+        rounded?: ArkRounded;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-input": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         type?: string;
