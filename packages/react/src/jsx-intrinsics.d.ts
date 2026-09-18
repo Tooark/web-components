@@ -53,6 +53,29 @@ declare global {
         color?: string;
         "text-color"?: string;
       };
+      "ark-checkbox": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        checked?: boolean;
+        indeterminate?: boolean;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
+        name?: string;
+        value?: string;
+        label?: string;
+      };
+      "ark-radio": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        checked?: boolean;
+        disabled?: boolean;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
+        name?: string;
+        value?: string;
+        label?: string;
+      };
       "ark-switch": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         checked?: boolean;

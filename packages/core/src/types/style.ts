@@ -102,6 +102,40 @@ export type ArkButtonStyleOptions = {
   textColor?: string;
 };
 
+// Exports types específicos do componente checkbox
+
+/** Props de estilo e comportamento do ark-checkbox. */
+export type ArkCheckboxStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+  testid?: string;
+  /** Intenção semântica de cor da caixa marcada. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Tamanho da caixa e do rótulo, na escala de espaçamento (a caixa é um glifo, não um controle de altura). Padrão: "md". */
+  size?: ArkSize;
+  /** Marcado. */
+  checked?: boolean;
+  /** Estado misto (aria-checked="mixed", traço no lugar do check); o próximo clique o limpa. */
+  indeterminate?: boolean;
+};
+
+// Exports types específicos do componente radio
+
+/** Props de estilo e comportamento do ark-radio. */
+export type ArkRadioStyleOptions = {
+  /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+  testid?: string;
+  /** Intenção semântica de cor da opção marcada. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Tamanho da opção e do rótulo, na escala de espaçamento. Padrão: "md". */
+  size?: ArkSize;
+  /** Marcado; marcar um desmarca os outros do mesmo `name`. */
+  checked?: boolean;
+};
+
 /** Props de estilo e comportamento do ark-switch. */
 export type ArkSwitchStyleOptions = {
   /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */

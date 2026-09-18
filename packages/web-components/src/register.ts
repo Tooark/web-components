@@ -3,6 +3,7 @@ import {
   ArkButton,
   ArkCalendar,
   ArkCarousel,
+  ArkCheckbox,
   ArkClock,
   ArkDatepicker,
   ArkDialog,
@@ -10,6 +11,7 @@ import {
   ArkInput,
   ArkMenu,
   ArkMenuItem,
+  ArkRadio,
   ArkScheduler,
   ArkSelect,
   ArkSkeleton,
@@ -35,6 +37,14 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkButton.tagName)) {
     customElements.define(ArkButton.tagName, ArkButton);
+  }
+
+  if (!customElements.get(ArkCheckbox.tagName)) {
+    customElements.define(ArkCheckbox.tagName, ArkCheckbox);
+  }
+
+  if (!customElements.get(ArkRadio.tagName)) {
+    customElements.define(ArkRadio.tagName, ArkRadio);
   }
 
   if (!customElements.get(ArkInput.tagName)) {
