@@ -5,6 +5,7 @@ export {
   ArkCarousel,
   ArkClock,
   ArkDatepicker,
+  ArkDialog,
   ArkInput,
   ArkScheduler,
   ArkSelect,

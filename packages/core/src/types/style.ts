@@ -285,6 +285,32 @@ export type ArkInputStyleOptions = {
   rounded?: ArkRounded;
 };
 
+// Exports types específicos do componente dialog
+
+/** Largura máxima do painel do diálogo. */
+export type ArkDialogSize = "sm" | "md" | "lg" | "xl" | "full";
+
+/** Origem de um fechamento do diálogo, publicada em `ark-close`. */
+export type ArkDialogCloseReason = "escape" | "backdrop" | "close-button" | "api";
+
+/** Props de estilo do ark-dialog. */
+export type ArkDialogStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Largura máxima do painel; "full" ocupa a viewport inteira, sem cantos. Padrão: "md". */
+  size?: ArkDialogSize;
+  /** Largura própria (comprimento CSS; número vira px): sobrescreve o preset no eixo, limitada à viewport. */
+  width?: string | number;
+  /** Altura própria (comprimento CSS; número vira px), limitada à viewport. Padrão: a altura do conteúdo. */
+  height?: string | number;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do rótulo do botão de fechar. Padrão: "en". */
+  lang?: ArkLang;
+  /** Strings customizadas (JSON) quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

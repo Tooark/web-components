@@ -5,6 +5,7 @@ import type {
   ArkButtonVariant,
   ArkCarouselSnap,
   ArkDatepickerLang,
+  ArkDialogSize,
   ArkIntent,
   ArkLang,
   ArkRounded,
@@ -124,6 +125,19 @@ declare global {
         "event-display"?: "dots" | "count" | "list";
         "step-minutes"?: number;
         "hours-format"?: "24" | "12";
+      };
+      "ark-dialog": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        open?: boolean;
+        size?: ArkDialogSize;
+        width?: string | number;
+        height?: string | number;
+        label?: string;
+        "no-close-button"?: boolean;
+        persistent?: boolean;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
       };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

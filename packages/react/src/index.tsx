@@ -11,6 +11,8 @@ export type { ArkClockProps } from "./ark-clock";
 export { ArkClock } from "./ark-clock";
 export type { ArkDatepickerProps } from "./ark-datepicker";
 export { ArkDatepicker } from "./ark-datepicker";
+export type { ArkDialogProps } from "./ark-dialog";
+export { ArkDialog } from "./ark-dialog";
 export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
 export type { ArkSchedulerProps } from "./ark-scheduler";

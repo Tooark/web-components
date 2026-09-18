@@ -143,6 +143,76 @@
     opacity: 0.5;
   }
 
+  /* ---------- ark-dialog: painel em popover; cabeçalho e rodapé fixos por sticky ---------- */
+
+  /*
+   * Coluna flex: o cabeçalho do componente é o primeiro filho, o rodapé do
+   * usuário vai ao fim por order, e o resto é o corpo. O display fica aqui, e
+   * não em classe do host, porque um [popover] com display do autor aparece
+   * fora do top layer: sem o estado interno o host fechado fica oculto.
+   */
+  ark-dialog {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 1.5rem;
+  }
+
+  ark-dialog:not([data-ark-state]) {
+    display: none;
+  }
+
+  ark-dialog:not(:has(> [data-ark="dialog-header"])) {
+    padding-top: 1.5rem;
+  }
+
+  ark-dialog:not(:has(> [slot="footer"])) {
+    padding-bottom: 1.5rem;
+  }
+
+  /*
+   * O rodapé do usuário: fim da coluna, sticky no fundo do painel rolável,
+   * ações à direita. Com altura sobrando (height/full) o margin-top auto o
+   * empurra para o fundo.
+   */
+  ark-dialog > [slot="footer"] {
+    order: 1;
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-inline: -1.5rem;
+    padding: 1rem 1.5rem 1.5rem;
+    @apply ark:bg-surface;
+  }
+
+  /*
+   * Scrim: só opacidade, entra com `default` e sai com `quick` junto do painel
+   * (o estado `closing` antecede o hidePopover). Custom properties chegam ao
+   * ::backdrop por herança do host (Chrome 121+); sem ela valem os fallbacks.
+   * Redefina --ark-dialog-scrim no host ou em :root para trocar a cor.
+   */
+  ark-dialog::backdrop {
+    background-color: var(--ark-dialog-scrim, oklch(0 0 0 / 0.5));
+    opacity: 1;
+    transition: opacity var(--ark-duration-default, 250ms) var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1));
+  }
+
+  ark-dialog[data-ark-state="closing"]::backdrop {
+    opacity: 0;
+    transition-duration: var(--ark-duration-quick, 150ms);
+    transition-timing-function: var(--ark-ease-in, cubic-bezier(0.4, 0, 1, 1));
+  }
+
+  @starting-style {
+    ark-dialog::backdrop {
+      opacity: 0;
+    }
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

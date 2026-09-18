@@ -5,6 +5,7 @@ import {
   ArkCarousel,
   ArkClock,
   ArkDatepicker,
+  ArkDialog,
   ArkInput,
   ArkScheduler,
   ArkSelect,
@@ -62,6 +63,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkDatepicker.tagName)) {
     customElements.define(ArkDatepicker.tagName, ArkDatepicker);
+  }
+
+  if (!customElements.get(ArkDialog.tagName)) {
+    customElements.define(ArkDialog.tagName, ArkDialog);
   }
 
   if (!customElements.get(ArkCarousel.tagName)) {
