@@ -447,6 +447,35 @@ export type ArkDialogStyleOptions = {
   localeJson?: string;
 };
 
+// Exports types específicos do componente drawer
+
+/** Borda onde o ark-drawer encosta. */
+export type ArkDrawerSide = "left" | "right" | "top" | "bottom";
+
+/** Modo do ark-drawer: overlay (popover modal com scrim) ou inline (no fluxo da página, só anima). */
+export type ArkDrawerMode = "overlay" | "inline";
+
+/** Origem de um fechamento da gaveta, publicada em `ark-close`. */
+export type ArkDrawerCloseReason = ArkDialogCloseReason;
+
+/** Props de estilo do ark-drawer. */
+export type ArkDrawerStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Borda onde a gaveta encosta e de onde desliza. Padrão: "right". */
+  side?: ArkDrawerSide;
+  /** overlay (popover modal com scrim) ou inline (no fluxo, só anima). Padrão: "overlay". */
+  mode?: ArkDrawerMode;
+  /** Preset sm/md/lg (18/24/32 rem de largura; 16/20/28 rem de altura) ou comprimento CSS no eixo da gaveta (número vira px). Padrão: "md". */
+  size?: "sm" | "md" | "lg" | (string & {}) | number;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do rótulo do botão de fechar. Padrão: "en". */
+  lang?: ArkLang;
+  /** Strings customizadas (JSON) quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente menu
 
 /** Alinhamento do menu em relação ao gatilho. */

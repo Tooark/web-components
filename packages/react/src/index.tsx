@@ -23,6 +23,8 @@ export type { ArkDatepickerProps } from "./ark-datepicker";
 export { ArkDatepicker } from "./ark-datepicker";
 export type { ArkDialogProps } from "./ark-dialog";
 export { ArkDialog } from "./ark-dialog";
+export type { ArkDrawerProps } from "./ark-drawer";
+export { ArkDrawer } from "./ark-drawer";
 export type { ArkEmptyProps } from "./ark-empty";
 export { ArkEmpty } from "./ark-empty";
 export type { ArkFileInputProps } from "./ark-file-input";

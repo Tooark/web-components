@@ -237,6 +237,60 @@
     }
   }
 
+  /* ---------- ark-drawer: painel em popover (overlay) ou no fluxo (inline); cabeçalho e rodapé como o dialog ---------- */
+
+  ark-drawer {
+    display: flex;
+    flex-direction: column;
+    padding-inline: 1.5rem;
+  }
+
+  ark-drawer:not([data-ark-state]) {
+    display: none;
+  }
+
+  ark-drawer:not(:has(> [data-ark="drawer-header"])) {
+    padding-top: 1.5rem;
+  }
+
+  ark-drawer:not(:has(> [slot="footer"])) {
+    padding-bottom: 1.5rem;
+  }
+
+  ark-drawer > [slot="footer"] {
+    order: 1;
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    z-index: 1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-inline: -1.5rem;
+    padding: 1rem 1.5rem 1.5rem;
+    @apply ark:bg-surface;
+  }
+
+  /* Scrim só no overlay (o inline não tem ::backdrop); redefina --ark-drawer-scrim para trocar a cor. */
+  ark-drawer::backdrop {
+    background-color: var(--ark-drawer-scrim, var(--ark-dialog-scrim, oklch(0 0 0 / 0.5)));
+    opacity: 1;
+    transition: opacity var(--ark-duration-default, 250ms) var(--ark-ease-out, cubic-bezier(0, 0, 0.2, 1));
+  }
+
+  ark-drawer[data-ark-state="closing"]::backdrop {
+    opacity: 0;
+    transition-duration: var(--ark-duration-quick, 150ms);
+    transition-timing-function: var(--ark-ease-in, cubic-bezier(0.4, 0, 1, 1));
+  }
+
+  @starting-style {
+    ark-drawer::backdrop {
+      opacity: 0;
+    }
+  }
+
   /* ---------- ark-menu: painel ancorado em popover auto; entrada e saída por transição ---------- */
 
   /*

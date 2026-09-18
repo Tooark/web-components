@@ -10,6 +10,7 @@ export * from "./ark-clock";
 export * from "./ark-copy-button";
 export * from "./ark-datepicker";
 export * from "./ark-dialog";
+export * from "./ark-drawer";
 export * from "./ark-empty";
 export * from "./ark-file-input";
 export * from "./ark-input";

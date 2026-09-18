@@ -17,7 +17,7 @@ export type ArkRounded = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "full";
 export type ArkDuration = "none" | "instant" | "quick" | "default" | "moderate" | "gentle" | "slow" | "long";
 
 /** Curvas de easing de animações. */
-export type ArkEasing = "linear" | "standard" | "in" | "out" | "in-out" | "overshoot";
+export type ArkEasing = "linear" | "standard" | "in" | "out" | "in-out" | "overshoot" | "sheet";
 
 /** Tema resolvido (sem "auto"). */
 export type ArkThemeSelected = "light" | "dark";

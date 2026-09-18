@@ -157,6 +157,7 @@
   --ark-ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ark-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
   --ark-ease-overshoot: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ark-ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* Deslocamento padrão de slides (enter/exit) */
   --ark-motion-distance: 0.75rem;

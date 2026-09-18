@@ -11,6 +11,7 @@ import {
   ArkCopyButton,
   ArkDatepicker,
   ArkDialog,
+  ArkDrawer,
   ArkEmpty,
   ArkFileInput,
   ArkInput,
@@ -120,6 +121,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkDialog.tagName)) {
     customElements.define(ArkDialog.tagName, ArkDialog);
+  }
+
+  if (!customElements.get(ArkDrawer.tagName)) {
+    customElements.define(ArkDrawer.tagName, ArkDrawer);
   }
 
   if (!customElements.get(ArkEmpty.tagName)) {

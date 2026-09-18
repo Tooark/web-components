@@ -11,6 +11,8 @@ import type {
   ArkCarouselSnap,
   ArkDatepickerLang,
   ArkDialogSize,
+  ArkDrawerMode,
+  ArkDrawerSide,
   ArkIntent,
   ArkLang,
   ArkMenuAlign,
@@ -275,6 +277,19 @@ declare global {
         padding?: ArkCardPadding;
         rounded?: ArkRounded;
         theme?: ArkTheme;
+      };
+      "ark-drawer": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        open?: boolean;
+        side?: ArkDrawerSide;
+        mode?: ArkDrawerMode;
+        size?: string | number;
+        label?: string;
+        "no-close-button"?: boolean;
+        persistent?: boolean;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
       };
       "ark-empty": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
