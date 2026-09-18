@@ -258,6 +258,35 @@
     @apply ark:text-xs ark:text-fg-muted;
   }
 
+  /* ---------- ark-tooltip: o balão é popover manual, próprio ou o slot="content" do usuário ---------- */
+
+  /*
+   * O balão pode ser o nó do componente (texto de content) ou o filho
+   * slot="content" do usuário (conteúdo rico): os dois levam o hook
+   * tooltip-bubble e o mesmo visual aqui, sem classes no nó do usuário.
+   * Redefine o que o UA dá a [popover]; left/top vêm inline do posicionamento.
+   * Fechado fica oculto (um [popover] com display do autor apareceria no fluxo).
+   */
+  ark-tooltip > [data-ark="tooltip-bubble"] {
+    position: fixed;
+    inset: auto;
+    margin: 0;
+    border: 0;
+    width: max-content;
+    max-width: 20rem;
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    overflow: visible;
+    @apply ark:bg-fg ark:text-surface ark:shadow-md;
+  }
+
+  ark-tooltip > [slot="content"]:not(:popover-open),
+  ark-tooltip > [data-ark="tooltip-bubble"]:not(:popover-open) {
+    display: none;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

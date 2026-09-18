@@ -17,7 +17,8 @@ import {
   ArkTextarea,
   ArkToaster,
   ArkToggle,
-  ArkToggleGroup
+  ArkToggleGroup,
+  ArkTooltip
 } from "./components";
 
 /**
@@ -103,5 +104,9 @@ export function registerTooarkComponents(): void {
   // Depois de toggle/toggle-group: o scheduler usa o segmented control no header.
   if (!customElements.get(ArkScheduler.tagName)) {
     customElements.define(ArkScheduler.tagName, ArkScheduler);
+  }
+
+  if (!customElements.get(ArkTooltip.tagName)) {
+    customElements.define(ArkTooltip.tagName, ArkTooltip);
   }
 }

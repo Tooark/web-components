@@ -17,3 +17,4 @@ export * from "./ark-textarea";
 export * from "./ark-toaster";
 export * from "./ark-toggle";
 export * from "./ark-toggle-group";
+export * from "./ark-tooltip";

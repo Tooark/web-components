@@ -31,3 +31,5 @@ export type { ArkToasterProps } from "./ark-toaster";
 export { ArkToaster } from "./ark-toaster";
 export type { ArkToggleGroupProps, ArkToggleProps } from "./ark-toggle";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle";
+export type { ArkTooltipProps } from "./ark-tooltip";
+export { ArkTooltip } from "./ark-tooltip";

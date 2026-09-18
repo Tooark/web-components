@@ -15,3 +15,4 @@ export { ArkTab, ArkTabs } from "./ark-tabs";
 export { ArkTextarea } from "./ark-textarea";
 export { ArkToaster } from "./ark-toaster";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle";
+export { ArkTooltip } from "./ark-tooltip";

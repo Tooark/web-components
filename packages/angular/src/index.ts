@@ -15,3 +15,4 @@ export { ArkTabComponent, ArkTabsComponent } from "./ark-tabs.component";
 export { ArkTextareaComponent } from "./ark-textarea.component";
 export { ArkToasterComponent } from "./ark-toaster.component";
 export { ArkToggleComponent, ArkToggleGroupComponent } from "./ark-toggle.component";
+export { ArkTooltipComponent } from "./ark-tooltip.component";

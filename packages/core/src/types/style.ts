@@ -337,6 +337,23 @@ export type ArkMenuItemStyleOptions = {
   intent?: ArkIntent;
 };
 
+// Exports types específicos do componente tooltip
+
+/** Lado do gatilho onde a dica abre; vira para o oposto quando não cabe. */
+export type ArkTooltipSide = "top" | "bottom" | "left" | "right";
+
+/** Props de estilo do ark-tooltip. */
+export type ArkTooltipStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado no balão. */
+  testid?: string;
+  /** Lado do gatilho. Padrão: "top". */
+  side?: ArkTooltipSide;
+  /** Atraso em ms antes de abrir no hover; o foco abre na hora. Padrão: 200. */
+  delay?: number;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

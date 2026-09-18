@@ -32,7 +32,8 @@
     ark-textarea,
     ark-toaster,
     ark-toggle,
-    ark-toggle-group
+    ark-toggle-group,
+    ark-tooltip
   ) {
     /*
      * Tema. As cores dos tokens usam light-dark(), então o tema é só a

@@ -63,5 +63,7 @@ export type {
   ArkToastPosition,
   ArkToastType,
   ArkToggleGroupStyleOptions,
-  ArkToggleStyleOptions
+  ArkToggleStyleOptions,
+  ArkTooltipSide,
+  ArkTooltipStyleOptions
 } from "./types/style";

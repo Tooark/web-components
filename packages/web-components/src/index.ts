@@ -17,6 +17,7 @@ export {
   ArkTextarea,
   ArkToaster,
   ArkToggle,
-  ArkToggleGroup
+  ArkToggleGroup,
+  ArkTooltip
 } from "./components";
 export { registerTooarkComponents } from "./register";

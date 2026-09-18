@@ -16,7 +16,8 @@ import type {
   ArkTabsVariant,
   ArkTextareaResize,
   ArkTheme,
-  ArkToastPosition
+  ArkToastPosition,
+  ArkTooltipSide
 } from "@tooark/core";
 import React from "react";
 
@@ -158,6 +159,14 @@ declare global {
         checked?: boolean | "false";
         divider?: boolean;
         static?: boolean;
+      };
+      "ark-tooltip": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        content?: string;
+        side?: ArkTooltipSide;
+        delay?: number | string;
+        open?: boolean;
+        theme?: ArkTheme;
       };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
