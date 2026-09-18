@@ -25,6 +25,8 @@ export type { ArkInputProps } from "./ark-input";
 export { ArkInput } from "./ark-input";
 export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";
+export type { ArkProgressProps } from "./ark-progress";
+export { ArkProgress } from "./ark-progress";
 export type { ArkRadioProps } from "./ark-radio";
 export { ArkRadio } from "./ark-radio";
 export type { ArkSchedulerProps } from "./ark-scheduler";

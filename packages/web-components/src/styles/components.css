@@ -432,6 +432,22 @@
     border-top: 1px solid var(--ark-color-border);
   }
 
+  /* ---------- ark-progress: segmento indeterminado em loop ---------- */
+
+  /* Loader contínuo, como o spinner: duração fixa e isento de movimento reduzido (é o único sinal de progresso). */
+  @keyframes ark-progress-indeterminate {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(250%);
+    }
+  }
+
+  ark-progress[data-ark-indeterminate] > [data-ark="progress-track"] > [data-ark="progress-bar"] {
+    animation: ark-progress-indeterminate 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+
   /* ---------- ark-skeleton: altura padrão do bloco único ---------- */
 
   /* Em @layer components, para class (utilities) e style do usuário vencerem; as barras têm altura própria. */

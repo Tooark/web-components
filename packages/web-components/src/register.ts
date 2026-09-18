@@ -13,6 +13,7 @@ import {
   ArkInput,
   ArkMenu,
   ArkMenuItem,
+  ArkProgress,
   ArkRadio,
   ArkScheduler,
   ArkSelect,
@@ -47,6 +48,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkCheckbox.tagName)) {
     customElements.define(ArkCheckbox.tagName, ArkCheckbox);
+  }
+
+  if (!customElements.get(ArkProgress.tagName)) {
+    customElements.define(ArkProgress.tagName, ArkProgress);
   }
 
   if (!customElements.get(ArkRadio.tagName)) {

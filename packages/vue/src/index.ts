@@ -12,6 +12,7 @@ export { ArkDialog } from "./ark-dialog";
 export { ArkEmpty } from "./ark-empty";
 export { ArkInput } from "./ark-input";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";
+export { ArkProgress } from "./ark-progress";
 export { ArkRadio } from "./ark-radio";
 export { ArkScheduler } from "./ark-scheduler";
 export { ArkSelect } from "./ark-select";

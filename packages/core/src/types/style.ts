@@ -464,6 +464,20 @@ export type ArkSkeletonStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente progress
+
+/** Props de estilo do ark-progress. */
+export type ArkProgressStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Intenção semântica de cor da barra. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Altura do trilho (0.25 a 1 rem) e tamanho do texto do valor. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

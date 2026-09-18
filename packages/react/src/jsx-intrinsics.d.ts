@@ -79,6 +79,17 @@ declare global {
         value?: string;
         label?: string;
       };
+      "ark-progress": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: number | string;
+        max?: number | string;
+        indeterminate?: boolean;
+        label?: string;
+        "show-value"?: boolean;
+        intent?: ArkIntent;
+        size?: ArkSize;
+        theme?: ArkTheme;
+      };
       "ark-radio": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         checked?: boolean;

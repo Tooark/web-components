@@ -49,6 +49,7 @@ export type {
   ArkMenuDirection,
   ArkMenuItemStyleOptions,
   ArkMenuStyleOptions,
+  ArkProgressStyleOptions,
   ArkRadioStyleOptions,
   ArkRounded,
   ArkSchedulerEvent,

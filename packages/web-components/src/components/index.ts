@@ -12,6 +12,7 @@ export * from "./ark-empty";
 export * from "./ark-input";
 export * from "./ark-menu";
 export * from "./ark-menu-item";
+export * from "./ark-progress";
 export * from "./ark-radio";
 export * from "./ark-scheduler";
 export * from "./ark-select";

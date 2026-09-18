@@ -12,6 +12,7 @@ export { ArkDialogComponent } from "./ark-dialog.component";
 export { ArkEmptyComponent } from "./ark-empty.component";
 export { ArkInputComponent } from "./ark-input.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
+export { ArkProgressComponent } from "./ark-progress.component";
 export { ArkRadioComponent } from "./ark-radio.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
 export { ArkSelectComponent } from "./ark-select.component";
