@@ -354,6 +354,16 @@ export type ArkTooltipStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente empty
+
+/** Props de estilo do ark-empty. */
+export type ArkEmptyStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente select
 
 /** Opção do ark-select; `group` agrupa em um <optgroup> com esse rótulo. */

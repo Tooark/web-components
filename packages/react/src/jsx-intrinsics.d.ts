@@ -168,6 +168,12 @@ declare global {
         open?: boolean;
         theme?: ArkTheme;
       };
+      "ark-empty": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        heading?: string;
+        description?: string;
+        theme?: ArkTheme;
+      };
       "ark-scheduler": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         view?: "week" | "day" | "month" | "agenda";

@@ -34,6 +34,7 @@ export type {
   ArkDialogCloseReason,
   ArkDialogSize,
   ArkDialogStyleOptions,
+  ArkEmptyStyleOptions,
   ArkInputStyleOptions,
   ArkIntent,
   ArkLang,

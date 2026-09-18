@@ -287,6 +287,30 @@
     display: none;
   }
 
+  /* ---------- ark-empty: ícone e ação do usuário ordenados na coluna ---------- */
+
+  /* Ordem visual: ícone (-3), título (-2) e descrição (-1) do componente, filhos livres (0), ação (1). */
+  ark-empty > [slot="icon"] {
+    order: -3;
+    display: inline-flex;
+    margin-bottom: 0.25rem;
+    @apply ark:text-fg-faint;
+  }
+
+  ark-empty > [slot="icon"] > :where(svg) {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  ark-empty > [slot="action"] {
+    order: 1;
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
   /* ---------- ark-carousel: host rolável com scroll snap ---------- */
 
   ark-carousel {

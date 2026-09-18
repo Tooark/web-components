@@ -6,6 +6,7 @@ export { ArkCarousel } from "./ark-carousel";
 export { ArkClock } from "./ark-clock";
 export { ArkDatepicker } from "./ark-datepicker";
 export { ArkDialog } from "./ark-dialog";
+export { ArkEmpty } from "./ark-empty";
 export { ArkInput } from "./ark-input";
 export { ArkMenu, ArkMenuItem } from "./ark-menu";
 export { ArkScheduler } from "./ark-scheduler";
