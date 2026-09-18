@@ -1,4 +1,6 @@
 import type {
+  ArkAlertLive,
+  ArkAlertVariant,
   ArkBadgeSize,
   ArkBadgeVariant,
   ArkButtonStatus,
@@ -26,6 +28,17 @@ import React from "react";
 declare global {
   namespace JSX {
     interface IntrinsicElements {
+      "ark-alert": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        intent?: ArkIntent;
+        variant?: ArkAlertVariant;
+        heading?: string;
+        dismissible?: boolean;
+        live?: ArkAlertLive;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-badge": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         intent?: ArkIntent;

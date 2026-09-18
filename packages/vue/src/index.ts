@@ -1,4 +1,5 @@
 export { dismissToast, showToast, toast } from "@tooark/core";
+export { ArkAlert } from "./ark-alert";
 export { ArkBadge } from "./ark-badge";
 export { ArkButton } from "./ark-button";
 export { ArkCalendar } from "./ark-calendar";

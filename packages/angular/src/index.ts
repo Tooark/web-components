@@ -1,4 +1,5 @@
 export { dismissToast, showToast, toast } from "@tooark/core";
+export { ArkAlertComponent } from "./ark-alert.component";
 export { ArkBadgeComponent } from "./ark-badge.component";
 export { ArkButtonComponent } from "./ark-button.component";
 export { ArkCalendarComponent } from "./ark-calendar.component";

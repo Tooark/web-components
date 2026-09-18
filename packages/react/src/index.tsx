@@ -1,4 +1,6 @@
 export { dismissToast, showToast, toast } from "@tooark/core";
+export type { ArkAlertProps } from "./ark-alert";
+export { ArkAlert } from "./ark-alert";
 export type { ArkBadgeProps } from "./ark-badge";
 export { ArkBadge } from "./ark-badge";
 export type { ArkButtonProps } from "./ark-button";

@@ -16,6 +16,9 @@ export { closePopover, focusableElements, isPopoverOpen, openPopover, positionAn
 export type { ArkAnnouncePoliteness } from "./services";
 export { announce, dismissToast, showToast, toast } from "./services";
 export type {
+  ArkAlertLive,
+  ArkAlertStyleOptions,
+  ArkAlertVariant,
   ArkBadgeSize,
   ArkBadgeStyleOptions,
   ArkBadgeVariant,

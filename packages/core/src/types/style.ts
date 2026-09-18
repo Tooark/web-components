@@ -395,6 +395,32 @@ export type ArkTooltipStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente alert
+
+/** Forma do ark-alert: caixa arredondada ou banner de largura toda com borda inferior. */
+export type ArkAlertVariant = "box" | "banner";
+
+/** Live region do ark-alert: role="status" (polite), role="alert" (assertive) ou nenhuma (off). */
+export type ArkAlertLive = "polite" | "assertive" | "off";
+
+/** Props de estilo do ark-alert. */
+export type ArkAlertStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Intenção semântica de cor (fundo e borda suaves). Padrão: "info". */
+  intent?: ArkIntent;
+  /** Caixa arredondada ou banner de largura toda. Padrão: "box". */
+  variant?: ArkAlertVariant;
+  /** Live region. Padrão: "assertive" em warning e danger, "polite" nos demais. */
+  live?: ArkAlertLive;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma do rótulo do botão de dispensar. Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente card
 
 /** Escala do espaçamento interno do ark-card (padding do host e gap entre as linhas). */
