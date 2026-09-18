@@ -8,6 +8,7 @@ import {
   ArkCarousel,
   ArkCheckbox,
   ArkClock,
+  ArkColorSwatches,
   ArkCopyButton,
   ArkDatepicker,
   ArkDialog,
@@ -16,12 +17,14 @@ import {
   ArkFileInput,
   ArkInput,
   ArkKbd,
+  ArkMark,
   ArkMenu,
   ArkMenuItem,
   ArkProgress,
   ArkRadio,
   ArkScheduler,
   ArkSelect,
+  ArkShapePicker,
   ArkSkeleton,
   ArkSpinner,
   ArkStatusDot,
@@ -84,6 +87,19 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkKbd.tagName)) {
     customElements.define(ArkKbd.tagName, ArkKbd);
+  }
+
+  if (!customElements.get(ArkColorSwatches.tagName)) {
+    customElements.define(ArkColorSwatches.tagName, ArkColorSwatches);
+  }
+
+  // A marca antes do seletor de forma: cada opção dele é um ark-mark.
+  if (!customElements.get(ArkMark.tagName)) {
+    customElements.define(ArkMark.tagName, ArkMark);
+  }
+
+  if (!customElements.get(ArkShapePicker.tagName)) {
+    customElements.define(ArkShapePicker.tagName, ArkShapePicker);
   }
 
   if (!customElements.get(ArkSelect.tagName)) {

@@ -57,5 +57,11 @@ export const es: ArkLocale = {
   noEntries: "Sin entradas",
   deleteRow: "Eliminar fila",
   unsaved: "Cambios sin guardar",
-  closeTab: "Cerrar pestaña"
+  closeTab: "Cerrar pestaña",
+  shapeCircle: "Círculo",
+  shapeSquare: "Cuadrado",
+  shapeTriangle: "Triángulo",
+  shapeDiamond: "Rombo",
+  shapeStar: "Estrella",
+  shapeHexagon: "Hexágono"
 };

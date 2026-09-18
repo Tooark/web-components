@@ -86,6 +86,18 @@ export interface ArkLocale {
   unsaved: string;
   /** Rótulo acessível do botão que fecha uma aba. */
   closeTab: string;
+  /** Nome da forma círculo (ark-shape-picker). */
+  shapeCircle: string;
+  /** Nome da forma quadrado. */
+  shapeSquare: string;
+  /** Nome da forma triângulo. */
+  shapeTriangle: string;
+  /** Nome da forma losango. */
+  shapeDiamond: string;
+  /** Nome da forma estrela. */
+  shapeStar: string;
+  /** Nome da forma hexágono. */
+  shapeHexagon: string;
 }
 
 /** Nome anterior de ArkLocale, mantido por compatibilidade. */

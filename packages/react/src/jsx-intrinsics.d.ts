@@ -15,6 +15,7 @@ import type {
   ArkDrawerSide,
   ArkIntent,
   ArkLang,
+  ArkMarkShape,
   ArkMenuAlign,
   ArkMenuDirection,
   ArkRounded,
@@ -186,6 +187,15 @@ declare global {
         "step-minutes"?: number;
         "hours-format"?: "24" | "12";
       };
+      "ark-color-swatches": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        colors?: string;
+        label?: string;
+        disabled?: boolean;
+        size?: ArkSize;
+        theme?: ArkTheme;
+      };
       "ark-copy-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         value?: string;
@@ -245,6 +255,14 @@ declare global {
         size?: ArkSize;
         theme?: ArkTheme;
       };
+      "ark-mark": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        shape?: ArkMarkShape;
+        color?: string;
+        size?: number | string;
+        label?: string;
+        theme?: ArkTheme;
+      };
       "ark-menu": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         for?: string;
@@ -296,6 +314,17 @@ declare global {
         heading?: string;
         description?: string;
         theme?: ArkTheme;
+      };
+      "ark-shape-picker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: ArkMarkShape;
+        color?: string;
+        label?: string;
+        disabled?: boolean;
+        size?: ArkSize;
+        theme?: ArkTheme;
+        lang?: ArkLang;
+        "locale-json"?: string;
       };
       "ark-skeleton": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;

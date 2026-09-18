@@ -187,6 +187,59 @@ export type ArkRadioStyleOptions = {
   checked?: boolean;
 };
 
+// Exports types específicos dos componentes de marca de escopo (mark, color-swatches, shape-picker)
+
+/** Formas do ark-mark. */
+export type ArkMarkShape = "circle" | "square" | "triangle" | "diamond" | "star" | "hexagon";
+
+/** Props de estilo do ark-mark. */
+export type ArkMarkStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Forma desenhada. Padrão: "circle". */
+  shape?: ArkMarkShape;
+  /** Cor CSS da forma. Padrão: a cor do texto ao redor (currentColor). */
+  color?: string;
+  /** Lado do SVG: número em px ou comprimento CSS. Padrão: 16. */
+  size?: number | string;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+/** Uma amostra de cor do ark-color-swatches. */
+export type ArkColorSwatch = {
+  /** Nome acessível da amostra. */
+  name: string;
+  /** Cor CSS da amostra e valor publicado em `change`. */
+  value: string;
+};
+
+/** Props de estilo do ark-color-swatches. */
+export type ArkColorSwatchesStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas amostras. */
+  testid?: string;
+  /** Diâmetro das amostras na escala de espaçamento (1 a 2.5 rem). Padrão: "md" (1.5 rem). */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+/** Props de estilo do ark-shape-picker. */
+export type ArkShapePickerStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas opções. */
+  testid?: string;
+  /** Cor CSS em que as seis formas são desenhadas. Padrão: a cor do texto ao redor. */
+  color?: string;
+  /** Tamanho das opções na escala de espaçamento. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos nomes das formas (rótulos acessíveis). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente kbd
 
 /** Props de estilo do ark-kbd. */
