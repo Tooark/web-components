@@ -4,6 +4,7 @@ import type {
   ArkButtonStatus,
   ArkButtonType,
   ArkButtonVariant,
+  ArkCardPadding,
   ArkCarouselSnap,
   ArkDatepickerLang,
   ArkDialogSize,
@@ -192,6 +193,13 @@ declare global {
         side?: ArkTooltipSide;
         delay?: number | string;
         open?: boolean;
+        theme?: ArkTheme;
+      };
+      "ark-card": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        heading?: string;
+        padding?: ArkCardPadding;
+        rounded?: ArkRounded;
         theme?: ArkTheme;
       };
       "ark-empty": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {

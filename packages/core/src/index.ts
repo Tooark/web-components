@@ -26,6 +26,8 @@ export type {
   ArkCalendarEvent,
   ArkCalendarEventDisplay,
   ArkCalendarStyleOptions,
+  ArkCardPadding,
+  ArkCardStyleOptions,
   ArkCarouselSnap,
   ArkCarouselStyleOptions,
   ArkCheckboxStyleOptions,

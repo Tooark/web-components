@@ -311,6 +311,72 @@
     margin-top: 0.5rem;
   }
 
+  /* ---------- ark-card: grid cabeçalho (título | ações) / corpo / rodapé ---------- */
+
+  /* Espaçamento interno numa custom property (padding do host e gap entre as linhas, iguais), escalada pelo
+     atributo padding via data-ark-padding. Duas colunas: a segunda só existe para as ações. */
+  ark-card {
+    --ark-card-gap: calc(var(--ark-spacing, 0.25rem) * 4);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 0;
+    row-gap: var(--ark-card-gap);
+    padding: var(--ark-card-gap);
+  }
+
+  ark-card[data-ark-padding="none"] {
+    --ark-card-gap: 0px;
+  }
+
+  ark-card[data-ark-padding="sm"] {
+    --ark-card-gap: calc(var(--ark-spacing, 0.25rem) * 3);
+  }
+
+  ark-card[data-ark-padding="lg"] {
+    --ark-card-gap: calc(var(--ark-spacing, 0.25rem) * 6);
+  }
+
+  /* Linha de cima: o h2 próprio ou o slot="header" do usuário à esquerda, as ações à direita. */
+  ark-card > [data-ark-chrome="heading"],
+  ark-card > [slot="header"] {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    min-width: 0;
+  }
+
+  ark-card > [slot="actions"] {
+    grid-column: 2;
+    grid-row: 1;
+    align-self: center;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-inline-start: var(--ark-card-gap);
+  }
+
+  /* Com heading, o slot="header" do usuário passa a ser a linha seguinte do cabeçalho, na largura toda. */
+  ark-card:has(> [data-ark-chrome="heading"]) > [slot="header"] {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    order: -1;
+  }
+
+  /* Corpo: todo filho sem slot conhecido, na largura toda e na ordem do DOM. */
+  ark-card > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome]) {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  /* Rodapé: sempre a última linha, com divisor. */
+  ark-card > [slot="footer"] {
+    grid-column: 1 / -1;
+    order: 1;
+    padding-top: var(--ark-card-gap);
+    border-top: 1px solid var(--ark-color-border);
+  }
+
   /* ---------- ark-skeleton: altura padrão do bloco único ---------- */
 
   /* Em @layer components, para class (utilities) e style do usuário vencerem; as barras têm altura própria. */

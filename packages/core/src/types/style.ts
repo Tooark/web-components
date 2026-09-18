@@ -395,6 +395,23 @@ export type ArkTooltipStyleOptions = {
   theme?: ArkTheme;
 };
 
+// Exports types específicos do componente card
+
+/** Escala do espaçamento interno do ark-card (padding do host e gap entre as linhas). */
+export type ArkCardPadding = "none" | "sm" | "md" | "lg";
+
+/** Props de estilo do ark-card. */
+export type ArkCardStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Espaçamento interno: padding do host e gap entre as linhas (0 / 0.75 / 1 / 1.5 rem). Padrão: "md". */
+  padding?: ArkCardPadding;
+  /** Raio dos cantos. Padrão: "lg". */
+  rounded?: ArkRounded;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 // Exports types específicos do componente empty
 
 /** Props de estilo do ark-empty. */

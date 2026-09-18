@@ -5,6 +5,8 @@ export type { ArkButtonProps } from "./ark-button";
 export { ArkButton } from "./ark-button";
 export type { ArkCalendarProps } from "./ark-calendar";
 export { ArkCalendar } from "./ark-calendar";
+export type { ArkCardProps } from "./ark-card";
+export { ArkCard } from "./ark-card";
 export type { ArkCarouselProps } from "./ark-carousel";
 export { ArkCarousel } from "./ark-carousel";
 export type { ArkCheckboxProps } from "./ark-checkbox";

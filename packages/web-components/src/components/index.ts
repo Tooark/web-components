@@ -1,6 +1,7 @@
 export * from "./ark-badge";
 export * from "./ark-button";
 export * from "./ark-calendar";
+export * from "./ark-card";
 export * from "./ark-carousel";
 export * from "./ark-checkbox";
 export * from "./ark-clock";

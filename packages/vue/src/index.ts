@@ -2,6 +2,7 @@ export { dismissToast, showToast, toast } from "@tooark/core";
 export { ArkBadge } from "./ark-badge";
 export { ArkButton } from "./ark-button";
 export { ArkCalendar } from "./ark-calendar";
+export { ArkCard } from "./ark-card";
 export { ArkCarousel } from "./ark-carousel";
 export { ArkCheckbox } from "./ark-checkbox";
 export { ArkClock } from "./ark-clock";

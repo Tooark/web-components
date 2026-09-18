@@ -2,6 +2,7 @@ import {
   ArkBadge,
   ArkButton,
   ArkCalendar,
+  ArkCard,
   ArkCarousel,
   ArkCheckbox,
   ArkClock,
@@ -99,6 +100,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkMenu.tagName)) {
     customElements.define(ArkMenu.tagName, ArkMenu);
+  }
+
+  if (!customElements.get(ArkCard.tagName)) {
+    customElements.define(ArkCard.tagName, ArkCard);
   }
 
   if (!customElements.get(ArkCarousel.tagName)) {
