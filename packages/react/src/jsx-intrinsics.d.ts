@@ -184,6 +184,25 @@ declare global {
         "step-minutes"?: number;
         "hours-format"?: "24" | "12";
       };
+      "ark-copy-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+        testid?: string;
+        value?: string;
+        for?: string;
+        "feedback-ms"?: number | string;
+        variant?: ArkButtonVariant;
+        intent?: ArkIntent;
+        theme?: ArkTheme;
+        size?: ArkSize;
+        rounded?: ArkRounded;
+        loading?: boolean;
+        disabled?: boolean;
+        "icon-only"?: boolean;
+        "full-width"?: boolean;
+        color?: string;
+        "text-color"?: string;
+        lang?: ArkLang;
+        "locale-json"?: string;
+      };
       "ark-datepicker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
         testid?: string;
         lang?: ArkDatepickerLang;

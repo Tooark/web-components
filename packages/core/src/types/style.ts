@@ -121,6 +121,38 @@ export type ArkButtonStyleOptions = {
   textColor?: string;
 };
 
+// Exports types específicos do componente copy-button
+
+/** Props de estilo do ark-copy-button: o subconjunto do ark-button que faz sentido num botão de copiar. */
+export type ArkCopyButtonStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Aparência: variante de estilo ou intent. Padrão: "primary". */
+  variant?: ArkButtonVariant;
+  /** Intenção semântica de cor. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Altura do controle via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Arredondamento da borda. Padrão: "md". */
+  rounded?: ArkRounded;
+  /** Mostra o spinner, marca aria-busy e bloqueia o clique. */
+  loading?: boolean;
+  /** Só o ícone, quadrado; o rótulo copiar/copiado vai para aria-label e title. */
+  iconOnly?: boolean;
+  /** Ocupa toda a largura disponível. */
+  fullWidth?: boolean;
+  /** Cor de fundo CSS custom, com precedência sobre variant/intent. */
+  color?: string;
+  /** Cor do texto CSS custom, usada junto de color. */
+  textColor?: string;
+  /** Idioma das strings copy/copied. Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
 // Exports types específicos do componente checkbox
 
 /** Props de estilo e comportamento do ark-checkbox. */

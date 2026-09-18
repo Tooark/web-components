@@ -8,6 +8,7 @@ import {
   ArkCarousel,
   ArkCheckbox,
   ArkClock,
+  ArkCopyButton,
   ArkDatepicker,
   ArkDialog,
   ArkEmpty,
@@ -52,6 +53,11 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkButton.tagName)) {
     customElements.define(ArkButton.tagName, ArkButton);
+  }
+
+  // Depois do botão: herda dele.
+  if (!customElements.get(ArkCopyButton.tagName)) {
+    customElements.define(ArkCopyButton.tagName, ArkCopyButton);
   }
 
   if (!customElements.get(ArkCheckbox.tagName)) {

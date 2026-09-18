@@ -7,6 +7,7 @@ export * from "./ark-card";
 export * from "./ark-carousel";
 export * from "./ark-checkbox";
 export * from "./ark-clock";
+export * from "./ark-copy-button";
 export * from "./ark-datepicker";
 export * from "./ark-dialog";
 export * from "./ark-empty";

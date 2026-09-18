@@ -17,6 +17,8 @@ export type { ArkCheckboxProps } from "./ark-checkbox";
 export { ArkCheckbox } from "./ark-checkbox";
 export type { ArkClockProps } from "./ark-clock";
 export { ArkClock } from "./ark-clock";
+export type { ArkCopyButtonProps } from "./ark-copy-button";
+export { ArkCopyButton } from "./ark-copy-button";
 export type { ArkDatepickerProps } from "./ark-datepicker";
 export { ArkDatepicker } from "./ark-datepicker";
 export type { ArkDialogProps } from "./ark-dialog";

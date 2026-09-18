@@ -53,7 +53,8 @@ let arkButtonIdCounter = 0;
  * é nomeado pelo conteúdo do host (`aria-labelledby`).
  */
 export class ArkButton extends HTMLElement {
-  static readonly tagName = "ark-button";
+  // `string`, e não o literal, para subclasses (ark-copy-button) redeclararem o próprio tag.
+  static readonly tagName: string = "ark-button";
   static readonly formAssociated = true;
 
   private readonly internals: ElementInternals | null;
@@ -440,7 +441,8 @@ export class ArkButton extends HTMLElement {
     return palettes[intent];
   }
 
-  private isDisabled(): boolean {
+  /** Desabilitado por atributo, por `loading` ou pelo formulário; subclasses consultam antes de agir. */
+  protected isDisabled(): boolean {
     return this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("loading");
   }
 
@@ -657,7 +659,8 @@ export class ArkButton extends HTMLElement {
     }
   }
 
-  private updateAppearance(): void {
+  /** Ponto único de atualização; subclasses o estendem (chamando super) para o próprio chrome. */
+  protected updateAppearance(): void {
     this.syncAnchor();
     this.syncHostSemantics();
     this.applyOwnClasses(this.computeClasses());

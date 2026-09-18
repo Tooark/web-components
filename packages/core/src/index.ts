@@ -37,6 +37,7 @@ export type {
   ArkCarouselStyleOptions,
   ArkCheckboxStyleOptions,
   ArkClockStyleOptions,
+  ArkCopyButtonStyleOptions,
   ArkDatepickerLang,
   ArkDatepickerMode,
   ArkDatepickerStyleOptions,

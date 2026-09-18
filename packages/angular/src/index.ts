@@ -8,6 +8,7 @@ export { ArkCardComponent } from "./ark-card.component";
 export { ArkCarouselComponent } from "./ark-carousel.component";
 export { ArkCheckboxComponent } from "./ark-checkbox.component";
 export { ArkClockComponent } from "./ark-clock.component";
+export { ArkCopyButtonComponent } from "./ark-copy-button.component";
 export { ArkDatepickerComponent } from "./ark-datepicker.component";
 export { ArkDialogComponent } from "./ark-dialog.component";
 export { ArkEmptyComponent } from "./ark-empty.component";
