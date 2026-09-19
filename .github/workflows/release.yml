@@ -82,7 +82,8 @@ jobs:
         if: steps.check.outputs.published == 'false'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-          NPM_CONFIG_PROVENANCE: "true"
+          # Provenance (attestation) so existe para repositorio publico: num privado o npm recusa o publish.
+          NPM_CONFIG_PROVENANCE: ${{ github.event.repository.private == false }}
         run: pnpm -r publish --access public --tag ${{ steps.version.outputs.tag }} --no-git-checks
 
       - name: Tag and GitHub Release

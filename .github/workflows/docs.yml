@@ -43,6 +43,8 @@ jobs:
 
   deploy:
     needs: build
+    # Pages num repositorio privado exige GitHub Pro/Team: enquanto o repo for privado o deploy fica de fora, sem run vermelho.
+    if: github.event.repository.private == false
     runs-on: ubuntu-latest
     environment:
       name: github-pages
