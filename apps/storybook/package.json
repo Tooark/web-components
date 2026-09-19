@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tooark/chart": "workspace:*",
+    "@tooark/code": "workspace:*",
     "@tooark/core": "workspace:*",
     "@tooark/motion": "workspace:*",
     "@tooark/web-components": "workspace:*",

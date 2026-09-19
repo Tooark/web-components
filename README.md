@@ -29,7 +29,8 @@ The monorepo is organized in layers — each package only depends on the layers 
 ├──────────────┬──────────────────────────┬───────────────┤
 │ @tooark/chart│      @tooark/core        │@tooark/wysiwyg│
 │  (ECharts)   │ types · i18n · services  │   (Tiptap)    │
-│              │   motion presets/WAAPI   │               │
+│ @tooark/code │   motion presets/WAAPI   │               │
+│ (CodeMirror) │                          │               │
 ├──────────────┴──────────────────────────┴───────────────┤
 │                     @tooark/tokens                      │
 │    design primitives · CSS custom properties (--ark-*)  │
@@ -53,6 +54,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 | `@tooark/angular`        | Angular wrapper components.                                                                                                                                                                                                                                                                 |
 | `@tooark/chart`          | `ark-chart` — charts built on [ECharts](https://echarts.apache.org/) (peer dependency).                                                                                                                                                                                                     |
 | `@tooark/wysiwyg`        | `ark-wysiwyg` — rich-text editor and viewer built on [Tiptap](https://tiptap.dev/).                                                                                                                                                                                                         |
+| `@tooark/code`           | `ark-code-editor` — code editor built on [CodeMirror 6](https://codemirror.net/) (peer dependencies): JSON, JavaScript and YAML, variable completions.                                                                                                                                      |
 | `@tooark/motion`         | **Opt-in** advanced animation helpers built on [Motion](https://motion.dev/): staggered list entrances, scroll reveal, FLIP reordering and swipe gestures with spring physics.                                                                                                              |
 
 ---
@@ -104,6 +106,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 | `ark-tooltip`         | web-components | Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.                                                                                      |
 | `ark-chart`           | chart          | ECharts-powered chart types with theme support.                                                                                                                                                                                                                                    |
 | `ark-wysiwyg`         | wysiwyg        | Tiptap-based editor + read-only viewer.                                                                                                                                                                                                                                            |
+| `ark-code-editor`     | code           | CodeMirror 6 editor: `language` json/javascript/yaml/text, line numbers, folding, search, `readonly`, `wrap`, `placeholder`, `min-height`, `variableKeys` completions after `{{`, theme by tokens with `auto` following the page. Emits `change`.                                  |
 
 ### Key attributes
 
@@ -190,6 +193,8 @@ The monorepo is organized in layers — each package only depends on the layers 
 **`ark-toaster`** — `position` (`top-left` … `bottom-right`), `rich-colors`, `close-button` (`"false"` hides), `max-visible`, `duration` (ms; `0` keeps toasts until dismissed), `lang`, `theme`. Fed by the `toast` service from `@tooark/core` (or the `toast()`/`dismiss()` methods); emits `ark-toast-action` with `detail: { id, actionId }` when an action button is clicked. The stack is the component's own `popover="manual"`: it enters the top layer with the first toast and leaves it when empty, with no `z-index` to fight, and it re-enters on every new toast, so a toast fired while a dialog, drawer or menu is open shows above their scrim (unless keyboard focus is inside a toast, which stays where it is).
 
 **`announce()`** (service, `@tooark/core`) — `announce(text, politeness = "polite")` speaks a message to screen readers through a single hidden live region appended to `document.body` (`data-ark="announcer"`, with a `role="status"` child for `polite` and a `role="alert"` child for `assertive`). Components use it to announce a result in place (a button's `status`, "copied", chosen files) without creating live regions inside the host, where the text would join the control's accessible name. Calling it again with the same text announces it again; it is a no-op without a DOM.
+
+**`ark-code-editor`** (`@tooark/code`) — a CodeMirror 6 editor as a Custom Element; the CodeMirror packages are peer dependencies (`@codemirror/state`, `view`, `language`, `commands`, `search`, `autocomplete`, `lang-json`, `lang-javascript`, `lang-yaml`, `@lezer/highlight`), so the page keeps a single copy of each. The text goes through the `value` property (a `value` attribute seeds it) and comes back in `change` with `detail: { value }` on every user edit (not on programmatic `value`). `language` (`json` / `javascript` / `yaml` / `text`, default), `readonly` (no editing cursor, no active-line highlight; search and folding still work), `placeholder`, `min-height` (CSS length, default `8rem`; the editor grows with its content), `line-numbers` and `fold` (on by default, `"false"` turns them off), `wrap` (visual line wrapping instead of horizontal scrolling), `theme` (`auto`, default, follows the page's `color-scheme` and runtime toggles through `observeColorScheme`; `light`/`dark` force a side), `testid`. JS: `value`, `variableKeys` (keys offered as completions after `{{`; picking one inserts `{{key}}`, or just the key when the closing `}}` is already there), `language`, `readonly`, `wrap`, `lineNumbers`, `fold`, `placeholder`, `minHeight`, `theme`, `resolvedTheme`, `view` (the `EditorView`), `focus()`. Keys: Ctrl/Cmd+F opens the search panel, Ctrl/Cmd+Z/Y history, Ctrl+Space completions; Tab is not bound, so keyboard navigation leaves the editor as expected. The chrome (surface, text, borders, selection, gutters, tooltips) reads the `--ark-color-*` tokens with fallbacks, so it matches the app theme even without `@tooark/web-components` styles; the syntax colors are two fixed palettes. `createCodeEditor(parent, options)` from the same package gives the imperative engine (`getValue`/`setValue`, every `set*`, `resolvedTheme`, `focus`, `destroy`, `view`) without the element, and `registerTooarkCode()` defines it.
 
 **Overlay helpers** (`@tooark/core`) — the pieces `ark-dialog` is built from, for overlays of your own on the Popover API. `trapFocus(container, { initial, returnTo, onOutsidePointer })` returns a release function: Tab and Shift+Tab cycle through the container's focusables, focus that escapes comes back, pointer events that start outside are cancelled at capture for the whole gesture, so a scrim click that closes the overlay never activates what is behind it (the `pointerdown` is reported to `onOutsidePointer`, e.g. to close on the scrim), popovers opened on top are left alone, nested traps stack, and releasing restores focus to `returnTo` (default: the element focused at activation). `openPopover(host, preset, options)` calls `showPopover()` then `arkEnter`; `closePopover(host, preset, options)` runs `arkExit` first and only then `hidePopover()`, and a reopen during the exit abandons it. `openPopover` also takes `lockScroll: true` (what `ark-dialog`, `ark-drawer` and `ark-command-palette` pass): `lockScroll(owner)` sets `overflow: hidden` on the root element plus a `padding-right` the size of the scrollbar that disappeared (also exposed as `--ark-scroll-lock-gap`, for fixed elements of your own to compensate), reference-counted by owner so stacked overlays release only when the last one closes; `closePopover` calls `unlockScroll(owner)` after the exit, and `isScrollLocked()` tells whether any lock is active. `positionAnchored(panel, anchor, { side, align, offset, padding, onPlace })` places a `position: fixed` panel next to an element or a `{ x, y, width, height }` rect from `getBoundingClientRect()`: preferred side with a flip to the opposite one when there is no room, alignment along that side, sliding to stay inside the viewport; it writes `left`/`top`/`transform-origin` inline plus `data-ark-side`/`data-ark-align` on the panel and repositions on scroll and resize until the returned dispose runs. `focusableElements(root)` lists the tabbable elements in DOM order; `isPopoverOpen(host)` checks `:popover-open`.
 
@@ -308,6 +313,16 @@ import { toast } from "@tooark/core";
 toast.success("Saved", { description: "Your changes were published." });
 ```
 
+```ts
+import { registerTooarkCode } from "@tooark/code"; // CodeMirror packages are peer dependencies
+
+registerTooarkCode();
+const editor = document.querySelector("ark-code-editor");
+editor.variableKeys = ["baseUrl", "token"]; // completions after {{
+editor.value = JSON.stringify(body, null, 2);
+editor.addEventListener("change", (event) => save(event.detail.value));
+```
+
 ### React
 
 ```tsx
@@ -398,7 +413,7 @@ If your app already has its own design variables (a generated theme, another des
 
 Duration and easing overrides follow the rule from the [motion system](#motion-system): keep them inside `@media (prefers-reduced-motion: no-preference)`.
 
-`ark-chart` and `ark-wysiwyg` cannot be themed by CSS alone (ECharts and Tiptap paint their own colors), so their `theme="auto"` resolves the host's computed `color-scheme` when the element is created: a page that forces `dark` gets a dark chart, a page that leaves it at `light dark` (or undeclared) follows the system preference. The resolution is kept up to date while the element is connected: `observeColorScheme(element, onChange)` from `@tooark/tokens` watches the `class`, `style`, `data-theme` and `theme` attributes of `<html>` and `<body>` (where apps switch themes) plus the system preference, so a chart or editor left on `auto` follows a runtime theme toggle; `theme="light|dark"` still forces one side.
+`ark-chart`, `ark-wysiwyg` and `ark-code-editor` cannot be themed by CSS alone (ECharts, Tiptap and CodeMirror paint their own colors), so their `theme="auto"` resolves the host's computed `color-scheme` when the element is created: a page that forces `dark` gets a dark chart, a page that leaves it at `light dark` (or undeclared) follows the system preference. The resolution is kept up to date while the element is connected: `observeColorScheme(element, onChange)` from `@tooark/tokens` watches the `class`, `style`, `data-theme` and `theme` attributes of `<html>` and `<body>` (where apps switch themes) plus the system preference, so a chart or editor left on `auto` follows a runtime theme toggle; `theme="light|dark"` still forces one side.
 
 To reuse the same tokens as utilities (`bg-primary`, `text-fg-muted`, …) in your own Tailwind v4 project, import them in your CSS entry:
 
@@ -508,6 +523,7 @@ Hooks per component:
 | `ark-textarea`        | `textarea`        | `textarea-label`, `textarea-helper`/`textarea-error`                                                                                                                                                                                                                                                                                                                                                            |
 | `ark-tooltip`         | `tooltip`         | `tooltip-bubble` (the component's bubble or your `slot="content"` child)                                                                                                                                                                                                                                                                                                                                        |
 | `ark-toaster`         | `toaster`         | `toaster-toast` (+ `data-toast-id`), `toaster-toast-title`, `toaster-toast-description`, `toaster-toast-close`, `toaster-toast-action`, `toaster-toast-cancel`                                                                                                                                                                                                                                                  |
+| `ark-code-editor`     | `code-editor`     | the CodeMirror root (`.cm-editor`) carries `data-ark="code-editor"` and the testid                                                                                                                                                                                                                                                                                                                              |
 
 For `ark-button`, `ark-toggle`, `ark-toggle-group` and `ark-carousel` the main hook sits on the host element itself, since the host is the control; `input-suffix` is applied to your own `slot="suffix"` element and `carousel-slide-{i}` to your own slides.
 

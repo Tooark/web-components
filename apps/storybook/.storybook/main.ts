@@ -33,6 +33,7 @@ const config: StorybookConfig = {
       "@tooark/motion": path.resolve(rootDir, "packages/motion/src/index.ts"),
       "@tooark/web-components": path.resolve(rootDir, "packages/web-components/src/index.ts"),
       "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
+      "@tooark/code": path.resolve(rootDir, "packages/code/src/index.ts"),
       "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts")
     };
 

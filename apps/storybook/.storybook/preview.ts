@@ -2,11 +2,13 @@
 import "./preview.css";
 import "../../../packages/web-components/src/styles/index.css";
 import { registerTooarkChart } from "@tooark/chart";
+import { registerTooarkCode } from "@tooark/code";
 import { registerTooarkComponents } from "@tooark/web-components";
 import { registerTooarkWysiwyg } from "@tooark/wysiwyg";
 
 registerTooarkComponents();
 registerTooarkChart();
+registerTooarkCode();
 registerTooarkWysiwyg();
 
 const preview = {

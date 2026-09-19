@@ -58,9 +58,9 @@ CI (`.github/workflows/tests.yml`) runs `biome ci .`, then `pnpm -r build` (whic
 @tooark/tokens                                     tokens.css (@theme) + Ark* primitive types + JS mirrors of motion tokens
 ```
 
-Side packages: `@tooark/chart` (`ark-chart`, ECharts as peer dep), `@tooark/wysiwyg` (`ark-wysiwyg-editor`/`-viewer`, Tiptap), `@tooark/motion` (opt-in helpers on the Motion lib). Each ships its own `registerTooark*()` and an imperative `engine/` usable without the element. **Animation libraries must never become dependencies of `@tooark/core` or `@tooark/web-components`**; anything that needs the Motion lib goes in `@tooark/motion`.
+Side packages: `@tooark/chart` (`ark-chart`, ECharts as peer dep), `@tooark/wysiwyg` (`ark-wysiwyg-editor`/`-viewer`, Tiptap), `@tooark/code` (`ark-code-editor`, every `@codemirror/*` package and `@lezer/highlight` as peer deps so the page keeps one `@codemirror/state`), `@tooark/motion` (opt-in helpers on the Motion lib). Each ships its own `registerTooark*()` and an imperative `engine/` usable without the element, depends on `@tooark/tokens` only (no core, no wrappers: they are used through the DOM), resolves `theme="auto"` with `resolveColorScheme` and follows runtime theme toggles with `observeColorScheme`. In `@tooark/code` the completion source must be created once per configuration (`EditorState.languageData.of(() => data)` with a stable `data`): autocompletion tracks queries by the source function's identity and a fresh closure per read leaves the completion pending forever. **Animation libraries must never become dependencies of `@tooark/core` or `@tooark/web-components`**; anything that needs the Motion lib goes in `@tooark/motion`.
 
-Rollup builds ESM + CJS + a bundled `.d.ts` for tokens/core/web-components/chart/wysiwyg/motion, externalizing the layer below (`@tooark/core`, `@tooark/tokens`, `echarts`, `motion`). React/Vue build with plain `tsc`; Angular builds with `ng-packagr` in partial Ivy (`packages/angular/ng-package.json`, published from `dist/`).
+Rollup builds ESM + CJS + a bundled `.d.ts` for tokens/core/web-components/chart/wysiwyg/code/motion, externalizing the layer below (`@tooark/core`, `@tooark/tokens`, `echarts`, `@codemirror/*`, `motion`). React/Vue build with plain `tsc`; Angular builds with `ng-packagr` in partial Ivy (`packages/angular/ng-package.json`, published from `dist/`).
 
 ### CSS pipeline (read before touching any class string)
 
@@ -111,7 +111,7 @@ Each of `packages/{react,vue,angular}/src` has one file per component plus `regi
 
 ### Storybook specifics
 
-`apps/storybook/.storybook/main.ts` aliases every `@tooark/*` import to the package `src/index.ts`, so Storybook and tests always run against source. `preview.ts` imports the lib CSS from source and registers web-components, chart and wysiwyg. `vitest.config.ts` sets a 30 s test timeout and `coverage.allowExternal` so coverage covers `packages/*`.
+`apps/storybook/.storybook/main.ts` aliases every `@tooark/*` import to the package `src/index.ts`, so Storybook and tests always run against source. `preview.ts` imports the lib CSS from source and registers web-components, chart, wysiwyg and code. `vitest.config.ts` sets a 30 s test timeout and `coverage.allowExternal` so coverage covers `packages/*`.
 
 ### Dependency policy
 
