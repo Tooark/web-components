@@ -237,9 +237,10 @@ export const Formatting = {
     // Listas: recuo so entra depois do segundo item; sair de lista desabilita de novo.
     editor.editor?.chain().focus("end").setParagraph().insertContent("\nUm").run();
     await userEvent.click(canvas.getByRole("button", { name: "Lista com marcadores" }));
-    expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeDisabled();
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeDisabled());
+    // O ProseMirror le a digitacao pelo MutationObserver do DOM, entao o estado da barra chega um tick depois.
     await userEvent.keyboard("{Enter}Dois");
-    expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeEnabled();
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeEnabled());
     await userEvent.click(canvas.getByRole("button", { name: "Aumentar recuo" }));
     expect(content.querySelectorAll("ul ul").length).toBe(1);
     await userEvent.click(canvas.getByRole("button", { name: "Diminuir recuo" }));
