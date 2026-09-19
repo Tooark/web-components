@@ -409,6 +409,17 @@
     @apply ark:text-xs ark:text-fg-muted;
   }
 
+  /* ---------- ark-toaster: a pilha é um popover manual no top layer ---------- */
+
+  /* Coluna flex enquanto aberta; fechada (sem toasts) fica oculta, e não no fluxo com display do autor. */
+  ark-toaster > [data-ark="toaster"] {
+    display: flex;
+  }
+
+  ark-toaster > [data-ark="toaster"]:not(:popover-open) {
+    display: none;
+  }
+
   /* ---------- ark-datepicker: popup em popover manual, ancorado no campo ---------- */
 
   /* Fechado fica oculto (um [popover] com display do autor apareceria no fluxo); left/top vêm inline. */

@@ -237,3 +237,68 @@ export const FluxoDeDismiss = {
     await waitFor(() => expect(canvas.queryByText("Projeto salvo")).not.toBeInTheDocument());
   }
 };
+
+export const TopLayer = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A pilha e um `popover="manual"` proprio: entra no top layer com o primeiro toast e sai quando esvazia, sem z-index. Um toast que chega com um dialogo aberto fica por cima do scrim, porque a pilha reentra no top layer a cada toast novo.'
+      }
+    }
+  },
+  args: {
+    duration: 0
+  },
+  render: (args: StoryArgs) => {
+    const page = renderToaster(args);
+    const dialog = document.createElement("ark-dialog");
+    dialog.setAttribute("label", "Dialogo aberto");
+    dialog.setAttribute("lang", "pt");
+    const body = document.createElement("p");
+    body.textContent = "Dispare um toast com este dialogo aberto: ele aparece por cima do scrim.";
+    dialog.appendChild(body);
+    const footer = document.createElement("div");
+    footer.setAttribute("slot", "footer");
+    footer.appendChild(
+      createButton("Toast por cima", () => {
+        toast.success("Por cima do dialogo", { duration: args.duration });
+      })
+    );
+    dialog.appendChild(footer);
+    page.querySelector("div")?.appendChild(createButton("Abrir dialogo", () => dialog.setAttribute("open", "")));
+    page.appendChild(dialog);
+    return page;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const stack = canvasElement.querySelector<HTMLElement>('[data-ark="toaster"]')!;
+    await expect(stack).toHaveAttribute("popover", "manual");
+    expect(stack.matches(":popover-open")).toBe(false);
+    expect(getComputedStyle(stack).display).toBe("none");
+
+    await userEvent.click(canvas.getByRole("button", { name: "Default" }));
+    await canvas.findByText("Projeto salvo");
+    expect(stack.matches(":popover-open")).toBe(true);
+    expect(getComputedStyle(stack).display).toBe("flex");
+
+    // Dialogo aberto depois da pilha: o toast seguinte reentra no top layer e fica por cima do scrim.
+    await userEvent.click(canvas.getByRole("button", { name: "Abrir dialogo" }));
+    const dialog = canvasElement.querySelector<HTMLElement>("ark-dialog")!;
+    await waitFor(() => expect(dialog.matches(":popover-open")).toBe(true));
+    await userEvent.click(canvas.getByRole("button", { name: "Toast por cima" }));
+    const card = (await canvas.findByText("Por cima do dialogo")).closest<HTMLElement>('[data-ark="toaster-toast"]')!;
+    await waitFor(() => expect(card.getAnimations().length).toBe(0));
+    const rect = card.getBoundingClientRect();
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    expect(card.contains(hit)).toBe(true);
+
+    (dialog as HTMLElement & { close(): void }).close();
+    await waitFor(() => expect(dialog).not.toHaveAttribute("data-ark-state"));
+
+    // Esvaziar a pilha a tira do top layer.
+    await userEvent.click(canvas.getByRole("button", { name: "Dismiss all" }));
+    await waitFor(() => expect(stack.matches(":popover-open")).toBe(false));
+    expect(getComputedStyle(stack).display).toBe("none");
+  }
+};

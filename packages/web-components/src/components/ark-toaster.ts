@@ -1,5 +1,5 @@
 import type { ArkMotionPreset, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
-import { arkEnter, arkExit, resolveLocale } from "@tooark/core";
+import { arkEnter, arkExit, isPopoverOpen, resolveLocale } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkToastItem = ArkToastOptions & {
@@ -23,7 +23,10 @@ type ArkToasterPalette = {
  * Pilha de toasts da página. Não é chamado diretamente: escuta `ark-toast` e
  * `ark-toast-dismiss` em window, disparados pelo serviço `toast` do
  * @tooark/core, o que mantém serviço e elemento desacoplados. Mostra até
- * `max-visible` de cada vez e enfileira o excedente.
+ * `max-visible` de cada vez e enfileira o excedente. A pilha é um
+ * `popover="manual"` próprio: fica no top layer sem z-index, acima de
+ * dialogs e menus, e é reaberta a cada toast novo para voltar ao topo da
+ * pilha do top layer quando um overlay abriu depois dela.
  */
 export class ArkToaster extends HTMLElement {
   static readonly tagName = "ark-toaster";
@@ -80,6 +83,8 @@ export class ArkToaster extends HTMLElement {
 
     this.scheduleDismiss(item);
     this.render();
+    // Um overlay aberto depois da pilha ficaria por cima dela: reentrar no top layer a põe acima de novo.
+    this.raise();
 
     return id;
   }
@@ -181,10 +186,41 @@ export class ArkToaster extends HTMLElement {
     this.timers.set(toast.id, timer);
   }
 
+  // --- Pilha no top layer ---
+
+  // A pilha entra no top layer enquanto há toasts e sai quando esvazia; o display fica no components.css.
+  private syncPopover(): void {
+    if (!this.root || typeof this.root.showPopover !== "function") return;
+    const open = isPopoverOpen(this.root);
+    try {
+      if (this.toasts.length > 0 && !open) {
+        this.root.showPopover();
+      } else if (this.toasts.length === 0 && open) {
+        this.root.hidePopover();
+      }
+    } catch {
+      // Desconectado no meio: nada a fazer.
+    }
+  }
+
+  private raise(): void {
+    if (!this.root || !isPopoverOpen(this.root) || typeof this.root.hidePopover !== "function") return;
+    // Esconder tiraria o foco de um toast que o usuário está lendo pelo teclado: nesse caso fica onde está.
+    if (this.root.contains(document.activeElement)) return;
+    try {
+      this.root.hidePopover();
+      this.root.showPopover();
+    } catch {
+      // Desconectado no meio: nada a fazer.
+    }
+  }
+
   private getPalette(): ArkToasterPalette {
+    // Redefine o que o UA dá a [popover] (inset, margin, border, padding, overflow, cores); o display vem do
+    // components.css, para a pilha vazia ficar oculta mesmo com display do autor.
     return {
       stack:
-        "ark:fixed ark:z-[9999] ark:flex ark:w-full ark:max-w-sm ark:flex-col ark:gap-3 ark:p-4 ark:pointer-events-none",
+        "ark:fixed ark:inset-auto ark:m-0 ark:w-full ark:max-w-sm ark:flex-col ark:gap-3 ark:overflow-visible ark:border-0 ark:bg-transparent ark:p-4 ark:text-inherit ark:pointer-events-none",
       toastBase:
         "ark:pointer-events-auto ark:rounded-xl ark:border ark:border-border ark:bg-surface/95 ark:p-4 ark:shadow-lg ark:backdrop-blur",
       title: "ark:text-sm ark:font-semibold ark:text-fg",
@@ -244,6 +280,7 @@ export class ArkToaster extends HTMLElement {
     if (!this.root) {
       this.root = document.createElement("div");
       this.root.setAttribute("part", "stack");
+      this.root.setAttribute("popover", "manual");
       this.appendChild(this.root);
     }
 
@@ -261,6 +298,7 @@ export class ArkToaster extends HTMLElement {
     this.root.className = `${palette.stack} ${this.getPositionClasses(position)}`;
     this.root.innerHTML = "";
     applyTestHooks(this, "toaster", this.root);
+    this.syncPopover();
 
     const activeIds = new Set(this.toasts.map((toast) => toast.id));
     for (const id of this.entered) {
