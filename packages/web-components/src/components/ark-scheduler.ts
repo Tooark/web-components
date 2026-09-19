@@ -500,8 +500,8 @@ export class ArkScheduler extends HTMLElement {
     button.style.backgroundColor = colors.bg;
     button.style.color = colors.fg;
     button.className = compact
-      ? "ark:flex ark:w-full ark:items-center ark:gap-1 ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-left ark:text-[10px] ark:font-medium ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1"
-      : "ark:flex ark:h-full ark:w-full ark:flex-col ark:overflow-hidden ark:rounded-md ark:px-1.5 ark:py-1 ark:text-left ark:text-[11px] ark:leading-tight ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1";
+      ? "ark:flex ark:w-full ark:items-center ark:gap-1 ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-left ark:text-2xs ark:font-medium ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1"
+      : "ark:flex ark:h-full ark:w-full ark:flex-col ark:overflow-hidden ark:rounded-md ark:px-1.5 ark:py-1 ark:text-left ark:text-2xs ark:leading-tight ark:transition ark:hover:opacity-90 ark:focus:outline-none ark:focus:ring-2 ark:focus:ring-ring ark:focus:ring-offset-1";
 
     const title = document.createElement("span");
     title.className = "ark:truncate ark:font-semibold";
@@ -586,7 +586,7 @@ export class ArkScheduler extends HTMLElement {
 
     if (hasAllDay) {
       const gutterLabel = document.createElement("span");
-      gutterLabel.className = `ark:block ark:pt-8 ark:text-center ark:text-[10px] ${palette.mutedText}`;
+      gutterLabel.className = `ark:block ark:pt-8 ark:text-center ark:text-2xs ${palette.mutedText}`;
       gutterLabel.textContent = loc.allDay;
       headerGutter.appendChild(gutterLabel);
     }
@@ -607,7 +607,7 @@ export class ArkScheduler extends HTMLElement {
       slot.style.height = `${HOUR_HEIGHT_PX}px`;
 
       const label = document.createElement("span");
-      label.className = "ark:absolute ark:-top-2 ark:right-2 ark:text-[10px]";
+      label.className = "ark:absolute ark:-top-2 ark:right-2 ark:text-2xs";
       label.textContent = this.formatHour(hour);
       slot.appendChild(label);
       gutter.appendChild(slot);
@@ -774,7 +774,7 @@ export class ArkScheduler extends HTMLElement {
       if (dayEvents.length > maxChips) {
         const more = document.createElement("button");
         more.type = "button";
-        more.className = `ark:mt-0.5 ark:block ark:w-full ark:px-1 ark:text-left ark:text-[10px] ${palette.mutedText} ark:hover:underline`;
+        more.className = `ark:mt-0.5 ark:block ark:w-full ark:px-1 ark:text-left ark:text-2xs ${palette.mutedText} ark:hover:underline`;
         more.textContent = `+${dayEvents.length - maxChips}`;
         applyTestHooks(this, "scheduler", more, "event-more");
         // Ver todos: abre o dia clicado na view "day".

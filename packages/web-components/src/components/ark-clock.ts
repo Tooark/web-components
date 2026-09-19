@@ -106,7 +106,7 @@ export class ArkClock extends HTMLElement {
       container:
         "ark:inline-flex ark:flex-col ark:gap-1 ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-2 ark:shadow-sm",
       columnLabel:
-        "ark:px-1 ark:pb-1 ark:text-center ark:text-[10px] ark:font-medium ark:uppercase ark:tracking-wide ark:text-fg-muted",
+        "ark:px-1 ark:pb-1 ark:text-center ark:text-2xs ark:font-medium ark:uppercase ark:tracking-wide ark:text-fg-muted",
       option: "ark:text-fg-soft ark:hover:bg-surface-muted",
       optionSelected: `${selectedByIntent[intent]} ark:font-semibold`,
       focusRing: "ark:focus:ring-ring"

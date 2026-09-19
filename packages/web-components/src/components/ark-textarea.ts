@@ -155,8 +155,8 @@ export class ArkTextarea extends HTMLElement {
 
     // Fonte e padding por size; a altura mínima segue o token para uma linha alinhar com o ark-input.
     const sizes: Record<ArkSize, { field: string; label: string }> = {
-      xs: { field: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs", label: "ark:text-[10px]" },
-      sm: { field: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs", label: "ark:text-[11px]" },
+      xs: { field: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs", label: "ark:text-2xs" },
+      sm: { field: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs", label: "ark:text-2xs" },
       md: { field: "ark:min-h-(--ark-size-md) ark:px-3 ark:py-1.5 ark:text-sm", label: "ark:text-xs" },
       lg: { field: "ark:min-h-(--ark-size-lg) ark:px-4 ark:py-2 ark:text-base", label: "ark:text-sm" },
       xl: { field: "ark:min-h-(--ark-size-xl) ark:px-5 ark:py-2.5 ark:text-lg", label: "ark:text-base" }

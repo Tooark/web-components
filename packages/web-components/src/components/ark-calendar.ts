@@ -618,7 +618,7 @@ export class ArkCalendar extends HTMLElement {
           const maxChips = 2;
           for (const event of dayEvents.slice(0, maxChips)) {
             const chip = document.createElement("span");
-            chip.className = "ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-[10px] ark:font-medium";
+            chip.className = "ark:truncate ark:rounded ark:px-1 ark:py-0.5 ark:text-2xs ark:font-medium";
             const chipColors = this.eventColors(event);
             chip.style.backgroundColor = chipColors.bg;
             chip.style.color = chipColors.fg;
@@ -628,7 +628,7 @@ export class ArkCalendar extends HTMLElement {
           }
           if (dayEvents.length > maxChips) {
             const more = document.createElement("span");
-            more.className = "ark:px-0.5 ark:text-[10px] ark:text-fg-muted";
+            more.className = "ark:px-0.5 ark:text-2xs ark:text-fg-muted";
             more.textContent = `+${dayEvents.length - maxChips}`;
             applyTestHooks(this, "calendar", more, "event-more");
             cell.appendChild(more);

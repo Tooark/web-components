@@ -133,6 +133,14 @@
   --size-md: 2.25rem;
   --size-lg: 2.75rem;
   --size-xl: 3.25rem;
+
+  /*
+   * Um passo abaixo de text-xs para os micro-rótulos (rótulo flutuante dos
+   * campos xs/sm, chips do calendário e do scheduler, rótulos de coluna do
+   * clock): pela escala, para a densidade do app valer neles. Sem line-height
+   * próprio, o texto herda a altura de linha do contexto.
+   */
+  --text-2xs: 0.6875rem;
 }
 
 /*

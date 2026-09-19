@@ -241,12 +241,12 @@ export class ArkSelect extends HTMLElement {
     const sizes: Record<ArkSize, { field: string; label: string; chevron: string }> = {
       xs: {
         field: "ark:min-h-(--ark-size-xs) ark:py-0.5 ark:pr-7 ark:pl-2 ark:text-xs",
-        label: "ark:text-[10px]",
+        label: "ark:text-2xs",
         chevron: "ark:h-3.5 ark:w-3.5"
       },
       sm: {
         field: "ark:min-h-(--ark-size-sm) ark:py-1 ark:pr-8 ark:pl-2.5 ark:text-xs",
-        label: "ark:text-[11px]",
+        label: "ark:text-2xs",
         chevron: "ark:h-3.5 ark:w-3.5"
       },
       md: {

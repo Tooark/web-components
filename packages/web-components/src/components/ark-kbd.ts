@@ -33,7 +33,7 @@ export class ArkKbd extends HTMLElement {
   private getSizeClass(): string {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const sizes: Record<ArkSize, string> = {
-      xs: "ark:min-h-4 ark:min-w-4 ark:px-1 ark:text-[0.625rem]",
+      xs: "ark:min-h-4 ark:min-w-4 ark:px-1 ark:text-2xs",
       sm: "ark:min-h-5 ark:min-w-5 ark:px-1 ark:text-xs",
       md: "ark:min-h-6 ark:min-w-6 ark:px-1.5 ark:text-xs",
       lg: "ark:min-h-7 ark:min-w-7 ark:px-2 ark:text-sm",

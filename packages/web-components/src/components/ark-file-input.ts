@@ -191,13 +191,13 @@ export class ArkFileInput extends HTMLElement {
       xs: {
         button: "ark:min-h-(--ark-size-xs) ark:px-2 ark:text-xs",
         zone: "ark:gap-1.5 ark:p-3",
-        label: "ark:text-[10px]",
+        label: "ark:text-2xs",
         text: "ark:text-xs"
       },
       sm: {
         button: "ark:min-h-(--ark-size-sm) ark:px-3 ark:text-xs",
         zone: "ark:gap-1.5 ark:p-3",
-        label: "ark:text-[11px]",
+        label: "ark:text-2xs",
         text: "ark:text-xs"
       },
       md: {

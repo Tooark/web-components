@@ -385,7 +385,7 @@ Se o seu app já tem as próprias variáveis de design (um tema gerado, outro de
 
    Se o seu tema também define neutros, faça a ponte de `--ark-color-surface*`, `--ark-color-fg*` e `--ark-color-border*` também; senão os seus cinzas e os cinzas dos componentes vêm de duas fontes.
 
-3. **Densidade.** `--ark-size-*` define a altura dos controles e `--ark-text-xs`/`--ark-text-sm` a maior parte do texto dentro deles (alguns micro-rótulos no calendário, no relógio, na agenda e no switch usam tamanhos fixos em pixel):
+3. **Densidade.** `--ark-size-*` define a altura dos controles e `--ark-text-xs`/`--ark-text-sm` a maior parte do texto dentro deles; os micro-rótulos (o rótulo flutuante dos campos `xs`/`sm`, os chips do calendário e da agenda, os rótulos de coluna do relógio, avatares e kbd `xs`) ficam um passo abaixo em `--ark-text-2xs` (0,6875 rem, sem altura de linha própria). Só os rótulos dentro do trilho do switch e o badge de contagem do calendário mantêm tamanhos fixos em pixel, porque estão presos à geometria do contêiner:
 
    ```css
    :root {

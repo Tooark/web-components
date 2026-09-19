@@ -385,7 +385,7 @@ If your app already has its own design variables (a generated theme, another des
 
    If your theme also defines neutrals, bridge `--ark-color-surface*`, `--ark-color-fg*` and `--ark-color-border*` as well; otherwise your greys and the components' greys come from two sources.
 
-3. **Density.** `--ark-size-*` sets the control heights and `--ark-text-xs`/`--ark-text-sm` most of the text inside the controls (a few micro-labels in the calendar, clock, scheduler and switch use fixed pixel sizes):
+3. **Density.** `--ark-size-*` sets the control heights and `--ark-text-xs`/`--ark-text-sm` most of the text inside the controls; the micro-labels (the floating label of `xs`/`sm` fields, the calendar and scheduler chips, the clock column labels, `xs` avatars and kbd) sit one step below on `--ark-text-2xs` (0.6875 rem, no line-height of its own). Only the labels inside the switch track and the calendar count badge keep fixed pixel sizes, because they are bound to the geometry of their container:
 
    ```css
    :root {

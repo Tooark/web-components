@@ -259,7 +259,7 @@ export class ArkInput extends HTMLElement {
     > = {
       xs: {
         input: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs",
-        label: "ark:text-[10px]",
+        label: "ark:text-2xs",
         prefixPad: "ark:pl-7",
         suffixPad: "ark:pr-7",
         bothPad: "ark:pr-12",
@@ -268,7 +268,7 @@ export class ArkInput extends HTMLElement {
       },
       sm: {
         input: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs",
-        label: "ark:text-[11px]",
+        label: "ark:text-2xs",
         prefixPad: "ark:pl-8",
         suffixPad: "ark:pr-8",
         bothPad: "ark:pr-14",

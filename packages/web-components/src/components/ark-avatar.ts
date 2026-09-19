@@ -62,7 +62,7 @@ export class ArkAvatar extends HTMLElement {
   private getSizing(): ArkAvatarSizing {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const sizes: Record<ArkSize, ArkAvatarSizing> = {
-      xs: { box: "ark:h-6 ark:w-6", text: "ark:text-[0.625rem]" },
+      xs: { box: "ark:h-6 ark:w-6", text: "ark:text-2xs" },
       sm: { box: "ark:h-8 ark:w-8", text: "ark:text-xs" },
       md: { box: "ark:h-10 ark:w-10", text: "ark:text-sm" },
       lg: { box: "ark:h-12 ark:w-12", text: "ark:text-base" },
