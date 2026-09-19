@@ -1,7 +1,7 @@
 {
   "name": "@tooark/core",
   "version": "1.0.0",
-  "description": "Tooark Core — tipos, i18n, servicos de toast e announce, motion sem dependencias e helpers de overlay dos componentes ark-*",
+  "description": "Tooark Core — types, i18n, toast and announce services, dependency-free motion, and overlay helpers for ark-* components",
   "keywords": [
     "tooark",
     "web-components",

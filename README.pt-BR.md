@@ -7,9 +7,12 @@
 [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](pnpm-workspace.yaml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](tsconfig.base.json)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](packages/tokens/tokens.css)
-[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](apps/storybook)
+[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.github.io/web-components/)
+[![npm](https://img.shields.io/npm/v/@tooark/web-components?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/web-components)
 
 Biblioteca de componentes agnóstica de framework construída sobre **Web Components** nativos (Custom Elements), com wrappers dedicados para **React**, **Vue** e **Angular**. Os componentes seguem a convenção da família **Ark** (elementos `ark-*`, tipos `Ark*`, tokens CSS `--ark-*`) e são estilizados com **Tailwind CSS v4** sobre uma camada compartilhada de design tokens.
+
+📖 **Docs:** [Storybook (exemplos vivos)](https://tooark.github.io/web-components/) · [pacotes no npm](https://www.npmjs.com/search?q=%40tooark) · [Changelog](CHANGELOG.md)
 
 🌍 **Idiomas:** [![USA Flag](https://flagcdn.com/w20/us.png) English](https://github.com/Tooark/web-components/blob/main/README.md) · ![Brazil Flag](https://flagcdn.com/w20/br.png) **Português (este arquivo)**
 
@@ -252,6 +255,25 @@ Os motion tokens são sobrescritos como os tokens de cor, com uma regra: mantenh
 
 ## Começando
 
+Exemplos vivos de todos os componentes, com os testes de interação, estão no **[Storybook](https://tooark.github.io/web-components/)**. As seções abaixo vão da instalação a um formulário funcionando em cada ambiente.
+
+### Instalação
+
+Todos os pacotes `@tooark/*` são publicados juntos, numa única versão, em ESM + CJS com tipos TypeScript. Instale o pacote da sua stack; ele traz `@tooark/web-components`, `@tooark/core` e `@tooark/tokens` junto:
+
+| Stack                                | Instalação                                                                                                                                                                                                                                | Peer dependencies por sua conta                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Vanilla / qualquer framework         | `pnpm add @tooark/web-components`                                                                                                                                                                                                         | —                                                             |
+| React 18 / 19                        | `pnpm add @tooark/react`                                                                                                                                                                                                                  | `react`, `react-dom` ≥ 18                                     |
+| Vue 3                                | `pnpm add @tooark/vue`                                                                                                                                                                                                                    | `vue` ≥ 3                                                     |
+| Angular                              | `pnpm add @tooark/angular`                                                                                                                                                                                                                | `@angular/core`, `@angular/common` ≥ 21.2.19                  |
+| Gráficos (`ark-chart`)               | `pnpm add @tooark/chart echarts`                                                                                                                                                                                                          | `echarts` ≥ 5                                                 |
+| Texto rico (`ark-wysiwyg-*`)         | `pnpm add @tooark/wysiwyg`                                                                                                                                                                                                                | — (o Tiptap vem junto)                                        |
+| Editor de código (`ark-code-editor`) | `pnpm add @tooark/code @codemirror/state @codemirror/view @codemirror/language @codemirror/commands @codemirror/search @codemirror/autocomplete @codemirror/lang-json @codemirror/lang-javascript @codemirror/lang-yaml @lezer/highlight` | os pacotes do CodeMirror, para a página ter uma cópia de cada |
+| Motion avançado                      | `pnpm add @tooark/motion`                                                                                                                                                                                                                 | — (a lib Motion vem junto)                                    |
+
+Duas coisas que todo setup precisa, seja qual for o framework: **importar a folha de estilo uma vez** (`@tooark/web-components/styles.css`, o único CSS necessário — tokens, presets de motion e estilos dos componentes) e **registrar os elementos** (`registerTooarkComponents()`; os wrappers de React, Vue e Angular fazem isso por você no primeiro render). Os pacotes laterais registram os próprios elementos (`registerTooarkChart()`, `registerTooarkWysiwyg()`, `registerTooarkCode()`).
+
 ### Vanilla / qualquer framework
 
 ```ts
@@ -261,52 +283,296 @@ import "@tooark/web-components/styles.css";
 registerTooarkComponents();
 ```
 
-`styles.css` é a única folha de estilo necessária: reúne os design tokens, os presets de motion e os estilos dos componentes. É seguro carregá-la ao lado do seu próprio framework CSS:
+O `styles.css` pode conviver com o seu framework CSS:
 
-- **Sem reset global.** O preflight do Tailwind não é embarcado; um reset escopado vale só dentro dos elementos `ark-*`.
-- **Utilities e variáveis prefixadas.** Toda classe dos componentes é `ark:*` (ex.: `ark:inline-flex`) e as variáveis do theme são `--ark-*` (ex.: `--ark-color-primary`), então nada colide com um Tailwind v3/v4 do seu app.
+- **Sem reset global.** O preflight do Tailwind não é distribuído; um reset com escopo se aplica apenas dentro dos elementos `ark-*`.
+- **Utilitários e variáveis com prefixo.** Toda classe de componente é `ark:*` (ex.: `ark:inline-flex`) e as variáveis de tema são `--ark-*` (ex.: `--ark-color-primary`), então nada colide com um setup Tailwind v3/v4 no seu app.
+
+Um formulário com um campo, um select, um diálogo de confirmação e um toast — o mesmo cenário que as seções de framework abaixo reproduzem:
 
 ```html
-<ark-button intent="primary" size="md">Salvar</ark-button>
-<ark-button icon-only rounded="full" intent="success" aria-label="Confirmar">✓</ark-button>
+<form id="perfil">
+  <ark-input name="nome" label="Nome" placeholder="Seu nome completo" helper="Como no documento" required></ark-input>
+  <ark-select
+    name="papel"
+    label="Papel"
+    options='[{"value":"dev","label":"Desenvolvimento"},{"value":"ops","label":"Operações"}]'
+  ></ark-select>
+  <ark-datepicker input mode="date" lang="pt" name="desde"></ark-datepicker>
+  <ark-button type="submit" intent="primary">Salvar</ark-button>
+</form>
 
-<ark-switch labels icons intent="success" label="Notificações"></ark-switch>
-
-<ark-toggle-group value="dia">
-  <ark-toggle value="dia">Dia</ark-toggle>
-  <ark-toggle value="semana">Semana</ark-toggle>
-  <ark-toggle value="mes">Mês</ark-toggle>
-</ark-toggle-group>
-
-<ark-input label="Nome" placeholder="Seu nome completo" helper="Como no documento"></ark-input>
-
-<!-- Campo + popup; o formulário recebe o valor ISO em name="data" -->
-<ark-datepicker input mode="date" lang="pt" name="data"></ark-datepicker>
-
-<!-- Painéis inline (sem `input`): data + hora -->
-<ark-datepicker lang="pt"></ark-datepicker>
-
-<ark-calendar lang="pt" event-display="count"></ark-calendar>
-
-<ark-clock hours-format="12" step-minutes="15"></ark-clock>
-
-<ark-scheduler view="week" lang="pt" hour-start="8" hour-end="18"></ark-scheduler>
+<ark-dialog id="confirmar" label="Publicar alterações?" lang="pt">
+  <p>Seu perfil ficará visível para todo o time.</p>
+  <div slot="footer">
+    <ark-button variant="ghost" data-action="cancel">Cancelar</ark-button>
+    <ark-button intent="primary" data-action="publish">Publicar</ark-button>
+  </div>
+</ark-dialog>
 
 <ark-toaster position="bottom-right" lang="pt"></ark-toaster>
 ```
 
-`events` do `ark-calendar`/`ark-scheduler` também aceita a propriedade JS, evitando serializar JSON no atributo:
+```ts
+import { toast } from "@tooark/core";
+
+const form = document.querySelector<HTMLFormElement>("#perfil")!;
+const dialog = document.querySelector("ark-dialog")!; // `show()`, `close(reason)`, `open`
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  dialog.show(); // popover no top layer: foco preso, Esc e o scrim fecham
+});
+
+dialog.addEventListener("click", (event) => {
+  const action = (event.target as HTMLElement).closest("[data-action]")?.getAttribute("data-action");
+  if (action === "publish") {
+    const data = Object.fromEntries(new FormData(form)); // { nome, papel, desde: "YYYY-MM-DD" }
+    toast.success("Perfil publicado", { description: `Bem-vindo, ${data.nome}.` });
+  }
+  if (action) dialog.close();
+});
+
+// Todo elemento ark-* também é uma API DOM comum: atributos, propriedades e eventos customizados.
+document.querySelector("ark-select")!.addEventListener("change", (event) => {
+  console.log((event as CustomEvent<{ value: string }>).detail.value);
+});
+```
+
+`events` no `ark-calendar`/`ark-scheduler`, `rows` no `ark-kv-editor` e `options` no `ark-select` também aceitam a propriedade JS, o que evita serializar JSON no atributo:
 
 ```ts
-document.querySelector("ark-scheduler").events = [
-  {
-    id: "1",
-    title: "Daily",
-    start: "2026-09-01T09:00",
-    end: "2026-09-01T09:15",
-    intent: "info",
-  },
+document.querySelector("ark-scheduler")!.events = [
+  { id: "1", title: "Daily", start: "2026-09-01T09:00", end: "2026-09-01T09:15", intent: "info" },
 ];
+```
+
+### React
+
+O `@tooark/react` exporta um componente por elemento (`ArkButton`, `ArkInput`, `ArkDialog`, …) com props camelCase e tipadas; props de objeto (`events`, `rows`, `localeJson`) são serializadas para você e os eventos customizados viram handlers que recebem o `CustomEvent` (`onChange`, `onClose`, `onSelect`, `onEventClick`, …). Importe a folha de estilo uma vez (no `main.tsx` ou no layout raiz) e use os componentes em qualquer lugar:
+
+```tsx
+// main.tsx
+import "@tooark/web-components/styles.css";
+```
+
+```tsx
+import { ArkButton, ArkDialog, ArkInput, ArkSelect, ArkToaster } from "@tooark/react";
+import { toast } from "@tooark/core";
+import { type FormEvent, useState } from "react";
+
+const PAPEIS = [
+  { value: "dev", label: "Desenvolvimento" },
+  { value: "ops", label: "Operações" },
+];
+
+export function FormularioPerfil() {
+  const [nome, setNome] = useState("");
+  const [papel, setPapel] = useState("dev");
+  const [confirmando, setConfirmando] = useState(false);
+
+  function enviar(event: FormEvent) {
+    event.preventDefault();
+    setConfirmando(true);
+  }
+
+  function publicar() {
+    setConfirmando(false);
+    toast.success("Perfil publicado", { description: `Bem-vindo, ${nome}.` });
+  }
+
+  return (
+    <form onSubmit={enviar}>
+      {/* Eventos nativos sobem do controle interno: leia o valor de event.target */}
+      <ArkInput label="Nome" value={nome} required onInput={(e) => setNome((e.target as HTMLInputElement).value)} />
+      {/* O ark-select consolida o próprio `change` como CustomEvent com detail.value */}
+      <ArkSelect label="Papel" options={PAPEIS} value={papel} onChange={(e) => setPapel(e.detail.value)} />
+      <ArkButton type="submit" intent="primary">
+        Salvar
+      </ArkButton>
+
+      {/* `open` é a fonte da verdade; o diálogo anima a saída mesmo quando o React o remove */}
+      <ArkDialog label="Publicar alterações?" open={confirmando} onClose={() => setConfirmando(false)}>
+        <p>Seu perfil ficará visível para todo o time.</p>
+        <div slot="footer">
+          <ArkButton variant="ghost" onClick={() => setConfirmando(false)}>
+            Cancelar
+          </ArkButton>
+          <ArkButton intent="primary" onClick={publicar}>
+            Publicar
+          </ArkButton>
+        </div>
+      </ArkDialog>
+
+      <ArkToaster position="bottom-right" lang="pt" />
+    </form>
+  );
+}
+```
+
+Funciona com React 18 (atributos) e React 19 (propriedades): os setters booleanos de todo elemento aceitam os dois (veja `coerceBooleanAttr` nas notas abaixo). Para elementos sem wrapper (os pacotes laterais), use a tag diretamente com `registerTooark*()` num efeito e um `ref` para atribuir as propriedades JS; o `@tooark/react` distribui as tipagens `IntrinsicElements` de toda tag `ark-*`.
+
+### Vue 3
+
+O `@tooark/vue` exporta um componente por elemento com props tipadas; os eventos customizados mantêm o nome nativo (`@ark-change`, `@ark-close`, `@ark-select`, …) e entregam o `CustomEvent`. Importe a folha de estilo uma vez (no `main.ts`) e use os componentes em qualquer SFC:
+
+```ts
+// main.ts
+import "@tooark/web-components/styles.css";
+```
+
+```vue
+<script setup lang="ts">
+import { ArkButton, ArkDialog, ArkInput, ArkSelect, ArkToaster } from "@tooark/vue";
+import { toast } from "@tooark/core";
+import { ref } from "vue";
+
+const papeis = [
+  { value: "dev", label: "Desenvolvimento" },
+  { value: "ops", label: "Operações" },
+];
+const nome = ref("");
+const papel = ref("dev");
+const confirmando = ref(false);
+
+function publicar() {
+  confirmando.value = false;
+  toast.success("Perfil publicado", { description: `Bem-vindo, ${nome.value}.` });
+}
+</script>
+
+<template>
+  <form @submit.prevent="confirmando = true">
+    <!-- Eventos nativos sobem do controle interno: leia o valor de event.target -->
+    <ArkInput label="Nome" :value="nome" required @input="nome = ($event.target as HTMLInputElement).value" />
+    <!-- O ark-select consolida o próprio `change` como CustomEvent com detail.value -->
+    <ArkSelect label="Papel" :options="papeis" :value="papel" @change="papel = $event.detail.value" />
+    <ArkButton type="submit" intent="primary">Salvar</ArkButton>
+
+    <ArkDialog label="Publicar alterações?" :open="confirmando" @ark-close="confirmando = false">
+      <p>Seu perfil ficará visível para todo o time.</p>
+      <div slot="footer">
+        <ArkButton variant="ghost" @click="confirmando = false">Cancelar</ArkButton>
+        <ArkButton intent="primary" @click="publicar">Publicar</ArkButton>
+      </div>
+    </ArkDialog>
+
+    <ArkToaster position="bottom-right" lang="pt" />
+  </form>
+</template>
+```
+
+Avise o compilador do Vue de que as tags `ark-*` são custom elements quando usar uma sem wrapper (pacotes laterais): `compilerOptions.isCustomElement = (tag) => tag.startsWith("ark-")` no `vite.config.ts` (`plugins: [vue({ template: { compilerOptions } })]`).
+
+### Angular
+
+O `@tooark/angular` exporta um componente standalone por elemento (`ArkInputComponent`, `ArkDialogComponent`, …) com o seletor `<ark-*-wrapper>`: `@Input()` para os atributos e `@Output()` reemitindo os eventos customizados (`arkChange`, `arkClose`, `arkSelect`, …). Adicione a folha de estilo ao `angular.json` e importe os componentes que usar:
+
+```json
+// angular.json → projects.<app>.architect.build.options
+"styles": ["node_modules/@tooark/web-components/dist/styles.css", "src/styles.css"]
+```
+
+```ts
+import { Component } from "@angular/core";
+import {
+  ArkButtonComponent,
+  ArkDialogComponent,
+  ArkInputComponent,
+  ArkSelectComponent,
+  ArkToasterComponent,
+} from "@tooark/angular";
+import { toast } from "@tooark/core";
+
+@Component({
+  selector: "app-formulario-perfil",
+  standalone: true,
+  imports: [ArkInputComponent, ArkSelectComponent, ArkButtonComponent, ArkDialogComponent, ArkToasterComponent],
+  template: `
+    <form (submit)="$event.preventDefault(); confirmando = true">
+      <!-- Eventos nativos sobem do controle interno: leia o valor de $event.target -->
+      <ark-input-wrapper
+        label="Nome"
+        [value]="nome"
+        [required]="true"
+        (input)="nome = $any($event.target).value"
+      ></ark-input-wrapper>
+      <!-- O ark-select consolida o próprio change, reemitido como (changed) com detail.value -->
+      <ark-select-wrapper
+        label="Papel"
+        [options]="papeis"
+        [value]="papel"
+        (changed)="papel = $event.detail.value"
+      ></ark-select-wrapper>
+      <ark-button-wrapper type="submit" intent="primary">Salvar</ark-button-wrapper>
+
+      <ark-dialog-wrapper label="Publicar alterações?" [open]="confirmando" (arkClose)="confirmando = false">
+        <p>Seu perfil ficará visível para todo o time.</p>
+        <div slot="footer">
+          <ark-button-wrapper variant="ghost" (click)="confirmando = false">Cancelar</ark-button-wrapper>
+          <ark-button-wrapper intent="primary" (click)="publicar()">Publicar</ark-button-wrapper>
+        </div>
+      </ark-dialog-wrapper>
+
+      <ark-toaster-wrapper position="bottom-right" lang="pt"></ark-toaster-wrapper>
+    </form>
+  `,
+})
+export class FormularioPerfilComponent {
+  papeis = [
+    { value: "dev", label: "Desenvolvimento" },
+    { value: "ops", label: "Operações" },
+  ];
+  nome = "";
+  papel = "dev";
+  confirmando = false;
+
+  publicar(): void {
+    this.confirmando = false;
+    toast.success("Perfil publicado", { description: `Bem-vindo, ${this.nome}.` });
+  }
+}
+```
+
+O pacote é compilado com `ng-packagr` em Ivy parcial, então funciona em builds AOT de produção, e exige Angular ≥ 21.2.19 (o mesmo piso que o workspace impõe por correções de segurança). Os custom elements são registrados sob demanda no construtor de cada wrapper e pulados no servidor, então os wrappers são seguros para SSR. Para usar uma tag `ark-*` sem wrapper (pacotes laterais), adicione `schemas: [CUSTOM_ELEMENTS_SCHEMA]` ao componente e chame a função `registerTooark*()` no navegador.
+
+### Gráficos, texto rico e código
+
+Os pacotes laterais trazem os próprios Custom Elements, com o mesmo tema (`theme="auto"` segue o `color-scheme` da página, inclusive a troca em tempo de execução) e sem wrapper de framework — use a tag diretamente em React, Vue ou Angular como descrito acima.
+
+```ts
+import { registerTooarkChart } from "@tooark/chart"; // o ECharts é peer dependency
+
+registerTooarkChart();
+const chart = document.querySelector("ark-chart")!;
+chart.option = {
+  xAxis: { type: "category", data: ["Seg", "Ter", "Qua"] },
+  yAxis: {},
+  series: [{ type: "bar", data: [120, 200, 150] }],
+};
+```
+
+```ts
+import { registerTooarkWysiwyg } from "@tooark/wysiwyg"; // o Tiptap vem junto
+
+registerTooarkWysiwyg();
+const editor = document.querySelector("ark-wysiwyg-editor")!;
+editor.setAttribute("toolbar", "style,marks,color,lists,link,media,history"); // grupos opt-in
+editor.uploadFile = async (file) => ({ src: await enviarParaMeuStorage(file) }); // liga imagem/vídeo; o JSON guarda só a URL
+editor.content = jsonSalvo; // JSON do Tiptap, sanitizado ao entrar
+editor.addEventListener("ark-wysiwyg-change", (event) => salvar(event.detail));
+document.querySelector("ark-wysiwyg-viewer")!.content = jsonSalvo;
+```
+
+```ts
+import { registerTooarkCode } from "@tooark/code"; // os pacotes do CodeMirror são peer dependencies
+
+registerTooarkCode();
+const editor = document.querySelector("ark-code-editor")!;
+editor.setAttribute("language", "json");
+editor.variableKeys = ["baseUrl", "token"]; // completions depois de {{
+editor.value = JSON.stringify(body, null, 2);
+editor.addEventListener("change", (event) => salvar(event.detail.value));
 ```
 
 ```ts
@@ -315,39 +581,13 @@ import { toast } from "@tooark/core";
 toast.success("Salvo", { description: "Suas alterações foram publicadas." });
 ```
 
-```ts
-import { registerTooarkCode } from "@tooark/code"; // os pacotes do CodeMirror são peer dependencies
+### Renderização no servidor
 
-registerTooarkCode();
-const editor = document.querySelector("ark-code-editor");
-editor.variableKeys = ["baseUrl", "token"]; // completions depois de {{
-editor.value = JSON.stringify(body, null, 2);
-editor.addEventListener("change", (event) => salvar(event.detail.value));
-```
+Os elementos precisam de um navegador: `customElements` não existe no servidor. Renderize a marcação normalmente (uma tag `ark-*` não registrada é HTML inerte, e os filhos em light DOM continuam lá para SEO e para a primeira pintura) e registre no cliente — os wrappers de React, Vue e Angular já fazem isso num hook que só roda no navegador. Inclua o `styles.css` na página renderizada no servidor para os hosts terem a caixa antes da hidratação. O que só existe no navegador (gráficos, editores) renderiza depois de montar; dê um `min-height` ao host se o deslocamento de layout importar.
 
-### React
-
-```tsx
-import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/react";
-```
-
-As props dos wrappers são camelCase e tipadas (`eventDisplay`, `stepMinutes`, `hoursFormat`, `hourStart`…); props de objeto (`events`, `localeJson`) são serializadas para o atributo automaticamente e os eventos customizados chegam como `onChange`/`onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` recebendo o `detail`.
+### Notas para integrações com frameworks
 
 O React 18 escreve atributos nos custom elements, o React 19 escreve a propriedade quando o elemento a tem, então um booleano que o wrapper passa como `""` (presente) ou omite chega ao elemento dos dois jeitos: todo setter booleano (`disabled`, `open`, `checked`, …) aceita `true`/`""` como ligado e `false`/`"false"`/`null`/`undefined` como desligado (`coerceBooleanAttr` do `@tooark/core`, se você escrever elementos seus).
-
-### Vue 3
-
-```ts
-import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/vue";
-```
-
-Os eventos mantêm o nome nativo (`@ark-change`, `@ark-event-click`, …) e entregam o `detail` diretamente.
-
-### Angular
-
-Importe os componentes wrapper de `@tooark/angular` (`ArkDatepickerComponent`, `ArkSchedulerComponent`, …). Cada um é standalone, usa o seletor `<ark-*-wrapper>` e reemite os eventos customizados como `@Output()` (`arkChange`, `arkEventClick`, `arkSlotClick`, `arkViewChange`, `arkRangeChange`).
-
-O pacote é compilado com `ng-packagr` em partial compilation (Ivy), então funciona em builds AOT de produção. Exige Angular ≥ 21.2.19 (o mesmo piso que o workspace impõe por correções de segurança). Os custom elements são registrados sob demanda no construtor de cada wrapper e ignorados no servidor, então os wrappers são seguros para SSR.
 
 ### Tema e design tokens
 
@@ -436,6 +676,7 @@ Requisitos: **Node.js ≥ 22** e **pnpm 11** (versão fixada via `packageManager
 pnpm install          # instala as dependências do workspace
 pnpm build            # compila todos os pacotes
 pnpm dev:storybook    # roda o Storybook em http://localhost:6006
+pnpm check:publish    # empacota cada pacote e valida os tarballs (publint + attw)
 pnpm clean            # remove os artefatos de build
 pnpm check            # lint, formatação e ordem de imports (Biome)
 pnpm check:fix        # aplica as correções e a formatação do Biome

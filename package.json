@@ -1,7 +1,7 @@
 {
   "name": "@tooark/root",
   "version": "1.0.0",
-  "description": "Biblioteca de Componentes Web para projetos Angular, React e Vue",
+  "description": "Web Component Library for Angular, React, and Vue projects",
   "private": true,
   "type": "module",
   "keywords": [

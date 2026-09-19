@@ -1,7 +1,7 @@
 {
   "name": "@tooark/web-components",
   "version": "1.0.0",
-  "description": "Tooark Web Components — Custom Elements ark-* (botoes, campos, dialogos, menus, calendario, editor chave/valor...) com Tailwind v4 e tokens",
+  "description": "Tooark Web Components — Custom Elements (ark-*) (buttons, fields, dialogs, menus, calendar, key/value editor...) with Tailwind v4 and tokens",
   "keywords": [
     "tooark",
     "web-components",

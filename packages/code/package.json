@@ -1,7 +1,7 @@
 {
   "name": "@tooark/code",
   "version": "1.0.0",
-  "description": "Tooark Code — editor de codigo <ark-code-editor> sobre o CodeMirror 6 (JSON, JavaScript, YAML), com completions, formatacao e tema pelos tokens",
+  "description": "Tooark Code — a code editor (`<ark-code-editor>`) based on CodeMirror 6 (supporting JSON, JavaScript, and YAML), featuring code completion, formatting, and token-based theming",
   "keywords": [
     "tooark",
     "web-components",

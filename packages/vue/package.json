@@ -1,7 +1,7 @@
 {
   "name": "@tooark/vue",
   "version": "1.0.0",
-  "description": "Tooark Vue — wrappers dos componentes ark-* para Vue 3",
+  "description": "Tooark Vue — ark-* component wrappers for Vue 3",
   "keywords": [
     "tooark",
     "web-components",

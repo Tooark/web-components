@@ -1,7 +1,7 @@
 {
   "name": "@tooark/tokens",
   "version": "1.0.0",
-  "description": "Tooark Tokens — primitivas de design (cores por intent, tamanhos, raios, motion) como tokens CSS e tipos TypeScript",
+  "description": "Tooark Tokens — design primitives (colors by intent, sizes, radii, motion) as CSS tokens and TypeScript types",
   "keywords": [
     "tooark",
     "web-components",
