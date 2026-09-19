@@ -6,8 +6,10 @@ import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
 /**
  * Viewer somente-leitura (Custom Element) que renderiza o mesmo JSON do editor.
  *
- * Usa Tiptap em modo `editable: false` — por isso renderiza o conteúdo de forma
- * segura a partir do JSON, sem injetar HTML arbitrário.
+ * Usa Tiptap em modo `editable: false` com o mesmo schema do editor (links,
+ * cores, alinhamento, imagens e vídeos externos): renderiza a partir do JSON,
+ * sanitizado ao entrar (`sanitizeWysiwygContent`), sem injetar HTML
+ * arbitrário; links abrem em nova aba com `rel="noopener noreferrer nofollow"`.
  *
  * Conteúdo via propriedade `content` (JSON do Tiptap). Atributo: `theme`.
  */

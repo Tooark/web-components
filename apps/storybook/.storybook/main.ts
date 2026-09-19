@@ -10,6 +10,8 @@ const config: StorybookConfig = {
     disableTelemetry: true
   },
   stories: ["../stories/**/*.stories.@(ts|mdx)"],
+  // Arquivos estaticos das stories (ex.: a imagem que o uploader de exemplo do wysiwyg devolve).
+  staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-docs"),
     getAbsolutePath("@storybook/addon-vitest"),
