@@ -208,6 +208,38 @@ export const ArrowsNavigate = {
   }
 };
 
+export const NextBeforeFirstFrame = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Um `next()` no mesmo frame da montagem (um framework chamando a API logo apos o mount) vale: o posicionamento inicial, que espera um frame pelo layout, parte do indice atual e nao volta ao `start-index`, entao `ark-slide-change` dispara uma unica vez."
+      }
+    }
+  },
+  render: (): HTMLElement => document.createElement("div"),
+  play: async ({ canvasElement, args }: { canvasElement: HTMLElement; args: StoryArgs }) => {
+    const host = canvasElement.querySelector("div")!;
+    const carousel = renderCarousel(args) as HTMLElement & { index: number; next(): void };
+    const changes: number[] = [];
+    carousel.addEventListener("ark-slide-change", (event) => changes.push((event as CustomEvent).detail.index));
+
+    // Conecta e avanca sincronamente, antes do requestAnimationFrame da montagem.
+    host.appendChild(carousel);
+    carousel.next();
+    await expect(carousel.index).toBe(1);
+    await expect(changes).toEqual([1]);
+
+    const target = canvasElement.querySelector<HTMLElement>('[data-ark="carousel-slide-1"]')!;
+    await waitFor(() => expect(Math.abs(carousel.scrollLeft - target.offsetLeft)).toBeLessThan(2));
+    // A sincronizacao por rolagem (80 ms apos parar) nao pode emitir de novo nem voltar o indice.
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(carousel.index).toBe(1);
+    await expect(changes).toEqual([1]);
+    await expect(canvasElement.querySelector('[data-ark="carousel-dot-1"]')).toHaveAttribute("aria-current", "true");
+  }
+};
+
 export const DynamicSlides = {
   render: renderCarousel,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

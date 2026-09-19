@@ -9,6 +9,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `ark-carousel`: a `next()`/`prev()` or arrow click in the same frame as the mount was undone by the deferred
+  initial positioning (it went back to `start-index`), which let the smooth scroll finish on its own and fire a second
+  `ark-slide-change`. The initial positioning now starts from the current index, and the pending frame is cancelled
+  when the element is removed.
+
 ## [1.0.0] - 2026-09-19
 
 First public release of the Tooark Web Components family.

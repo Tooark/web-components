@@ -33,6 +33,7 @@ export class ArkCarousel extends HTMLElement {
   private currentIndex = 0;
   private autoplayId: number | null = null;
   private scrollTimer: number | null = null;
+  private mountFrame: number | null = null;
   private observer: MutationObserver | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private ownClasses: string[] = [];
@@ -113,15 +114,22 @@ export class ArkCarousel extends HTMLElement {
       this.resizeObserver.observe(this);
     }
 
-    const startIndex = this.normalizeIndex(this.getStartIndex());
-    this.currentIndex = startIndex;
-    requestAnimationFrame(() => {
-      this.goTo(startIndex, { behavior: "auto" });
+    this.currentIndex = this.normalizeIndex(this.getStartIndex());
+    // O offsetLeft dos slides so existe depois do layout, entao o posicionamento inicial espera um frame. Ele parte
+    // do indice ATUAL, nao do start-index: um next()/click no primeiro frame ja mudou o indice e disparou o evento, e
+    // voltar ao inicio aqui deixava a rolagem suave seguir sozinha ate o slide, com um segundo ark-slide-change.
+    this.mountFrame = requestAnimationFrame(() => {
+      this.mountFrame = null;
+      this.goTo(this.currentIndex, { behavior: "auto" });
       this.startAutoplay();
     });
   }
 
   disconnectedCallback(): void {
+    if (this.mountFrame !== null) {
+      cancelAnimationFrame(this.mountFrame);
+      this.mountFrame = null;
+    }
     this.stopAutoplay();
     this.observer?.disconnect();
     this.observer = null;
