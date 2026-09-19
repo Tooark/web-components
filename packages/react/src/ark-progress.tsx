@@ -1,7 +1,7 @@
 import type { ArkProgressStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkProgressProps = ArkProgressStyleOptions & {
   /** Valor atual, de 0 a max. Padrao: 0. */

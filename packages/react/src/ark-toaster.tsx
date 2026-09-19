@@ -1,7 +1,7 @@
 import type { ArkToasterStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkToasterProps = ArkToasterStyleOptions & {
   className?: string;

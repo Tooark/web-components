@@ -1,6 +1,6 @@
 import type { ArkAlertLive, ArkAlertVariant, ArkIntent, ArkLang, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkAlert = defineComponent({
   name: "ArkAlert",

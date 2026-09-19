@@ -1,15 +1,61 @@
 {
   "name": "@tooark/vue",
   "version": "1.0.0",
-  "description": "Vue wrappers for Tooark Web Components",
+  "description": "Tooark Vue — wrappers dos componentes ark-* para Vue 3",
+  "keywords": [
+    "tooark",
+    "web-components",
+    "custom-elements",
+    "design-system",
+    "tailwindcss",
+    "vue",
+    "vue3",
+    "wrappers"
+  ],
   "license": "Apache-2.0",
+  "author": {
+    "name": "Paulo Sergio de Freitas Junior",
+    "email": "paulo.freitas@tooark.com",
+    "url": "https://paulofreitas.tooark.com"
+  },
+  "homepage": "https://github.com/Tooark/web-components#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tooark/web-components.git",
+    "directory": "packages/vue"
+  },
+  "bugs": {
+    "url": "https://github.com/Tooark/web-components/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/paulosfjunior"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/paulosfjunior"
+    }
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "NOTICE",
+    "README.pt-BR.md",
     "dist"
   ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "clean": "rimraf dist"
@@ -18,7 +64,7 @@
     "vue": ">=3"
   },
   "dependencies": {
-    "@tooark/core": "workspace:*",
-    "@tooark/web-components": "workspace:*"
+    "@tooark/core": "workspace:^",
+    "@tooark/web-components": "workspace:^"
   }
 }

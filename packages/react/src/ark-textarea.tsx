@@ -1,6 +1,6 @@
 import type { ArkTextareaResize, ArkTextareaStyleOptions } from "@tooark/core";
 import React, { createElement, type PropsWithChildren, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkTextareaProps = PropsWithChildren<
   ArkTextareaStyleOptions & {

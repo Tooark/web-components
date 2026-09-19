@@ -1,24 +1,70 @@
 {
   "name": "@tooark/wysiwyg",
   "version": "1.0.0",
-  "description": "Tooark WYSIWYG — editor e viewer (Custom Elements) baseados em Tiptap",
+  "description": "Tooark WYSIWYG — editor e viewer de texto rico (<ark-wysiwyg-editor>, <ark-wysiwyg-viewer>) sobre o Tiptap, com conteudo JSON sanitizado",
+  "keywords": [
+    "tooark",
+    "web-components",
+    "custom-elements",
+    "design-system",
+    "tailwindcss",
+    "wysiwyg",
+    "rich-text",
+    "editor",
+    "tiptap",
+    "prosemirror"
+  ],
   "license": "Apache-2.0",
+  "author": {
+    "name": "Paulo Sergio de Freitas Junior",
+    "email": "paulo.freitas@tooark.com",
+    "url": "https://paulofreitas.tooark.com"
+  },
+  "homepage": "https://github.com/Tooark/web-components#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tooark/web-components.git",
+    "directory": "packages/wysiwyg"
+  },
+  "bugs": {
+    "url": "https://github.com/Tooark/web-components/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/paulosfjunior"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/paulosfjunior"
+    }
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
     "NOTICE",
+    "README.pt-BR.md",
     "dist"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
@@ -33,7 +79,7 @@
     "@tiptap/extension-text-style": "^3.31.3",
     "@tiptap/pm": "^3.31.3",
     "@tiptap/starter-kit": "^3.31.3",
-    "@tooark/tokens": "workspace:*",
+    "@tooark/tokens": "workspace:^",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

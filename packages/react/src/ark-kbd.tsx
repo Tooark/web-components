@@ -1,7 +1,7 @@
 import type { ArkKbdStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, type PropsWithChildren, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkKbdProps = PropsWithChildren<
   ArkKbdStyleOptions & {

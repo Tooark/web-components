@@ -1,18 +1,58 @@
 {
   "name": "@tooark/core",
   "version": "1.0.0",
-  "description": "Design system core (Web Components nativos + Tailwind v4)",
+  "description": "Tooark Core — tipos, i18n, servicos de toast e announce, motion sem dependencias e helpers de overlay dos componentes ark-*",
+  "keywords": [
+    "tooark",
+    "web-components",
+    "custom-elements",
+    "design-system",
+    "tailwindcss",
+    "core",
+    "i18n",
+    "motion",
+    "popover",
+    "focus-trap"
+  ],
   "license": "Apache-2.0",
+  "author": {
+    "name": "Paulo Sergio de Freitas Junior",
+    "email": "paulo.freitas@tooark.com",
+    "url": "https://paulofreitas.tooark.com"
+  },
+  "homepage": "https://github.com/Tooark/web-components#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tooark/web-components.git",
+    "directory": "packages/core"
+  },
+  "bugs": {
+    "url": "https://github.com/Tooark/web-components/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/paulosfjunior"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/paulosfjunior"
+    }
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "style": "./dist/styles.css",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./styles.css": {
       "default": "./dist/styles.css"
@@ -20,9 +60,17 @@
   },
   "files": [
     "NOTICE",
+    "README.pt-BR.md",
     "dist"
   ],
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css",
+    "**/*.css"
+  ],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "rollup -c && pnpm run build:css",
     "build:css": "tailwindcss -i src/styles/index.css -o dist/styles.css --minify && node ../../scripts/check-css.mjs dist/styles.css --min-bytes 2000 --expect --ark-duration-default --ark-color-primary: ark-fade-in .ark-skeleton",
@@ -30,7 +78,7 @@
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@tooark/tokens": "workspace:*",
+    "@tooark/tokens": "workspace:^",
     "tslib": "^2.8.1"
   },
   "devDependencies": {

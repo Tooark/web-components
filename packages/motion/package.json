@@ -1,32 +1,78 @@
 {
   "name": "@tooark/motion",
   "version": "1.0.0",
-  "description": "Tooark Motion — Camada 3 do sistema de motion: stagger, scroll reveal, FLIP e swipe baseados na lib Motion (motion.dev)",
+  "description": "Tooark Motion — helpers opt-in de animacao (stagger, scroll reveal, FLIP, swipe) sobre a lib Motion, com os tokens do design system",
+  "keywords": [
+    "tooark",
+    "web-components",
+    "custom-elements",
+    "design-system",
+    "tailwindcss",
+    "motion",
+    "animation",
+    "flip",
+    "stagger",
+    "scroll-reveal"
+  ],
   "license": "Apache-2.0",
+  "author": {
+    "name": "Paulo Sergio de Freitas Junior",
+    "email": "paulo.freitas@tooark.com",
+    "url": "https://paulofreitas.tooark.com"
+  },
+  "homepage": "https://github.com/Tooark/web-components#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tooark/web-components.git",
+    "directory": "packages/motion"
+  },
+  "bugs": {
+    "url": "https://github.com/Tooark/web-components/issues"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/paulosfjunior"
+    },
+    {
+      "type": "ko-fi",
+      "url": "https://ko-fi.com/paulosfjunior"
+    }
+  ],
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     }
   },
   "files": [
     "NOTICE",
+    "README.pt-BR.md",
     "dist"
   ],
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
     "clean": "rimraf dist"
   },
   "dependencies": {
-    "@tooark/core": "workspace:*",
-    "@tooark/tokens": "workspace:*",
+    "@tooark/core": "workspace:^",
+    "@tooark/tokens": "workspace:^",
     "motion": "^13.1.1",
     "tslib": "^2.8.1"
   },

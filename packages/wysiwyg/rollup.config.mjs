@@ -30,7 +30,12 @@ export default [
   },
   {
     input,
-    output: [{ file: "dist/index.d.ts", format: "esm" }],
+    // O mesmo bundle de tipos em .d.ts (import) e .d.cts (require): o TypeScript escolhe pela extensao, e sem o
+    // .d.cts um consumidor CommonJS com moduleResolution node16 leria os tipos como ESM.
+    output: [
+      { file: "dist/index.d.ts", format: "esm" },
+      { file: "dist/index.d.cts", format: "esm" }
+    ],
     plugins: [dts()],
     external: isExternal
   }

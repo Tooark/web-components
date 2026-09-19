@@ -1,6 +1,6 @@
 import type { ArkDatepickerLang, ArkDatepickerStyleOptions, ArkLocale } from "@tooark/core";
 import React, { useCallback, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
   lang?: ArkDatepickerLang;

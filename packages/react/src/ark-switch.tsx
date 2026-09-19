@@ -1,6 +1,6 @@
 import type { ArkSwitchStyleOptions } from "@tooark/core";
 import React, { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSwitchProps = ArkSwitchStyleOptions & {
   disabled?: boolean;

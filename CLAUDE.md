@@ -25,6 +25,7 @@ pnpm dev:storybook                             # Storybook at http://localhost:6
 pnpm clean                                     # remove dist/ and storybook-static/
 pnpm check                                     # Biome lint + format + import order, read-only (CI runs `biome ci .`)
 pnpm check:fix                                 # apply Biome safe fixes and formatting; run before committing
+pnpm check:publish                             # pack every package and run publint + attw on the tarballs (CI runs it too)
 pnpm version patch                             # bumps root version and syncs every packages/*/package.json (scripts/sync-versions.mjs)
 ```
 
@@ -39,6 +40,10 @@ pnpm --filter storybook exec vitest run --project storybook stories/ark-switch.s
 ```
 
 CI (`.github/workflows/tests.yml`) runs `biome ci .`, then `pnpm -r build` (which includes the CSS smoke test), then the suite above.
+
+### Publishing
+
+All `@tooark/*` packages share one version (root `package.json` is the source, `pnpm version` syncs `packages/*`). `.github/workflows/release.yml` runs on every push to `main`: when `@tooark/web-components@<version>` is not on npm yet it lints, builds, runs `check:publish` and the suite, then `pnpm -r publish --access public` (topological order, `workspace:^` rewritten, Angular published from `dist/` via `publishConfig.directory`, `NPM_TOKEN` secret + provenance), tags `vX.Y.Z` and creates the GitHub Release from the matching `CHANGELOG.md` section (`scripts/changelog-section.mjs`). Prerelease versions (`1.1.0-next.0`) go to the `next` dist-tag. Every package has `publishConfig.access: public`, `repository.directory`, a `README.md` (English, shown on npm) plus a `README.pt-BR.md` shipped in the tarball (`files`; ng-packagr `assets` for Angular), both in the same structure as the Tooark NuGet packages (contents, 📖 overview, 🔧 installation, ⚙️ configuration, 📦 components, 📝 usage examples, 📋 dependencies table generated from the manifest, 🪪 contributing, 📄 license), `sideEffects` listing its CSS, and the Rollup packages emit both `index.d.ts` and `index.d.cts` with `exports` split by `import`/`require` (publint strict + attw pass, keep it that way). React/Vue sources import relative modules with the `.js` extension because `tsc` emits them as written and Node ESM resolution needs it. `docs.yml` deploys the Storybook to GitHub Pages on push to `main`.
 
 ### Windows notes
 

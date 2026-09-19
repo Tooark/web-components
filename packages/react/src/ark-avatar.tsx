@@ -1,7 +1,7 @@
 import type { ArkAvatarStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkAvatarProps = ArkAvatarStyleOptions & {
   /** Nome da pessoa: vira aria-label e as iniciais (primeira letra, ou primeira + ultima com sobrenome). */

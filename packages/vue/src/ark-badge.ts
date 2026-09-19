@@ -1,6 +1,6 @@
 import type { ArkBadgeSize, ArkBadgeVariant, ArkIntent, ArkRounded, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkBadge = defineComponent({
   name: "ArkBadge",

@@ -1,6 +1,6 @@
 import type { ArkIntent, ArkRounded, ArkSelectOption, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkSelect = defineComponent({
   name: "ArkSelect",

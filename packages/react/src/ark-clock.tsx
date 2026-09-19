@@ -1,6 +1,6 @@
 import type { ArkClockStyleOptions, ArkDatepickerLang } from "@tooark/core";
 import React, { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkClockProps = ArkClockStyleOptions & {
   value?: string;

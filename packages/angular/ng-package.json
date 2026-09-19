@@ -4,6 +4,6 @@
   "lib": {
     "entryFile": "src/index.ts"
   },
-  "assets": ["LICENSE", "NOTICE"],
+  "assets": ["LICENSE", "NOTICE", "README.pt-BR.md"],
   "allowedNonPeerDependencies": ["@tooark/core", "@tooark/web-components"]
 }

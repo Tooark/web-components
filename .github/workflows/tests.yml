@@ -31,6 +31,10 @@ jobs:
       - name: Build packages
         run: pnpm -r build
 
+      # Empacota cada pacote como o publish faria e confere manifesto, exports e tipos (publint + attw).
+      - name: Check the tarballs (publint, attw)
+        run: pnpm check:publish
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install chromium --with-deps
 

@@ -1,7 +1,7 @@
 import type { ArkKvEditorStyleOptions, ArkKvRow } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect, useRef } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkKvEditorProps = ArkKvEditorStyleOptions & {
   /** Linhas { id, key, value, enabled }; atribuir substitui tudo e renderiza de novo. */

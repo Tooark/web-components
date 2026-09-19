@@ -1,7 +1,7 @@
 import type { ArkCommandItemStyleOptions, ArkCommandPaletteStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, type PropsWithChildren, useEffect, useRef } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkCommandPaletteProps = PropsWithChildren<
   ArkCommandPaletteStyleOptions & {

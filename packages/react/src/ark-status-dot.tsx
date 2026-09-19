@@ -1,7 +1,7 @@
 import type { ArkStatusDotStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkStatusDotProps = ArkStatusDotStyleOptions & {
   /** Com rotulo o ponto vira role="img" nomeado; sem ele e decorativo (aria-hidden). */

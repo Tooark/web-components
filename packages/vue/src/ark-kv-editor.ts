@@ -1,6 +1,6 @@
 import type { ArkKvBulkFormat, ArkKvRow, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkKvEditor = defineComponent({
   name: "ArkKvEditor",

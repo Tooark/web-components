@@ -1,7 +1,7 @@
 import type { ArkFileInputStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, useEffect, useRef } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkFileInputProps = ArkFileInputStyleOptions & {
   /** Tipos aceitos pelo seletor nativo (accept). */

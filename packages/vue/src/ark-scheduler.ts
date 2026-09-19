@@ -1,6 +1,6 @@
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkScheduler = defineComponent({
   name: "ArkScheduler",

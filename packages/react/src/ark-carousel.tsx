@@ -1,6 +1,6 @@
 import type { ArkCarouselSnap, ArkCarouselStyleOptions } from "@tooark/core";
 import React, { createElement, type PropsWithChildren, useCallback, useEffect } from "react";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkCarouselProps = PropsWithChildren<
   ArkCarouselStyleOptions & {

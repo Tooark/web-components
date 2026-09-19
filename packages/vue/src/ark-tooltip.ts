@@ -1,6 +1,6 @@
 import type { ArkTheme, ArkTooltipSide } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
-import { ensureTooarkComponentsRegistered } from "./register";
+import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export const ArkTooltip = defineComponent({
   name: "ArkTooltip",

@@ -170,6 +170,10 @@ tool trailers besides the DCO `Signed-off-by`.
   change in one requires the same change in the other.
 - Each component has three README entries: a row in the components table, a
   **key attributes** paragraph and a row in the **E2E test hooks** table.
+- Each package has its own `README.md` (English, the npm page) and `README.pt-BR.md`,
+  with the same sections in the same order (contents, overview, installation,
+  configuration, components, usage examples, dependencies, contributing, license); a
+  new attribute, event or export goes into both.
 - Storybook `docs.description` on the component and on non-obvious stories is
   the living documentation; write it in Portuguese without accents, like the
   stories themselves.
@@ -183,8 +187,14 @@ tool trailers besides the DCO `Signed-off-by`.
 - All `@tooark/*` packages share **one version** (lockstep). The root
   `package.json` is the source of truth; `pnpm version <patch|minor|major>`
   runs `scripts/sync-versions.mjs` and propagates it to `packages/*`.
-- Releases are cut by the maintainers from `main`: bump, `chore(release): vX.Y.Z`,
-  git tag `vX.Y.Z`, publish. Contributors do not bump versions in PRs.
+- Releases are cut by the maintainers from `main`: `pnpm version <patch|minor|major>`
+  (or `prerelease --preid next`), a `chore(release): vX.Y.Z` commit that also adds the
+  `## [X.Y.Z]` section to `CHANGELOG.md`, merge. The `release.yml` workflow sees a version
+  that is not on npm yet, runs lint, build, `pnpm check:publish` and the test suite, publishes
+  every package (`latest`, or `next` for prereleases) with provenance, creates the `vX.Y.Z`
+  tag and a GitHub Release with that changelog section. Contributors do not bump versions in PRs.
+- `pnpm check:publish` packs every package and runs publint + attw on the tarballs; run it
+  when you touch a `package.json`, an `exports` map or a Rollup config.
 - Breaking changes must be called out in the PR ("Notes for reviewers") and in
   the commit body (`BREAKING CHANGE:` footer).
 
