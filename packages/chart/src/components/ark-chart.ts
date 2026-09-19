@@ -1,3 +1,4 @@
+import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import type { EChartsOption } from "echarts";
 import { type ArkChartInstance, createChart } from "../engine";
 import type { ArkChartRenderer, ArkChartTheme } from "../types";
@@ -13,7 +14,9 @@ import type { ArkChartRenderer, ArkChartTheme } from "../types";
  *   document.body.appendChild(el);
  *
  * Atributos: `theme` ("auto" | "light" | "dark"), `renderer` ("canvas" | "svg"),
- * `height` (ex.: "320px" | "20rem") e `auto-resize` ("false" desliga).
+ * `height` (ex.: "320px" | "20rem") e `auto-resize` ("false" desliga). Em
+ * `auto` o tema segue o color-scheme da página e acompanha a troca em
+ * tempo de execução (`observeColorScheme` de @tooark/tokens).
  *
  * Eventos: dispara `ark-chart-click` (bubbles/composed) ao clicar em uma série,
  * com `detail` = params nativos do ECharts.
@@ -25,6 +28,8 @@ export class ArkChart extends HTMLElement {
   private instance: ArkChartInstance | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private pendingOption: EChartsOption | null = null;
+  /** Para de observar o tema da página; só existe com `theme="auto"`. */
+  private disposeTheme: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return ["theme", "renderer", "height", "auto-resize"];
@@ -43,6 +48,11 @@ export class ArkChart extends HTMLElement {
       // Ainda não conectado: aplica no connectedCallback.
       this.render();
     }
+  }
+
+  /** Tema efetivamente aplicado ao gráfico (depois de resolver `auto`); `null` antes de renderizar. */
+  get resolvedTheme(): ArkThemeSelected | null {
+    return this.instance?.resolvedTheme() ?? null;
   }
 
   connectedCallback(): void {
@@ -120,6 +130,16 @@ export class ArkChart extends HTMLElement {
     });
 
     this.syncAutoResize();
+    this.syncThemeObserver();
+  }
+
+  // Em `auto`, a troca de tema da página (classe/atributo em html ou body, preferência do sistema) re-resolve o
+  // tema do ECharts; com tema fixo não há o que observar.
+  private syncThemeObserver(): void {
+    this.disposeTheme?.();
+    this.disposeTheme = null;
+    if (this.getTheme() !== "auto") return;
+    this.disposeTheme = observeColorScheme(this, () => this.instance?.setTheme("auto"));
   }
 
   private syncAutoResize(): void {
@@ -137,6 +157,8 @@ export class ArkChart extends HTMLElement {
   private teardown(): void {
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
+    this.disposeTheme?.();
+    this.disposeTheme = null;
     this.instance?.destroy();
     this.instance = null;
     if (this.container) {

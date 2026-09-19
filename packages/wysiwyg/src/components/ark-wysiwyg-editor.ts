@@ -1,4 +1,5 @@
 import type { Editor } from "@tiptap/core";
+import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import { type ArkWysiwygInstance, createWysiwygEditor } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme, ArkWysiwygToolbarItem } from "../types";
@@ -107,6 +108,8 @@ export class ArkWysiwygEditor extends HTMLElement {
   private root: HTMLDivElement | null = null;
   private toolbarButtons: Array<{ item: ArkWysiwygToolbarItem; button: HTMLButtonElement }> = [];
   private pendingContent: ArkWysiwygContent | null = null;
+  /** Para de observar o tema da página; só existe com `theme="auto"`. */
+  private disposeTheme: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return ["theme", "placeholder", "editable", "toolbar"];
@@ -122,6 +125,11 @@ export class ArkWysiwygEditor extends HTMLElement {
     this.instance?.setContent(value);
   }
 
+  /** Tema efetivamente aplicado (depois de resolver `auto`); `null` antes de renderizar. */
+  get resolvedTheme(): ArkThemeSelected | null {
+    return this.instance?.resolvedTheme() ?? null;
+  }
+
   connectedCallback(): void {
     ensureWysiwygStyles();
     this.build();
@@ -135,7 +143,8 @@ export class ArkWysiwygEditor extends HTMLElement {
     if (oldValue === newValue || !this.instance) return;
 
     if (name === "theme") {
-      this.instance.setTheme(this.getTheme());
+      this.applyTheme(this.getTheme());
+      this.syncThemeObserver();
       return;
     }
     if (name === "editable") {
@@ -210,6 +219,23 @@ export class ArkWysiwygEditor extends HTMLElement {
 
     this.instance.editor.on("selectionUpdate", this.syncToolbar);
     this.syncToolbar();
+    this.root.setAttribute("data-ark-theme", this.instance.resolvedTheme());
+    this.syncThemeObserver();
+  }
+
+  // Em `auto`, a troca de tema da página re-resolve o tema do editor; com tema fixo não há o que observar.
+  private syncThemeObserver(): void {
+    this.disposeTheme?.();
+    this.disposeTheme = null;
+    if (this.getTheme() !== "auto") return;
+    this.disposeTheme = observeColorScheme(this, () => this.applyTheme("auto"));
+  }
+
+  // O engine marca o mount com data-ark-theme; o CSS do tema lê a raiz .ark-wysiwyg, então ela recebe o mesmo.
+  private applyTheme(theme: ArkWysiwygTheme): void {
+    if (!this.instance) return;
+    this.instance.setTheme(theme);
+    this.root?.setAttribute("data-ark-theme", this.instance.resolvedTheme());
   }
 
   private buildToolbar(items: ArkWysiwygToolbarItem[]): HTMLDivElement {
@@ -247,6 +273,8 @@ export class ArkWysiwygEditor extends HTMLElement {
   };
 
   private teardown(): void {
+    this.disposeTheme?.();
+    this.disposeTheme = null;
     if (this.instance) {
       this.instance.editor.off("selectionUpdate", this.syncToolbar);
       this.instance.destroy();

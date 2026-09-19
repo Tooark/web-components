@@ -1,4 +1,5 @@
 import type { ArkChart, EChartsOption } from "@tooark/chart";
+import { expect, waitFor } from "storybook/test";
 
 const meta = {
   title: "Chart/ArkChart",
@@ -137,4 +138,38 @@ export const ScatterSvg = {
     renderer: "svg"
   },
   render: renderChart
+};
+
+export const FollowsPageTheme = {
+  args: {
+    theme: "auto"
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Em `theme="auto"` o grafico resolve o color-scheme da pagina e acompanha a troca em tempo de execucao (`observeColorScheme` de @tooark/tokens observa html/body e a preferencia do sistema). `resolvedTheme` expoe o lado aplicado.'
+      }
+    }
+  },
+  render: renderChart,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const chart = canvasElement.querySelector("ark-chart") as ArkChart;
+    const root = document.documentElement;
+    const before = root.style.colorScheme;
+    try {
+      root.style.colorScheme = "light";
+      await waitFor(() => expect(chart.resolvedTheme).toBe("light"));
+      root.style.colorScheme = "dark";
+      await waitFor(() => expect(chart.resolvedTheme).toBe("dark"));
+      // Tema fixo ignora a pagina.
+      chart.setAttribute("theme", "light");
+      await waitFor(() => expect(chart.resolvedTheme).toBe("light"));
+      root.style.colorScheme = "light";
+      chart.setAttribute("theme", "auto");
+      await waitFor(() => expect(chart.resolvedTheme).toBe("light"));
+    } finally {
+      root.style.colorScheme = before;
+    }
+  }
 };

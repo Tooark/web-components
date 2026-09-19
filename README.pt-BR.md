@@ -398,7 +398,7 @@ Se o seu app já tem as próprias variáveis de design (um tema gerado, outro de
 
 Overrides de duração e easing seguem a regra do [sistema de motion](#sistema-de-motion): mantenha-os dentro de `@media (prefers-reduced-motion: no-preference)`.
 
-`ark-chart` e `ark-wysiwyg` não podem ser tematizados só por CSS (ECharts e Tiptap pintam as próprias cores), então o `theme="auto"` deles resolve o `color-scheme` computado do host quando o elemento é criado: uma página que força `dark` recebe um gráfico escuro, uma página que o deixa em `light dark` (ou sem declarar) segue a preferência do sistema. Essa resolução não roda de novo quando a página troca de tema depois, então um app que alterna o tema em tempo de execução deve dirigir `theme="light|dark"` nesses dois elementos junto com a página.
+`ark-chart` e `ark-wysiwyg` não podem ser tematizados só por CSS (ECharts e Tiptap pintam as próprias cores), então o `theme="auto"` deles resolve o `color-scheme` computado do host quando o elemento é criado: uma página que força `dark` recebe um gráfico escuro, uma página que o deixa em `light dark` (ou sem declarar) segue a preferência do sistema. A resolução acompanha a página enquanto o elemento está conectado: `observeColorScheme(element, onChange)` do `@tooark/tokens` observa os atributos `class`, `style`, `data-theme` e `theme` de `<html>` e `<body>` (onde os apps trocam o tema) mais a preferência do sistema, então um gráfico ou editor deixado em `auto` segue a troca de tema em tempo de execução; `theme="light|dark"` continua forçando um lado.
 
 Para reaproveitar os mesmos tokens como utilities (`bg-primary`, `text-fg-muted`, …) no seu próprio projeto Tailwind v4, importe-os no seu entry CSS:
 

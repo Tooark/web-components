@@ -1,4 +1,5 @@
 import type { ArkWysiwygContent, ArkWysiwygEditor, ArkWysiwygViewer } from "@tooark/wysiwyg";
+import { expect, waitFor } from "storybook/test";
 
 const meta = {
   title: "Wysiwyg/ArkWysiwyg",
@@ -80,6 +81,51 @@ export const Viewer = {
     viewer.style.maxWidth = "720px";
     viewer.content = SAMPLE_CONTENT;
     return viewer;
+  }
+};
+
+export const FollowsPageTheme = {
+  args: {
+    theme: "auto"
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Em `theme="auto"` editor e viewer resolvem o color-scheme da pagina e acompanham a troca em tempo de execucao (`observeColorScheme` de @tooark/tokens). `resolvedTheme` expoe o lado aplicado; o wrapper leva `data-ark-theme`.'
+      }
+    }
+  },
+  render: (args: StoryArgs): HTMLElement => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "16px";
+    wrap.style.maxWidth = "720px";
+    const editor = makeEditor(args);
+    const viewer = document.createElement("ark-wysiwyg-viewer") as ArkWysiwygViewer;
+    viewer.setAttribute("theme", args.theme);
+    viewer.style.display = "block";
+    viewer.content = SAMPLE_CONTENT;
+    wrap.append(editor, viewer);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-wysiwyg-editor") as ArkWysiwygEditor;
+    const viewer = canvasElement.querySelector("ark-wysiwyg-viewer") as ArkWysiwygViewer;
+    const root = document.documentElement;
+    const before = root.style.colorScheme;
+    try {
+      root.style.colorScheme = "light";
+      await waitFor(() => expect(editor.resolvedTheme).toBe("light"));
+      root.style.colorScheme = "dark";
+      await waitFor(() => expect(editor.resolvedTheme).toBe("dark"));
+      await waitFor(() => expect(viewer.resolvedTheme).toBe("dark"));
+      expect(editor.querySelector(".ark-wysiwyg")).toHaveAttribute("data-ark-theme", "dark");
+      root.style.colorScheme = "light";
+      await waitFor(() => expect(viewer.querySelector(".ark-wysiwyg")).toHaveAttribute("data-ark-theme", "light"));
+    } finally {
+      root.style.colorScheme = before;
+    }
   }
 };
 
