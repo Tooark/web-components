@@ -210,6 +210,7 @@ declare global {
         placeholder?: string;
         hotkey?: string;
         filter?: boolean;
+        "no-scroll-lock"?: boolean;
         "query-delay"?: number | string;
         label?: string;
         theme?: ArkTheme;
@@ -273,6 +274,7 @@ declare global {
         label?: string;
         "no-close-button"?: boolean;
         persistent?: boolean;
+        "no-scroll-lock"?: boolean;
         theme?: ArkTheme;
         lang?: ArkLang;
         "locale-json"?: string;
@@ -349,6 +351,7 @@ declare global {
         label?: string;
         "no-close-button"?: boolean;
         persistent?: boolean;
+        "no-scroll-lock"?: boolean;
         theme?: ArkTheme;
         lang?: ArkLang;
         "locale-json"?: string;

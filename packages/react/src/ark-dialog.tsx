@@ -12,6 +12,8 @@ export type ArkDialogProps = PropsWithChildren<
     noCloseButton?: boolean;
     /** Esc e clique no scrim nao fecham. */
     persistent?: boolean;
+    /** A pagina continua rolando com o dialogo aberto. */
+    noScrollLock?: boolean;
     "aria-label"?: string;
     className?: string;
     onOpen?: (event: CustomEvent) => void;
@@ -21,8 +23,20 @@ export type ArkDialogProps = PropsWithChildren<
 >;
 
 export function ArkDialog(props: ArkDialogProps): React.JSX.Element {
-  const { children, className, open, width, height, noCloseButton, persistent, localeJson, onOpen, onClose, ...rest } =
-    props;
+  const {
+    children,
+    className,
+    open,
+    width,
+    height,
+    noCloseButton,
+    persistent,
+    noScrollLock,
+    localeJson,
+    onOpen,
+    onClose,
+    ...rest
+  } = props;
   const ref = React.useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -53,6 +67,7 @@ export function ArkDialog(props: ArkDialogProps): React.JSX.Element {
     height: height === undefined ? undefined : String(height),
     "no-close-button": noCloseButton ? "" : undefined,
     persistent: persistent ? "" : undefined,
+    "no-scroll-lock": noScrollLock ? "" : undefined,
     "locale-json": localeJson
   };
 

@@ -24,6 +24,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.label]="label"
     [attr.no-close-button]="noCloseButton ? '' : null"
     [attr.persistent]="persistent ? '' : null"
+    [attr.no-scroll-lock]="noScrollLock ? '' : null"
     [attr.size]="size"
     [attr.width]="width"
     [attr.height]="height"
@@ -48,6 +49,8 @@ export class ArkDialogComponent implements AfterViewInit, OnDestroy {
   @Input() noCloseButton = false;
   /** Esc e clique no scrim não fecham. */
   @Input() persistent = false;
+  /** A página continua rolando com o diálogo aberto. */
+  @Input() noScrollLock = false;
   /** Largura máxima do painel; "full" ocupa a viewport inteira. Padrão: "md". */
   @Input() size: ArkDialogSize = "md";
   /** Largura própria (comprimento CSS; número vira px), acima do preset e limitada à viewport. */

@@ -13,6 +13,8 @@ export type ArkDrawerProps = PropsWithChildren<
     noCloseButton?: boolean;
     /** Esc e clique no scrim nao fecham (so no overlay). */
     persistent?: boolean;
+    /** A pagina continua rolando com a gaveta aberta em overlay. */
+    noScrollLock?: boolean;
     "aria-label"?: string;
     className?: string;
     onOpen?: (event: CustomEvent) => void;
@@ -22,7 +24,19 @@ export type ArkDrawerProps = PropsWithChildren<
 >;
 
 export function ArkDrawer(props: ArkDrawerProps): React.JSX.Element {
-  const { children, className, open, size, noCloseButton, persistent, localeJson, onOpen, onClose, ...rest } = props;
+  const {
+    children,
+    className,
+    open,
+    size,
+    noCloseButton,
+    persistent,
+    noScrollLock,
+    localeJson,
+    onOpen,
+    onClose,
+    ...rest
+  } = props;
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -52,6 +66,7 @@ export function ArkDrawer(props: ArkDrawerProps): React.JSX.Element {
     size: size === undefined ? undefined : String(size),
     "no-close-button": noCloseButton ? "" : undefined,
     persistent: persistent ? "" : undefined,
+    "no-scroll-lock": noScrollLock ? "" : undefined,
     "locale-json": localeJson
   };
 

@@ -23,6 +23,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.open]="open ? '' : null"
     [attr.placeholder]="placeholder"
     [attr.hotkey]="hotkey"
+    [attr.no-scroll-lock]="noScrollLock ? '' : null"
     [attr.filter]="filter ? '' : null"
     [attr.query-delay]="queryDelay"
     [attr.label]="label"
@@ -45,6 +46,8 @@ export class ArkCommandPaletteComponent implements AfterViewInit, OnDestroy {
   @Input() placeholder: string | undefined;
   /** Atalho global: "/", "mod+k" (Ctrl ou Cmd), "ctrl+shift+p"... */
   @Input() hotkey: string | undefined;
+  /** A página continua rolando com a paleta aberta. */
+  @Input() noScrollLock = false;
   /** Filtra localmente pelo label dos itens. */
   @Input() filter = false;
   /** Debounce de ark-query em ms. Padrão: 150. */

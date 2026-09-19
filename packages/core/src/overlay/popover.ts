@@ -3,6 +3,13 @@
 
 import { arkEnter, arkExit } from "../motion/animate";
 import type { ArkMotionOptions, ArkMotionPreset } from "../motion/types";
+import { lockScroll, unlockScroll } from "./scroll-lock";
+
+/** Opções de `openPopover`: as da animação de entrada mais a trava de rolagem. */
+export type ArkPopoverOptions = ArkMotionOptions & {
+  /** Trava a rolagem da página enquanto o popover está aberto (liberada no `closePopover`). Padrão: false. */
+  lockScroll?: boolean;
+};
 
 // Saídas em andamento por host: uma reabertura no meio da animação invalida o hidePopover() pendente.
 const closing = new WeakMap<HTMLElement, object>();
@@ -24,16 +31,18 @@ function cancelAnimations(host: HTMLElement): void {
 /**
  * Mostra o host como popover (top layer) e anima a entrada com `arkEnter`; resolve ao fim da entrada, imediato
  * com movimento reduzido. O host precisa do atributo `popover` e de estar conectado. Uma saída ainda em curso é
- * cancelada. Sem suporte à Popover API só anima.
+ * cancelada. Com `lockScroll`, a página para de rolar até o `closePopover` (ou `unlockScroll(host)`) do mesmo
+ * host. Sem suporte à Popover API só anima.
  */
 export function openPopover(
   host: HTMLElement,
   preset: ArkMotionPreset = "fade",
-  options: ArkMotionOptions = {}
+  options: ArkPopoverOptions = {}
 ): Promise<void> {
   closing.delete(host);
   // A saída anterior fica com fill forwards (opacidade 0) até ser cancelada.
   cancelAnimations(host);
+  if (options.lockScroll) lockScroll(host);
 
   if (!isPopoverOpen(host) && typeof host.showPopover === "function") {
     try {
@@ -48,8 +57,8 @@ export function openPopover(
 
 /**
  * Anima a saída com `arkExit` e só então tira o host do top layer com `hidePopover()`, para a animação rodar
- * visível; resolve depois de escondido. Se `openPopover` for chamado no meio, a saída é abandonada e o host
- * continua aberto.
+ * visível, e libera a trava de rolagem que o host tiver; resolve depois de escondido. Se `openPopover` for
+ * chamado no meio, a saída é abandonada e o host continua aberto.
  */
 export function closePopover(
   host: HTMLElement,
@@ -70,5 +79,6 @@ export function closePopover(
         // Já escondido ou desconectado: nada a fazer.
       }
     }
+    unlockScroll(host);
   });
 }

@@ -17,6 +17,8 @@ export type ArkCommandPaletteProps = PropsWithChildren<
     queryDelay?: number;
     /** Nome acessivel do dialogo. */
     label?: string;
+    /** A pagina continua rolando com a paleta aberta. */
+    noScrollLock?: boolean;
     "aria-label"?: string;
     className?: string;
     onSelect?: (event: CustomEvent<{ value: string }>) => void;
@@ -27,8 +29,20 @@ export type ArkCommandPaletteProps = PropsWithChildren<
 >;
 
 export function ArkCommandPalette(props: ArkCommandPaletteProps): React.JSX.Element {
-  const { children, className, open, filter, queryDelay, localeJson, onSelect, onQuery, onOpen, onClose, ...rest } =
-    props;
+  const {
+    children,
+    className,
+    open,
+    filter,
+    queryDelay,
+    noScrollLock,
+    localeJson,
+    onSelect,
+    onQuery,
+    onOpen,
+    onClose,
+    ...rest
+  } = props;
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -61,6 +75,7 @@ export function ArkCommandPalette(props: ArkCommandPaletteProps): React.JSX.Elem
     class: className,
     open: open ? "" : undefined,
     filter: filter ? "" : undefined,
+    "no-scroll-lock": noScrollLock ? "" : undefined,
     "query-delay": queryDelay === undefined ? undefined : String(queryDelay),
     "locale-json": localeJson
   };

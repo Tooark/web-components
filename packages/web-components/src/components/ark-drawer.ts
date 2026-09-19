@@ -11,7 +11,8 @@ import {
   focusableElements,
   openPopover,
   resolveLocale,
-  trapFocus
+  trapFocus,
+  unlockScroll
 } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
@@ -42,7 +43,8 @@ type ArkDrawerState = "closed" | "open" | "closing";
  * primeiro filho, marcado `data-ark-chrome`. `side` escolhe a borda, a
  * direção do slide (com o easing `sheet`) e a borda desenhada; `size` é um
  * preset ou um comprimento CSS no eixo da gaveta. `open` é a fonte da
- * verdade, como no ark-dialog.
+ * verdade, como no ark-dialog, e em overlay a página para de rolar enquanto
+ * aberta, salvo com `no-scroll-lock`.
  */
 export class ArkDrawer extends HTMLElement {
   static readonly tagName = "ark-drawer";
@@ -97,6 +99,7 @@ export class ArkDrawer extends HTMLElement {
     this.observer = null;
     this.releaseTrap?.();
     this.releaseTrap = null;
+    unlockScroll(this);
     this.state = "closed";
     this.removeAttribute("data-ark-state");
   }
@@ -144,6 +147,15 @@ export class ArkDrawer extends HTMLElement {
     this.toggleAttribute("persistent", coerceBooleanAttr(value));
   }
 
+  /** A página continua rolando com a gaveta aberta em overlay (atributo `no-scroll-lock`). */
+  get noScrollLock(): boolean {
+    return this.hasAttribute("no-scroll-lock");
+  }
+
+  set noScrollLock(value: boolean | string | null | undefined) {
+    this.toggleAttribute("no-scroll-lock", coerceBooleanAttr(value));
+  }
+
   /** Borda onde a gaveta encosta. Padrão: "right". */
   get side(): ArkDrawerSide {
     const side = (this.getAttribute("side") || "").toLowerCase();
@@ -188,8 +200,8 @@ export class ArkDrawer extends HTMLElement {
     this.warnWithoutName();
 
     if (this.mode === "overlay") {
-      // Percorre a própria largura/altura: entra de fora da viewport.
-      void openPopover(this, this.preset(), { distance: "100%", easing: "sheet" });
+      // Percorre a própria largura/altura: entra de fora da viewport. Overlay é modal: a página para de rolar.
+      void openPopover(this, this.preset(), { distance: "100%", easing: "sheet", lockScroll: !this.noScrollLock });
       this.releaseTrap?.();
       this.releaseTrap = trapFocus(this, {
         initial: this.initialFocus(),

@@ -7,7 +7,8 @@ import {
   focusableElements,
   openPopover,
   resolveLocale,
-  trapFocus
+  trapFocus,
+  unlockScroll
 } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
@@ -41,7 +42,8 @@ type ArkDialogState = "closed" | "open" | "closing";
  * alternam, e a saída anima antes de sair do top layer mesmo quando um
  * framework remove o atributo. A Popover API não aplica `inert` ao resto da
  * página: o `trapFocus` de core cobre teclado e ponteiro; um leitor de tela
- * navegando por cursor virtual ainda alcança o conteúdo atrás.
+ * navegando por cursor virtual ainda alcança o conteúdo atrás. A página para
+ * de rolar enquanto aberto (`lockScroll` de core), salvo com `no-scroll-lock`.
  */
 export class ArkDialog extends HTMLElement {
   static readonly tagName = "ark-dialog";
@@ -98,9 +100,10 @@ export class ArkDialog extends HTMLElement {
   disconnectedCallback(): void {
     this.observer?.disconnect();
     this.observer = null;
-    // Saiu do DOM aberto: o navegador já o tirou do top layer; libera o trap e o estado sem animar.
+    // Saiu do DOM aberto: o navegador já o tirou do top layer; libera o trap, a rolagem e o estado sem animar.
     this.releaseTrap?.();
     this.releaseTrap = null;
+    unlockScroll(this);
     this.state = "closed";
     this.removeAttribute("data-ark-state");
   }
@@ -148,6 +151,15 @@ export class ArkDialog extends HTMLElement {
     this.toggleAttribute("persistent", coerceBooleanAttr(value));
   }
 
+  /** A página continua rolando com o diálogo aberto (atributo `no-scroll-lock`). */
+  get noScrollLock(): boolean {
+    return this.hasAttribute("no-scroll-lock");
+  }
+
+  set noScrollLock(value: boolean | string | null | undefined) {
+    this.toggleAttribute("no-scroll-lock", coerceBooleanAttr(value));
+  }
+
   /** Abre o diálogo: adiciona `open`, que faz o resto. */
   show(): void {
     if (!this.open) this.setAttribute("open", "");
@@ -170,7 +182,7 @@ export class ArkDialog extends HTMLElement {
     this.warnWithoutName();
 
     // showPopover() antes do foco: os focáveis só têm caixas com o painel visível.
-    void openPopover(this, "scale");
+    void openPopover(this, "scale", { lockScroll: !this.noScrollLock });
     this.releaseTrap?.();
     this.releaseTrap = trapFocus(this, {
       initial: this.initialFocus(),

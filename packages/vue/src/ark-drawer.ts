@@ -14,6 +14,7 @@ export const ArkDrawer = defineComponent({
     label: { type: String, default: undefined },
     noCloseButton: { type: Boolean, default: false },
     persistent: { type: Boolean, default: false },
+    noScrollLock: { type: Boolean, default: false },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     lang: { type: String as PropType<ArkLang>, default: undefined },
     localeJson: { type: String, default: undefined }
@@ -47,6 +48,7 @@ export const ArkDrawer = defineComponent({
           label: props.label,
           "no-close-button": props.noCloseButton ? "" : undefined,
           persistent: props.persistent ? "" : undefined,
+          "no-scroll-lock": props.noScrollLock ? "" : undefined,
           theme: props.theme,
           lang: props.lang,
           "locale-json": props.localeJson

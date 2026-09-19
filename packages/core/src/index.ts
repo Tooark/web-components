@@ -11,9 +11,20 @@ export type {
   ArkAnchorRect,
   ArkAnchorSide,
   ArkFocusTrapOptions,
+  ArkPopoverOptions,
   ArkPositionAnchoredOptions
 } from "./overlay";
-export { closePopover, focusableElements, isPopoverOpen, openPopover, positionAnchored, trapFocus } from "./overlay";
+export {
+  closePopover,
+  focusableElements,
+  isPopoverOpen,
+  isScrollLocked,
+  lockScroll,
+  openPopover,
+  positionAnchored,
+  trapFocus,
+  unlockScroll
+} from "./overlay";
 export type { ArkAnnouncePoliteness } from "./services";
 export { announce, dismissToast, showToast, toast } from "./services";
 export type {

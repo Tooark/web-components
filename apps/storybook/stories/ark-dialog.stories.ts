@@ -1,4 +1,4 @@
-import type { ArkDialogSize, ArkTheme } from "@tooark/core";
+import { type ArkDialogSize, type ArkTheme, isScrollLocked } from "@tooark/core";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -393,6 +393,56 @@ export const CloseButtonAndReopen = {
     expect(dialog.querySelector('[data-ark="dialog-close"]')).toBeNull();
     await userEvent.click(canvas.getByText("Cancelar"));
     expect(reasons).toEqual(["close-button", "api"]);
+    await closed(dialog);
+  }
+};
+
+export const LocksPageScroll = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Com o dialogo aberto a pagina para de rolar (`lockScroll` de core: `overflow: hidden` na raiz e `padding-right` do tamanho da barra que sumiu, exposto em `--ark-scroll-lock-gap`); a trava e liberada depois da saida. `no-scroll-lock` desliga."
+      }
+    }
+  },
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-3";
+    const scene = createScene({ label: "Trava a rolagem", lang: "pt" });
+    const filler = document.createElement("div");
+    filler.className = "h-[140vh] rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-500";
+    filler.textContent = "Conteudo alto: role a pagina, abra o dialogo e a rolagem para; feche e volta.";
+    wrap.append(scene, filler);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const root = document.documentElement;
+    const before = root.style.overflow;
+
+    await userEvent.click(canvas.getByText("Abrir"));
+    expect(isScrollLocked()).toBe(true);
+    expect(root.style.overflow).toBe("hidden");
+    expect(root.style.getPropertyValue("--ark-scroll-lock-gap")).toMatch(/^\d+px$/);
+
+    // A trava dura ate o fim da saida (o scrim ainda esta visivel enquanto anima).
+    dialog.close();
+    await expect(dialog).toHaveAttribute("data-ark-state", "closing");
+    expect(isScrollLocked()).toBe(true);
+    await closed(dialog);
+    await waitFor(() => expect(isScrollLocked()).toBe(false));
+    expect(root.style.overflow).toBe(before);
+    expect(root.style.getPropertyValue("--ark-scroll-lock-gap")).toBe("");
+
+    // Opt-out: a pagina continua rolando.
+    dialog.setAttribute("no-scroll-lock", "");
+    dialog.show();
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
+    expect(isScrollLocked()).toBe(false);
+    expect(root.style.overflow).toBe(before);
+    dialog.close();
     await closed(dialog);
   }
 };

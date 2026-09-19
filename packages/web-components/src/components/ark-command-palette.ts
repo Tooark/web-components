@@ -1,4 +1,12 @@
-import { type ArkLocale, closePopover, coerceBooleanAttr, openPopover, resolveLocale, trapFocus } from "@tooark/core";
+import {
+  type ArkLocale,
+  closePopover,
+  coerceBooleanAttr,
+  openPopover,
+  resolveLocale,
+  trapFocus,
+  unlockScroll
+} from "@tooark/core";
 import { ArkCommandItem } from "./ark-command-item";
 import type { ArkInput } from "./ark-input";
 import { applyTestHooks } from "./test-hooks";
@@ -23,7 +31,8 @@ function normalize(text: string): string {
  * filhos. Com `filter` o texto filtra localmente pelo `label` dos itens; em
  * qualquer caso `ark-query` sai com debounce para busca assíncrona. O foco
  * fica sempre no campo; setas movem a opção ativa (`aria-activedescendant`),
- * Enter seleciona, Esc fecha; `hotkey` abre de qualquer lugar da página.
+ * Enter seleciona, Esc fecha; `hotkey` abre de qualquer lugar da página. A
+ * página para de rolar enquanto aberta, salvo com `no-scroll-lock`.
  */
 export class ArkCommandPalette extends HTMLElement {
   static readonly tagName = "ark-command-palette";
@@ -85,6 +94,7 @@ export class ArkCommandPalette extends HTMLElement {
     this.queryTimer = null;
     this.releaseTrap?.();
     this.releaseTrap = null;
+    unlockScroll(this);
     this.state = "closed";
     this.removeAttribute("data-ark-state");
   }
@@ -120,6 +130,15 @@ export class ArkCommandPalette extends HTMLElement {
     } else {
       this.close();
     }
+  }
+
+  /** A página continua rolando com a paleta aberta (atributo `no-scroll-lock`). */
+  get noScrollLock(): boolean {
+    return this.hasAttribute("no-scroll-lock");
+  }
+
+  set noScrollLock(value: boolean | string | null | undefined) {
+    this.toggleAttribute("no-scroll-lock", coerceBooleanAttr(value));
   }
 
   /** Texto atual do campo de busca. */
@@ -353,7 +372,7 @@ export class ArkCommandPalette extends HTMLElement {
     this.warnWithoutName();
     this.syncItems();
 
-    void openPopover(this, "scale");
+    void openPopover(this, "scale", { lockScroll: !this.noScrollLock });
     const field = this.inputEl?.inputElement ?? null;
     this.releaseTrap?.();
     this.releaseTrap = trapFocus(this, {

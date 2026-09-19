@@ -27,6 +27,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.label]="label"
     [attr.no-close-button]="noCloseButton ? '' : null"
     [attr.persistent]="persistent ? '' : null"
+    [attr.no-scroll-lock]="noScrollLock ? '' : null"
     [attr.theme]="theme"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
@@ -54,6 +55,8 @@ export class ArkDrawerComponent implements AfterViewInit, OnDestroy {
   @Input() noCloseButton = false;
   /** Esc e clique no scrim não fecham (só no overlay). */
   @Input() persistent = false;
+  /** A página continua rolando com a gaveta aberta em overlay. */
+  @Input() noScrollLock = false;
   @Input() theme: ArkTheme = "auto";
   @Input() lang: ArkLang | undefined;
   @Input() localeJson: string | undefined;
