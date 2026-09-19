@@ -560,7 +560,7 @@ export class ArkKvEditor extends HTMLElement {
         this.rowEls.set(row.id, el);
       }
       // Ordem do modelo: insere depois da anterior.
-      const anchor = previous ? previous.nextSibling : this.listEl.firstChild;
+      const anchor: ChildNode | null = previous ? previous.nextSibling : this.listEl.firstChild;
       if (el !== anchor) this.listEl.insertBefore(el, anchor);
       previous = el;
 

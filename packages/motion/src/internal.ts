@@ -13,7 +13,8 @@ export const ARK_EASE_BEZIER: Record<ArkEasing, [number, number, number, number]
   in: [0.4, 0, 1, 1],
   out: [0, 0, 0.2, 1],
   "in-out": [0.4, 0, 0.2, 1],
-  overshoot: [0.34, 1.56, 0.64, 1]
+  overshoot: [0.34, 1.56, 0.64, 1],
+  sheet: [0.32, 0.72, 0, 1]
 };
 
 /**

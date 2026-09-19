@@ -21,7 +21,9 @@ export default [
         outDir: "dist",
         declaration: false,
         declarationMap: false,
-        declarationDir: undefined
+        declarationDir: undefined,
+        // Erro de tipo derruba o build: por padrao o plugin so avisa e o rollup segue.
+        noEmitOnError: true
       })
     ],
     external

@@ -191,7 +191,7 @@ export class ArkShapePicker extends HTMLElement {
     this.options.forEach((option, index) => {
       const shape = ARK_MARK_SHAPES[index];
       const selected = index === selectedIndex;
-      option.setAttribute("aria-label", locale[SHAPE_LABEL[shape]]);
+      option.setAttribute("aria-label", String(locale[SHAPE_LABEL[shape]]));
       option.setAttribute("aria-checked", selected ? "true" : "false");
       option.tabIndex = index === stop ? 0 : -1;
       option.disabled = disabled;
