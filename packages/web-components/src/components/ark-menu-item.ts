@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -57,8 +57,8 @@ export class ArkMenuItem extends HTMLElement {
     return this.hasAttribute("disabled");
   }
 
-  set disabled(value: boolean) {
-    this.toggleAttribute("disabled", Boolean(value));
+  set disabled(value: boolean | string | null | undefined) {
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /** Marcado; só faz sentido num item checkbox (atributo `checked` presente, `"false"` é desmarcado). */
@@ -66,8 +66,8 @@ export class ArkMenuItem extends HTMLElement {
     return this.hasAttribute("checked") && this.getAttribute("checked") !== "false";
   }
 
-  set checked(value: boolean) {
-    this.setAttribute("checked", value ? "" : "false");
+  set checked(value: boolean | string | null | undefined) {
+    this.setAttribute("checked", coerceBooleanAttr(value) ? "" : "false");
   }
 
   /** Item selecionável (não é divisor nem conteúdo estático). */

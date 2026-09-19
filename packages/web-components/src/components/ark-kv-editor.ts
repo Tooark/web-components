@@ -4,6 +4,7 @@ import {
   type ArkLocale,
   type ArkSize,
   announce,
+  coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
 import type { ArkButton } from "./ark-button";
@@ -187,7 +188,7 @@ export class ArkKvEditor extends HTMLElement {
   }
 
   set bulk(value: boolean | string | null | undefined) {
-    this.toggleAttribute("bulk", ArkKvEditor.truthy(value));
+    this.toggleAttribute("bulk", coerceBooleanAttr(value));
   }
 
   /** Formato do modo em massa. Padrão: "lines". */
@@ -222,7 +223,7 @@ export class ArkKvEditor extends HTMLElement {
   }
 
   set description(value: boolean | string | null | undefined) {
-    this.toggleAttribute("description", ArkKvEditor.truthy(value));
+    this.toggleAttribute("description", coerceBooleanAttr(value));
   }
 
   /** Cadeado de segredo por linha visível (atributo `secret`). */
@@ -231,7 +232,7 @@ export class ArkKvEditor extends HTMLElement {
   }
 
   set secret(value: boolean | string | null | undefined) {
-    this.toggleAttribute("secret", ArkKvEditor.truthy(value));
+    this.toggleAttribute("secret", coerceBooleanAttr(value));
   }
 
   get readonly(): boolean {
@@ -239,7 +240,7 @@ export class ArkKvEditor extends HTMLElement {
   }
 
   set readonly(value: boolean | string | null | undefined) {
-    this.toggleAttribute("readonly", ArkKvEditor.truthy(value));
+    this.toggleAttribute("readonly", coerceBooleanAttr(value));
   }
 
   /** Acrescenta uma linha vazia (ou com os campos dados), foca a chave, emite `ark-add` e `change`, anuncia. */
@@ -283,10 +284,6 @@ export class ArkKvEditor extends HTMLElement {
       );
     }
     return this.model.map((row) => `${row.enabled ? "" : "#"}${row.key}:${row.value}`).join("\n");
-  }
-
-  private static truthy(value: boolean | string | null | undefined): boolean {
-    return value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
   }
 
   private getLocale(): ArkLocale {

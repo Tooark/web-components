@@ -1,4 +1,5 @@
 import type { ArkButtonStyleOptions, ArkButtonType, ArkRounded, ArkSize } from "@tooark/core";
+import type { ArkButton } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -338,6 +339,39 @@ export const HostIsTheControl = {
     await userEvent.keyboard("{Enter}");
     await userEvent.keyboard(" ");
     await expect(clicks).toBe(3);
+  }
+};
+
+export const FrameworkProperties = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'O React 19 escreve propriedades nos custom elements quando o accessor existe, e os wrappers passam `""` para atributo presente. Os setters booleanos aceitam `""` como ligado e `"false"` como desligado.'
+      }
+    }
+  },
+  render: () => {
+    const el = document.createElement("ark-button");
+    el.textContent = "Salvar";
+    return el;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector<ArkButton>("ark-button")!;
+
+    host.disabled = "" as unknown as boolean;
+    await expect(host).toHaveAttribute("disabled");
+    host.disabled = "false" as unknown as boolean;
+    await expect(host).not.toHaveAttribute("disabled");
+
+    host.loading = "" as unknown as boolean;
+    await expect(host).toHaveAttribute("loading");
+    host.loading = false;
+    await expect(host).not.toHaveAttribute("loading");
+    host.loading = "true" as unknown as boolean;
+    await expect(host).toHaveAttribute("loading");
+    host.loading = null as unknown as boolean;
+    await expect(host).not.toHaveAttribute("loading");
   }
 };
 

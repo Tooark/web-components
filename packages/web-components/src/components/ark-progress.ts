@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -82,7 +82,7 @@ export class ArkProgress extends HTMLElement {
   }
 
   set indeterminate(value: boolean | string | null | undefined) {
-    this.toggleAttribute("indeterminate", ArkProgress.truthy(value));
+    this.toggleAttribute("indeterminate", coerceBooleanAttr(value));
   }
 
   get showValue(): boolean {
@@ -90,11 +90,7 @@ export class ArkProgress extends HTMLElement {
   }
 
   set showValue(value: boolean | string | null | undefined) {
-    this.toggleAttribute("show-value", ArkProgress.truthy(value));
-  }
-
-  private static truthy(value: boolean | string | null | undefined): boolean {
-    return value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    this.toggleAttribute("show-value", coerceBooleanAttr(value));
   }
 
   private getSizing(): ArkProgressSizing {

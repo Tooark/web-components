@@ -1,4 +1,4 @@
-import { type ArkLocale, type ArkMarkShape, type ArkSize, resolveLocale } from "@tooark/core";
+import { type ArkLocale, type ArkMarkShape, type ArkSize, coerceBooleanAttr, resolveLocale } from "@tooark/core";
 import { ARK_MARK_SHAPES, type ArkMark, normalizeMarkShape } from "./ark-mark";
 import { applyTestHooks } from "./test-hooks";
 
@@ -80,10 +80,7 @@ export class ArkShapePicker extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute(
-      "disabled",
-      value === "" || (value !== null && value !== undefined && value !== false && value !== "false")
-    );
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /** Seleciona uma forma como o usuário faria: muda `value`, foca a opção e emite `change`. */

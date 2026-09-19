@@ -4,6 +4,7 @@ import {
   type ArkIntent,
   type ArkLocale,
   arkExit,
+  coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
@@ -93,10 +94,7 @@ export class ArkAlert extends HTMLElement {
   }
 
   set dismissible(value: boolean | string | null | undefined) {
-    this.toggleAttribute(
-      "dismissible",
-      value === "" || (value !== null && value !== undefined && value !== false && value !== "false")
-    );
+    this.toggleAttribute("dismissible", coerceBooleanAttr(value));
   }
 
   /** Dispensa o alerta: anima a saída, emite `ark-dismiss` e esconde o host (`hidden`); remover é do app. */

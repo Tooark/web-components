@@ -81,7 +81,7 @@ The monorepo is organized in layers — each package only depends on the layers 
 | `ark-file-input`      | web-components | File field with the `ark-input` grid (label, helper/error): hidden native `<input type="file">` for forms, drop zone with `dragover` highlight, keyboard-accessible choose button, list of selected names, `accept`/`multiple`. Emits `change` with the files and announces them.  |
 | `ark-input`           | web-components | Standardized text field: label, helper/error with aria, prefix/suffix via `slot`, password `reveal`, native attributes passed through, sizes, intents, `rounded`.                                                                                                                  |
 | `ark-kbd`             | web-components | Keyboard key: the host is the key (mono, border, `surface-muted`, bottom edge) around your text; `size`.                                                                                                                                                                           |
-| `ark-kv-editor`       | web-components | Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON. Composes other ark-* controls. Emits `change`, `ark-add`, `ark-delete`.               |
+| `ark-kv-editor`       | web-components | Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON. Composes other ark-\* controls. Emits `change`, `ark-add`, `ark-delete`.              |
 | `ark-mark`            | web-components | Scope mark: one of six shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.                                                                                      |
 | `ark-menu`            | web-components | Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.                                                                   |
 | `ark-menu-item`       | web-components | Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).                                                                                                                |
@@ -315,6 +315,8 @@ import { ArkButton, ArkDatepicker, ArkScheduler, ArkToaster } from "@tooark/reac
 ```
 
 Wrapper props are camelCase and typed (`eventDisplay`, `stepMinutes`, `hoursFormat`, `hourStart`…); object props (`events`, `localeJson`) are serialized to the attribute for you, and custom events arrive as `onChange`/`onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` receiving the event `detail`.
+
+React 18 writes attributes on custom elements, React 19 writes the property when the element has one, so a boolean the wrapper passes as `""` (present) or leaves out reaches the element either way: every boolean setter (`disabled`, `open`, `checked`, …) accepts `true`/`""` as on and `false`/`"false"`/`null`/`undefined` as off (`coerceBooleanAttr` from `@tooark/core`, if you write elements of your own).
 
 ### Vue 3
 

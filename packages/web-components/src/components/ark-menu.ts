@@ -1,4 +1,4 @@
-import { type ArkAnchorRect, positionAnchored } from "@tooark/core";
+import { type ArkAnchorRect, coerceBooleanAttr, positionAnchored } from "@tooark/core";
 import type { ArkMenuItem } from "./ark-menu-item";
 import { applyTestHooks } from "./test-hooks";
 
@@ -109,8 +109,7 @@ export class ArkMenu extends HTMLElement {
   }
 
   set open(value: boolean | string | null | undefined) {
-    // Frameworks passam o valor do atributo como propriedade: "" é presente; "false", null e undefined fecham.
-    const next = value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    const next = coerceBooleanAttr(value);
     if (next) {
       this.show();
     } else {

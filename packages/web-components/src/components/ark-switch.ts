@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSwitchPalette = {
@@ -76,8 +76,8 @@ export class ArkSwitch extends HTMLElement {
     return this.hasAttribute("checked");
   }
 
-  set checked(value: boolean) {
-    if (value) {
+  set checked(value: boolean | string | null | undefined) {
+    if (coerceBooleanAttr(value)) {
       this.setAttribute("checked", "");
     } else {
       this.removeAttribute("checked");

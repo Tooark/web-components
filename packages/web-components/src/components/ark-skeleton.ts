@@ -1,4 +1,4 @@
-import type { ArkRounded } from "@tooark/core";
+import { type ArkRounded, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -71,8 +71,8 @@ export class ArkSkeleton extends HTMLElement {
     return this.hasAttribute("animated");
   }
 
-  set animated(value: boolean) {
-    this.toggleAttribute("animated", Boolean(value));
+  set animated(value: boolean | string | null | undefined) {
+    this.toggleAttribute("animated", coerceBooleanAttr(value));
   }
 
   private getRadius(): string | null {

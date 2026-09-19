@@ -3,6 +3,7 @@ import {
   type ArkDialogSize,
   type ArkLocale,
   closePopover,
+  coerceBooleanAttr,
   focusableElements,
   openPopover,
   resolveLocale,
@@ -130,8 +131,7 @@ export class ArkDialog extends HTMLElement {
   }
 
   set open(value: boolean | string | null | undefined) {
-    // Frameworks passam o valor do atributo como propriedade: "" é presente; "false", null e undefined fecham.
-    const next = value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    const next = coerceBooleanAttr(value);
     if (next) {
       this.show();
     } else {
@@ -144,8 +144,8 @@ export class ArkDialog extends HTMLElement {
     return this.hasAttribute("persistent");
   }
 
-  set persistent(value: boolean) {
-    this.toggleAttribute("persistent", Boolean(value));
+  set persistent(value: boolean | string | null | undefined) {
+    this.toggleAttribute("persistent", coerceBooleanAttr(value));
   }
 
   /** Abre o diálogo: adiciona `open`, que faz o resto. */

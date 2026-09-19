@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCheckboxPalette = {
@@ -93,7 +93,7 @@ export class ArkCheckbox extends HTMLElement {
   }
 
   set checked(value: boolean | string | null | undefined) {
-    this.toggleAttribute("checked", ArkCheckbox.truthy(value));
+    this.toggleAttribute("checked", coerceBooleanAttr(value));
   }
 
   /** Estado misto (parte de um grupo marcada): aria-checked="mixed" e o traço; o próximo clique limpa. */
@@ -102,7 +102,7 @@ export class ArkCheckbox extends HTMLElement {
   }
 
   set indeterminate(value: boolean | string | null | undefined) {
-    this.toggleAttribute("indeterminate", ArkCheckbox.truthy(value));
+    this.toggleAttribute("indeterminate", coerceBooleanAttr(value));
   }
 
   get disabled(): boolean {
@@ -110,7 +110,7 @@ export class ArkCheckbox extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute("disabled", ArkCheckbox.truthy(value));
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   get name(): string {
@@ -147,11 +147,6 @@ export class ArkCheckbox extends HTMLElement {
 
   focus(options?: FocusOptions): void {
     this.boxEl?.focus(options);
-  }
-
-  // Frameworks passam o valor do atributo como propriedade: "" é presente; "false", null e undefined desligam.
-  private static truthy(value: boolean | string | null | undefined): boolean {
-    return value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
   }
 
   // Cobre o atributo e o <fieldset disabled>, que desabilita o botão nativamente.

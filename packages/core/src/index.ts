@@ -1,5 +1,6 @@
 export type { ArkDuration, ArkEasing } from "@tooark/tokens";
 export { ARK_DURATION_MS, ARK_EASING_CSS, ARK_MOTION_DISTANCE } from "@tooark/tokens";
+export { coerceBooleanAttr } from "./attributes";
 export { en, es, pt, resolveLocale } from "./i18n";
 export type { ArkDatepickerLocale, ArkLocale } from "./i18n/types";
 export type { ArkMotionOptions, ArkMotionPreset } from "./motion";

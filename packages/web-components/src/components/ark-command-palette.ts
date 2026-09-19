@@ -1,4 +1,4 @@
-import { type ArkLocale, closePopover, openPopover, resolveLocale, trapFocus } from "@tooark/core";
+import { type ArkLocale, closePopover, coerceBooleanAttr, openPopover, resolveLocale, trapFocus } from "@tooark/core";
 import { ArkCommandItem } from "./ark-command-item";
 import type { ArkInput } from "./ark-input";
 import { applyTestHooks } from "./test-hooks";
@@ -114,7 +114,7 @@ export class ArkCommandPalette extends HTMLElement {
   }
 
   set open(value: boolean | string | null | undefined) {
-    const next = value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    const next = coerceBooleanAttr(value);
     if (next) {
       this.show();
     } else {

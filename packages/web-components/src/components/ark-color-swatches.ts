@@ -1,4 +1,4 @@
-import type { ArkColorSwatch, ArkSize } from "@tooark/core";
+import { type ArkColorSwatch, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -75,10 +75,7 @@ export class ArkColorSwatches extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute(
-      "disabled",
-      value === "" || (value !== null && value !== undefined && value !== false && value !== "false")
-    );
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /** Seleciona uma cor como o usuário faria: muda `value`, foca a amostra e emite `change`. */

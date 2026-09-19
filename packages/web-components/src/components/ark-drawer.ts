@@ -7,6 +7,7 @@ import {
   arkEnter,
   arkExit,
   closePopover,
+  coerceBooleanAttr,
   focusableElements,
   openPopover,
   resolveLocale,
@@ -126,7 +127,7 @@ export class ArkDrawer extends HTMLElement {
   }
 
   set open(value: boolean | string | null | undefined) {
-    const next = value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    const next = coerceBooleanAttr(value);
     if (next) {
       this.show();
     } else {
@@ -140,10 +141,7 @@ export class ArkDrawer extends HTMLElement {
   }
 
   set persistent(value: boolean | string | null | undefined) {
-    this.toggleAttribute(
-      "persistent",
-      value === "" || (value !== null && value !== undefined && value !== false && value !== "false")
-    );
+    this.toggleAttribute("persistent", coerceBooleanAttr(value));
   }
 
   /** Borda onde a gaveta encosta. Padrão: "right". */

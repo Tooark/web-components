@@ -1,4 +1,12 @@
-import { type ArkIntent, type ArkLocale, type ArkRounded, type ArkSize, announce, resolveLocale } from "@tooark/core";
+import {
+  type ArkIntent,
+  type ArkLocale,
+  type ArkRounded,
+  type ArkSize,
+  announce,
+  coerceBooleanAttr,
+  resolveLocale
+} from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -93,7 +101,7 @@ export class ArkFileInput extends HTMLElement {
   }
 
   set multiple(value: boolean | string | null | undefined) {
-    this.toggleAttribute("multiple", ArkFileInput.truthy(value));
+    this.toggleAttribute("multiple", coerceBooleanAttr(value));
   }
 
   get disabled(): boolean {
@@ -101,7 +109,7 @@ export class ArkFileInput extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute("disabled", ArkFileInput.truthy(value));
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /** Limpa a seleção sem emitir `change`. */
@@ -113,10 +121,6 @@ export class ArkFileInput extends HTMLElement {
 
   focus(options?: FocusOptions): void {
     this.buttonEl?.focus(options);
-  }
-
-  private static truthy(value: boolean | string | null | undefined): boolean {
-    return value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
   }
 
   private getLocale(): ArkLocale {

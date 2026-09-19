@@ -1,3 +1,4 @@
+import { coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -63,10 +64,7 @@ export class ArkCommandItem extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute(
-      "disabled",
-      value === "" || (value !== null && value !== undefined && value !== false && value !== "false")
-    );
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /** Seleciona o item: emite `ark-select` com o value, que a paleta consolida e fecha em seguida. */

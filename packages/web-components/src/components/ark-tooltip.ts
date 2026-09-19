@@ -1,4 +1,4 @@
-import { type ArkTooltipSide, isPopoverOpen, openPopover, positionAnchored } from "@tooark/core";
+import { type ArkTooltipSide, coerceBooleanAttr, isPopoverOpen, openPopover, positionAnchored } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 /** Contador para o id do balão, que o `aria-describedby` do gatilho referencia. */
@@ -99,8 +99,7 @@ export class ArkTooltip extends HTMLElement {
   }
 
   set open(value: boolean | string | null | undefined) {
-    // Frameworks passam o valor do atributo como propriedade: "" é presente; "false", null e undefined fecham.
-    const next = value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
+    const next = coerceBooleanAttr(value);
     if (next) {
       this.show();
     } else {

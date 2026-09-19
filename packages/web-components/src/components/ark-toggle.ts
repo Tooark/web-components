@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkTogglePalette = {
@@ -46,16 +46,16 @@ export class ArkToggle extends HTMLElement {
     return this.hasAttribute("pressed");
   }
 
-  set pressed(value: boolean) {
-    this.toggleAttribute("pressed", Boolean(value));
+  set pressed(value: boolean | string | null | undefined) {
+    this.toggleAttribute("pressed", coerceBooleanAttr(value));
   }
 
   get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
 
-  set disabled(value: boolean) {
-    this.toggleAttribute("disabled", Boolean(value));
+  set disabled(value: boolean | string | null | undefined) {
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   get value(): string {

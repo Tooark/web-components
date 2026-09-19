@@ -5,7 +5,8 @@ import {
   type ArkRounded,
   type ArkSize,
   type ArkStyleVariant,
-  announce
+  announce,
+  coerceBooleanAttr
 } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
@@ -211,8 +212,8 @@ export class ArkButton extends HTMLElement {
   /**
    * Define se o botão está desabilitado.
    */
-  set disabled(value: boolean) {
-    this.toggleAttribute("disabled", Boolean(value));
+  set disabled(value: boolean | string | null | undefined) {
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   /**
@@ -225,8 +226,8 @@ export class ArkButton extends HTMLElement {
   /**
    * Define se o botão está em estado de carregamento.
    */
-  set loading(value: boolean) {
-    this.toggleAttribute("loading", Boolean(value));
+  set loading(value: boolean | string | null | undefined) {
+    this.toggleAttribute("loading", coerceBooleanAttr(value));
   }
 
   /**

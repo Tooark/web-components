@@ -1,4 +1,4 @@
-import type { ArkIntent, ArkSize } from "@tooark/core";
+import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkRadioPalette = {
@@ -99,7 +99,7 @@ export class ArkRadio extends HTMLElement {
   }
 
   set checked(value: boolean | string | null | undefined) {
-    this.toggleAttribute("checked", ArkRadio.truthy(value));
+    this.toggleAttribute("checked", coerceBooleanAttr(value));
   }
 
   get disabled(): boolean {
@@ -107,7 +107,7 @@ export class ArkRadio extends HTMLElement {
   }
 
   set disabled(value: boolean | string | null | undefined) {
-    this.toggleAttribute("disabled", ArkRadio.truthy(value));
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   get name(): string {
@@ -143,10 +143,6 @@ export class ArkRadio extends HTMLElement {
 
   focus(options?: FocusOptions): void {
     this.boxEl?.focus(options);
-  }
-
-  private static truthy(value: boolean | string | null | undefined): boolean {
-    return value === "" || (value !== null && value !== undefined && value !== false && value !== "false");
   }
 
   private isDisabled(): boolean {

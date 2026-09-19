@@ -5,6 +5,7 @@ import {
   type ArkSize,
   type ArkTabsFill,
   type ArkTabsVariant,
+  coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
@@ -91,24 +92,24 @@ export class ArkTab extends HTMLElement {
     return this.hasAttribute("selected");
   }
 
-  set selected(value: boolean) {
-    this.toggleAttribute("selected", Boolean(value));
+  set selected(value: boolean | string | null | undefined) {
+    this.toggleAttribute("selected", coerceBooleanAttr(value));
   }
 
   get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
 
-  set disabled(value: boolean) {
-    this.toggleAttribute("disabled", Boolean(value));
+  set disabled(value: boolean | string | null | undefined) {
+    this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
   get dirty(): boolean {
     return this.hasAttribute("dirty");
   }
 
-  set dirty(value: boolean) {
-    this.toggleAttribute("dirty", Boolean(value));
+  set dirty(value: boolean | string | null | undefined) {
+    this.toggleAttribute("dirty", coerceBooleanAttr(value));
   }
 
   /** Fechável só na variante `editor`; nas outras o atributo é ignorado. */
