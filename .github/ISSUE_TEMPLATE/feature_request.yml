@@ -1,0 +1,69 @@
+name: ✨ Feature request
+description: Suggest an improvement to a component or a new component.
+title: "[feat] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your idea! Please explain the **problem** you are trying to solve, not just the solution.
+        Components stay framework-agnostic and generic (no app-specific vocabulary), so describe the use case in those terms.
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I have searched existing issues.
+          required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package?
+      options:
+        - "@tooark/web-components"
+        - "@tooark/core"
+        - "@tooark/tokens"
+        - "@tooark/react"
+        - "@tooark/vue"
+        - "@tooark/angular"
+        - "@tooark/chart"
+        - "@tooark/wysiwyg"
+        - "@tooark/code"
+        - "@tooark/motion"
+        - New component / cross-cutting
+        - Storybook / docs
+        - Repo tooling (scripts, workflows)
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem statement
+      description: What problem are you trying to solve? Who is affected?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: For components, sketch the API — attributes, JS properties, events (`ark-*`), slots — and the accessibility expectations (roles, keyboard).
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Including whether it can be done today with existing components, tokens or the core helpers.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to help implement this.
+        - label: I would be willing to help test this.

@@ -540,6 +540,12 @@ Always prefer semantic selectors (`getByRole("switch", { name: "..." })`) when p
 
 ---
 
+## Contributing
+
+Bug reports and feature requests go through the [issue templates](https://github.com/Tooark/web-components/issues/new/choose); [CONTRIBUTING.md](CONTRIBUTING.md) covers the development workflow, the commit convention (Conventional Commits in Portuguese, DCO sign-off) and the checklist for a new component. Security issues follow [SECURITY.md](SECURITY.md) (private advisories, never a public issue), and everyone in the project space is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+
+---
+
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE) © 2026 Tooark.

@@ -1,0 +1,75 @@
+# ==============================================================================
+# Tooark web-components — Dependabot configuration
+# ==============================================================================
+# Docs: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+#
+# Scope:
+#   - GitHub Actions: weekly, minor/patch grouped into one PR.
+#   - npm (pnpm workspace, single lockfile at the root): weekly. Minor and
+#     patch updates are grouped into two PRs (runtime deps of the published
+#     packages, and everything dev-only: Storybook, Vitest, Biome, Rollup...).
+#     Majors open one PR each so the changelog gets read.
+#   - Angular is pinned to a security floor in pnpm-workspace.yaml
+#     (overrides) and the peer range in packages/angular must move together
+#     with it, so Angular majors are left to a deliberate bump.
+#   - Commit messages follow the repo convention (Conventional Commits, DCO is
+#     added by the merge). Dependabot also keeps the CodeMirror, ECharts and
+#     Tiptap devDependencies in step with the peer ranges the packages declare.
+# ==============================================================================
+
+version: 2
+
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci"
+    commit-message:
+      prefix: "ci"
+      include: "scope"
+    groups:
+      actions-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "07:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    versioning-strategy: "increase"
+    ignore:
+      # Security floor and peer range move together, by hand (see pnpm-workspace.yaml overrides).
+      - dependency-name: "@angular/*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "ng-packagr"
+        update-types: ["version-update:semver-major"]
+    groups:
+      runtime-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      dev-minor-patch:
+        dependency-type: "development"
+        update-types:
+          - "minor"
+          - "patch"

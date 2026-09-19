@@ -540,6 +540,12 @@ Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) qu
 
 ---
 
+## Contribuindo
+
+Bugs e pedidos de funcionalidade entram pelos [templates de issue](https://github.com/Tooark/web-components/issues/new/choose); o [CONTRIBUTING.md](CONTRIBUTING.md) cobre o fluxo de desenvolvimento, a convenção de commits (Conventional Commits em português, assinatura DCO) e o checklist de um componente novo. Questões de segurança seguem o [SECURITY.md](SECURITY.md) (advisories privados, nunca uma issue pública), e todo mundo no espaço do projeto segue o [Código de Conduta](CODE_OF_CONDUCT.md).
+
+---
+
 ## Licença
 
 Licenciado sob a [Apache License 2.0](LICENSE) © 2026 Tooark.

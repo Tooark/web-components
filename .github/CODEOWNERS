@@ -1,0 +1,43 @@
+# ==============================================================================
+# Tooark web-components — CODEOWNERS
+# ==============================================================================
+# GitHub uses this file to auto-request reviews from the right owner.
+# Rules are matched top-to-bottom; the LAST matching rule wins per file.
+#
+# NOTE: uses the maintainer's personal handle (@paulosfjunior). Swap to a
+# @Tooark/... team once the org has 2+ reviewers.
+# ==============================================================================
+
+# Global default — anything not matched by a later rule.
+*                                   @paulosfjunior
+
+# Governance, legal and licensing.
+/LICENSE                            @paulosfjunior
+/NOTICE                             @paulosfjunior
+/CODE_OF_CONDUCT.md                 @paulosfjunior
+/SECURITY.md                        @paulosfjunior
+/CONTRIBUTING.md                    @paulosfjunior
+
+# CI/CD and GitHub configuration (supply-chain / release sensitive).
+/.github/                           @paulosfjunior
+/.github/workflows/                 @paulosfjunior
+/.github/CODEOWNERS                 @paulosfjunior
+
+# Toolchain, dependency policy and release plumbing.
+/package.json                       @paulosfjunior
+/pnpm-workspace.yaml                @paulosfjunior
+/pnpm-lock.yaml                     @paulosfjunior
+/biome.json                         @paulosfjunior
+/scripts/                           @paulosfjunior
+/CLAUDE.md                          @paulosfjunior
+
+# Public API surface: every other package builds on these.
+/packages/tokens/                   @paulosfjunior
+/packages/core/                     @paulosfjunior
+
+# CSS pipeline (Tailwind prefix, scoped preflight, host list) and the
+# per-package manifests that define what gets published.
+/packages/web-components/src/styles/ @paulosfjunior
+/packages/*/package.json            @paulosfjunior
+/packages/*/rollup.config.mjs       @paulosfjunior
+/packages/angular/ng-package.json   @paulosfjunior

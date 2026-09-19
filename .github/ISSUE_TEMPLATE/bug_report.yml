@@ -1,0 +1,117 @@
+name: 🐛 Bug report
+description: Report a defect in a component, a wrapper or the styles.
+title: "[bug] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug report! Please fill out the sections below.
+        For **security vulnerabilities**, do NOT file a public issue — see [`SECURITY.md`](https://github.com/Tooark/web-components/blob/main/SECURITY.md).
+
+  - type: checkboxes
+    id: preflight
+    attributes:
+      label: Preflight
+      options:
+        - label: I have searched existing issues and this is not a duplicate.
+          required: true
+        - label: I am using the latest published version of the packages.
+          required: true
+        - label: This is not a security vulnerability (those go through the private channel).
+          required: true
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Which package?
+      options:
+        - "@tooark/web-components"
+        - "@tooark/core"
+        - "@tooark/tokens"
+        - "@tooark/react"
+        - "@tooark/vue"
+        - "@tooark/angular"
+        - "@tooark/chart"
+        - "@tooark/wysiwyg"
+        - "@tooark/code"
+        - "@tooark/motion"
+        - Storybook / docs
+        - Repo tooling (scripts, workflows)
+        - Not sure
+    validations:
+      required: true
+
+  - type: input
+    id: component
+    attributes:
+      label: Component
+      description: The `ark-*` element (or helper) involved, if any.
+      placeholder: "e.g., ark-dialog"
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: "e.g., 1.0.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: framework
+    attributes:
+      label: How are you using it?
+      options:
+        - Vanilla (Custom Elements directly)
+        - React 18
+        - React 19
+        - Vue 3
+        - Angular
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser / OS
+      placeholder: "e.g., Chrome 131 on Windows 11, Safari 18 on iOS"
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear and concise description of the bug.
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction
+      description: The smallest markup/snippet that reproduces it, or a link (StackBlitz, CodeSandbox, a Storybook story name).
+      render: html
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Console errors / relevant output
+      description: Paste the relevant console output. ⚠️ Redact anything sensitive.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Your own CSS on the page (Tailwind, resets, `color-scheme`), reduced-motion settings, screenshots.
