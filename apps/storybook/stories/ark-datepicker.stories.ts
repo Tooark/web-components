@@ -270,7 +270,14 @@ export const InputMode = {
     const popup = canvasElement.querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
 
     await userEvent.click(toggle);
-    await expect(popup.hidden).toBe(false);
+    // O popup e um popover manual proprio: top layer, ancorado abaixo do campo por positionAnchored.
+    await expect(popup).toHaveAttribute("popover", "manual");
+    expect(popup.matches(":popover-open")).toBe(true);
+    await expect(popup).toHaveAttribute("data-ark-side", "bottom");
+    const field = canvasElement.querySelector<HTMLElement>("ark-input")!.getBoundingClientRect();
+    expect(popup.getBoundingClientRect().top).toBeGreaterThanOrEqual(field.bottom);
+    // Alinhado ao inicio do campo (positionAnchored ainda respeita a margem minima da viewport).
+    expect(popup.getBoundingClientRect().left).toBeGreaterThanOrEqual(field.left);
 
     const day = popup.querySelector<HTMLButtonElement>('[data-ark="calendar-day"][data-date$="-15"]')!;
     const iso = day.getAttribute("data-date")!;
@@ -282,7 +289,43 @@ export const InputMode = {
     const input = canvasElement.querySelector<HTMLInputElement>('[data-ark="input"]')!;
     const [y, m, d] = iso.split("-");
     await expect(input.value).toBe(`${d}/${m}/${y}`);
-    await waitFor(() => expect(popup.hidden).toBe(true));
+    // A saida anima antes de sair do top layer.
+    await waitFor(() => expect(popup.matches(":popover-open")).toBe(false));
+    expect(getComputedStyle(popup).display).toBe("none");
+  }
+};
+
+export const InsideOverflowHidden = {
+  args: { input: true, mode: "date", lang: "pt" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "O popup vive no top layer (popover manual): um container com `overflow: hidden` e altura curta nao o corta, e nao ha z-index para disputar. Sem espaco abaixo ele vira para cima (`data-ark-side`)."
+      }
+    }
+  },
+  render: (args: StoryArgs) => {
+    const box = document.createElement("div");
+    box.className = "h-16 w-80 overflow-hidden rounded-lg border border-dashed border-slate-300 p-3";
+    box.appendChild(createDatepicker(args));
+    return box;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const box = canvasElement.querySelector<HTMLElement>("div.overflow-hidden")!;
+    const toggle = canvasElement.querySelector<HTMLButtonElement>('[data-ark="datepicker-toggle"]')!;
+    const popup = canvasElement.querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
+
+    await userEvent.click(toggle);
+    expect(popup.matches(":popover-open")).toBe(true);
+    const rect = popup.getBoundingClientRect();
+    expect(rect.bottom).toBeGreaterThan(box.getBoundingClientRect().bottom);
+    // Visivel de verdade: o ponto central do popup e dele mesmo, nao do container que o cortaria.
+    const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    expect(popup.contains(hit)).toBe(true);
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(popup.matches(":popover-open")).toBe(false));
   }
 };
 
@@ -319,14 +362,14 @@ export const InputDateTime = {
 
     await userEvent.click(toggle);
     const popup = canvasElement.querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
-    await expect(popup.hidden).toBe(false);
+    expect(popup.matches(":popover-open")).toBe(true);
 
     // Seleciona a data: no modo datetime o popup continua aberto para a hora.
     const day = popup.querySelector<HTMLButtonElement>('[data-ark="calendar-day"][data-date$="-15"]')!;
     const iso = day.getAttribute("data-date")!;
     await userEvent.click(day);
     await expect(picker).toHaveAttribute("value", `${iso}T00:00:00`);
-    await expect(popup.hidden).toBe(false);
+    expect(popup.matches(":popover-open")).toBe(true);
 
     // Seleciona a hora.
     const hour = popup.querySelector<HTMLButtonElement>('[data-ark="clock-hours"] button[data-value="9"]')!;

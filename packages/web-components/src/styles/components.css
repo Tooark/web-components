@@ -409,6 +409,13 @@
     @apply ark:text-xs ark:text-fg-muted;
   }
 
+  /* ---------- ark-datepicker: popup em popover manual, ancorado no campo ---------- */
+
+  /* Fechado fica oculto (um [popover] com display do autor apareceria no fluxo); left/top vêm inline. */
+  ark-datepicker [data-ark="datepicker-popup"]:not(:popover-open) {
+    display: none;
+  }
+
   /* ---------- ark-tooltip: o balão é popover manual, próprio ou o slot="content" do usuário ---------- */
 
   /*

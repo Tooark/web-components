@@ -1,5 +1,5 @@
 import type { ArkDatepickerLang, ArkDatepickerMode } from "@tooark/core";
-import { type ArkLocale, arkEnter, arkExit, resolveLocale } from "@tooark/core";
+import { type ArkLocale, closePopover, openPopover, positionAnchored, resolveLocale } from "@tooark/core";
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
@@ -31,7 +31,11 @@ const CLOCK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" heigh
  * - Sem o atributo `input`, renderiza o(s) painel(is) inline.
  * - Com `input`, renderiza um ark-input com botão no sufixo e popup com o
  *   painel; suporta digitação com parse (`format` com tokens YYYY MM DD HH mm ss,
- *   sensível a maiúsculas), Esc/clique fora e formulário via input hidden.
+ *   sensível a maiúsculas), Esc/clique fora e formulário via input hidden. O
+ *   popup é um `popover="manual"` próprio (top layer: nenhum `overflow` do
+ *   app o corta, sem z-index), ancorado no campo por `positionAnchored` de
+ *   core (abre abaixo, vira para cima sem espaço) e animado com `scale` a
+ *   partir da origem.
  */
 export class ArkDatepicker extends HTMLElement {
   static readonly tagName = "ark-datepicker";
@@ -41,6 +45,8 @@ export class ArkDatepicker extends HTMLElement {
   private inputComp: ArkInput | null = null;
   private toggleEl: HTMLButtonElement | null = null;
   private popupEl: HTMLDivElement | null = null;
+  /** Para de reposicionar o popup em scroll/resize; só existe enquanto aberto. */
+  private disposePosition: (() => void) | null = null;
   private hiddenInputEl: HTMLInputElement | null = null;
   private popupOpen = false;
   private syncingValue = false;
@@ -298,6 +304,8 @@ export class ArkDatepicker extends HTMLElement {
 
   private teardown(): void {
     document.removeEventListener("pointerdown", this.handleOutsidePointer, true);
+    this.disposePosition?.();
+    this.disposePosition = null;
     this.popupOpen = false;
     this.replaceChildren();
     this.calendarEl = null;
@@ -397,10 +405,13 @@ export class ArkDatepicker extends HTMLElement {
       }
     });
 
+    // Redefine o que o UA dá a [popover] (inset, margin, border, padding, overflow, cores); left/top vêm inline do
+    // posicionamento e o display, fechado, do components.css.
     const popup = document.createElement("div");
-    popup.className = "ark:absolute ark:left-0 ark:top-full ark:z-50 ark:mt-2";
+    popup.className =
+      "ark:fixed ark:inset-auto ark:m-0 ark:border-0 ark:bg-transparent ark:p-0 ark:text-inherit ark:overflow-visible";
+    popup.setAttribute("popover", "manual");
     popup.setAttribute("role", "dialog");
-    popup.hidden = true;
     popup.appendChild(panel);
 
     const hidden = document.createElement("input");
@@ -611,15 +622,19 @@ export class ArkDatepicker extends HTMLElement {
   }
 
   private openPopup(): void {
-    if (!this.popupEl || this.popupOpen || this.hasAttribute("disabled")) return;
+    if (!this.popupEl || !this.inputComp || this.popupOpen || this.hasAttribute("disabled")) return;
     this.popupOpen = true;
 
-    // Cancela animações anteriores (o fill "forwards" do exit deixaria opacity 0).
-    for (const animation of this.popupEl.getAnimations()) animation.cancel();
-    this.popupEl.hidden = false;
-    this.inputComp?.inputElement?.setAttribute("aria-expanded", "true");
+    this.inputComp.inputElement?.setAttribute("aria-expanded", "true");
     document.addEventListener("pointerdown", this.handleOutsidePointer, true);
-    arkEnter(this.popupEl, "slide-down", { duration: "quick", distance: "0.5rem" });
+    // showPopover() primeiro: o painel só tem caixa para medir depois de entrar no top layer.
+    void openPopover(this.popupEl, "scale", { duration: "quick" });
+    this.disposePosition?.();
+    this.disposePosition = positionAnchored(this.popupEl, this.inputComp, {
+      side: "bottom",
+      align: "start",
+      offset: 8
+    });
   }
 
   private closePopup(focusInput = false): void {
@@ -627,11 +642,11 @@ export class ArkDatepicker extends HTMLElement {
     this.popupOpen = false;
     this.inputComp?.inputElement?.setAttribute("aria-expanded", "false");
     document.removeEventListener("pointerdown", this.handleOutsidePointer, true);
+    this.disposePosition?.();
+    this.disposePosition = null;
 
-    const popup = this.popupEl;
-    arkExit(popup, "fade", { duration: "quick" }).then(() => {
-      if (!this.popupOpen) popup.hidden = true;
-    });
+    // A saída anima antes de sair do top layer; reabrir no meio a abandona.
+    void closePopover(this.popupEl, "fade", { duration: "quick" });
 
     if (focusInput) this.inputComp?.focus();
   }
