@@ -21,8 +21,8 @@ importers:
         specifier: 2.5.13
         version: 2.5.13
       '@rollup/plugin-commonjs':
-        specifier: ^28.0.9
-        version: 28.0.9(rollup@4.63.1)
+        specifier: ^29.0.3
+        version: 29.0.3(rollup@4.63.1)
       '@rollup/plugin-node-resolve':
         specifier: ^16.0.3
         version: 16.0.3(rollup@4.63.1)
@@ -1404,8 +1404,8 @@ packages:
     resolution: {integrity: sha512-4EDEmvxWtgsCnnVeBvtFIFZtUhPPt1+bA9JrSwU4Sa//6oKtzCSlGGXYJr44OD9aGISymbieJ4mCKHUygUDU+g==}
     engines: {node: '>=18'}
 
-  '@rollup/plugin-commonjs@28.0.9':
-    resolution: {integrity: sha512-PIR4/OHZ79romx0BVVll/PkwWpJ7e5lsqFa3gFfcrFPWwLXLV39JVUzQV9RKjWerE7B845Hqjj9VYlQeieZ2dA==}
+  '@rollup/plugin-commonjs@29.0.3':
+    resolution: {integrity: sha512-ZaOxZceP7SOUW7Lqw5IRVweSQYWaeIPnXIGLiB690EBA3FGJTO40EEr2L5yZplJWsgTCogILRSpcAe7+U0Otdg==}
     engines: {node: '>=16.0.0 || 14 >= 14.17'}
     peerDependencies:
       rollup: ^2.68.0||^3.0.0||^4.0.0
@@ -4247,7 +4247,7 @@ snapshots:
     dependencies:
       tinyexec: 1.3.1
 
-  '@rollup/plugin-commonjs@28.0.9(rollup@4.63.1)':
+  '@rollup/plugin-commonjs@29.0.3(rollup@4.63.1)':
     dependencies:
       '@rollup/pluginutils': 5.4.0(rollup@4.63.1)
       commondir: 1.0.1
