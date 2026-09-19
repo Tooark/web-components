@@ -5,4 +5,13 @@ export { ArkCodeEditor } from "./components";
 export type { ArkCodeEditorInstance } from "./engine";
 export { createCodeEditor, resolveCodeTheme } from "./engine";
 export { registerTooarkCode } from "./register";
-export type { ArkCodeEditorOptions, ArkCodeLanguage, ArkCodeTheme } from "./types";
+export type {
+  ArkCodeCompletion,
+  ArkCodeCompletionSource,
+  ArkCodeEditorOptions,
+  ArkCodeFormatter,
+  ArkCodeIndentStyle,
+  ArkCodeLanguage,
+  ArkCodeLineEnding,
+  ArkCodeTheme
+} from "./types";

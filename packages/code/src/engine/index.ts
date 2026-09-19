@@ -7,7 +7,7 @@ import {
   closeBracketsKeymap,
   completionKeymap
 } from "@codemirror/autocomplete";
-import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { defaultKeymap, history, historyKeymap, indentWithTab } from "@codemirror/commands";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { yaml } from "@codemirror/lang-yaml";
@@ -17,6 +17,7 @@ import {
   foldKeymap,
   HighlightStyle,
   indentOnInput,
+  indentUnit,
   syntaxHighlighting
 } from "@codemirror/language";
 import { highlightSelectionMatches, searchKeymap } from "@codemirror/search";
@@ -36,7 +37,16 @@ import {
 } from "@codemirror/view";
 import { tags } from "@lezer/highlight";
 import { type ArkThemeSelected, resolveColorScheme } from "@tooark/tokens";
-import type { ArkCodeEditorOptions, ArkCodeLanguage, ArkCodeTheme } from "../types";
+import type {
+  ArkCodeCompletion,
+  ArkCodeCompletionSource,
+  ArkCodeEditorOptions,
+  ArkCodeFormatter,
+  ArkCodeIndentStyle,
+  ArkCodeLanguage,
+  ArkCodeLineEnding,
+  ArkCodeTheme
+} from "../types";
 
 export type ArkCodeEditorInstance = {
   /** Instância nativa do CodeMirror (uso avançado: dispatch, state, extensões). */
@@ -61,8 +71,28 @@ export type ArkCodeEditorInstance = {
   setWrap(on: boolean): void;
   /** Altura mínima (comprimento CSS). */
   setMinHeight(value: string): void;
+  /** Recuo: espaços ou tabulação, e o tamanho (espaços por nível ou largura da tabulação). */
+  setIndent(style: ArkCodeIndentStyle, size: number): void;
+  /** Fim de linha do valor (`getValue`, `onChange`); "auto" segue o último `setValue`. */
+  setLineEnding(lineEnding: ArkCodeLineEnding): void;
+  /** Fim de linha em vigor depois de resolver "auto". */
+  resolvedLineEnding(): "lf" | "crlf";
+  /** Liga/desliga Tab para recuar (com Esc+Tab para sair). */
+  setTabIndent(on: boolean): void;
+  /** Liga/desliga as completions. */
+  setAutocomplete(on: boolean): void;
   /** Troca as chaves oferecidas depois de `{{`. */
   setVariableKeys(keys: string[]): void;
+  /** Troca as palavras oferecidas como completion em qualquer linguagem. */
+  setCompletions(items: ArkCodeCompletion[]): void;
+  /** Troca a fonte de completion própria. */
+  setCompletionSource(source: ArkCodeCompletionSource | undefined): void;
+  /** Troca o formatador do app. */
+  setFormatter(formatter: ArkCodeFormatter | undefined): void;
+  /** Formata o documento (formatador do app, ou JSON nativo); `false` sem formatador ou quando falha. */
+  format(): Promise<boolean>;
+  /** Indica se há como formatar a linguagem atual. */
+  canFormat(): boolean;
   /** Tema efetivamente aplicado (após resolver "auto"). */
   resolvedTheme(): ArkThemeSelected;
   /** Foca o editor. */
@@ -312,21 +342,66 @@ function variableSource(keys: string[]): (context: CompletionContext) => Complet
   };
 }
 
-function variablesFor(keys: string[]): Extension {
-  if (keys.length === 0) return [];
-  // languageData é o que o autocompletion consulta no cursor: assim a fonte vale em qualquer linguagem. A fonte é
-  // criada uma vez: o autocompletion identifica a consulta pela identidade da função, e uma nova a cada leitura
-  // deixaria a completion pendente para sempre.
-  const data = [{ autocomplete: variableSource(keys) }];
-  return EditorState.languageData.of(() => data);
+// --- Recuo, fim de linha e formatação ---
+
+function indentExtensions(style: ArkCodeIndentStyle, size: number): Extension {
+  const width = Math.max(1, Math.min(16, Math.floor(size) || 2));
+  return [indentUnit.of(style === "tab" ? "\t" : " ".repeat(width)), EditorState.tabSize.of(width)];
+}
+
+// O documento fica sempre em LF por dentro (colar CRLF num doc LF não deixa \r solto); o fim de linha só vale
+// na fronteira: `getValue` junta com o configurado e `setValue`/`auto` detectam o que entrou.
+function detectLineEnding(value: string): "lf" | "crlf" {
+  return value.includes("\r\n") ? "crlf" : "lf";
+}
+
+function normalizeNewlines(value: string): string {
+  return value.replace(/\r\n?/g, "\n");
+}
+
+function completionsSource(items: ArkCodeCompletion[]): ArkCodeCompletionSource {
+  return (context) => {
+    const word = context.matchBefore(/[\w$.-]+/);
+    if (!word && !context.explicit) return null;
+    return { from: word ? word.from : context.pos, options: items, validFor: /^[\w$.-]*$/ };
+  };
+}
+
+function completionExtensions(
+  on: boolean,
+  keys: string[],
+  items: ArkCodeCompletion[],
+  source: ArkCodeCompletionSource | undefined
+): Extension {
+  if (!on) return [];
+  // languageData é o que o autocompletion consulta no cursor: assim as fontes valem em qualquer linguagem. Cada
+  // fonte é criada uma vez por configuração: o autocompletion identifica a consulta pela identidade da função, e
+  // uma nova a cada leitura deixaria a completion pendente para sempre.
+  const sources: Array<{ autocomplete: ArkCodeCompletionSource }> = [];
+  if (keys.length > 0) sources.push({ autocomplete: variableSource(keys) });
+  if (items.length > 0) sources.push({ autocomplete: completionsSource(items) });
+  if (source) sources.push({ autocomplete: source });
+  return [autocompletion(), sources.length > 0 ? EditorState.languageData.of(() => sources) : []];
+}
+
+// Tab recua e Shift+Tab desfaz. A saída por teclado é do próprio CodeMirror: Esc arma o tab-focus mode por dois
+// segundos (o Tab seguinte só move o foco) e Ctrl+M, do keymap padrão, alterna o modo de vez.
+function tabExtensions(on: boolean): Extension {
+  return on ? keymap.of([indentWithTab]) : [];
+}
+
+function formatJson(value: string, unit: string): string {
+  return JSON.stringify(JSON.parse(value), null, unit);
 }
 
 // --- Instância ---
 
 /**
  * Cria um editor CodeMirror 6 dentro de `parent` com o setup básico do Tooark: numeração e dobra, histórico,
- * fechamento de pares, realce da linha ativa (só editável), busca por Ctrl+F, completions e tema pelos tokens.
- * Tab não indenta (fica livre para a navegação por teclado, como o CodeMirror recomenda).
+ * fechamento de pares, realce da linha ativa (só editável), busca por Ctrl+F, completions (da linguagem, de
+ * `variableKeys`, de `completions` e de `completionSource`), Tab para recuar com saída por Esc+Tab, recuo por
+ * espaços ou tabulação, fim de linha LF/CRLF na fronteira do valor, formatação por Shift+Alt+F (JSON nativo ou o
+ * `formatter` do app) e tema pelos tokens.
  */
 export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOptions = {}): ArkCodeEditorInstance {
   const language = new Compartment();
@@ -336,19 +411,64 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
   const gutterNumbers = new Compartment();
   const gutterFold = new Compartment();
   const wrapping = new Compartment();
-  const variables = new Compartment();
+  const indentation = new Compartment();
+  const tabKey = new Compartment();
+  const completion = new Compartment();
 
   let resolved = resolveCodeTheme(options.theme ?? "auto", parent);
   let applying = false;
+  let currentLanguage: ArkCodeLanguage = options.language ?? "text";
+  let indentStyle: ArkCodeIndentStyle = options.indentStyle ?? "space";
+  let indentSize = options.indentSize ?? 2;
+  let lineEnding: ArkCodeLineEnding = options.lineEnding ?? "auto";
+  let detected: "lf" | "crlf" = detectLineEnding(options.value ?? "");
+  let autocomplete = options.autocomplete !== false;
+  let variableKeys = options.variableKeys ?? [];
+  let completions = options.completions ?? [];
+  let completionSource = options.completionSource;
+  let formatter = options.formatter;
 
   const readonlyExtensions = (on: boolean): Extension => [
     EditorState.readOnly.of(on),
     EditorView.editable.of(!on),
     on ? [] : [highlightActiveLine(), highlightActiveLineGutter()]
   ];
+  const reconfigureCompletion = (): void => {
+    view.dispatch({
+      effects: completion.reconfigure(completionExtensions(autocomplete, variableKeys, completions, completionSource))
+    });
+  };
+  const eol = (): "\n" | "\r\n" => ((lineEnding === "auto" ? detected : lineEnding) === "crlf" ? "\r\n" : "\n");
+
+  const format = async (): Promise<boolean> => {
+    const source = view.state.doc.toString();
+    try {
+      let next: string;
+      if (formatter) {
+        next = normalizeNewlines(await formatter(source, currentLanguage));
+      } else if (currentLanguage === "json") {
+        next = formatJson(source, indentStyle === "tab" ? "\t" : " ".repeat(indentSize));
+      } else {
+        return false;
+      }
+      if (view.state.doc.toString() !== source) return false;
+      if (next !== source) {
+        // Edição de verdade: entra no histórico e dispara onChange, como se o usuário tivesse digitado.
+        view.dispatch({
+          changes: { from: 0, to: view.state.doc.length, insert: next },
+          selection: { anchor: Math.min(view.state.selection.main.head, next.length) },
+          userEvent: "format"
+        });
+      }
+      return true;
+    } catch (error) {
+      options.onFormatError?.(error);
+      return false;
+    }
+  };
 
   const state = EditorState.create({
-    doc: options.value ?? "",
+    doc: normalizeNewlines(options.value ?? ""),
     extensions: [
       gutterNumbers.of(options.lineNumbers === false ? [] : lineNumbers()),
       gutterFold.of(options.fold === false ? [] : foldGutter()),
@@ -360,7 +480,6 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
       indentOnInput(),
       bracketMatching(),
       closeBrackets(),
-      autocompletion(),
       rectangularSelection(),
       crosshairCursor(),
       highlightSelectionMatches(),
@@ -370,16 +489,25 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
         ...searchKeymap,
         ...historyKeymap,
         ...foldKeymap,
-        ...completionKeymap
+        ...completionKeymap,
+        {
+          key: "Shift-Alt-f",
+          run: () => {
+            void format();
+            return true;
+          }
+        }
       ]),
-      language.of(languageFor(options.language ?? "text")),
+      language.of(languageFor(currentLanguage)),
       theme.of(themeFor(resolved)),
       readonly.of(readonlyExtensions(options.readonly === true)),
       placeholder.of(options.placeholder ? placeholderExtension(options.placeholder) : []),
       wrapping.of(options.wrap ? EditorView.lineWrapping : []),
-      variables.of(variablesFor(options.variableKeys ?? [])),
+      indentation.of(indentExtensions(indentStyle, indentSize)),
+      tabKey.of(tabExtensions(options.tabIndent !== false)),
+      completion.of(completionExtensions(autocomplete, variableKeys, completions, completionSource)),
       EditorView.updateListener.of((update) => {
-        if (update.docChanged && !applying) options.onChange?.(update.state.doc.toString());
+        if (update.docChanged && !applying) options.onChange?.(update.state.doc.toString().split("\n").join(eol()));
       })
     ]
   });
@@ -389,17 +517,22 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
 
   return {
     view,
-    getValue: () => view.state.doc.toString(),
+    getValue: () => view.state.doc.toString().split("\n").join(eol()),
     setValue: (value) => {
-      if (value === view.state.doc.toString()) return;
+      detected = detectLineEnding(value);
+      const text = normalizeNewlines(value);
+      if (text === view.state.doc.toString()) return;
       applying = true;
       try {
-        view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: value }, selection: { anchor: 0 } });
+        view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: text }, selection: { anchor: 0 } });
       } finally {
         applying = false;
       }
     },
-    setLanguage: (next) => view.dispatch({ effects: language.reconfigure(languageFor(next)) }),
+    setLanguage: (next) => {
+      currentLanguage = next;
+      view.dispatch({ effects: language.reconfigure(languageFor(next)) });
+    },
     setTheme: (next) => {
       const side = resolveCodeTheme(next, parent);
       if (side === resolved) return;
@@ -413,7 +546,37 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
     setFold: (on) => view.dispatch({ effects: gutterFold.reconfigure(on ? foldGutter() : []) }),
     setWrap: (on) => view.dispatch({ effects: wrapping.reconfigure(on ? EditorView.lineWrapping : []) }),
     setMinHeight: (value) => view.dom.style.setProperty("--ark-code-min-height", value),
-    setVariableKeys: (keys) => view.dispatch({ effects: variables.reconfigure(variablesFor(keys)) }),
+    setIndent: (style, size) => {
+      indentStyle = style;
+      indentSize = size;
+      view.dispatch({ effects: indentation.reconfigure(indentExtensions(style, size)) });
+    },
+    setLineEnding: (next) => {
+      lineEnding = next;
+    },
+    resolvedLineEnding: () => (lineEnding === "auto" ? detected : lineEnding),
+    setTabIndent: (on) => view.dispatch({ effects: tabKey.reconfigure(tabExtensions(on)) }),
+    setAutocomplete: (on) => {
+      autocomplete = on;
+      reconfigureCompletion();
+    },
+    setVariableKeys: (keys) => {
+      variableKeys = keys;
+      reconfigureCompletion();
+    },
+    setCompletions: (items) => {
+      completions = items;
+      reconfigureCompletion();
+    },
+    setCompletionSource: (source) => {
+      completionSource = source;
+      reconfigureCompletion();
+    },
+    setFormatter: (next) => {
+      formatter = next;
+    },
+    format,
+    canFormat: () => formatter !== undefined || currentLanguage === "json",
     resolvedTheme: () => resolved,
     focus: () => view.focus(),
     destroy: () => view.destroy()

@@ -1,4 +1,4 @@
-import type { ArkCodeEditor, ArkCodeLanguage, ArkCodeTheme } from "@tooark/code";
+import type { ArkCodeEditor, ArkCodeIndentStyle, ArkCodeLanguage, ArkCodeLineEnding, ArkCodeTheme } from "@tooark/code";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -20,7 +20,12 @@ const meta = {
     minHeight: { control: "text", description: "Altura minima (comprimento CSS). Padrao: 8rem" },
     lineNumbers: { control: "boolean" },
     fold: { control: "boolean" },
-    wrap: { control: "boolean" }
+    wrap: { control: "boolean" },
+    indentStyle: { control: "inline-radio", options: ["space", "tab"], description: "Recuo com espacos ou tabulacao" },
+    indentSize: { control: "number", description: "Espacos por nivel ou largura da tabulacao. Padrao: 2" },
+    lineEnding: { control: "inline-radio", options: ["auto", "lf", "crlf"], description: "Fim de linha do valor" },
+    tabIndent: { control: "boolean", description: "Tab recua; Esc+Tab sai do editor" },
+    autocomplete: { control: "boolean" }
   },
   args: {
     language: "json",
@@ -30,7 +35,12 @@ const meta = {
     minHeight: "12rem",
     lineNumbers: true,
     fold: true,
-    wrap: false
+    wrap: false,
+    indentStyle: "space",
+    indentSize: 2,
+    lineEnding: "auto",
+    tabIndent: true,
+    autocomplete: true
   }
 };
 
@@ -45,6 +55,11 @@ type StoryArgs = {
   lineNumbers: boolean;
   fold: boolean;
   wrap: boolean;
+  indentStyle: ArkCodeIndentStyle;
+  indentSize: number;
+  lineEnding: ArkCodeLineEnding;
+  tabIndent: boolean;
+  autocomplete: boolean;
   testid?: string;
 };
 
@@ -95,6 +110,11 @@ function createEditor(args: Partial<StoryArgs>, value?: string): ArkCodeEditor {
   if (args.lineNumbers === false) el.setAttribute("line-numbers", "false");
   if (args.fold === false) el.setAttribute("fold", "false");
   if (args.wrap) el.setAttribute("wrap", "");
+  if (args.indentStyle && args.indentStyle !== "space") el.setAttribute("indent-style", args.indentStyle);
+  if (args.indentSize && args.indentSize !== 2) el.setAttribute("indent-size", String(args.indentSize));
+  if (args.lineEnding && args.lineEnding !== "auto") el.setAttribute("line-ending", args.lineEnding);
+  if (args.tabIndent === false) el.setAttribute("tab-indent", "false");
+  if (args.autocomplete === false) el.setAttribute("autocomplete", "false");
   if (args.testid) el.setAttribute("testid", args.testid);
   el.style.maxWidth = "720px";
   el.value = value ?? SAMPLES[args.language ?? "text"];
@@ -191,6 +211,192 @@ export const VariableCompletion = {
     // O cursor pulou o "}}" fechado: continuar digitando fica depois da variavel.
     await userEvent.keyboard(" ok");
     await expect(editor.value).toBe("{{user.email}} ok");
+  }
+};
+
+export const IndentationAndLineEndings = {
+  args: { language: "json", minHeight: "6rem" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Tab recua e Shift+Tab desfaz (Esc e depois Tab sai do editor; Ctrl+M alterna o modo de vez). `indent-style` escolhe espacos ou tabulacao e `indent-size` o tamanho; `line-ending` (auto, lf, crlf) vale so na fronteira do valor: por dentro o documento e sempre LF, `value`/`change` saem com o fim de linha configurado, e `auto` segue o ultimo valor atribuido."
+      }
+    }
+  },
+  render: (args: StoryArgs) => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-3";
+    const after = document.createElement("button");
+    after.type = "button";
+    after.className = "self-start rounded border border-slate-300 px-3 py-1 text-sm";
+    after.textContent = "Proximo campo";
+    wrap.append(createEditor(args, "{}"), after);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const content = editor.querySelector<HTMLElement>(".cm-content")!;
+    const after = canvasElement.querySelector<HTMLButtonElement>("button")!;
+
+    // Tab recua com o tamanho configurado (2 espacos por padrao).
+    editor.value = "a";
+    await userEvent.click(content);
+    await userEvent.keyboard("{Home}{Tab}");
+    await expect(editor.value).toBe("  a");
+    await userEvent.keyboard("{Shift>}{Tab}{/Shift}");
+    await expect(editor.value).toBe("a");
+
+    editor.setAttribute("indent-size", "4");
+    await userEvent.keyboard("{Tab}");
+    await expect(editor.value).toBe("    a");
+
+    editor.setAttribute("indent-style", "tab");
+    editor.value = "b";
+    await userEvent.click(content);
+    await userEvent.keyboard("{Home}{Tab}");
+    await expect(editor.value).toBe("\tb");
+
+    // Esc e depois Tab deixam o editor em vez de recuar. O user-event nao envia keyCode, que o tab-focus mode do
+    // CodeMirror le: os eventos vao a mao, e a prova de que o Tab escapou e o keydown nao ter sido consumido (no
+    // navegador o foco segue entao para o proximo campo, o botao abaixo).
+    const press = (key: string, keyCode: number): boolean =>
+      content.dispatchEvent(new KeyboardEvent("keydown", { key, keyCode, bubbles: true, cancelable: true }));
+    expect(press("Tab", 9)).toBe(false);
+    await expect(editor.value).toBe("\t\tb");
+    press("Escape", 27);
+    expect(press("Tab", 9)).toBe(true);
+    await expect(editor.value).toBe("\t\tb");
+    expect(after).toBeInTheDocument();
+
+    // tab-indent="false": Tab e navegacao pura.
+    editor.setAttribute("tab-indent", "false");
+    expect(press("Tab", 9)).toBe(true);
+    await expect(editor.value).toBe("\t\tb");
+    editor.removeAttribute("tab-indent");
+
+    // Fim de linha: auto detecta CRLF do valor; lf/crlf forcam; por dentro o documento fica em LF.
+    editor.value = "x\r\ny";
+    expect(editor.resolvedLineEnding).toBe("crlf");
+    await expect(editor.value).toBe("x\r\ny");
+    expect(editor.view?.state.doc.toString()).toBe("x\ny");
+    editor.setAttribute("line-ending", "lf");
+    await expect(editor.value).toBe("x\ny");
+    editor.setAttribute("line-ending", "crlf");
+    editor.value = "p\nq";
+    await expect(editor.value).toBe("p\r\nq");
+    const changes: string[] = [];
+    editor.addEventListener("change", (event) => changes.push((event as CustomEvent<{ value: string }>).detail.value));
+    await userEvent.click(content);
+    await userEvent.keyboard("{Control>}{End}{/Control}{Enter}r");
+    await expect(changes.at(-1)).toBe("p\r\nq\r\nr");
+  }
+};
+
+export const Formatting = {
+  args: { language: "json", minHeight: "8rem" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`format()` (tambem Shift+Alt+F) formata o documento: JSON de fabrica, com o recuo configurado; outras linguagens so com a propriedade `formatter(value, language)` do app (Prettier, js-yaml...). JSON invalido ou formatador que lanca disparam `ark-format-error` e devolvem `false`; a formatacao entra no historico e emite `change`."
+      }
+    }
+  },
+  render: (args: StoryArgs) => createEditor(args, '{"a":1,"b":[1,2,{"c":true}]}'),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const errors: unknown[] = [];
+    const changes: string[] = [];
+    editor.addEventListener("ark-format-error", (event) => errors.push((event as CustomEvent).detail.error));
+    editor.addEventListener("change", (event) => changes.push((event as CustomEvent<{ value: string }>).detail.value));
+
+    expect(editor.canFormat).toBe(true);
+    await expect(editor.format()).resolves.toBe(true);
+    await expect(editor.value).toBe('{\n  "a": 1,\n  "b": [\n    1,\n    2,\n    {\n      "c": true\n    }\n  ]\n}');
+    expect(changes.length).toBe(1);
+
+    // Recuo por tabulacao vale para o JSON formatado; o atalho faz o mesmo que format().
+    editor.setAttribute("indent-style", "tab");
+    editor.value = '{"k":[1]}';
+    await userEvent.click(editor.querySelector<HTMLElement>(".cm-content")!);
+    await userEvent.keyboard("{Shift>}{Alt>}f{/Alt}{/Shift}");
+    await waitFor(() => expect(editor.value).toBe('{\n\t"k": [\n\t\t1\n\t]\n}'));
+
+    // JSON invalido: erro reportado, documento intacto.
+    editor.value = "{oops";
+    await expect(editor.format()).resolves.toBe(false);
+    expect(errors.length).toBe(1);
+    await expect(editor.value).toBe("{oops");
+
+    // Sem formatador, YAML nao formata; com o formatador do app, formata o que ele devolver.
+    editor.setAttribute("language", "yaml");
+    expect(editor.canFormat).toBe(false);
+    await expect(editor.format()).resolves.toBe(false);
+    editor.formatter = (value, language) => `# ${language}\n${value.trim()}\n`;
+    expect(editor.canFormat).toBe(true);
+    editor.value = "  a: 1  ";
+    await expect(editor.format()).resolves.toBe(true);
+    await expect(editor.value).toBe("# yaml\na: 1\n");
+  }
+};
+
+export const Completions = {
+  args: { language: "yaml", minHeight: "8rem" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Alem das completions da propria linguagem (JavaScript traz palavras-chave e variaveis locais), `completions` oferece palavras do app em qualquer linguagem (chaves de um schema, por exemplo) e `completionSource` uma fonte com contexto; `autocomplete="false"` desliga tudo. Ctrl+Espaco abre a lista a qualquer momento.'
+      }
+    }
+  },
+  render: (args: StoryArgs) => {
+    const el = createEditor(args, "");
+    el.completions = [
+      { label: "apiVersion", type: "keyword", detail: "string" },
+      { label: "kind", type: "keyword", detail: "string" },
+      { label: "metadata", type: "property" },
+      { label: "spec", type: "property" }
+    ];
+    return el;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const content = editor.querySelector<HTMLElement>(".cm-content")!;
+
+    await userEvent.click(content);
+    await userEvent.keyboard("ap");
+    const list = await waitFor(() => {
+      const ul = document.querySelector<HTMLElement>(".cm-tooltip-autocomplete ul");
+      expect(ul).not.toBeNull();
+      return ul!;
+    });
+    expect(Array.from(list.querySelectorAll("li")).map((li) => li.textContent?.trim())).toEqual(["apiVersionstring"]);
+    await new Promise((resolve) => setTimeout(resolve, 120));
+    await userEvent.keyboard("{Enter}");
+    await expect(editor.value).toBe("apiVersion");
+
+    // Fonte propria com contexto: depois de "kind: " sugere os tipos.
+    editor.completionSource = (context) => {
+      const match = context.matchBefore(/kind:\s*\w*/);
+      if (!match) return null;
+      const typed = match.text.match(/\w*$/)?.[0] ?? "";
+      return { from: match.to - typed.length, options: [{ label: "Deployment" }, { label: "Service" }] };
+    };
+    editor.value = "kind: ";
+    await userEvent.click(content);
+    await userEvent.keyboard("{End}D");
+    await waitFor(() => expect(document.querySelector(".cm-tooltip-autocomplete li")?.textContent).toBe("Deployment"));
+    await userEvent.keyboard("{Escape}");
+
+    // autocomplete="false" desliga tudo, inclusive Ctrl+Espaco.
+    editor.setAttribute("autocomplete", "false");
+    editor.value = "";
+    await userEvent.click(content);
+    await userEvent.keyboard("ap");
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    expect(document.querySelector(".cm-tooltip-autocomplete")).toBeNull();
   }
 };
 
