@@ -7,12 +7,12 @@
 [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](pnpm-workspace.yaml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](tsconfig.base.json)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](packages/tokens/tokens.css)
-[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.github.io/web-components/)
+[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.com/web-components/)
 [![npm](https://img.shields.io/npm/v/@tooark/web-components?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/web-components)
 
 Biblioteca de componentes agnóstica de framework construída sobre **Web Components** nativos (Custom Elements), com wrappers dedicados para **React**, **Vue** e **Angular**. Os componentes seguem a convenção da família **Ark** (elementos `ark-*`, tipos `Ark*`, tokens CSS `--ark-*`) e são estilizados com **Tailwind CSS v4** sobre uma camada compartilhada de design tokens.
 
-📖 **Docs:** [Storybook (exemplos vivos)](https://tooark.github.io/web-components/) · [pacotes no npm](https://www.npmjs.com/search?q=%40tooark) · [Changelog](CHANGELOG.md)
+📖 **Docs:** [Storybook (exemplos vivos)](https://tooark.com/web-components/) · [pacotes no npm](https://www.npmjs.com/search?q=%40tooark) · [Changelog](CHANGELOG.md)
 
 🌍 **Idiomas:** [![USA Flag](https://flagcdn.com/w20/us.png) English](https://github.com/Tooark/web-components/blob/main/README.md) · ![Brazil Flag](https://flagcdn.com/w20/br.png) **Português (este arquivo)**
 
@@ -255,7 +255,7 @@ Os motion tokens são sobrescritos como os tokens de cor, com uma regra: mantenh
 
 ## Começando
 
-Exemplos vivos de todos os componentes, com os testes de interação, estão no **[Storybook](https://tooark.github.io/web-components/)**. As seções abaixo vão da instalação a um formulário funcionando em cada ambiente.
+Exemplos vivos de todos os componentes, com os testes de interação, estão no **[Storybook](https://tooark.com/web-components/)**. As seções abaixo vão da instalação a um formulário funcionando em cada ambiente.
 
 ### Instalação
 
@@ -785,7 +785,7 @@ Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) qu
 
 ## Contribuindo
 
-Bugs e pedidos de funcionalidade entram pelos [templates de issue](https://github.com/Tooark/web-components/issues/new/choose); o [CONTRIBUTING.md](CONTRIBUTING.md) cobre o fluxo de desenvolvimento, a convenção de commits (Conventional Commits em português, assinatura DCO) e o checklist de um componente novo. Questões de segurança seguem o [SECURITY.md](SECURITY.md) (advisories privados, nunca uma issue pública), e todo mundo no espaço do projeto segue o [Código de Conduta](CODE_OF_CONDUCT.md).
+Bugs e pedidos de funcionalidade entram pelos [templates de issue](https://github.com/Tooark/web-components/issues/new/choose); o [CONTRIBUTING.md](CONTRIBUTING.md) cobre o fluxo de desenvolvimento, a convenção de commits (Conventional Commits em português, assinatura DCO) e o checklist de um componente novo. Dúvidas e onde achar ajuda estão no [SUPPORT.md](SUPPORT.md). Questões de segurança seguem o [SECURITY.md](SECURITY.md) (advisories privados, nunca uma issue pública), e todo mundo no espaço do projeto segue o [Código de Conduta](CODE_OF_CONDUCT.md).
 
 ---
 

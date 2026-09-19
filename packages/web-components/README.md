@@ -103,7 +103,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-toggle-group` — Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.
 - `ark-tooltip` — Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.
 
-Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.github.io/web-components/).
+Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 
 ---
 

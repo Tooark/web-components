@@ -72,7 +72,7 @@ Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-
 - Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, `@ark-event-click` em `ArkScheduler`, …); eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`).
 
-Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.github.io/web-components/).
+Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 
 ---
 

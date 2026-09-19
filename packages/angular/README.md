@@ -64,7 +64,7 @@ One standalone component per element: `ark-button` → `ArkButtonComponent` (`<a
 - State: attributes like `open` are the source of truth (`[open]="bool"` + `(arkClose)`).
 - Raw `ark-*` tags (side packages): add `schemas: [CUSTOM_ELEMENTS_SCHEMA]` to your component and call the `registerTooark*()` function in the browser.
 
-Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.github.io/web-components/).
+Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 
 ---
 

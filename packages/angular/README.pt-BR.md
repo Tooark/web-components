@@ -64,7 +64,7 @@ Um componente standalone por elemento: `ark-button` → `ArkButtonComponent` (`<
 - Estado: atributos como `open` são a fonte da verdade (`[open]="bool"` + `(arkClose)`).
 - Tags `ark-*` cruas (pacotes laterais): adicione `schemas: [CUSTOM_ELEMENTS_SCHEMA]` ao seu componente e chame a função `registerTooark*()` no navegador.
 
-Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.github.io/web-components/).
+Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 
 ---
 

@@ -63,7 +63,7 @@ One wrapper per element, named after it: `ark-button` → `ArkButton`, `ark-kv-e
 - Events: `on<Event>` for the custom events, receiving the `CustomEvent` (`onChange` on `ArkSelect`/`ArkKvEditor`, `onClose` on `ArkDialog`/`ArkDrawer`, `onSelect` on `ArkMenu`/`ArkCommandPalette`, `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` on `ArkScheduler`, …). Native events bubble from the inner control (`onInput` on `ArkInput`: read `event.target.value`).
 - State: attributes like `open` are the source of truth (`ArkDialog open={bool}` + `onClose`), so controlled rendering works and the exit still animates.
 
-Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.github.io/web-components/).
+Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 
 ---
 

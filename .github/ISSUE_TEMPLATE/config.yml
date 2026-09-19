@@ -2,6 +2,9 @@
 # questions that don't fit the bug/feature templates go in a blank issue.
 blank_issues_enabled: true
 contact_links:
+  - name: 💬 Need help? Read SUPPORT.md first
+    url: https://github.com/Tooark/web-components/blob/main/SUPPORT.md
+    about: Where the docs are, how to ask a question and what to expect.
   - name: 🔒 Report a security vulnerability
     url: https://github.com/Tooark/web-components/security/advisories/new
     about: Please use private security advisories, not public issues.

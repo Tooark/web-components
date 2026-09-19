@@ -161,6 +161,10 @@ One component (or one concern) per commit; the body says what changed and why,
 including the decisions that would otherwise be lost. No `Co-Authored-By` or
 tool trailers besides the DCO `Signed-off-by`.
 
+The `DCO` workflow checks every commit of a pull request for the trailer and
+fails with the list of unsigned commits; fix them with
+`git rebase --signoff <base> && git push --force-with-lease`.
+
 ---
 
 ## Documentation standards
@@ -217,6 +221,7 @@ Before opening a PR, confirm:
 ## Community
 
 - 🐛 [Issues](https://github.com/Tooark/web-components/issues)
+- 💬 [Support](SUPPORT.md)
 - 🔒 [Security policy](SECURITY.md)
 - 📜 [Code of Conduct](CODE_OF_CONDUCT.md)
 - 🌐 [Tooark](https://tooark.com)

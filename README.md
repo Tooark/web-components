@@ -7,12 +7,12 @@
 [![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](pnpm-workspace.yaml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](tsconfig.base.json)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](packages/tokens/tokens.css)
-[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.github.io/web-components/)
+[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.com/web-components/)
 [![npm](https://img.shields.io/npm/v/@tooark/web-components?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/web-components)
 
 A framework-agnostic component library built on native **Web Components** (Custom Elements), with first-class wrappers for **React**, **Vue** and **Angular**. Components follow the **Ark** family naming convention (`ark-*` elements, `Ark*` types, `--ark-*` CSS tokens) and are styled with **Tailwind CSS v4** on top of a shared design-token layer.
 
-📖 **Docs:** [Storybook (live examples)](https://tooark.github.io/web-components/) · [npm packages](https://www.npmjs.com/search?q=%40tooark) · [Changelog](CHANGELOG.md)
+📖 **Docs:** [Storybook (live examples)](https://tooark.com/web-components/) · [npm packages](https://www.npmjs.com/search?q=%40tooark) · [Changelog](CHANGELOG.md)
 
 🌍 **Languages:** ![USA Flag](https://flagcdn.com/w20/us.png) **English (this file)** · [![Brazil Flag](https://flagcdn.com/w20/br.png) Português](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md)
 
@@ -255,7 +255,7 @@ Motion tokens are overridden like the color tokens, with one rule: keep duration
 
 ## Getting started
 
-Live examples of every component, with their interaction tests, are in the **[Storybook](https://tooark.github.io/web-components/)**. The sections below take you from installation to a working form in each environment.
+Live examples of every component, with their interaction tests, are in the **[Storybook](https://tooark.com/web-components/)**. The sections below take you from installation to a working form in each environment.
 
 ### Installation
 
@@ -785,7 +785,7 @@ Always prefer semantic selectors (`getByRole("switch", { name: "..." })`) when p
 
 ## Contributing
 
-Bug reports and feature requests go through the [issue templates](https://github.com/Tooark/web-components/issues/new/choose); [CONTRIBUTING.md](CONTRIBUTING.md) covers the development workflow, the commit convention (Conventional Commits in Portuguese, DCO sign-off) and the checklist for a new component. Security issues follow [SECURITY.md](SECURITY.md) (private advisories, never a public issue), and everyone in the project space is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
+Bug reports and feature requests go through the [issue templates](https://github.com/Tooark/web-components/issues/new/choose); [CONTRIBUTING.md](CONTRIBUTING.md) covers the development workflow, the commit convention (Conventional Commits in Portuguese, DCO sign-off) and the checklist for a new component. Questions and where to find help are in [SUPPORT.md](SUPPORT.md). Security issues follow [SECURITY.md](SECURITY.md) (private advisories, never a public issue), and everyone in the project space is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ---
 

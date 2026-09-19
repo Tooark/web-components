@@ -103,7 +103,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-toggle-group` — Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.
 - `ark-tooltip` — Tooltip sobre a Popover API: envolve o gatilho sem movê-lo, texto por `content` ou `slot="content"` rico, `side` com flip, `delay`, hover/foco/Esc, `aria-describedby` no gatilho.
 
-Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.github.io/web-components/).
+Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 
 ---
 
