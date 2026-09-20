@@ -488,3 +488,136 @@ export const TestHooks = {
     expect(root.hasAttribute("data-testid")).toBe(false);
   }
 };
+
+export const Properties = {
+  args: { language: "json", minHeight: "6rem" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Cada propriedade JS reflete no atributo correspondente e le de volta com validacao (valor fora da faixa cai no padrao); booleanos seguem a regra dos wrappers ("" e true ligam, false, "false", null e undefined desligam). `variableKeys`, `completions`, `completionSource` e `formatter` tambem valem depois de montado, e `focus()` foca o CodeMirror.'
+      }
+    }
+  },
+  render: (args: StoryArgs) => createEditor(args, "{}"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const content = editor.querySelector<HTMLElement>(".cm-content")!;
+    const root = editor.view!.dom;
+
+    // Padroes (os argumentos da story deixam placeholder e theme nos valores do meta).
+    expect(editor.indentStyle).toBe("space");
+    expect(editor.indentSize).toBe(2);
+    expect(editor.lineEnding).toBe("auto");
+    expect(editor.tabIndent).toBe(true);
+    expect(editor.autocomplete).toBe(true);
+    expect(editor.language).toBe("json");
+    expect(editor.readonly).toBe(false);
+    expect(editor.wrap).toBe(false);
+    expect(editor.lineNumbers).toBe(true);
+    expect(editor.fold).toBe(true);
+    expect(editor.minHeight).toBe("6rem");
+    expect(editor.theme).toBe("auto");
+
+    // Recuo e fim de linha: setter reflete, getter valida.
+    editor.indentStyle = "tab";
+    await expect(editor).toHaveAttribute("indent-style", "tab");
+    editor.indentSize = 4;
+    await expect(editor).toHaveAttribute("indent-size", "4");
+    expect(editor.indentSize).toBe(4);
+    editor.indentSize = 99;
+    expect(editor.indentSize).toBe(2);
+    editor.lineEnding = "crlf";
+    await expect(editor).toHaveAttribute("line-ending", "crlf");
+    expect(editor.lineEnding).toBe("crlf");
+    editor.setAttribute("line-ending", "cr");
+    expect(editor.lineEnding).toBe("auto");
+
+    // Booleanos com a regra dos wrappers.
+    editor.tabIndent = false;
+    await expect(editor).toHaveAttribute("tab-indent", "false");
+    expect(editor.tabIndent).toBe(false);
+    editor.tabIndent = "";
+    expect(editor.tabIndent).toBe(true);
+    editor.autocomplete = "false";
+    expect(editor.autocomplete).toBe(false);
+    editor.autocomplete = true;
+    await expect(editor).toHaveAttribute("autocomplete", "true");
+    editor.readonly = true;
+    await expect(editor).toHaveAttribute("readonly", "");
+    expect(content.getAttribute("contenteditable")).toBe("false");
+    editor.readonly = null;
+    expect(editor.readonly).toBe(false);
+    expect(content.getAttribute("contenteditable")).toBe("true");
+    editor.wrap = "";
+    expect(editor.wrap).toBe(true);
+    expect(content.classList.contains("cm-lineWrapping")).toBe(true);
+    editor.wrap = "false";
+    expect(editor.wrap).toBe(false);
+    editor.lineNumbers = false;
+    expect(editor.querySelector(".cm-lineNumbers")).toBeNull();
+    editor.lineNumbers = undefined;
+    expect(editor.lineNumbers).toBe(false);
+    editor.lineNumbers = true;
+    expect(editor.querySelector(".cm-lineNumbers")).not.toBeNull();
+    editor.fold = false;
+    await expect(editor).toHaveAttribute("fold", "false");
+    expect(editor.querySelector(".cm-foldGutter")).toBeNull();
+    editor.fold = "";
+    expect(editor.querySelector(".cm-foldGutter")).not.toBeNull();
+
+    // Linguagem, placeholder, altura minima e tema.
+    editor.language = "yaml";
+    await expect(editor).toHaveAttribute("language", "yaml");
+    expect(editor.language).toBe("yaml");
+    editor.setAttribute("language", "rust");
+    expect(editor.language).toBe("text");
+    editor.placeholder = "Vazio";
+    await expect(editor).toHaveAttribute("placeholder", "Vazio");
+    editor.value = "";
+    await expect(editor.querySelector(".cm-placeholder")).toHaveTextContent("Vazio");
+    editor.placeholder = null;
+    expect(editor.hasAttribute("placeholder")).toBe(false);
+    expect(editor.placeholder).toBe("");
+    expect(editor.querySelector(".cm-placeholder")).toBeNull();
+    editor.minHeight = "10rem";
+    await expect(editor).toHaveAttribute("min-height", "10rem");
+    expect(root.style.getPropertyValue("--ark-code-min-height")).toBe("10rem");
+    editor.minHeight = "";
+    expect(editor.hasAttribute("min-height")).toBe(false);
+    expect(editor.minHeight).toBe("8rem");
+    expect(root.style.getPropertyValue("--ark-code-min-height")).toBe("8rem");
+    editor.theme = "dark";
+    await expect(editor).toHaveAttribute("theme", "dark");
+    await waitFor(() => expect(editor.resolvedTheme).toBe("dark"));
+    editor.setAttribute("theme", "sepia");
+    expect(editor.theme).toBe("auto");
+
+    // Propriedades JS depois de montado: entradas invalidas sao filtradas.
+    editor.variableKeys = ["baseUrl", "", 3 as never];
+    expect(editor.variableKeys).toEqual(["baseUrl"]);
+    editor.variableKeys = null;
+    expect(editor.variableKeys).toEqual([]);
+    editor.completions = [{ label: "tooark" }, { detail: "sem label" } as never];
+    expect(editor.completions).toEqual([{ label: "tooark" }]);
+    editor.completions = undefined;
+    expect(editor.completions).toEqual([]);
+    // O instrumentador do Storybook embrulha funcoes passadas ao expect: a identidade e comparada fora dele.
+    const source = (): null => null;
+    editor.completionSource = source;
+    expect(editor.completionSource === source).toBe(true);
+    editor.completionSource = null;
+    expect(editor.completionSource).toBeUndefined();
+    const formatter = (value: string): string => value.trim();
+    editor.formatter = formatter;
+    expect(editor.formatter === formatter).toBe(true);
+    expect(editor.canFormat).toBe(true);
+    editor.formatter = null;
+    expect(editor.formatter).toBeUndefined();
+    expect(editor.canFormat).toBe(false);
+
+    // focus() entrega o foco ao CodeMirror.
+    editor.focus();
+    await waitFor(() => expect(editor.view!.hasFocus).toBe(true));
+  }
+};

@@ -236,3 +236,110 @@ export const TestHooks = {
     await expect(canvasElement.querySelector('[data-ark="button"]')).toBeNull();
   }
 };
+
+export const PropertiesAndFallbacks = {
+  render: () => {
+    const wrap = row(createCopyButton({ value: "inicial", feedbackMs: 300, lang: "en", variant: "outline" }));
+    const input = document.createElement("input");
+    input.id = "fonte-input";
+    input.value = "valor do input";
+    input.className = "rounded border border-slate-300 px-2 py-1 text-sm";
+    wrap.appendChild(input);
+    wrap.appendChild(createCopyButton({ htmlFor: "fonte-input", feedbackMs: 300, lang: "en", variant: "outline" }));
+    wrap.appendChild(createCopyButton({ htmlFor: "nao-existe", feedbackMs: 300, lang: "en", variant: "outline" }));
+    return wrap;
+  },
+  // Setters refletem nos atributos; `for` le o value de um input e devolve vazio sem alvo; `locale-json` troca os
+  // rotulos; copiar de novo dentro do feedback reinicia o timer; sem Clipboard API cai no execCommand com um
+  // textarea temporario; icon-only escreve o aria-label proprio sem apagar um do usuario; filhos do usuario
+  // (fora comentarios) tiram o rotulo proprio e o icone volta ao inicio do host.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const [el, fromInput, missing] = Array.from(canvasElement.querySelectorAll("ark-copy-button")) as CopyButtonEl[];
+    const written: string[] = [];
+    let denied = false;
+    const clipboard = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+    Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: {
+        writeText: (text: string) => {
+          if (denied) return Promise.reject(new Error("denied"));
+          written.push(text);
+          return Promise.resolve();
+        }
+      }
+    });
+    const execCommand = document.execCommand;
+
+    try {
+      el.value = "novo";
+      await expect(el).toHaveAttribute("value", "novo");
+      expect(el.value).toBe("novo");
+      el.feedbackMs = 200;
+      await expect(el).toHaveAttribute("feedback-ms", "200");
+      expect(el.feedbackMs).toBe(200);
+      el.setAttribute("feedback-ms", "abc");
+      expect(el.feedbackMs).toBe(1500);
+      el.feedbackMs = 200;
+
+      expect(fromInput.value).toBe("valor do input");
+      expect(missing.value).toBe("");
+      missing.removeAttribute("for");
+      expect(missing.value).toBe("");
+
+      // locale-json vale com lang="custom" e e mesclado sobre o en.
+      el.setAttribute("locale-json", JSON.stringify({ copy: "Copiar link", copied: "Link copiado" }));
+      expect(el.textContent?.trim()).toBe("Copy");
+      el.setAttribute("lang", "custom");
+      expect(el.textContent?.trim()).toBe("Copiar link");
+      expect(el.title).toBe("Copiar link");
+
+      // Duas copias dentro do feedback: um so ciclo, timer reiniciado.
+      expect(await el.copy()).toBe(true);
+      expect(await el.copy()).toBe(true);
+      expect(el.textContent?.trim()).toBe("Link copiado");
+      expect(written).toEqual(["novo", "novo"]);
+      await waitFor(() => expect(el).not.toHaveAttribute("data-ark-copied"));
+
+      // Clipboard API negada: fallback com textarea + execCommand, removido depois; erro no execCommand = falha.
+      denied = true;
+      document.execCommand = () => true;
+      expect(await el.copy()).toBe(true);
+      expect(document.querySelector("textarea")).toBeNull();
+      await waitFor(() => expect(el).not.toHaveAttribute("data-ark-copied"));
+      document.execCommand = () => {
+        throw new Error("sem permissao");
+      };
+      expect(await el.copy()).toBe(false);
+      expect(el).not.toHaveAttribute("data-ark-copied");
+
+      // icon-only: aria-label proprio, retirado ao voltar; um aria-label do usuario fica.
+      el.setAttribute("icon-only", "");
+      await expect(el).toHaveAttribute("aria-label", "Copiar link");
+      expect(el.querySelector('[data-ark="copy-button-text"]')).toBeNull();
+      el.removeAttribute("icon-only");
+      expect(el.hasAttribute("aria-label")).toBe(false);
+      expect(el.querySelector('[data-ark="copy-button-text"]')).not.toBeNull();
+      el.setAttribute("aria-label", "Meu rotulo");
+      el.setAttribute("icon-only", "");
+      await expect(el).toHaveAttribute("aria-label", "Meu rotulo");
+      el.removeAttribute("icon-only");
+      await expect(el).toHaveAttribute("aria-label", "Meu rotulo");
+
+      // Comentario nao conta como conteudo do usuario; um elemento inserido antes do icone manda o icone de
+      // volta ao inicio e dispensa o rotulo proprio.
+      el.appendChild(document.createComment("nota"));
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      expect(el.querySelector('[data-ark="copy-button-text"]')).not.toBeNull();
+      const badge = document.createElement("b");
+      badge.textContent = "!";
+      el.prepend(badge);
+      await waitFor(() => expect(el.firstElementChild).toHaveAttribute("data-ark", "copy-button-icon"));
+      expect(el.querySelector('[data-ark="copy-button-text"]')).toBeNull();
+      expect(el.contains(badge)).toBe(true);
+    } finally {
+      document.execCommand = execCommand;
+      if (clipboard) Object.defineProperty(navigator, "clipboard", clipboard);
+      else delete (navigator as { clipboard?: unknown }).clipboard;
+    }
+  }
+};
