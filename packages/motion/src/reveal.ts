@@ -29,14 +29,11 @@ export function arkReveal(targets: ArkMotionTargets, options: ArkRevealOptions =
     el.style.opacity = "0";
     el.style.willChange = "opacity, transform";
 
-    let revealed = false;
-
-    // Configura a observação do elemento usando a função inView.
+    // Configura a observação do elemento usando a função inView. O `once` é do próprio inView: sem cleanup
+    // devolvido ele para de observar o elemento depois da primeira entrada, então o callback não roda de novo.
     const stop = inView(
       el,
       () => {
-        if (once && revealed) return;
-        revealed = true;
         el.style.opacity = "";
         void arkStaggerEnter([el], { ...options, interval: 0 });
 
