@@ -1,6 +1,6 @@
 {
   "name": "@tooark/web-components",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tooark Web Components — Custom Elements (ark-*) (buttons, fields, dialogs, menus, calendar, key/value editor...) with Tailwind v4 and tokens",
   "keywords": [
     "tooark",

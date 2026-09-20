@@ -1,6 +1,6 @@
 {
   "name": "@tooark/angular",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tooark Angular — standalone wrappers for ark-* components for Angular",
   "keywords": [
     "tooark",
