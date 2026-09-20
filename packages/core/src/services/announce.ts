@@ -9,7 +9,7 @@ const pending: Partial<Record<ArkAnnouncePoliteness, ReturnType<typeof setTimeou
 function getRegion(politeness: ArkAnnouncePoliteness): HTMLElement | null {
   if (typeof document === "undefined") return null;
 
-  if (!container || !container.isConnected) {
+  if (!container?.isConnected) {
     container = document.createElement("div");
     container.setAttribute("data-ark", "announcer");
     // Visualmente oculto sem display:none, que faria o leitor de tela ignorar a região.
