@@ -511,6 +511,11 @@ export class ArkWysiwygEditor extends HTMLElement {
     button.title = label;
     button.setAttribute("aria-label", label);
     button.tabIndex = -1;
+    // No mouse o botão não rouba o foco do editor (padrão de toolbar de editor): a seleção continua visível e o
+    // comando aplica sobre ela sem vai-e-volta de foco. O focus() do Tiptap só devolve o foco no próximo frame, e
+    // um Enter digitado nesse intervalo acionava o botão em vez de chegar ao editor. Teclado entra pelo Tab.
+    button.addEventListener("mousedown", (event) => event.preventDefault());
+    button.addEventListener("click", () => this.setCurrent(button));
     this.controls.push(button);
     return button;
   }

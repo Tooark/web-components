@@ -11,6 +11,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- `ark-wysiwyg-editor`: toolbar buttons no longer take focus from the editor on mouse click, so the selection
+  stays visible while formatting and a key pressed right after a click reaches the editor, not the button
+  (Tiptap restores focus only on the next frame). Keyboard access through the toolbar is unchanged.
 - `ark-carousel`: a `next()`/`prev()` or arrow click in the same frame as the mount was undone by the deferred
   initial positioning (it went back to `start-index`), which let the smooth scroll finish on its own and fire a second
   `ark-slide-change`. The initial positioning now starts from the current index, and the pending frame is cancelled

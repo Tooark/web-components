@@ -236,7 +236,13 @@ export const Formatting = {
 
     // Listas: recuo so entra depois do segundo item; sair de lista desabilita de novo.
     editor.editor?.chain().focus("end").setParagraph().insertContent("\nUm").run();
-    await userEvent.click(canvas.getByRole("button", { name: "Lista com marcadores" }));
+    // Com o mouse pressionado (antes do click) o foco continua no editor: o botao cancela o mousedown, entao o
+    // Enter a seguir chega ao editor, nao ao botao (o focus() do Tiptap so voltaria no frame seguinte).
+    const bulletList = canvas.getByRole("button", { name: "Lista com marcadores" });
+    const mouse = userEvent.setup();
+    await mouse.pointer({ keys: "[MouseLeft>]", target: bulletList });
+    expect(content).toHaveFocus();
+    await mouse.pointer({ keys: "[/MouseLeft]", target: bulletList });
     await waitFor(() => expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeDisabled());
     // O ProseMirror le a digitacao pelo MutationObserver do DOM, entao o estado da barra chega um tick depois.
     await userEvent.keyboard("{Enter}Dois");
