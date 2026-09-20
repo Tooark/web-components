@@ -10,7 +10,8 @@ const config: StorybookConfig = {
     disableTelemetry: true
   },
   stories: ["../stories/**/*.stories.@(ts|mdx)"],
-  // Arquivos estaticos das stories (ex.: a imagem que o uploader de exemplo do wysiwyg devolve).
+  // Arquivos estaticos: a imagem que o uploader de exemplo do wysiwyg devolve, o logo da sidebar (manager.ts) e o
+  // favicon.svg, que o Storybook usa no lugar do proprio por estar na raiz do diretorio.
   staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-docs"),

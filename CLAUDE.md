@@ -116,7 +116,7 @@ Each of `packages/{react,vue,angular}/src` has one file per component plus `regi
 
 ### Storybook specifics
 
-`apps/storybook/.storybook/main.ts` aliases every `@tooark/*` import to the package `src/index.ts`, so Storybook and tests always run against source. `preview.ts` imports the lib CSS from source and registers web-components, chart, wysiwyg and code. `vitest.config.ts` sets a 30 s test timeout and `coverage.allowExternal` so coverage covers `packages/*`.
+`apps/storybook/.storybook/main.ts` aliases every `@tooark/*` import to the package `src/index.ts`, so Storybook and tests always run against source. `preview.ts` imports the lib CSS from source and registers web-components, chart, wysiwyg and code. `manager.ts` sets the Tooark brand (`storybook/theming` `create()` without `base`, so the manager keeps following the OS color scheme); `public/tooark-logo.svg` (mark from the tooark.github.io site plus wordmark, colors switched by `prefers-color-scheme` inside the SVG) and `public/favicon.svg` (the site's favicon, picked up automatically because it sits at the `staticDirs` root; Biome wants a `<title>` in every SVG) live there. `vitest.config.ts` sets a 30 s test timeout and `coverage.allowExternal` so coverage covers `packages/*`.
 
 ### Dependency policy
 
