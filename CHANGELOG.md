@@ -20,6 +20,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   when the element is removed.
 - `ark-toggle-group`: removing `disabled` from the group re-enabled items that were disabled on their own, because
   the group marked every item as disabled by it. An item already disabled keeps its own `disabled`.
+- `ark-toaster`: every new toast rebuilt the whole stack, so keyboard focus on a toast's button was dropped to the
+  page (contrary to the documented behavior) and a toast leaving the stack lost its exit animation. Rendering is now
+  incremental: existing cards stay, only the new card is created (at the top) and dismissed ones are removed. Changing
+  a host attribute (`position`, `rich-colors`, `close-button`, `lang`, `testid`) still rebuilds the cards.
 
 ## [1.0.0] - 2026-09-19
 
