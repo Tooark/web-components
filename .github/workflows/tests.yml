@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+# So leitura: o job nao escreve nada no repositorio (CodeQL actions/missing-workflow-permissions).
+permissions:
+  contents: read
+
 jobs:
   component-tests:
     runs-on: ubuntu-latest
