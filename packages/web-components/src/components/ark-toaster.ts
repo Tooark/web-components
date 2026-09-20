@@ -58,6 +58,9 @@ export class ArkToaster extends HTMLElement {
   }
 
   attributeChangedCallback(): void {
+    // Posição, rich-colors, close-button, lang e testid mudam os cards já montados: recria todos (sem reanimar a
+    // entrada, que `entered` lembra).
+    this.root?.replaceChildren();
     this.render();
   }
 
@@ -70,6 +73,11 @@ export class ArkToaster extends HTMLElement {
       type: options.type || "default"
     };
 
+    // Mesmo id: o card antigo sai e o toast volta ao topo como um novo.
+    if (this.toasts.some((toast) => toast.id === id)) {
+      this.cardOf(id)?.remove();
+      this.entered.delete(id);
+    }
     this.toasts = [item, ...this.toasts.filter((toast) => toast.id !== id)];
 
     const maxVisible = this.getMaxVisible();
@@ -107,13 +115,17 @@ export class ArkToaster extends HTMLElement {
       this.render();
     };
 
-    const card = this.root?.querySelector<HTMLElement>(`[data-toast-id="${id}"]`);
+    const card = this.cardOf(id);
     if (card) {
       this.exiting.add(id);
       arkExit(card, this.getExitPreset()).then(finalize);
     } else {
       finalize();
     }
+  }
+
+  private cardOf(id: string): HTMLElement | null {
+    return this.root?.querySelector<HTMLElement>(`[data-toast-id="${CSS.escape(id)}"]`) ?? null;
   }
 
   private readonly handleToast = (event: Event): void => {
@@ -287,16 +299,14 @@ export class ArkToaster extends HTMLElement {
     this.render();
   }
 
+  // Incremental: os cards da lista ficam onde estão (recriar um card focado jogaria o foco do teclado no body e
+  // o leitor de tela perderia o toast que estava lendo, e um card em saída perderia a animação), os que saíram da
+  // lista vão embora e só os novos são criados, cada um na posição da lista (o mais novo no topo).
   private render(): void {
     if (!this.root) return;
 
-    const position = this.getPosition();
-    const richColors = this.hasRichColors();
-    const closeButton = this.hasCloseButton();
     const palette = this.getPalette();
-
-    this.root.className = `${palette.stack} ${this.getPositionClasses(position)}`;
-    this.root.innerHTML = "";
+    this.root.className = `${palette.stack} ${this.getPositionClasses(this.getPosition())}`;
     applyTestHooks(this, "toaster", this.root);
     this.syncPopover();
 
@@ -305,100 +315,117 @@ export class ArkToaster extends HTMLElement {
       if (!activeIds.has(id)) this.entered.delete(id);
     }
 
-    for (const toast of this.toasts) {
-      const card = document.createElement("section");
-      card.setAttribute("part", "toast");
-      card.dataset.toastId = toast.id;
-      // Cada card compartilha o hook "toaster-toast"; desambigue via data-toast-id.
-      applyTestHooks(this, "toaster", card, "toast");
-      card.className = `${palette.toastBase} ${this.getToastTypeClasses(toast.type, richColors)}`.trim();
-
-      const row = document.createElement("div");
-      row.className = "ark:flex ark:items-start ark:gap-3";
-
-      const icon = document.createElement("span");
-      icon.className = `${palette.icon} ark:mt-0.5 ark:inline-flex ark:h-5 ark:w-5 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-current/20`;
-      icon.textContent = this.getToastIcon(toast.type);
-
-      const content = document.createElement("div");
-      content.className = "ark:min-w-0 ark:flex-1";
-
-      const title = document.createElement("h4");
-      title.className = palette.title;
-      applyTestHooks(this, "toaster", title, "toast-title");
-      title.textContent = toast.title;
-      content.appendChild(title);
-
-      if (toast.description) {
-        const description = document.createElement("p");
-        description.className = palette.description;
-        applyTestHooks(this, "toaster", description, "toast-description");
-        description.textContent = toast.description;
-        content.appendChild(description);
-      }
-
-      row.appendChild(icon);
-      row.appendChild(content);
-
-      if (closeButton) {
-        const close = document.createElement("button");
-        close.type = "button";
-        close.className = palette.closeButton;
-        applyTestHooks(this, "toaster", close, "toast-close");
-        close.textContent = this.getCloseLabel();
-        close.addEventListener("click", () => this.dismiss(toast.id));
-        row.appendChild(close);
-      }
-
-      card.appendChild(row);
-
-      if (toast.actionLabel || toast.cancelLabel) {
-        const actions = document.createElement("div");
-        actions.className = "ark:mt-3 ark:flex ark:items-center ark:justify-end ark:gap-2";
-
-        if (toast.cancelLabel) {
-          const cancel = document.createElement("button");
-          cancel.type = "button";
-          cancel.className = palette.cancelButton;
-          applyTestHooks(this, "toaster", cancel, "toast-cancel");
-          cancel.textContent = toast.cancelLabel;
-          cancel.addEventListener("click", () => this.dismiss(toast.id));
-          actions.appendChild(cancel);
-        }
-
-        if (toast.actionLabel) {
-          const action = document.createElement("button");
-          action.type = "button";
-          action.className = palette.actionButton;
-          applyTestHooks(this, "toaster", action, "toast-action");
-          action.textContent = toast.actionLabel;
-          action.addEventListener("click", () => {
-            this.dispatchEvent(
-              new CustomEvent("ark-toast-action", {
-                detail: { id: toast.id, actionId: toast.actionId || null },
-                bubbles: true,
-                composed: true
-              })
-            );
-            this.dismiss(toast.id);
-          });
-          actions.appendChild(action);
-        }
-
-        card.appendChild(actions);
-      }
-
-      this.root.appendChild(card);
-
-      if (this.exiting.has(toast.id)) {
-        // Re-render durante uma saída em andamento: mantém o card oculto
-        card.style.opacity = "0";
-        card.style.pointerEvents = "none";
-      } else if (!this.entered.has(toast.id)) {
-        this.entered.add(toast.id);
-        arkEnter(card, this.getEnterPreset());
+    const existing = new Map<string, HTMLElement>();
+    for (const card of Array.from(this.root.querySelectorAll<HTMLElement>("[data-toast-id]"))) {
+      const id = card.dataset.toastId ?? "";
+      if (activeIds.has(id)) {
+        existing.set(id, card);
+      } else {
+        card.remove();
       }
     }
+
+    // Do mais antigo (fim da pilha) ao mais novo: um card novo entra antes do card do toast seguinte na lista.
+    let next: HTMLElement | null = null;
+    for (let index = this.toasts.length - 1; index >= 0; index--) {
+      const toast = this.toasts[index];
+      let card = existing.get(toast.id);
+      if (!card) {
+        card = this.buildCard(toast, palette);
+        this.root.insertBefore(card, next);
+        if (!this.entered.has(toast.id)) {
+          this.entered.add(toast.id);
+          arkEnter(card, this.getEnterPreset());
+        }
+      }
+      next = card;
+    }
+  }
+
+  private buildCard(toast: ArkToastItem, palette: ArkToasterPalette): HTMLElement {
+    const card = document.createElement("section");
+    card.setAttribute("part", "toast");
+    card.dataset.toastId = toast.id;
+    // Cada card compartilha o hook "toaster-toast"; desambigue via data-toast-id.
+    applyTestHooks(this, "toaster", card, "toast");
+    card.className = `${palette.toastBase} ${this.getToastTypeClasses(toast.type, this.hasRichColors())}`.trim();
+
+    const row = document.createElement("div");
+    row.className = "ark:flex ark:items-start ark:gap-3";
+
+    const icon = document.createElement("span");
+    icon.className = `${palette.icon} ark:mt-0.5 ark:inline-flex ark:h-5 ark:w-5 ark:items-center ark:justify-center ark:rounded-full ark:border ark:border-current/20`;
+    icon.textContent = this.getToastIcon(toast.type);
+
+    const content = document.createElement("div");
+    content.className = "ark:min-w-0 ark:flex-1";
+
+    const title = document.createElement("h4");
+    title.className = palette.title;
+    applyTestHooks(this, "toaster", title, "toast-title");
+    title.textContent = toast.title;
+    content.appendChild(title);
+
+    if (toast.description) {
+      const description = document.createElement("p");
+      description.className = palette.description;
+      applyTestHooks(this, "toaster", description, "toast-description");
+      description.textContent = toast.description;
+      content.appendChild(description);
+    }
+
+    row.appendChild(icon);
+    row.appendChild(content);
+
+    if (this.hasCloseButton()) {
+      const close = document.createElement("button");
+      close.type = "button";
+      close.className = palette.closeButton;
+      applyTestHooks(this, "toaster", close, "toast-close");
+      close.textContent = this.getCloseLabel();
+      close.addEventListener("click", () => this.dismiss(toast.id));
+      row.appendChild(close);
+    }
+
+    card.appendChild(row);
+
+    if (toast.actionLabel || toast.cancelLabel) {
+      const actions = document.createElement("div");
+      actions.className = "ark:mt-3 ark:flex ark:items-center ark:justify-end ark:gap-2";
+
+      if (toast.cancelLabel) {
+        const cancel = document.createElement("button");
+        cancel.type = "button";
+        cancel.className = palette.cancelButton;
+        applyTestHooks(this, "toaster", cancel, "toast-cancel");
+        cancel.textContent = toast.cancelLabel;
+        cancel.addEventListener("click", () => this.dismiss(toast.id));
+        actions.appendChild(cancel);
+      }
+
+      if (toast.actionLabel) {
+        const action = document.createElement("button");
+        action.type = "button";
+        action.className = palette.actionButton;
+        applyTestHooks(this, "toaster", action, "toast-action");
+        action.textContent = toast.actionLabel;
+        action.addEventListener("click", () => {
+          this.dispatchEvent(
+            new CustomEvent("ark-toast-action", {
+              detail: { id: toast.id, actionId: toast.actionId || null },
+              bubbles: true,
+              composed: true
+            })
+          );
+          this.dismiss(toast.id);
+        });
+        actions.appendChild(action);
+      }
+
+      card.appendChild(actions);
+    }
+
+    return card;
   }
 }
 
