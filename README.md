@@ -4,10 +4,10 @@
 [![License](https://img.shields.io/github/license/Tooark/web-components?color=blue)](LICENSE)
 [![Version](https://img.shields.io/github/package-json/v/Tooark/web-components?label=version&color=informational)](package.json)
 [![Node](https://img.shields.io/badge/node-%E2%89%A522-339933?logo=node.js&logoColor=white)](package.json)
-[![pnpm](https://img.shields.io/badge/pnpm-11-F69220?logo=pnpm&logoColor=white)](pnpm-workspace.yaml)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white)](tsconfig.base.json)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](packages/tokens/tokens.css)
-[![Storybook](https://img.shields.io/badge/Storybook-10-FF4785?logo=storybook&logoColor=white)](https://tooark.com/web-components/)
+[![pnpm](https://img.shields.io/github/package-json/packageManager/Tooark/web-components?label=&logo=pnpm&logoColor=white&color=F69220)](package.json)
+[![TypeScript](https://img.shields.io/github/package-json/dependency-version/Tooark/web-components/dev/typescript?label=TypeScript&logo=typescript&logoColor=white&color=3178C6)](tsconfig.base.json)
+[![Tailwind CSS](https://img.shields.io/github/package-json/dependency-version/Tooark/web-components/dev/@tailwindcss/cli?label=Tailwind%20CSS&logo=tailwindcss&logoColor=white&color=06B6D4)](packages/tokens/tokens.css)
+[![Storybook](https://img.shields.io/github/package-json/dependency-version/Tooark/web-components/dev/storybook?label=Storybook&logo=storybook&logoColor=white&color=FF4785)](https://tooark.com/web-components/)
 [![npm](https://img.shields.io/npm/v/@tooark/web-components?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/web-components)
 
 A framework-agnostic component library built on native **Web Components** (Custom Elements), with first-class wrappers for **React**, **Vue** and **Angular**. Components follow the **Ark** family naming convention (`ark-*` elements, `Ark*` types, `--ark-*` CSS tokens) and are styled with **Tailwind CSS v4** on top of a shared design-token layer.
@@ -670,7 +670,7 @@ This is independent from the component stylesheet: the components carry their ow
 
 ## Development
 
-Requirements: **Node.js ≥ 22** and **pnpm 11** (version pinned via `packageManager`).
+Requirements: **Node.js ≥ 22** (CI runs on 24) and **pnpm 12** (version pinned via `packageManager`; pnpm switches to it on its own).
 
 ```bash
 pnpm install          # install all workspace dependencies

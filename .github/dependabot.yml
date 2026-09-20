@@ -62,6 +62,10 @@ updates:
         update-types: ["version-update:semver-major"]
       - dependency-name: "ng-packagr"
         update-types: ["version-update:semver-major"]
+      # TypeScript 7 (native port) waits for @angular/compiler-cli (>=5.9 <6.1) and @rollup/plugin-typescript
+      # (it uses the JS API that 7 no longer ships); deliberate bump once both support it.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       runtime-minor-patch:
         dependency-type: "production"

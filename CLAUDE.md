@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 pnpm monorepo for **Tooark Web Components**: framework-agnostic Custom Elements (`ark-*`) styled with Tailwind v4 on top of a design-token layer, plus React/Vue/Angular wrappers. Source comments and commit messages are written in Portuguese (Conventional Commits, no accents, e.g. `feat(web-components): ...`); the README is bilingual (`README.md` / `README.pt-BR.md`) and both must be kept in sync when public behavior changes.
 
-Requirements: Node >= 22, pnpm 11 (pinned via `packageManager`). Lint, formatting and import ordering are enforced by Biome (`biome.json` at the root: 120-column lines, double quotes, no trailing commas, `organizeImports` on, `noNonNullAssertion` off). The formatter cannot keep a space before the function parenthesis, so `name(): void` is the style. Suppress a deliberate violation in place with `// biome-ignore lint/<group>/<rule>: reason` (CSS uses the `/* */` form). Type checking is `tsc --strict` inside each package build; every Rollup config sets `noEmitOnError: true` on the TypeScript plugin because by default it only _warns_ about type errors and the build still succeeds (three errors shipped that way before the flag).
+Requirements: Node >= 22 (CI runs on 24), pnpm 12 (pinned via `packageManager`; pnpm self-switches to it), TypeScript 6.0 (the last JS-based line; 7 waits for `@angular/compiler-cli` and `@rollup/plugin-typescript`, and Dependabot ignores its majors). Lint, formatting and import ordering are enforced by Biome (`biome.json` at the root: 120-column lines, double quotes, no trailing commas, `organizeImports` on, `noNonNullAssertion` off). The formatter cannot keep a space before the function parenthesis, so `name(): void` is the style. Suppress a deliberate violation in place with `// biome-ignore lint/<group>/<rule>: reason` (CSS uses the `/* */` form). Type checking is `tsc --strict` inside each package build; every Rollup config sets `noEmitOnError: true` on the TypeScript plugin because by default it only _warns_ about type errors and the build still succeeds (three errors shipped that way before the flag).
 
 ### Comment convention
 
@@ -47,7 +47,7 @@ All `@tooark/*` packages share one version (root `package.json` is the source, `
 
 ### Windows notes
 
-- pnpm 11 may abort `pnpm run`/`build` in `runDepsStatusCheck` or hang on an interactive purge prompt. Use `$env:CI = "true"` and `pnpm --config.verify-deps-before-run=false --filter <pkg> build`; for installs, `pnpm install --config.confirmModulesPurge=false`.
+- pnpm may abort `pnpm run`/`build` in `runDepsStatusCheck` or hang on an interactive purge prompt. Use `$env:CI = "true"` and `pnpm --config.verify-deps-before-run=false --filter <pkg> build`; for installs, `pnpm install --config.confirmModulesPurge=false`.
 - The `@tooark/web-components` build intermittently fails with `EBUSY` on `dist/styles.css`; delete that file and rebuild.
 - `patches/` (gitignored) holds optional pnpm patches that raise Storybook/addon-vitest test-runner timeouts for slow Windows machines. They are **not** wired into `pnpm-workspace.yaml`; the "Run tests" widget inside the Storybook UI may time out on Windows, the CLI is unaffected. Never commit `patchedDependencies` without committing the patch files.
 - The "Run tests" widget in the Storybook UI keeps every story's axe report (addon-a11y) in the dev server; with full reports the server grew past the 4 GB heap and died with `JavaScript heap out of memory` after ~13 minutes (Node `DEP0205` warnings on startup are unrelated). `preview.ts` limits `a11y.options.resultTypes` to violations and incomplete, which lets the run finish (about 4 minutes, server around 2 GB); the CLI never retains the reports and stays near 1 GB. If the UI run still runs out of heap, run the CLI or start with `NODE_OPTIONS=--max-old-space-size=8192`.
@@ -120,4 +120,4 @@ Each of `packages/{react,vue,angular}/src` has one file per component plus `regi
 
 ### Dependency policy
 
-`pnpm-workspace.yaml` pins security floors via `overrides` (Angular >= 21.2.19, postcss, nanoid) and disables build scripts for `esbuild`/`@parcel/watcher`. The Angular peer range in `packages/angular/package.json` must stay aligned with that floor.
+`pnpm-workspace.yaml` pins security floors via `overrides` (Angular >= 21.2.19, postcss, nanoid), disables build scripts for `esbuild`/`@parcel/watcher` and allows TypeScript 6 for `ng-packagr` 21.2 (`peerDependencyRules.allowedVersions`: the Angular 21.2 compiler accepts `<6.1` and the build passes, only ng-packagr's declared peer lags; drop the rule when Angular moves to 22). The Angular peer range in `packages/angular/package.json` must stay aligned with that floor.

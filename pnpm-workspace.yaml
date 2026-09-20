@@ -7,6 +7,13 @@ allowBuilds:
   # Dependência opcional do Tailwind CLI (--watch); usa binário pré-compilado.
   "@parcel/watcher": false
 
+# TypeScript 6.0 (último da linha JS, ponte para o 7): o @angular/compiler-cli 21.2 aceita `>=5.9 <6.1` e o build
+# do @tooark/angular passa, mas o ng-packagr 21.2 ainda declara `<6.0` no peer. Só o ng-packagr 22 alarga, e ele
+# puxa o Angular 22 (biblioteca compila com o menor Angular que suporta). Regra de peer até o Angular subir.
+peerDependencyRules:
+  allowedVersions:
+    "ng-packagr>typescript": "6"
+
 # Correções de segurança em dependências transitivas/peers (pnpm audit):
 # só os ranges vulneráveis são substituídos pela versão corrigida.
 overrides:

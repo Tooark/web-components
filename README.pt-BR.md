@@ -670,7 +670,7 @@ Isso é independente da folha de estilo dos componentes: eles carregam a própri
 
 ## Desenvolvimento
 
-Requisitos: **Node.js ≥ 22** e **pnpm 11** (versão fixada via `packageManager`).
+Requisitos: **Node.js ≥ 22** (o CI roda no 24) e **pnpm 12** (versão fixada via `packageManager`; o pnpm troca para ela sozinho).
 
 ```bash
 pnpm install          # instala as dependências do workspace

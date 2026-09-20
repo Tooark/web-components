@@ -63,8 +63,8 @@ Shared, repo-wide files:
 
 ## Development workflow
 
-**Prerequisites:** Node.js ≥ 22 and pnpm 11 (`corepack enable` picks the pinned
-version from `packageManager`).
+**Prerequisites:** Node.js ≥ 22 (CI runs on 24) and pnpm 12 (pnpm and `corepack enable` both pick the
+pinned version from `packageManager`).
 
 1. **Fork** the repository and clone your fork.
 2. Create a feature branch: `git checkout -b feat/short-description`.
