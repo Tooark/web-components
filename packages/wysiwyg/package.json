@@ -1,6 +1,6 @@
 {
   "name": "@tooark/wysiwyg",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tooark WYSIWYG — rich text editor and viewer (<ark-wysiwyg-editor>, <ark-wysiwyg-viewer>) built on Tiptap, featuring sanitized JSON content",
   "keywords": [
     "tooark",

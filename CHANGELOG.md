@@ -9,6 +9,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-09-20
+
 ### Fixed
 
 - `ark-wysiwyg-editor`: toolbar buttons no longer take focus from the editor on mouse click, so the selection
@@ -49,5 +51,6 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/Tooark/web-components/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Tooark/web-components/releases/tag/v1.0.0

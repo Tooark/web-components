@@ -1,6 +1,6 @@
 {
   "name": "@tooark/react",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tooark React — typed wrappers for ark-* components for React 18 and 19",
   "keywords": [
     "tooark",

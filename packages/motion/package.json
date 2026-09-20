@@ -1,6 +1,6 @@
 {
   "name": "@tooark/motion",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Tooark Motion — opt-in animation helpers (stagger, scroll reveal, FLIP, swipe) on top of the Motion lib, with design system tokens",
   "keywords": [
     "tooark",
