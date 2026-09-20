@@ -26,6 +26,16 @@ const config: StorybookConfig = {
     // compilam o próprio CSS com o Tailwind CLI, sem depender daqui.
     viteConfig.plugins = [...(viteConfig.plugins || []), tailwindcss()];
 
+    // Os tokens de cor são light-dark(). No `storybook build` o Vite 8 minifica o CSS com o Lightning CSS mirando
+    // "baseline-widely-available" (Chrome 107, Safari 16...), que não conhece light-dark() e a troca pelo polyfill
+    // `var(--lightningcss-light, a) var(--lightningcss-dark, b)`; ele só funciona onde há um `color-scheme`
+    // declarado, e a lib só o declara em theme="light|dark", então todo host sem o atributo ficava sem cor.
+    // Declarar os navegadores que já suportam light-dark() mantém a função nativa, como no dist/styles.css.
+    viteConfig.build = {
+      ...viteConfig.build,
+      cssTarget: ["chrome123", "edge123", "firefox120", "safari17.5"]
+    };
+
     viteConfig.resolve = viteConfig.resolve || {};
     viteConfig.resolve.alias = {
       ...(viteConfig.resolve.alias || {}),
