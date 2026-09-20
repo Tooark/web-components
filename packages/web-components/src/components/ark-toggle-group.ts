@@ -141,8 +141,11 @@ export class ArkToggleGroup extends HTMLElement {
       if (intent) toggle.setAttribute("intent", intent);
       if (theme) toggle.setAttribute("theme", theme);
       if (disabled) {
-        toggle.setAttribute("disabled", "");
-        toggle.dataset.groupDisabled = "true";
+        // Um item já desabilitado por conta própria não leva a marca do grupo, senão ela apagaria o individual.
+        if (!toggle.hasAttribute("disabled")) {
+          toggle.setAttribute("disabled", "");
+          toggle.dataset.groupDisabled = "true";
+        }
       } else if (toggle.dataset.groupDisabled) {
         // Só remove o "disabled" que o próprio grupo aplicou; preserva o individual.
         toggle.removeAttribute("disabled");

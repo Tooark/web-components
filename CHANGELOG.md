@@ -18,6 +18,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   initial positioning (it went back to `start-index`), which let the smooth scroll finish on its own and fire a second
   `ark-slide-change`. The initial positioning now starts from the current index, and the pending frame is cancelled
   when the element is removed.
+- `ark-toggle-group`: removing `disabled` from the group re-enabled items that were disabled on their own, because
+  the group marked every item as disabled by it. An item already disabled keeps its own `disabled`.
 
 ## [1.0.0] - 2026-09-19
 
