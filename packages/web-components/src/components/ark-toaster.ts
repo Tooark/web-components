@@ -79,17 +79,8 @@ export class ArkToaster extends HTMLElement {
       this.entered.delete(id);
     }
     this.toasts = [item, ...this.toasts.filter((toast) => toast.id !== id)];
-
-    const maxVisible = this.getMaxVisible();
-    if (this.toasts.length > maxVisible) {
-      const removed = this.toasts.slice(maxVisible);
-      this.toasts = this.toasts.slice(0, maxVisible);
-      for (const toast of removed) {
-        this.clearTimer(toast.id);
-      }
-    }
-
-    this.scheduleDismiss(item);
+    // O render agenda o fechamento dos visíveis; o mesmo id recomeça a contagem.
+    this.clearTimer(id);
     this.render();
     // Um overlay aberto depois da pilha ficaria por cima dela: reentrar no top layer a põe acima de novo.
     this.raise();
@@ -310,7 +301,16 @@ export class ArkToaster extends HTMLElement {
     applyTestHooks(this, "toaster", this.root);
     this.syncPopover();
 
-    const activeIds = new Set(this.toasts.map((toast) => toast.id));
+    // Até max-visible cards; o excedente (os mais antigos) espera na fila com o relógio parado e entra quando um sai.
+    const visible = this.toasts.slice(0, this.getMaxVisible());
+    const activeIds = new Set(visible.map((toast) => toast.id));
+    for (const toast of this.toasts) {
+      if (!activeIds.has(toast.id)) {
+        this.clearTimer(toast.id);
+      } else if (!this.timers.has(toast.id) && !this.exiting.has(toast.id)) {
+        this.scheduleDismiss(toast);
+      }
+    }
     for (const id of this.entered) {
       if (!activeIds.has(id)) this.entered.delete(id);
     }
@@ -327,8 +327,8 @@ export class ArkToaster extends HTMLElement {
 
     // Do mais antigo (fim da pilha) ao mais novo: um card novo entra antes do card do toast seguinte na lista.
     let next: HTMLElement | null = null;
-    for (let index = this.toasts.length - 1; index >= 0; index--) {
-      const toast = this.toasts[index];
+    for (let index = visible.length - 1; index >= 0; index--) {
+      const toast = visible[index];
       let card = existing.get(toast.id);
       if (!card) {
         card = this.buildCard(toast, palette);
