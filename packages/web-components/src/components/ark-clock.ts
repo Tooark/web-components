@@ -1,5 +1,6 @@
 import type { ArkDatepickerLang, ArkIntent } from "@tooark/core";
 import { resolveLocale } from "@tooark/core";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkClockColumn = "hours" | "minutes" | "seconds" | "meridiem";
@@ -47,6 +48,10 @@ export class ArkClock extends HTMLElement {
 
   get value(): string {
     return this.getAttribute("value") || "";
+  }
+
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
   }
 
   private getIntent(): ArkIntent {

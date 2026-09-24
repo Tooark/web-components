@@ -14,6 +14,7 @@ import {
   startOfWeek
 } from "./date-utils";
 import { intentColors } from "./intent-colors";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSchedulerPalette = {
@@ -117,7 +118,13 @@ export class ArkScheduler extends HTMLElement {
     return this.eventsProp ?? this.parseEventsAttr();
   }
 
-  set events(list: ArkSchedulerEvent[]) {
+  set events(list: ArkSchedulerEvent[] | string | null) {
+    // Frameworks que preferem propriedade a atributo (React 19, Vue) entregam o JSON do wrapper aqui.
+    if (typeof list === "string") {
+      this.eventsProp = null;
+      this.setAttribute("events", list);
+      return;
+    }
     this.eventsProp = Array.isArray(list) ? list : null;
     if (this.root) this.build();
   }
@@ -135,6 +142,10 @@ export class ArkScheduler extends HTMLElement {
   /** Data de referência da view atual (ISO YYYY-MM-DD). */
   get date(): string {
     return formatISODate(this.refDate);
+  }
+
+  set date(value: string | null | undefined) {
+    reflectAttr(this, "date", value);
   }
 
   private parseEventsAttr(): ArkSchedulerEvent[] {

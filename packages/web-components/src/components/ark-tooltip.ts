@@ -100,6 +100,11 @@ export class ArkTooltip extends HTMLElement {
 
   set open(value: boolean | string | null | undefined) {
     const next = coerceBooleanAttr(value);
+    // Desconectado (React 19 e Vue gravam a prop antes de inserir o nó): só reflete; o connectedCallback abre.
+    if (!this.isConnected) {
+      this.toggleAttribute("open", next);
+      return;
+    }
     if (next) {
       this.show();
     } else {
