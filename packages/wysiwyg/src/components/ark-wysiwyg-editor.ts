@@ -370,10 +370,6 @@ export class ArkWysiwygEditor extends HTMLElement {
 
   private build(): void {
     this.teardown();
-
-    if (this.pendingContent === null) {
-      this.pendingContent = this.content;
-    }
     this.labels = resolveWysiwygLabels(this.getAttribute("lang"), this.getAttribute("locale-json"));
 
     const root = document.createElement("div");
@@ -789,6 +785,8 @@ export class ArkWysiwygEditor extends HTMLElement {
     this.disposeTheme?.();
     this.disposeTheme = null;
     if (this.instance) {
+      // Reconstruir (toolbar, rótulos, paletas, gancho) ou mover o nó no DOM não pode perder o que foi digitado.
+      this.pendingContent = this.instance.getJSON();
       this.instance.editor.off("selectionUpdate", this.syncToolbar);
       this.instance.editor.off("transaction", this.syncToolbar);
       this.instance.destroy();

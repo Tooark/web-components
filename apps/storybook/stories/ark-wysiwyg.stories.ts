@@ -526,3 +526,30 @@ export const EditorAndViewer = {
     return wrap;
   }
 };
+
+export const KeepsEditsOnRebuild = {
+  args: { toolbar: "marks" },
+  render: (args: StoryArgs): HTMLElement => makeEditor(args, null),
+  // Trocar toolbar/lang/paletas/gancho reconstrói o Tiptap, e mover o nó desconecta e reconecta: o texto fica.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-wysiwyg-editor") as ArkWysiwygEditor;
+    const typed = (): string => editor.querySelector(".ProseMirror")?.textContent ?? "";
+
+    await userEvent.click(editor.querySelector<HTMLElement>(".ProseMirror")!);
+    await userEvent.keyboard("Rascunho importante");
+    await expect(typed()).toBe("Rascunho importante");
+
+    editor.setAttribute("toolbar", "all");
+    await expect(typed()).toBe("Rascunho importante");
+    editor.setAttribute("lang", "pt");
+    editor.colors = ["#dc2626"];
+    editor.uploadFile = fakeUploader;
+    await expect(typed()).toBe("Rascunho importante");
+
+    const holder = document.createElement("div");
+    canvasElement.append(holder);
+    holder.append(editor);
+    await expect(typed()).toBe("Rascunho importante");
+    await expect(JSON.stringify(editor.content)).toContain("Rascunho importante");
+  }
+};
