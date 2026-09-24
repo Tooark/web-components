@@ -79,7 +79,8 @@ export class ArkCommandPalette extends HTMLElement {
     if (!this.observer) {
       // Itens que entram ou saem (busca assíncrona, frameworks) reordenam a lista.
       this.observer = new MutationObserver(() => this.syncItems());
-      this.observer.observe(this, { childList: true });
+      // subtree: o item de um wrapper de framework entra dentro do wrapper, não como filho da paleta.
+      this.observer.observe(this, { childList: true, subtree: true });
     }
     document.addEventListener("keydown", this.handleHotkey);
     this.updateAppearance();
@@ -169,10 +170,13 @@ export class ArkCommandPalette extends HTMLElement {
 
   // --- Itens ---
 
-  /** Os ark-command-item filhos diretos, na ordem do DOM. */
+  /**
+   * Os ark-command-item desta paleta, na ordem do DOM. Descendentes, não só filhos: um wrapper de framework (o
+   * `<ark-command-item-wrapper>` do Angular) fica entre a paleta e o item. Itens de uma paleta aninhada são dela.
+   */
   private items(): ArkCommandItem[] {
-    return Array.from(this.querySelectorAll(":scope > ark-command-item")).filter(
-      (el): el is ArkCommandItem => el instanceof ArkCommandItem
+    return Array.from(this.querySelectorAll("ark-command-item")).filter(
+      (el): el is ArkCommandItem => el instanceof ArkCommandItem && el.closest("ark-command-palette") === this
     );
   }
 
@@ -220,14 +224,16 @@ export class ArkCommandPalette extends HTMLElement {
     }
     groups.forEach((group, index) => {
       const header = this.groupEls[index];
-      header.textContent = group;
+      // Só escreve o que mudou: o observer (subtree) veria a troca do nó de texto e sincronizaria em laço.
+      if (header.textContent !== group) header.textContent = group;
       header.style.order = String((index + 1) * 1000);
       applyTestHooks(this, "command-palette", header, "group");
     });
 
     this.listEl.setAttribute("aria-owns", visible.map((item) => item.id).join(" "));
     this.emptyEl.hidden = visible.length > 0;
-    this.emptyEl.textContent = this.getLocale().noResults;
+    const noResults = this.getLocale().noResults;
+    if (this.emptyEl.textContent !== noResults) this.emptyEl.textContent = noResults;
 
     const enabled = visible.filter((item) => !item.disabled);
     if (!enabled.some((item) => item.id === this.activeId)) this.activeId = enabled[0]?.id ?? null;
@@ -488,7 +494,7 @@ export class ArkCommandPalette extends HTMLElement {
         this.inputEl.removeAttribute(attr);
       }
     }
-    this.emptyEl.textContent = locale.noResults;
+    if (this.emptyEl.textContent !== locale.noResults) this.emptyEl.textContent = locale.noResults;
 
     applyTestHooks(this, "command-palette", this);
     applyTestHooks(this, "command-palette", this.inputEl, "input");
