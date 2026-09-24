@@ -176,7 +176,12 @@ export class ArkKvEditor extends HTMLElement {
     return this.model.map((row) => ({ ...row }));
   }
 
-  set rows(value: ArkKvRow[] | null | undefined) {
+  set rows(value: ArkKvRow[] | string | null | undefined) {
+    // Uma string é o JSON do atributo (React 19 e Vue gravam a prop como propriedade): segue o caminho do atributo.
+    if (typeof value === "string") {
+      this.setAttribute("rows", value);
+      return;
+    }
     this.model = Array.isArray(value) ? value.map(cloneRow) : [];
     this.resetRows();
     if (this.isConnected) this.updateAppearance();

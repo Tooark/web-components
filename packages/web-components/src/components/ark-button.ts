@@ -8,6 +8,7 @@ import {
   announce,
   coerceBooleanAttr
 } from "@tooark/core";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -236,6 +237,10 @@ export class ArkButton extends HTMLElement {
   get type(): ArkButtonType {
     const type = this.getAttribute("type");
     return type === "submit" || type === "reset" ? type : "button";
+  }
+
+  set type(value: ArkButtonType | null | undefined) {
+    reflectAttr(this, "type", value);
   }
 
   /**

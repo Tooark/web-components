@@ -9,6 +9,7 @@ import {
   resolveLocale
 } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /** Ícone do botão de fechar (chrome próprio do componente). */
@@ -87,6 +88,10 @@ export class ArkTab extends HTMLElement {
     return this.getAttribute("value") || "";
   }
 
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
+  }
+
   /** Aba ativa; o ark-tabs reflete aqui o seu `value`. */
   get selected(): boolean {
     return this.hasAttribute("selected");
@@ -115,6 +120,10 @@ export class ArkTab extends HTMLElement {
   /** Fechável só na variante `editor`; nas outras o atributo é ignorado. */
   get closable(): boolean {
     return this.hasAttribute("closable") && this.getVariant() === "editor";
+  }
+
+  set closable(value: boolean | string | null | undefined) {
+    this.toggleAttribute("closable", coerceBooleanAttr(value));
   }
 
   /** Pede a seleção desta aba: emite `change` com o valor, que o ark-tabs consolida. */

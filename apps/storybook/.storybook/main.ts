@@ -47,7 +47,10 @@ const config: StorybookConfig = {
       "@tooark/web-components": path.resolve(rootDir, "packages/web-components/src/index.ts"),
       "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
       "@tooark/code": path.resolve(rootDir, "packages/code/src/index.ts"),
-      "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts")
+      "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts"),
+      // Wrappers exercitados com react-dom e vue reais (framework-wrappers.stories.ts).
+      "@tooark/react": path.resolve(rootDir, "packages/react/src/index.tsx"),
+      "@tooark/vue": path.resolve(rootDir, "packages/vue/src/index.ts")
     };
 
     return viteConfig;

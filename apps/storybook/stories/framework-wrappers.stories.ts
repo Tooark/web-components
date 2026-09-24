@@ -1,0 +1,175 @@
+import type { ArkSchedulerEvent } from "@tooark/core";
+import {
+  ArkButton as ReactArkButton,
+  ArkDatepicker as ReactArkDatepicker,
+  ArkMenu as ReactArkMenu,
+  ArkMenuItem as ReactArkMenuItem,
+  ArkScheduler as ReactArkScheduler
+} from "@tooark/react";
+import { ArkButton as VueArkButton, ArkScheduler as VueArkScheduler } from "@tooark/vue";
+import { createElement, type ReactNode } from "react";
+import { flushSync } from "react-dom";
+import { createRoot, type Root } from "react-dom/client";
+import { expect, waitFor } from "storybook/test";
+import { createApp, h, nextTick, ref } from "vue";
+
+// Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
+// e os frameworks gravam as props como propriedade: o caminho que o React 19 e o Vue seguem num app real a partir do
+// segundo render.
+const meta = {
+  title: "Integration/Framework Wrappers"
+};
+
+export default meta;
+
+const EVENT_A: ArkSchedulerEvent = {
+  id: "a",
+  title: "Planejamento",
+  start: "2026-09-15T10:00",
+  end: "2026-09-15T11:00"
+};
+const EVENT_B: ArkSchedulerEvent = {
+  id: "b",
+  title: "Retrospectiva",
+  start: "2026-09-16T14:00",
+  end: "2026-09-16T15:00"
+};
+
+function mountPoint(canvasElement: HTMLElement): HTMLElement {
+  const host = document.createElement("div");
+  canvasElement.append(host);
+  return host;
+}
+
+function reactRoot(canvasElement: HTMLElement, errors: unknown[]): (node: ReactNode) => Root {
+  const root = createRoot(mountPoint(canvasElement), {
+    onUncaughtError: (error) => errors.push(error),
+    onCaughtError: (error) => errors.push(error)
+  });
+  return (node) => {
+    flushSync(() => root.render(node));
+    return root;
+  };
+}
+
+type Ctx = { canvasElement: HTMLElement };
+
+export const ReactSubmitButton = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    let submitted = 0;
+    const render = reactRoot(canvasElement, errors);
+    const form = (label: string): ReactNode =>
+      createElement(
+        "form",
+        {
+          onSubmit: (event: SubmitEvent) => {
+            event.preventDefault();
+            submitted++;
+          }
+        },
+        createElement(ReactArkButton, { type: "submit", intent: "primary" }, label)
+      );
+
+    render(form("Salvar"));
+    await expect(errors).toEqual([]);
+    const button = canvasElement.querySelector("ark-button") as HTMLElement;
+    await expect(button).toHaveAttribute("type", "submit");
+
+    button.click();
+    await waitFor(() => expect(submitted).toBe(1));
+
+    // Update depois do mount: o React regrava a prop só quando muda, mas o render não pode lançar.
+    render(form("Salvar de novo"));
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const ReactControlledProps = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const tree = (value: string, events: ArkSchedulerEvent[], open: boolean): ReactNode => [
+      createElement(ReactArkDatepicker, { key: "dp", value, mode: "date" }),
+      createElement(ReactArkScheduler, { key: "sc", date: "2026-09-15", view: "week", events }),
+      createElement("button", { key: "tg", id: "wrapper-menu-trigger", type: "button" }, "Ações"),
+      createElement(
+        ReactArkMenu,
+        { key: "mn", htmlFor: "wrapper-menu-trigger", open },
+        createElement(ReactArkMenuItem, { value: "abrir" }, "Abrir")
+      )
+    ];
+
+    render(tree("2026-09-15", [EVENT_A], true));
+    await expect(errors).toEqual([]);
+    const datepicker = canvasElement.querySelector("ark-datepicker") as HTMLElement & { value: string };
+    const scheduler = canvasElement.querySelector("ark-scheduler") as HTMLElement & { events: ArkSchedulerEvent[] };
+    const menu = canvasElement.querySelector("ark-menu") as HTMLElement;
+    await expect(datepicker.value).toBe("2026-09-15");
+    await expect(scheduler.events.map((event) => event.id)).toEqual(["a"]);
+    // `open` chega antes do nó entrar no DOM: o menu precisa abrir ao conectar.
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(true));
+    await expect(canvasElement.querySelector("ark-menu-item")).toHaveAttribute("value", "abrir");
+
+    render(tree("2026-09-20", [EVENT_A, EVENT_B], false));
+    await expect(errors).toEqual([]);
+    await expect(datepicker.value).toBe("2026-09-20");
+    await expect(scheduler.events.map((event) => event.id)).toEqual(["a", "b"]);
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(false));
+  }
+};
+
+export const VueSubmitButton = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    let submitted = 0;
+    const app = createApp({
+      setup: () => () =>
+        h(
+          "form",
+          {
+            onSubmit: (event: SubmitEvent) => {
+              event.preventDefault();
+              submitted++;
+            }
+          },
+          [h(VueArkButton, { type: "submit" }, () => "Salvar")]
+        )
+    });
+    // O Vue engole a falha de gravar a propriedade com um warn e nunca grava o atributo: o warn é o sintoma.
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+
+    const button = canvasElement.querySelector("ark-button") as HTMLElement;
+    await expect(problems).toEqual([]);
+    await expect(button).toHaveAttribute("type", "submit");
+    button.click();
+    await waitFor(() => expect(submitted).toBe(1));
+  }
+};
+
+export const VueControlledEvents = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const events = ref<ArkSchedulerEvent[]>([EVENT_A]);
+    const app = createApp({
+      setup: () => () => h(VueArkScheduler, { date: "2026-09-15", view: "week", events: events.value })
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+
+    const scheduler = canvasElement.querySelector("ark-scheduler") as HTMLElement & { events: ArkSchedulerEvent[] };
+    await expect(scheduler.events.map((event) => event.id)).toEqual(["a"]);
+
+    events.value = [EVENT_A, EVENT_B];
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expect(scheduler.events.map((event) => event.id)).toEqual(["a", "b"]);
+  }
+};

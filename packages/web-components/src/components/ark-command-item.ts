@@ -1,4 +1,5 @@
 import { coerceBooleanAttr } from "@tooark/core";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -42,9 +43,17 @@ export class ArkCommandItem extends HTMLElement {
     return this.getAttribute("value") || "";
   }
 
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
+  }
+
   /** Seção em que a paleta lista o item; vazio é sem grupo. */
   get group(): string {
     return (this.getAttribute("group") || "").trim();
+  }
+
+  set group(value: string | null | undefined) {
+    reflectAttr(this, "group", value);
   }
 
   /** Texto usado no filtro e no nome da opção: `label`, senão o texto dos filhos sem slot. */
@@ -57,6 +66,10 @@ export class ArkCommandItem extends HTMLElement {
       .join(" ")
       .replace(/\s+/g, " ")
       .trim();
+  }
+
+  set label(value: string | null | undefined) {
+    reflectAttr(this, "label", value);
   }
 
   get disabled(): boolean {

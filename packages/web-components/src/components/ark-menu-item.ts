@@ -1,5 +1,6 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { normalizeIntent } from "./intent-colors";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /** Ícone do item marcado (chrome próprio do componente). */
@@ -51,6 +52,10 @@ export class ArkMenuItem extends HTMLElement {
 
   get value(): string {
     return this.getAttribute("value") || "";
+  }
+
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
   }
 
   get disabled(): boolean {

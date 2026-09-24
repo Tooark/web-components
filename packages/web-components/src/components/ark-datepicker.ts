@@ -3,6 +3,7 @@ import { type ArkLocale, closePopover, openPopover, positionAnchored, resolveLoc
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /** Atributos repassados aos componentes internos. */
@@ -123,6 +124,10 @@ export class ArkDatepicker extends HTMLElement {
 
   get value(): string {
     return this.getAttribute("value") || "";
+  }
+
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
   }
 
   private hasRendered(): boolean {

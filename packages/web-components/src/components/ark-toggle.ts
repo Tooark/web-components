@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkTogglePalette = {
@@ -60,6 +61,10 @@ export class ArkToggle extends HTMLElement {
 
   get value(): string {
     return this.getAttribute("value") || "";
+  }
+
+  set value(value: string | null | undefined) {
+    reflectAttr(this, "value", value);
   }
 
   toggle(): void {

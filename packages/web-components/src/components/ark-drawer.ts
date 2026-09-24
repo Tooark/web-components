@@ -14,6 +14,7 @@ import {
   trapFocus,
   unlockScroll
 } from "@tooark/core";
+import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
 /** Ícone do botão de fechar (chrome próprio do componente). */
@@ -162,9 +163,17 @@ export class ArkDrawer extends HTMLElement {
     return side === "left" || side === "top" || side === "bottom" ? side : "right";
   }
 
+  set side(value: ArkDrawerSide | null | undefined) {
+    reflectAttr(this, "side", value);
+  }
+
   /** `overlay` (popover modal com scrim) ou `inline` (no fluxo, só anima). Padrão: "overlay". */
   get mode(): ArkDrawerMode {
     return (this.getAttribute("mode") || "").toLowerCase() === "inline" ? "inline" : "overlay";
+  }
+
+  set mode(value: ArkDrawerMode | null | undefined) {
+    reflectAttr(this, "mode", value);
   }
 
   /** Abre a gaveta: adiciona `open`, que faz o resto. */

@@ -75,8 +75,9 @@ export class ArkSplitPane extends HTMLElement {
     return this.normalizedSizes(this.panels().length);
   }
 
-  set sizes(value: number[]) {
-    this.setAttribute("sizes", value.map((size) => String(size)).join(","));
+  set sizes(value: number[] | string) {
+    // React 19 e Vue entregam aqui a string do atributo ("30,70") quando a prop vem do wrapper.
+    this.setAttribute("sizes", typeof value === "string" ? value : value.map((size) => String(size)).join(","));
   }
 
   // --- Painéis e medidas ---

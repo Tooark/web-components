@@ -93,7 +93,13 @@ export class ArkCalendar extends HTMLElement {
     return this.eventsProp ?? this.parseEventsAttr();
   }
 
-  set events(list: ArkCalendarEvent[]) {
+  set events(list: ArkCalendarEvent[] | string | null) {
+    // Frameworks que preferem propriedade a atributo (React 19, Vue) entregam o JSON do wrapper aqui.
+    if (typeof list === "string") {
+      this.eventsProp = null;
+      this.setAttribute("events", list);
+      return;
+    }
     this.eventsProp = Array.isArray(list) ? list : null;
     if (this.root) this.build();
   }

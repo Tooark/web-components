@@ -56,7 +56,13 @@ export class ArkColorSwatches extends HTMLElement {
     }
   }
 
-  set colors(list: ArkColorSwatch[] | null | undefined) {
+  set colors(list: ArkColorSwatch[] | string | null | undefined) {
+    // Frameworks que preferem propriedade a atributo (React 19, Vue) entregam o JSON do wrapper aqui.
+    if (typeof list === "string") {
+      this.colorsProperty = null;
+      this.setAttribute("colors", list);
+      return;
+    }
     this.colorsProperty = Array.isArray(list) ? list : null;
     if (this.isConnected) this.updateAppearance();
   }
