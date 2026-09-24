@@ -28,7 +28,7 @@ The `@tooark/react` package provides:
 
 - one component per element (33 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) with typed props that extend the `Ark*StyleOptions` from `@tooark/core`;
 - camelCase props map to attributes; booleans are passed as present/absent; object props (`events`, `rows`, `options`, `localeJson`) are serialized or assigned as properties for you;
-- custom events become handlers receiving the `CustomEvent` (`onChange`, `onClose`, `onSelect`, `onEventClick`, …); native events (`onClick`, `onInput`) work as usual;
+- custom events become handlers receiving the `CustomEvent` (`onChange`, `onClose`, `onSelect`, `onEventClick`, …); native events (`onClick`, `onInput`) work as usual, and `ArkButtonProps` extends `React.HTMLAttributes<HTMLElement>`, so `onClick`, `onFocus`, `id`, `style`, … are typed (a `disabled` or `loading` button never fires `onClick`);
 - the elements register themselves on first render (`ensureTooarkComponentsRegistered`), browser only, so SSR frameworks are fine;
 - `IntrinsicElements` typings for every `ark-*` tag, for the side packages or when you prefer the raw element;
 - `toast`, `showToast`, `dismissToast` re-exported from `@tooark/core`.

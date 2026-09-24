@@ -13,6 +13,10 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 export const ArkButton = defineComponent({
   name: "ArkButton",
   inheritAttrs: false,
+  emits: {
+    // Tipa o @click; o bloqueio de disabled/loading do host impede que o listener dispare.
+    click: (_event: MouseEvent) => true
+  },
   props: {
     variant: { type: String as PropType<ArkButtonVariant>, default: "primary" },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
@@ -31,13 +35,14 @@ export const ArkButton = defineComponent({
     color: { type: String, default: undefined },
     textColor: { type: String, default: undefined }
   },
-  setup(props, { attrs, slots }) {
+  setup(props, { attrs, emit, slots }) {
     ensureTooarkComponentsRegistered();
     return () =>
       h(
         "ark-button",
         {
           ...attrs,
+          onClick: (event: MouseEvent) => emit("click", event),
           variant: props.variant,
           intent: props.intent,
           theme: props.theme,

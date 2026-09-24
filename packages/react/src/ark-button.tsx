@@ -3,12 +3,13 @@ import type React from "react";
 import { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
+/** Props do ArkButton: opções de estilo mais os atributos e handlers DOM do React (onClick, onFocus, id, style...). */
 export type ArkButtonProps = PropsWithChildren<
-  ArkButtonStyleOptions & {
-    type?: ArkButtonType;
-    disabled?: boolean;
-    className?: string;
-  }
+  ArkButtonStyleOptions &
+    Omit<React.HTMLAttributes<HTMLElement>, keyof ArkButtonStyleOptions | "children"> & {
+      type?: ArkButtonType;
+      disabled?: boolean;
+    }
 >;
 
 export function ArkButton(props: ArkButtonProps): React.JSX.Element {
@@ -18,7 +19,9 @@ export function ArkButton(props: ArkButtonProps): React.JSX.Element {
     ensureTooarkComponentsRegistered();
   }, []);
 
-  const attrs: Record<string, string | boolean | undefined> = {
+  // Handlers (onClick...) seguem no rest: o React os delega a partir da raiz, e o bloqueio
+  // de disabled/loading do host (captura + stopImmediatePropagation) impede que disparem.
+  const attrs: Record<string, unknown> = {
     ...rest,
     class: className,
     "text-color": textColor,
