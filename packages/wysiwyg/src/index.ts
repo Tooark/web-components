@@ -1,8 +1,10 @@
-// Tipos
+// Entry point for the wysiwyg package
+import "./tag-map";
 
 // Custom Elements
 export { ArkWysiwygEditor, ArkWysiwygViewer } from "./components";
 
+// Tipos
 // Engine imperativo (uso avançado / sem Custom Element)
 export type { ArkWysiwygInstance } from "./engine";
 export {

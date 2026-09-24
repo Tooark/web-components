@@ -1,6 +1,10 @@
+// Entry point for the code package
+import "./tag-map";
+
 // Custom Element
 export { ArkCodeEditor } from "./components";
 
+// Tipos
 // Engine imperativo (uso avançado / sem Custom Element)
 export type { ArkCodeEditorInstance } from "./engine";
 export { createCodeEditor, resolveCodeTheme } from "./engine";
