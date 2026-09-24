@@ -323,7 +323,7 @@ export const TiposAcoesERichColors = {
     docs: {
       description: {
         story:
-          "Interaction test: cada tipo do servico (`toast.success/info/warning/error/loading`) ganha icone e, com `rich-colors`, a paleta do intent; o botao de acao emite `ark-toast-action` e o de cancelamento so fecha; o mais novo fica no topo e o excedente de `max-visible` sai da pilha."
+          "Interaction test: cada tipo do servico (`toast.success/info/warning/error/loading`) ganha icone e, com `rich-colors`, a paleta do intent; o botao de acao emite `ark-toast-action` e o de cancelamento so fecha; o mais novo fica no topo e o excedente de `max-visible` espera na fila, voltando quando um card sai."
       }
     }
   },
@@ -369,10 +369,15 @@ export const TiposAcoesERichColors = {
     );
     expect(actions).toEqual([{ id: expect.stringMatching(/^ark-toast-/), actionId: "retry-publish" }]);
     await canvas.findByText("Tentando novamente");
-    // O toast de resposta e o quinto: com max-visible 4 o mais antigo sai da pilha.
+    // O toast de resposta e o quinto: com max-visible 4 o mais antigo espera na fila e volta quando um card sai.
     expect(canvas.queryByText("Upload concluido")).not.toBeInTheDocument();
     await waitFor(() => expect(canvas.queryByText("Falha ao publicar")).not.toBeInTheDocument());
-    expect(titlesOf(canvasElement)).toEqual(["Tentando novamente", "Conexao instavel", "Nova versao disponivel"]);
+    expect(titlesOf(canvasElement)).toEqual([
+      "Tentando novamente",
+      "Conexao instavel",
+      "Nova versao disponivel",
+      "Upload concluido"
+    ]);
 
     // Cancelamento: so fecha, sem evento.
     await userEvent.click(canvas.getByRole("button", { name: "Error" }));
@@ -449,7 +454,7 @@ export const AutoDismissEFila = {
     docs: {
       description: {
         story:
-          "Interaction test: `duration` do host vale para toasts sem duracao propria e o timer some quando o toast e empurrado para fora de `max-visible` ou o host sai do DOM; o mesmo `id` substitui o toast; valores invalidos dos atributos caem nos padroes e um evento sem titulo e ignorado."
+          "Interaction test: `duration` do host vale para toasts sem duracao propria e o timer para enquanto o toast espera na fila de `max-visible` e quando o host sai do DOM; o mesmo `id` substitui o toast; valores invalidos dos atributos caem nos padroes e um evento sem titulo e ignorado."
       }
     }
   },
@@ -462,11 +467,13 @@ export const AutoDismissEFila = {
     const toaster = canvasElement.querySelector<ArkToaster>("ark-toaster")!;
     const cards = (): number => canvasElement.querySelectorAll('[data-ark="toaster-toast"]').length;
 
-    // Tres toasts sem duracao propria com max-visible 2: o primeiro sai da fila e os outros expiram em 300 ms.
+    // Tres toasts sem duracao propria com max-visible 2: o primeiro espera na fila com o relogio parado e so
+    // aparece (e conta os seus 300 ms) quando os outros expiram.
     toast("Primeiro");
     toast("Segundo");
     toast("Terceiro");
     expect(titlesOf(canvasElement)).toEqual(["Terceiro", "Segundo"]);
+    await waitFor(() => expect(titlesOf(canvasElement)).toEqual(["Primeiro"]), { timeout: 3000, interval: 20 });
     await waitFor(() => expect(cards()).toBe(0), { timeout: 3000 });
 
     // Mesmo id substitui o toast por um card novo; dispensar duas vezes durante a saida nao quebra e um toast novo
