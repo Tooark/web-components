@@ -8,6 +8,7 @@ import {
   type OnChanges,
   type OnDestroy,
   Output,
+  type SimpleChanges,
   ViewChild
 } from "@angular/core";
 import type { ArkKvBulkFormat, ArkKvRow, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
@@ -83,8 +84,9 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
     this.editorRef?.nativeElement?.addEventListener("ark-delete", this.deleteHandler);
   }
 
-  ngOnChanges(): void {
-    this.syncRows();
+  ngOnChanges(changes: SimpleChanges): void {
+    // Só um `rows` novo substitui o modelo: bulk, readonly ou theme mudando não podem apagar o que o usuário editou.
+    if (changes.rows) this.syncRows();
   }
 
   ngOnDestroy(): void {
