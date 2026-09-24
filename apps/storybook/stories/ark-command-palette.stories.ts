@@ -268,6 +268,44 @@ export const Navigation = {
   }
 };
 
+// Wrappers de framework (o `<ark-command-item-wrapper>` do Angular) ficam entre a paleta e o item, e o item pode
+// entrar no wrapper depois de o wrapper entrar na paleta.
+export const WrappedItems = {
+  render: () => {
+    const palette = createPalette({ filter: true, lang: "pt", queryDelay: 10 }, []);
+    return createScene(palette, "Itens dentro de um elemento intermediario, como o wrapper do Angular.");
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const palette = canvasElement.querySelector("ark-command-palette") as PaletteEl;
+    for (const command of COMMANDS) {
+      const wrapper = document.createElement("ark-command-item-wrapper");
+      wrapper.style.display = "contents";
+      palette.appendChild(wrapper);
+      wrapper.appendChild(createItem(command));
+    }
+    const items = () => Array.from(palette.querySelectorAll("ark-command-item")) as HTMLElement[];
+    const visible = () =>
+      items()
+        .filter((item) => !item.hidden)
+        .map((item) => item.getAttribute("value"));
+
+    palette.show();
+    await settled(palette);
+    const combobox = canvas.getByRole("combobox");
+    await expect(palette.querySelector('[data-ark="command-palette-empty"]')).not.toBeVisible();
+    await expect(
+      Array.from(palette.querySelectorAll('[data-ark="command-palette-group"]')).map((el) => el.textContent)
+    ).toEqual(["Requisicoes", "Workspace", "Ajuda"]);
+    await expect(items()[0]).toHaveAttribute("aria-selected", "true");
+
+    await userEvent.type(combobox, "workspace");
+    await expect(visible()).toEqual(["switch-workspace", "settings", "archive"]);
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(canvasElement.querySelector("[data-result]")?.textContent).toBe("Selecionado: settings");
+  }
+};
+
 export const TestHooks = {
   render: () =>
     createScene(createPalette({ lang: "pt", testid: "paleta" }), "Hooks: abra a paleta e inspecione os data-ark."),

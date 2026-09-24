@@ -91,6 +91,8 @@ export class ArkCommandPaletteComponent implements AfterViewInit, OnDestroy {
   selector: "ark-command-item-wrapper",
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  // Sem caixa própria: o item entra no layout da paleta, que o ordena por grupo com `order`.
+  host: { style: "display: contents" },
   template: `
   <ark-command-item
     [attr.testid]="testid"
