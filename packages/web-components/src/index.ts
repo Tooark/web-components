@@ -1,25 +1,8 @@
-export {
-  ArkBadge,
-  ArkButton,
-  ArkCalendar,
-  ArkCarousel,
-  ArkClock,
-  ArkDatepicker,
-  ArkDialog,
-  ArkEmpty,
-  ArkInput,
-  ArkMenu,
-  ArkMenuItem,
-  ArkScheduler,
-  ArkSelect,
-  ArkSkeleton,
-  ArkSwitch,
-  ArkTab,
-  ArkTabs,
-  ArkTextarea,
-  ArkToaster,
-  ArkToggle,
-  ArkToggleGroup,
-  ArkTooltip
-} from "./components";
+// Entry point for the web-components package
+import "./tag-map";
+
+// Custom Elements
+export * from "./components";
+
+// Registro de Componentes
 export { registerTooarkComponents } from "./register";
