@@ -125,7 +125,8 @@ export const DarkTheme = {
 
 export const HoverOpensAfterDelay = {
   render: () => createScene({ content: "Enviar a requisicao", delay: 150 }),
-  // Hover abre depois do delay com role tooltip no top layer e aria-describedby no gatilho; sair fecha na hora.
+  // Hover abre depois do delay com role tooltip no top layer e aria-describedby no gatilho; sair fecha depois da
+  // tolerância que deixa o ponteiro chegar ao balão.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const tooltip = canvasElement.querySelector("ark-tooltip") as TooltipEl;
     const trigger = tooltip.querySelector("ark-button") as HTMLElement;
@@ -150,7 +151,7 @@ export const HoverOpensAfterDelay = {
     expect(bubble.textContent).toBe("Atualizado");
 
     await userEvent.unhover(trigger);
-    expect(popoverOpen(bubble)).toBe(false);
+    await waitFor(() => expect(popoverOpen(bubble)).toBe(false));
     await expect(tooltip).not.toHaveAttribute("open");
 
     // Sair antes do delay cancela a abertura.
@@ -158,6 +159,36 @@ export const HoverOpensAfterDelay = {
     await userEvent.unhover(trigger);
     await new Promise((resolve) => setTimeout(resolve, 250));
     expect(popoverOpen(bubble)).toBe(false);
+  }
+};
+
+// O ponteiro sai do gatilho, cruza o espaço até o balão e para sobre ele: a dica fica aberta (WCAG 1.4.13).
+export const HoverReachesTheBubble = {
+  render: () => createScene({ content: "Atalho: Ctrl+Enter", delay: 0 }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const tooltip = canvasElement.querySelector("ark-tooltip") as TooltipEl;
+    const trigger = tooltip.querySelector("ark-button") as HTMLElement;
+    const bubble = bubbleOf(tooltip);
+    const pointer = (type: string, target: Element, relatedTarget: Element): void => {
+      target.dispatchEvent(
+        new PointerEvent(type, { bubbles: true, relatedTarget, pointerId: 1, isPrimary: true, pointerType: "mouse" })
+      );
+    };
+
+    pointer("pointerover", trigger, document.body);
+    await waitFor(() => expect(popoverOpen(bubble)).toBe(true));
+    await expect(getComputedStyle(bubble).pointerEvents).not.toBe("none");
+
+    // Sai para o espaço vazio entre os dois (fora do host) e entra no balão antes da tolerância acabar.
+    pointer("pointerout", trigger, document.body);
+    pointer("pointerover", bubble, document.body);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    await expect(popoverOpen(bubble)).toBe(true);
+
+    // Sai do balão para fora: fecha depois da tolerância.
+    pointer("pointerout", bubble, document.body);
+    await expect(popoverOpen(bubble)).toBe(true);
+    await waitFor(() => expect(popoverOpen(bubble)).toBe(false));
   }
 };
 
@@ -214,7 +245,7 @@ export const RichContentIsTheBubble = {
     await expect(rich).toHaveAttribute("data-ark-side", "bottom");
     expect(rich.querySelector("strong")?.textContent).toBe("Ambiente: producao");
     await userEvent.unhover(trigger);
-    expect(popoverOpen(rich)).toBe(false);
+    await waitFor(() => expect(popoverOpen(rich)).toBe(false));
   }
 };
 
