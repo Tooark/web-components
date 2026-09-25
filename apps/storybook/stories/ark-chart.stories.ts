@@ -173,3 +173,19 @@ export const FollowsPageTheme = {
     }
   }
 };
+
+// `option` antes de entrar no DOM só fica guardada: o gráfico nasce ao conectar, já com a largura do contêiner.
+export const OptionBeforeConnect = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const chart = document.createElement("ark-chart") as ArkChart;
+    chart.option = buildOption("bar");
+    await expect(chart.querySelector('[part="canvas"]')).toBeNull();
+    await expect(chart.resolvedTheme).toBeNull();
+
+    canvasElement.appendChild(chart);
+    const canvas = await waitFor(() => chart.querySelector('[part="canvas"]') as HTMLElement);
+    await expect(canvas.getBoundingClientRect().width).toBeGreaterThan(0);
+    await expect(chart.resolvedTheme).not.toBeNull();
+  }
+};

@@ -45,7 +45,7 @@ export class ArkChart extends HTMLElement {
     if (this.instance && value) {
       this.instance.setOption(value, { notMerge: true });
     } else if (value) {
-      // Ainda não conectado: aplica no connectedCallback.
+      // Conectado sem instância (primeira option) monta agora; desconectado, o connectedCallback monta.
       this.render();
     }
   }
@@ -100,7 +100,8 @@ export class ArkChart extends HTMLElement {
   }
 
   private render(): void {
-    if (!this.pendingOption) return;
+    // Fora do DOM o ECharts iniciaria num contêiner sem largura e deixaria instância e observer sem dono.
+    if (!this.pendingOption || !this.isConnected) return;
 
     this.teardown();
 
