@@ -248,10 +248,14 @@ export const HeaderAlignsWithGrid = {
 };
 
 export const SwitchingViews = {
-  args: { view: "week" },
+  args: { view: "week", date: "2026-09-15" },
   render: Playground.render,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const scheduler = canvasElement.querySelector("ark-scheduler")!;
+    const events: Array<{ type: string; detail: Record<string, string> }> = [];
+    for (const type of ["ark-view-change", "ark-range-change"]) {
+      scheduler.addEventListener(type, (event) => events.push({ type, detail: (event as CustomEvent).detail }));
+    }
     // O ark-toggle é o próprio controle; o scheduler o marca como parte sua.
     const monthToggle = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-view-month"]')!;
 
@@ -260,6 +264,11 @@ export const SwitchingViews = {
     await expect(scheduler).toHaveAttribute("view", "month");
     // A view de mês renderiza o grid de células, não a timeline.
     await expect(canvasElement.querySelector('[data-ark="scheduler-grid"]')).not.toBeNull();
+    // Trocar de view também troca o intervalo visível: ark-range-change vem logo depois do ark-view-change.
+    await expect(events.map((event) => event.type)).toEqual(["ark-view-change", "ark-range-change"]);
+    const range = events[1].detail;
+    await expect(range.view).toBe("month");
+    await expect(range.start <= "2026-09-01" && range.end >= "2026-09-30").toBe(true);
   }
 };
 
