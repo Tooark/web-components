@@ -30,10 +30,10 @@ Example: "Closes #42 — ark-select ganha `aria-label` espelhado no <select>."
 
 - [ ] Commits follow [Conventional Commits](https://www.conventionalcommits.org/) in Portuguese without accents and are signed off (`git commit -s`, DCO)
 - [ ] `pnpm check` is clean (Biome lint, format, import order)
-- [ ] `pnpm -r build` passes (TypeScript strict + the CSS smoke test)
+- [ ] `pnpm -r build` passes (TypeScript strict + the CSS smoke test), and `pnpm check:ssr` after it
 - [ ] The Storybook suite passes (`pnpm --filter storybook test`); new behavior has a `play` test
 - [ ] New component: element + `register.ts`, `base.css` host list, `Ark*StyleOptions` in core, the three wrappers, story with `TestHooks`, README rows (table, key attributes, hooks) — see `CLAUDE.md`
-- [ ] Every utility class is `ark:`-prefixed and written as a complete literal; no `z-index`, no moving user children
+- [ ] Every utility class is `ark:`-prefixed and written as a complete literal; no `z-index` to stack overlays, no moving user children
 - [ ] `README.md` and `README.pt-BR.md` updated **and in sync** (if public behavior changed)
 
 ## Notes for reviewers
