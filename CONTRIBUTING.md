@@ -48,7 +48,7 @@ Packages are layered; a package may only depend on the layers below it:
 | `packages/core`                                  | Types, i18n (`en`/`pt`/`es`), toast and announce services, motion helpers, overlay helpers |
 | `packages/web-components`                        | The `ark-*` Custom Elements and the only stylesheet a consumer imports                     |
 | `packages/react` · `vue` · `angular`             | Thin wrappers, one file per component                                                      |
-| `packages/chart` · `wysiwyg` · `code` · `motion` | Side packages (ECharts, Tiptap, CodeMirror, Motion) with their own `registerTooark*()`     |
+| `packages/chart` · `wysiwyg` · `code` · `motion` | Side packages (ECharts, Tiptap, CodeMirror, Motion); the first three register elements     |
 | `apps/storybook`                                 | Stories, docs and the whole test suite (Vitest + Playwright, real Chromium)                |
 
 Shared, repo-wide files:
@@ -56,8 +56,11 @@ Shared, repo-wide files:
 - [`CLAUDE.md`](CLAUDE.md) — architecture, CSS pipeline and component authoring rules
 - [`biome.json`](biome.json) — lint, formatting and import order
 - [`pnpm-workspace.yaml`](pnpm-workspace.yaml) — workspace and dependency policy (security floors)
-- [`scripts/`](scripts/) — `check-css.mjs` (CSS smoke test), `sync-versions.mjs` (lockstep versioning)
-- [`.github/workflows/`](.github/workflows/) — CI (lint, build, tests)
+- [`scripts/`](scripts/) — `check-css.mjs` (CSS smoke test), `check-publish.mjs` (publint + attw on the
+  tarballs), `check-ssr.mjs` (imports every build without a DOM), `sync-versions.mjs` (lockstep versioning),
+  `changelog-section.mjs` (release notes from `CHANGELOG.md`)
+- [`.github/workflows/`](.github/workflows/) — `tests.yml` (lint, build, `check:publish`, `check:ssr`, test
+  suite), `release.yml` (publish on `main`), `docs.yml` (Storybook on GitHub Pages), `dco.yml` (sign-off check)
 
 ---
 
@@ -101,9 +104,10 @@ pinned version from `packageManager`).
 The full checklist is in `CLAUDE.md` ("Adding a component: files that must
 change together"). In short, a new `ark-x` touches:
 
-1. `packages/web-components/src/components/ark-x.ts` + exports in
-   `components/index.ts` and `src/index.ts`, and `customElements.define` in
-   `register.ts`.
+1. `packages/web-components/src/components/ark-x.ts` (extending
+   `HTMLElementBase`) + the export in `components/index.ts` (`src/index.ts`
+   re-exports it), an `HTMLElementTagNameMap` entry in `src/tag-map.ts`, and
+   `customElements.define` in `register.ts`.
 2. The `:where(...)` host list in `src/styles/base.css` (and structural rules
    in `components.css` when the host is the container).
 3. `ArkXStyleOptions` (+ behavior types) in `packages/core/src/types/style.ts`,
@@ -153,7 +157,7 @@ the package (or `storybook`) as the scope:
 ```text
 feat(web-components): ark-kv-editor
 fix(web-components): aria-label observado nao reentra o updateAppearance
-feat(core): observeColorScheme e tema auto reativo no chart e no wysiwyg
+feat(tokens): observeColorScheme e tema auto reativo no chart e no wysiwyg
 fix(storybook): relatorios do axe enxutos para o Run tests da UI nao estourar o heap
 ```
 
@@ -189,11 +193,11 @@ fails with the list of unsigned commits; fix them with
 ## Versioning and releasing
 
 - All `@tooark/*` packages share **one version** (lockstep). The root
-  `package.json` is the source of truth; `pnpm version <patch|minor|major>`
-  runs `scripts/sync-versions.mjs` and propagates it to `packages/*`.
-- Releases are cut by the maintainers from `main`: `pnpm version <patch|minor|major>`
-  (or `prerelease --preid next`), a `chore(release): vX.Y.Z` commit that also adds the
-  `## [X.Y.Z]` section to `CHANGELOG.md`, merge. The `release.yml` workflow sees a version
+  `package.json` is the source of truth; after editing its `version`,
+  `pnpm version:sync` (`scripts/sync-versions.mjs`) propagates it to `packages/*`.
+- Releases are cut by the maintainers: bump the root version (`X.Y.Z`, or `X.Y.Z-next.N`
+  for a prerelease) and run `pnpm version:sync`, then a `chore(release): X.Y.Z` commit that
+  also adds the `## [X.Y.Z]` section to `CHANGELOG.md`, and a PR to `main`. The `release.yml` workflow sees a version
   that is not on npm yet, runs lint, build, `pnpm check:publish`, `pnpm check:ssr` and the test suite, publishes
   every package (`latest`, or `next` for prereleases) with provenance, creates the `vX.Y.Z`
   tag and a GitHub Release with that changelog section. Contributors do not bump versions in PRs.
