@@ -2,6 +2,7 @@ import type { ArkDrawerCloseReason, ArkDrawerStyleOptions } from "@tooark/core";
 import type React from "react";
 import { createElement, type PropsWithChildren, useEffect, useRef } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkDrawerProps = PropsWithChildren<
   ArkDrawerStyleOptions & {
@@ -43,7 +44,7 @@ export function ArkDrawer(props: ArkDrawerProps): React.JSX.Element {
     ensureTooarkComponentsRegistered();
   }, []);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 

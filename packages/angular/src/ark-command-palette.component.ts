@@ -1,14 +1,4 @@
-import {
-  type AfterViewInit,
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
-  EventEmitter,
-  Input,
-  type OnDestroy,
-  Output,
-  ViewChild
-} from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
 import type { ArkLang, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -18,7 +8,6 @@ import { ensureTooarkComponentsRegistered } from "./register";
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-command-palette
-    #palette
     [attr.testid]="testid"
     [attr.open]="open ? '' : null"
     [attr.placeholder]="placeholder"
@@ -30,11 +19,15 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.theme]="theme"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
-    [attr.aria-label]="ariaLabel">
+    [attr.aria-label]="ariaLabel"
+    (ark-select)="selectHandler($event)"
+    (ark-query)="queryHandler($event)"
+    (ark-open)="openHandler($event)"
+    (ark-close)="closeHandler($event)">
     <ng-content></ng-content>
   </ark-command-palette>`
 })
-export class ArkCommandPaletteComponent implements AfterViewInit, OnDestroy {
+export class ArkCommandPaletteComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
   }
@@ -63,28 +56,12 @@ export class ArkCommandPaletteComponent implements AfterViewInit, OnDestroy {
   @Output() arkOpen = new EventEmitter<CustomEvent>();
   @Output() arkClose = new EventEmitter<CustomEvent>();
 
-  @ViewChild("palette", { static: false }) paletteRef!: ElementRef<HTMLElement>;
-
-  private selectHandler = (event: Event) => this.arkSelect.emit(event as CustomEvent<{ value: string }>);
-  private queryHandler = (event: Event) => this.arkQuery.emit(event as CustomEvent<{ query: string }>);
-  private openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
-  private closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent);
-
-  ngAfterViewInit(): void {
-    const el = this.paletteRef?.nativeElement;
-    el?.addEventListener("ark-select", this.selectHandler);
-    el?.addEventListener("ark-query", this.queryHandler);
-    el?.addEventListener("ark-open", this.openHandler);
-    el?.addEventListener("ark-close", this.closeHandler);
-  }
-
-  ngOnDestroy(): void {
-    const el = this.paletteRef?.nativeElement;
-    el?.removeEventListener("ark-select", this.selectHandler);
-    el?.removeEventListener("ark-query", this.queryHandler);
-    el?.removeEventListener("ark-open", this.openHandler);
-    el?.removeEventListener("ark-close", this.closeHandler);
-  }
+  // Ligados no template, e não no ngAfterViewInit: o listener existe desde a criação da view, então o ark-open de um
+  // overlay que já nasce aberto (o elemento o emite num microtask) não se perde, nem na hidratação de SSR.
+  protected selectHandler = (event: Event) => this.arkSelect.emit(event as CustomEvent<{ value: string }>);
+  protected queryHandler = (event: Event) => this.arkQuery.emit(event as CustomEvent<{ query: string }>);
+  protected openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
+  protected closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent);
 }
 
 @Component({

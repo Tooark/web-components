@@ -46,6 +46,8 @@ export class ArkCommandPalette extends HTMLElementBase {
   private ownClasses: string[] = [];
   private syncingClass = false;
   private state: ArkPaletteState = "closed";
+  /** A abertura em curso veio do connectedCallback: o ark-open espera um microtask. */
+  private openingOnConnect = false;
   private releaseTrap: (() => void) | null = null;
   private queryTimer: number | null = null;
   private activeId: string | null = null;
@@ -85,7 +87,11 @@ export class ArkCommandPalette extends HTMLElementBase {
     }
     document.addEventListener("keydown", this.handleHotkey);
     this.updateAppearance();
-    if (this.hasAttribute("open")) this.openNow();
+    if (this.hasAttribute("open")) {
+      this.openingOnConnect = true;
+      this.openNow();
+      this.openingOnConnect = false;
+    }
   }
 
   disconnectedCallback(): void {
@@ -389,7 +395,14 @@ export class ArkCommandPalette extends HTMLElementBase {
     field?.select();
     this.inputEl?.inputElement?.setAttribute("aria-expanded", "true");
 
-    this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
+    const emit = (): void => {
+      if (this.state === "open") this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
+    };
+    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o evento
+    // sai num microtask, para chegar a quem se inscreve no mesmo ciclo em que o nó entrou (os wrappers React e
+    // Angular ligam os listeners dos overlays durante a montagem) em vez de disparar antes de alguém escutar.
+    if (this.openingOnConnect) queueMicrotask(emit);
+    else emit();
   }
 
   private closeNow(): void {

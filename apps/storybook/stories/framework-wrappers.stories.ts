@@ -3,6 +3,7 @@ import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
   ArkDatepicker as ReactArkDatepicker,
+  ArkDialog as ReactArkDialog,
   ArkFileInput as ReactArkFileInput,
   ArkInput as ReactArkInput,
   ArkMenu as ReactArkMenu,
@@ -344,5 +345,18 @@ export const VueToasterLangAndAction = {
     } finally {
       toast.dismiss();
     }
+  }
+};
+
+// Dialog que já nasce aberto: o onOpen do wrapper (ligado num useEffect, depois do commit) ainda recebe o ark-open.
+export const ReactDialogOpenOnMount = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    let opened = 0;
+    // Render comum (sem flushSync), como num app: os efeitos rodam numa tarefa depois do commit.
+    const root = createRoot(mountPoint(canvasElement));
+    root.render(createElement(ReactArkDialog, { label: "Aviso", open: true, onOpen: () => opened++ }, "Oi"));
+    await waitFor(() => expect(opened).toBe(1));
+    (canvasElement.querySelector("ark-dialog") as HTMLElement & { close: () => void }).close();
   }
 };

@@ -1,6 +1,7 @@
 import type { ArkMenuAlign, ArkMenuDirection, ArkMenuItemStyleOptions, ArkMenuStyleOptions } from "@tooark/core";
 import React, { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkMenuProps = PropsWithChildren<
   ArkMenuStyleOptions & {
@@ -29,7 +30,7 @@ export function ArkMenu(props: ArkMenuProps): React.JSX.Element {
     ensureTooarkComponentsRegistered();
   }, []);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 

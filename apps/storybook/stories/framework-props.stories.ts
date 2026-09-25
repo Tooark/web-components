@@ -112,3 +112,23 @@ export const PropertyAssignmentMatchesAttribute = {
     await expect(mismatches.map((m) => `${m.tag}.${m.attr}: ${m.problem}`)).toEqual([]);
   }
 };
+
+// Overlay que já nasce aberto: o ark-open precisa chegar a quem se inscreve logo depois de inserir o nó (o
+// layout effect dos wrappers React, a view dos wrappers Angular, inclusive na hidratação de SSR), e não sair antes
+// de alguém escutar.
+export const OpenOnConnectReachesLateListeners = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    for (const tag of ["ark-dialog", "ark-drawer", "ark-command-palette"]) {
+      const el = document.createElement(tag) as HTMLElement & { close: () => void };
+      el.setAttribute("label", "Painel");
+      el.setAttribute("open", "");
+      let opened = 0;
+      canvasElement.appendChild(el);
+      el.addEventListener("ark-open", () => opened++);
+      await Promise.resolve();
+      await expect({ tag, opened }).toEqual({ tag, opened: 1 });
+      el.remove();
+    }
+  }
+};

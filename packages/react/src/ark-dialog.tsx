@@ -1,6 +1,7 @@
 import type { ArkDialogCloseReason, ArkDialogStyleOptions } from "@tooark/core";
 import React, { createElement, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkDialogProps = PropsWithChildren<
   ArkDialogStyleOptions & {
@@ -43,7 +44,7 @@ export function ArkDialog(props: ArkDialogProps): React.JSX.Element {
     ensureTooarkComponentsRegistered();
   }, []);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
