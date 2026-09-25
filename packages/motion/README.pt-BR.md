@@ -30,7 +30,7 @@ O pacote `@tooark/motion` fornece:
 - `arkReveal(targets, options)`: animação de entrada quando os elementos entram na viewport (`once`, `amount`, `margin`), devolve a função que para;
 - `arkFlip(targets, mutate, options)`: mede, aplica a sua mutação de DOM (reordenar, inserir, filtrar) e anima cada item até a nova posição com spring (`stiffness`, `damping`);
 - `arkSwipe(element, options)`: gesto de ponteiro num eixo com `threshold`, `velocityThreshold`, `feedback` de arrasto e `resistance`, chamando `onSwipe(direction, { delta, velocity })`;
-- todos respeitam `prefers-reduced-motion` e os tokens `--ark-duration-*`/`--ark-ease-*`; as primitivas da Motion (`animate`, `spring`, `stagger`, `inView`, …) são reexportadas;
+- todos respeitam `prefers-reduced-motion`; `arkStaggerEnter` e `arkReveal` também leem os tokens `--ark-duration-*`/`--ark-ease-*`/`--ark-motion-distance` (`arkFlip` e `arkSwipe` animam com spring, sem duração nem curva de token); as primitivas da Motion (`animate`, `spring`, `stagger`, `inView`, …) são reexportadas;
 - nada aqui é exigido pelos componentes: o `@tooark/core` já traz uma camada de motion sem dependências.
 
 ---
@@ -45,7 +45,7 @@ pnpm add @tooark/motion   # traz motion, @tooark/core e @tooark/tokens
 
 ## ⚙️ Configuração
 
-Sem registro: importe os helpers que usar. Durações e easings vêm dos tokens na página (`@tooark/web-components/styles.css` ou `@tooark/core/styles.css`); sem eles valem os espelhos JS do `@tooark/tokens`.
+Sem registro: importe os helpers que usar. Durações, easings e distância de slide do `arkStaggerEnter`/`arkReveal` vêm dos tokens na página (`@tooark/web-components/styles.css` ou `@tooark/core/styles.css`); sem eles valem os espelhos JS (durações e distância do `@tooark/tokens`, curvas da tabela bezier do próprio pacote).
 
 ---
 
@@ -57,7 +57,7 @@ Sem registro: importe os helpers que usar. Durações e easings vêm dos tokens 
 - `arkSwipe(element, { axis?, threshold?, velocityThreshold?, feedback?, resistance?, onSwipe })` → função de dispose.
 - `targets`: um seletor, um elemento, um array ou uma `NodeList` (`ArkMotionTargets`).
 - Reexportados da Motion: `animate`, `hover`, `inView`, `press`, `scroll`, `spring`, `stagger`.
-- Tipos: `ArkStaggerOptions`, `ArkRevealOptions`, `ArkFlipOptions`, `ArkSwipeOptions`, `ArkSwipeDirection`, `ArkSwipeInfo`, `ArkMotionPreset`.
+- Tipos: `ArkMotionPlusOptions`, `ArkStaggerOptions`, `ArkRevealOptions`, `ArkFlipOptions`, `ArkSwipeOptions`, `ArkSwipeDirection`, `ArkSwipeInfo`, `ArkMotionPreset`, `ArkMotionTargets`.
 
 ---
 
@@ -80,7 +80,7 @@ const parar = arkReveal(".card", { preset: "fade", once: true, amount: 0.3 });
 import { arkFlip, arkSwipe } from "@tooark/motion";
 
 const lista = document.querySelector("ul")!;
-await arkFlip(lista.children, () => {
+await arkFlip(Array.from(lista.children), () => {
   lista.prepend(lista.lastElementChild!); // qualquer mutação de DOM: reordenar, inserir, filtrar
 });
 
@@ -101,9 +101,9 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                           | Versão  | Descrição                                                            |
 | ---------------------------------------------------------------- | ------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.0.0  | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.0.0  | Design tokens (cores, tamanhos, raios, motion) e tipos primitivos    |
-| [`motion`](https://www.npmjs.com/package/motion)                 | ^13.1.1 | Biblioteca de animação Motion (spring, scroll, gestos)               |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.1.0  | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.1.0  | Design tokens (cores, tamanhos, motion) e tipos primitivos           |
+| [`motion`](https://www.npmjs.com/package/motion)                 | ^13.4.0 | Biblioteca de animação Motion (spring, scroll, gestos)               |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1  | Helpers de runtime do TypeScript                                     |
 
 ---

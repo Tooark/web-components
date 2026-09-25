@@ -26,10 +26,10 @@
 
 The `@tooark/wysiwyg` package provides:
 
-- content as Tiptap JSON (never raw HTML), sanitized on the way in by `sanitizeWysiwygContent`: unknown nodes and marks dropped, `href`/`src`/`poster` restricted to http(s), mailto, tel or relative paths, colors validated;
+- content as Tiptap JSON (never raw HTML), sanitized on the way in by `sanitizeWysiwygContent`: unknown nodes and marks dropped, `href`/`src`/`poster` restricted to http(s), mailto, tel or a relative path starting with `/`, `#`, `?`, `./` or `../` (`uploads/x.png` is refused), colors validated (hex, a CSS color name or `rgb()`/`hsl()`);
 - toolbar built from opt-in groups (`style`, `marks`, `color`, `align`, `lists`, `link`, `media`, `blocks`, `clear`, `history`; `all`, `none`), `role="toolbar"` with one tab stop, labels in `en`/`pt`/`es`;
 - links with a URL popover (unsafe schemes refused), text color and highlight palettes, alignment, list indentation, clear formatting;
-- images and videos only through the `uploadFile(file, kind)` hook — your storage, the JSON keeps the URL, never base64; without the hook the `media` group does not render and pasted/dropped files are refused;
+- images and videos only through the `uploadFile(file, kind)` hook — your storage, the JSON keeps the URL, never base64; without the hook the `media` group does not render, pasted/dropped files are refused and `<img>`/`<video>` are stripped from pasted HTML; with it, pasted `<img>`/`<video>` only enter with an allowed `src`; pasted/dropped files that are not images or videos are refused with `unsupported-type`;
 - the same schema in the viewer, which renders links with `target="_blank"` and `rel="noopener noreferrer nofollow"`;
 - `createWysiwygEditor`/`createWysiwygViewer` engine for use without the elements; theme follows the page (`theme="auto"`).
 
@@ -38,7 +38,7 @@ The `@tooark/wysiwyg` package provides:
 ## 🔧 Installation
 
 ```bash
-pnpm add @tooark/wysiwyg   # Tiptap is bundled as a dependency
+pnpm add @tooark/wysiwyg   # Tiptap is installed as a dependency
 ```
 
 ---
@@ -61,8 +61,9 @@ Pick the toolbar groups per instance with `toolbar` and, to enable images and vi
 
 ### `ark-wysiwyg-editor`
 
-- Attributes: `toolbar` (groups and/or items, comma-separated; `all`; `none`; default `style,marks,lists,link,blocks,clear,history`), `theme` (`auto` | `light` | `dark`), `placeholder`, `editable="false"`, `lang` (`en` | `pt` | `es`) and `locale-json`, `colors`/`highlights` (JSON arrays of CSS colors), `max-file-size` (bytes, default 10 MiB).
-- Properties: `content` (Tiptap JSON, sanitized; setting it does not emit `change` and stays out of the undo history), `uploadFile`, `colors`, `highlights`, `resolvedTheme`, `editor` (the Tiptap instance); `insertFile(file)`.
+- Attributes: `toolbar` (groups and/or items, comma-separated; `all`; `none`; default `style,marks,lists,link,blocks,clear,history`), `theme` (`auto` | `light` | `dark`), `placeholder`, `editable="false"`, `lang` (`en` | `pt` | `es`, or `custom` with `locale-json`), `colors`/`highlights` (JSON arrays of CSS colors: hex, a color name or `rgb()`/`hsl()`; others, such as `oklch()` or `var()`, are dropped), `max-file-size` (bytes, default 10 MiB).
+- Toolbar items, to mix with the groups in `toolbar` (unknown names are ignored; `image`/`video` only with `uploadFile`): `heading` (block style select), `heading-1` to `heading-4`, `bold`, `italic`, `underline`, `strike`, `code`, `text-color`, `highlight`, `align-left`, `align-center`, `align-right`, `align-justify`, `bullet-list`, `ordered-list`, `outdent`, `indent`, `link`, `image`, `video`, `blockquote`, `horizontal-rule`, `clear-format`, `undo`, `redo`.
+- Properties: `content` (Tiptap JSON, sanitized; setting it does not emit `ark-wysiwyg-change` and stays out of the undo history), `uploadFile`, `colors`, `highlights`, `resolvedTheme`, `editor` (the Tiptap instance); `insertFile(file)`.
 - Events: `ark-wysiwyg-change` (`detail` = JSON), `ark-wysiwyg-upload-error` (`detail: { reason, file, error? }`, reasons `no-uploader`, `unsupported-type`, `too-large`, `invalid-src`, `failed`).
 
 ### `ark-wysiwyg-viewer`
@@ -72,7 +73,9 @@ Pick the toolbar groups per instance with `toolbar` and, to enable images and vi
 ### Engine and helpers
 
 - `createWysiwygEditor(element, options)`, `createWysiwygViewer(element, options)` → `{ editor, getJSON, setContent, isActive, setEditable, setTheme, resolvedTheme, insertFile, uploading, setLink, unsetLink, destroy }`.
-- `createWysiwygExtensions`, `sanitizeWysiwygContent(json, schema)`, `isSafeUrl`, `isSafeColor`, `resolveWysiwygLabels`, `ARK_WYSIWYG_TOOLBAR_GROUPS`, `ARK_WYSIWYG_DEFAULT_TOOLBAR`, `EMPTY_DOC`.
+- `createWysiwygExtensions`, `Video` (the video node), `sanitizeWysiwygContent(json, schema)`, `isSafeUrl`, `isSafeColor`, `resolveWysiwygLabels`, `resolveWysiwygTheme(theme, element)`, `ARK_WYSIWYG_TOOLBAR_GROUPS`, `ARK_WYSIWYG_DEFAULT_TOOLBAR`, `EMPTY_DOC`, `DEFAULT_MAX_FILE_SIZE`, `HEADING_LEVELS`.
+- Styles: `ensureWysiwygStyles()` injects `wysiwygCss` into `<head>` once (a `<style>` whose id is `WYSIWYG_STYLE_ID`); the elements call it on connect, the engine does not.
+- Types: `ArkWysiwygInstance`, `ArkWysiwygContent`, `ArkWysiwygEditorOptions`, `ArkWysiwygViewerOptions`, `ArkWysiwygTheme`, `ArkWysiwygLang`, `ArkWysiwygLabels`, `ArkWysiwygToolbarGroup`, `ArkWysiwygToolbarItem`, `ArkWysiwygUploader`, `ArkWysiwygUploadKind`, `ArkWysiwygUploadResult`, `ArkWysiwygUploadError`, `ArkWysiwygUploadErrorReason`, `JSONContent` (re-exported).
 
 ---
 
@@ -96,7 +99,7 @@ editor.addEventListener("ark-wysiwyg-upload-error", (event) => {
 document.querySelector("ark-wysiwyg-viewer")!.content = savedJson;
 ```
 
-### Sanitizing content on the server side too
+### Sanitizing content outside the editor too
 
 ```ts
 import { createWysiwygViewer, sanitizeWysiwygContent } from "@tooark/wysiwyg";
@@ -123,7 +126,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 | [`@tiptap/extension-text-style`](https://www.npmjs.com/package/@tiptap/extension-text-style)   | ^3.31.3 | Text style mark with color                                               |
 | [`@tiptap/pm`](https://www.npmjs.com/package/@tiptap/pm)                                       | ^3.31.3 | ProseMirror packages used by Tiptap                                      |
 | [`@tiptap/starter-kit`](https://www.npmjs.com/package/@tiptap/starter-kit)                     | ^3.31.3 | Base nodes and marks (paragraph, heading, lists, bold, link, underline…) |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.0.0  | Design tokens (colors, sizes, radii, motion) and primitive types         |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.1.0  | Design tokens (colors, sizes, motion) and primitive types                |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                                 | ^2.8.1  | TypeScript runtime helpers                                               |
 
 ---

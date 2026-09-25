@@ -1,7 +1,7 @@
 {
   "name": "@tooark/chart",
   "version": "1.1.0",
-  "description": "Tooark Chart — Custom Element <ark-chart> based on ECharts, themed using tokens",
+  "description": "Tooark Chart — Custom Element <ark-chart> based on ECharts, following the page's light/dark theme",
   "keywords": [
     "tooark",
     "web-components",
