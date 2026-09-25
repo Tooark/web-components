@@ -72,6 +72,11 @@ export class ArkMenuItem extends HTMLElement {
   }
 
   set checked(value: boolean | string | null | undefined) {
+    // Três estados: null/undefined voltam a item comum (React tira a prop assim); false desmarca o checkbox.
+    if (value === null || value === undefined) {
+      this.removeAttribute("checked");
+      return;
+    }
     this.setAttribute("checked", coerceBooleanAttr(value) ? "" : "false");
   }
 
