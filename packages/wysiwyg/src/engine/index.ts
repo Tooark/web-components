@@ -85,13 +85,21 @@ export const Video = Node.create({
   addAttributes() {
     return {
       src: { default: null },
-      poster: { default: null },
+      // HTML colado: um poster fora da lista de permissão cai, o vídeo fica.
+      poster: {
+        default: null,
+        parseHTML: (element) => {
+          const poster = element.getAttribute("poster");
+          return isSafeUrl(poster) ? poster : null;
+        }
+      },
       title: { default: null }
     };
   },
 
   parseHTML() {
-    return [{ tag: "video[src]" }];
+    // HTML colado: só vira nó com src permitido (nada de data:/blob:, que a sanitização do JSON também barra).
+    return [{ tag: "video[src]", getAttrs: (element) => (isSafeUrl(element.getAttribute("src")) ? null : false) }];
   },
 
   renderHTML({ HTMLAttributes }) {
@@ -105,6 +113,13 @@ export const Video = Node.create({
         ({ commands }) =>
           commands.insertContent({ type: this.name, attrs })
     };
+  }
+});
+
+/** Imagem do Tiptap que, no HTML colado, só vira nó com src permitido (o padrão só barra data:, não blob:). */
+const SafeImage = Image.extend({
+  parseHTML() {
+    return [{ tag: "img[src]", getAttrs: (element) => (isSafeUrl(element.getAttribute("src")) ? null : false) }];
   }
 });
 
@@ -133,7 +148,7 @@ export function createWysiwygExtensions(options: { editable: boolean; placeholde
     Color,
     Highlight.configure({ multicolor: true }),
     TextAlign.configure({ types: ["heading", "paragraph"], alignments: ["left", "center", "right", "justify"] }),
-    Image.configure({ allowBase64: false, inline: false }),
+    SafeImage.configure({ allowBase64: false, inline: false }),
     Video
   ];
   if (options.placeholder) {
@@ -162,8 +177,8 @@ function kindOf(file: File): ArkWysiwygUploadKind | null {
   return null;
 }
 
-function mediaFiles(list: FileList | null | undefined): File[] {
-  return Array.from(list ?? []).filter((file) => kindOf(file) !== null);
+function filesOf(list: FileList | null | undefined): File[] {
+  return Array.from(list ?? []);
 }
 
 function createInstance(element: HTMLElement, options: InternalOptions): ArkWysiwygInstance {
@@ -177,7 +192,8 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
     return false;
   };
 
-  // Arquivos colados ou arrastados só entram pelo gancho; sem ele são consumidos (nada de base64 no JSON).
+  // Arquivos colados ou arrastados só entram pelo gancho; sem ele são consumidos (nada de base64 no JSON). Os que
+  // não são imagem nem vídeo são recusados com o motivo (insertFile emite unsupported-type), em vez de sumir.
   const handleFiles = (files: File[], position?: number): boolean => {
     if (files.length === 0) return false;
     for (const file of files) void insertFile(file, position);
@@ -190,11 +206,17 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
     extensions: createWysiwygExtensions({ editable: options.editable, placeholder: options.placeholder }),
     content: EMPTY_DOC,
     editorProps: {
-      handlePaste: (_view, event) => handleFiles(mediaFiles(event.clipboardData?.files)),
+      handlePaste: (_view, event) => {
+        const files = filesOf(event.clipboardData?.files);
+        // Planilhas e editores copiam o texto junto de arquivos que não são mídia: aí o texto vence e cola normal.
+        const hasText = Array.from(event.clipboardData?.types ?? []).some((type) => type.startsWith("text/"));
+        if (hasText && !files.some((file) => kindOf(file))) return false;
+        return handleFiles(files);
+      },
       handleDrop: (view, event, _slice, moved) => {
         if (moved) return false;
         const at = view.posAtCoords({ left: event.clientX, top: event.clientY });
-        return handleFiles(mediaFiles(event.dataTransfer?.files), at?.pos);
+        return handleFiles(filesOf(event.dataTransfer?.files), at?.pos);
       },
       // HTML colado com <img>/<video> só vira nó quando há gancho: sem ele, seria um hotlink que o app não controla.
       transformPastedHTML: (html) => (options.uploadFile ? html : html.replace(/<(img|video|source)\b[^>]*>/gi, ""))
