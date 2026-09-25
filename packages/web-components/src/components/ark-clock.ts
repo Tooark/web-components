@@ -26,7 +26,7 @@ export class ArkClock extends HTMLElement {
   private syncingValue = false;
 
   static get observedAttributes(): string[] {
-    return ["value", "seconds", "step-minutes", "hours-format", "lang", "theme", "intent", "testid"];
+    return ["value", "seconds", "step-minutes", "hours-format", "lang", "locale-json", "theme", "intent", "testid"];
   }
 
   connectedCallback(): void {
@@ -194,7 +194,10 @@ export class ArkClock extends HTMLElement {
 
   private build(): void {
     const palette = this.getPalette(this.getIntent());
-    const loc = resolveLocale((this.getAttribute("lang") || "en") as ArkDatepickerLang, undefined);
+    const loc = resolveLocale(
+      (this.getAttribute("lang") || "en") as ArkDatepickerLang,
+      this.getAttribute("locale-json") || undefined
+    );
 
     this.root?.remove();
     this.columnEls.clear();
