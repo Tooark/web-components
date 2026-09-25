@@ -369,6 +369,58 @@ export const Media = {
   }
 };
 
+// Colar: mídia de HTML só entra com src permitido, e arquivo que não é mídia é recusado com o motivo.
+export const PastedMedia = {
+  args: { toolbar: "media,history" },
+  render: (args: StoryArgs): HTMLElement => {
+    const editor = makeEditor(args, null);
+    editor.uploadFile = fakeUploader;
+    return editor;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-wysiwyg-editor") as ArkWysiwygEditor;
+    const content = editor.querySelector<HTMLElement>(".ProseMirror")!;
+    const errors: ArkWysiwygUploadError[] = [];
+    editor.addEventListener("ark-wysiwyg-upload-error", (event) => errors.push((event as CustomEvent).detail));
+    const paste = (fill: (data: DataTransfer) => void): void => {
+      const data = new DataTransfer();
+      fill(data);
+      content.dispatchEvent(new ClipboardEvent("paste", { clipboardData: data, bubbles: true, cancelable: true }));
+    };
+    await userEvent.click(content);
+
+    paste((data) =>
+      data.setData(
+        "text/html",
+        '<p>Colado</p><img src="https://exemplo.com/a.png"><img src="blob:https://exemplo.com/1">' +
+          '<video src="data:video/mp4;base64,AAAA"></video>' +
+          '<video src="https://exemplo.com/v.mp4" poster="data:image/png;base64,AAAA"></video>'
+      )
+    );
+    await waitFor(() => expect(content.textContent).toContain("Colado"));
+    expect(Array.from(content.querySelectorAll("img")).map((img) => img.getAttribute("src"))).toEqual([
+      "https://exemplo.com/a.png"
+    ]);
+    expect(Array.from(content.querySelectorAll("video")).map((video) => video.getAttribute("src"))).toEqual([
+      "https://exemplo.com/v.mp4"
+    ]);
+    expect(content.querySelector("video")?.hasAttribute("poster")).toBe(false);
+    expect(JSON.stringify(editor.content)).not.toMatch(/data:|blob:/);
+
+    // Só um arquivo que não é mídia: recusado com o motivo, em vez de sumir em silêncio.
+    paste((data) => data.items.add(new File(["%PDF"], "contrato.pdf", { type: "application/pdf" })));
+    await waitFor(() => expect(errors.map((error) => error.reason)).toEqual(["unsupported-type"]));
+
+    // Texto junto de um arquivo que não é mídia (planilhas fazem isso): cola o texto, sem erro.
+    paste((data) => {
+      data.setData("text/plain", "Linha da planilha");
+      data.items.add(new File(["x"], "celula.bin", { type: "application/octet-stream" }));
+    });
+    await waitFor(() => expect(content.textContent).toContain("Linha da planilha"));
+    expect(errors).toHaveLength(1);
+  }
+};
+
 export const SanitizedContent = {
   args: { toolbar: "marks" },
   parameters: {
