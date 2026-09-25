@@ -300,6 +300,19 @@ const JSON_ROW = '[{ "key": "k", "value": "v", "enabled": true, "type": "string"
 
 // Colunas opcionais: description e types entram por atributo, com os campos no modelo; o modo em massa em
 // lines preserva tipo e descricao por posicao, e em json edita tudo, sinalizando JSON invalido sem mexer.
+// Linha sem type com a coluna de tipos: o select mostra o primeiro tipo e o campo de valor segue esse mesmo tipo.
+export const UntypedRowFollowsSelect = {
+  render: () =>
+    createEditor({ ...ENV_ARGS, types: "number,string" }, [{ id: "p1", key: "porta", value: "8080", enabled: true }]),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const row = canvasElement.querySelector('[data-ark="kv-editor-row"]') as HTMLElement;
+    const select = row.querySelector('[data-ark="kv-editor-type"] select') as HTMLSelectElement;
+    const value = row.querySelector('[data-ark="kv-editor-value"] input') as HTMLInputElement;
+    await expect(select.value).toBe("number");
+    await expect(value.type).toBe("number");
+  }
+};
+
 export const ColumnsAndJsonBulk = {
   render: () =>
     createEditor({ ...ENV_ARGS, keyPlaceholder: "Chave", types: "string,number,date" }, [
