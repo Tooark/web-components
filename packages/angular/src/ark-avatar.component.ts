@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-avatar
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.name]="name"
     [attr.src]="src"
     [attr.size]="size"
@@ -23,6 +24,8 @@ export class ArkAvatarComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   /** Nome da pessoa: vira aria-label e as iniciais (primeira letra, ou primeira + última com sobrenome). */
   @Input() name: string | undefined;
   /** Imagem; em erro de carga caem as iniciais. */

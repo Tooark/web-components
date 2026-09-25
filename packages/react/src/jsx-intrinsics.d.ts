@@ -387,6 +387,7 @@ interface ArkIntrinsicElements {
     date?: string;
     events?: string;
     lang?: ArkDatepickerLang;
+    "locale-json"?: string;
     theme?: ArkTheme;
     intent?: ArkIntent;
     views?: string;
@@ -419,6 +420,7 @@ interface ArkIntrinsicElements {
     label?: string;
     helper?: string;
     "error-message"?: string;
+    error?: boolean;
     disabled?: boolean;
     required?: boolean;
     name?: string;
@@ -498,6 +500,7 @@ interface ArkIntrinsicElements {
     helper?: string;
     error?: boolean;
     "error-message"?: string;
+    wrap?: "soft" | "hard" | "off";
     disabled?: boolean;
     required?: boolean;
     readonly?: boolean;
@@ -531,6 +534,7 @@ interface ArkIntrinsicElements {
     "close-button"?: boolean | "false";
     "max-visible"?: number;
     duration?: number;
+    lang?: ArkLang;
   };
   "ark-chart": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     theme?: ArkTheme;

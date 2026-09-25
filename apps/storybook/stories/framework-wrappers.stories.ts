@@ -1,18 +1,22 @@
-import type { ArkSchedulerEvent } from "@tooark/core";
+import { type ArkSchedulerEvent, toast } from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
+  ArkCalendar as ReactArkCalendar,
   ArkDatepicker as ReactArkDatepicker,
+  ArkFileInput as ReactArkFileInput,
   ArkInput as ReactArkInput,
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
   ArkScheduler as ReactArkScheduler,
-  ArkTextarea as ReactArkTextarea
+  ArkTextarea as ReactArkTextarea,
+  ArkToaster as ReactArkToaster
 } from "@tooark/react";
 import {
   ArkButton as VueArkButton,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
-  ArkScheduler as VueArkScheduler
+  ArkScheduler as VueArkScheduler,
+  ArkToaster as VueArkToaster
 } from "@tooark/vue";
 import { createElement, type ReactNode } from "react";
 import { flushSync } from "react-dom";
@@ -275,5 +279,69 @@ export const ReactNativeBooleanProps = {
     await expect(input.spellcheck).toBe(false);
     await expect(textarea.spellcheck).toBe(false);
     await waitFor(() => expect(document.activeElement).toBe(input));
+  }
+};
+
+// Props que os wrappers não repassavam: lang e ação do toaster, error do file-input, wrap do textarea e o resto
+// (data-*, aria-*) nos wrappers que montavam os atributos à mão.
+export const ReactPassThroughProps = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const actions: Array<string | null> = [];
+    const render = reactRoot(canvasElement, errors);
+    render([
+      createElement(ReactArkToaster, {
+        key: "t",
+        lang: "pt",
+        duration: 0,
+        onAction: (event: CustomEvent<{ id: string; actionId: string | null }>) => actions.push(event.detail.actionId)
+      }),
+      createElement(ReactArkFileInput, { key: "f", label: "Anexo", error: true }),
+      createElement(ReactArkTextarea, { key: "x", label: "Log", wrap: "off" }),
+      createElement(ReactArkCalendar, { key: "c", "data-secao": "agenda", "aria-describedby": "dica" })
+    ]);
+    await expect(errors).toEqual([]);
+
+    const calendar = canvasElement.querySelector("ark-calendar") as HTMLElement;
+    await expect(calendar).toHaveAttribute("data-secao", "agenda");
+    await expect(calendar).toHaveAttribute("aria-describedby", "dica");
+    await expect(canvasElement.querySelector("ark-textarea textarea")).toHaveAttribute("wrap", "off");
+    await expect(canvasElement.querySelector('[data-ark="file-input-button"]')).toHaveAttribute("aria-invalid", "true");
+
+    try {
+      toast("Arquivo movido", { actionLabel: "Desfazer", actionId: "undo" });
+      const close = await waitFor(() => canvasElement.querySelector('[data-ark="toaster-toast-close"]') as HTMLElement);
+      await expect(close.textContent).toBe("Fechar");
+      (canvasElement.querySelector('[data-ark="toaster-toast-action"]') as HTMLElement).click();
+      await expect(actions).toEqual(["undo"]);
+    } finally {
+      toast.dismiss();
+    }
+  }
+};
+
+export const VueToasterLangAndAction = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const actions: Array<string | null> = [];
+    const app = createApp({
+      setup: () => () =>
+        h(VueArkToaster, {
+          lang: "es",
+          duration: 0,
+          "onArk-toast-action": (event: CustomEvent<{ actionId: string | null }>) => actions.push(event.detail.actionId)
+        })
+    });
+    app.mount(mountPoint(canvasElement));
+    try {
+      toast("Guardado", { actionLabel: "Deshacer", actionId: "undo" });
+      const close = await waitFor(() => canvasElement.querySelector('[data-ark="toaster-toast-close"]') as HTMLElement);
+      await expect(close.textContent).toBe("Cerrar");
+      (canvasElement.querySelector('[data-ark="toaster-toast-action"]') as HTMLElement).click();
+      await expect(actions).toEqual(["undo"]);
+    } finally {
+      toast.dismiss();
+    }
   }
 };

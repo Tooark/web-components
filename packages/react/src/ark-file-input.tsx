@@ -13,6 +13,8 @@ export type ArkFileInputProps = ArkFileInputStyleOptions & {
   helper?: string;
   /** Mensagem de erro; liga aria-invalid e a borda de erro. */
   errorMessage?: string;
+  /** Estado de erro sem mensagem (borda danger e aria-invalid), como no ArkInput. */
+  error?: boolean;
   disabled?: boolean;
   required?: boolean;
   /** Nome no formulario (input nativo oculto). */
@@ -23,7 +25,7 @@ export type ArkFileInputProps = ArkFileInputStyleOptions & {
 };
 
 export function ArkFileInput(props: ArkFileInputProps): React.JSX.Element {
-  const { className, multiple, errorMessage, disabled, required, localeJson, onChange, ...rest } = props;
+  const { className, multiple, errorMessage, error, disabled, required, localeJson, onChange, ...rest } = props;
   const ref = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,7 @@ export function ArkFileInput(props: ArkFileInputProps): React.JSX.Element {
     class: className,
     multiple: multiple ? "" : undefined,
     "error-message": errorMessage,
+    error: error ? "" : undefined,
     disabled: disabled ? "" : undefined,
     required: required ? "" : undefined,
     "locale-json": localeJson

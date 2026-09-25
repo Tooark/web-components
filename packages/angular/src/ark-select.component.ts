@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-select
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.label]="label"
     [attr.placeholder]="placeholder"
     [attr.options]="optionsStr"
@@ -33,6 +34,8 @@ export class ArkSelectComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() label: string | undefined;
   @Input() placeholder: string | undefined;
   @Input() options: ArkSelectOption[] | undefined;

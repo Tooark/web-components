@@ -17,7 +17,8 @@ export const ArkScheduler = defineComponent({
     hourEnd: { type: Number, default: undefined },
     slotMinutes: { type: Number, default: undefined },
     hoursFormat: { type: String as PropType<"24" | "12">, default: undefined },
-    views: { type: String, default: undefined }
+    views: { type: String, default: undefined },
+    localeJson: { type: String, default: undefined }
   },
   setup(props, { attrs, emit }) {
     ensureTooarkComponentsRegistered();
@@ -27,6 +28,7 @@ export const ArkScheduler = defineComponent({
         view: props.view,
         date: props.date,
         lang: props.lang,
+        "locale-json": props.localeJson,
         theme: props.theme,
         intent: props.intent,
         views: props.views,

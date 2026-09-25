@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-color-swatches
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.value]="value"
     [attr.colors]="colorsJson"
     [attr.label]="label"
@@ -24,6 +25,8 @@ export class ArkColorSwatchesComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   /** Cor selecionada (o value da amostra). */
   @Input() value: string | undefined;
   /** Amostras { name, value }[]; vão como JSON no atributo. */
