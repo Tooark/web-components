@@ -1,6 +1,6 @@
 {
   "name": "@tooark/root",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Web Component Library for Angular, React, and Vue projects",
   "private": true,
   "type": "module",
