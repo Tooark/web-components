@@ -17,6 +17,29 @@ export const ARK_EASE_BEZIER: Record<ArkEasing, [number, number, number, number]
   sheet: [0.32, 0.72, 0, 1]
 };
 
+/** Valor de uma custom property (token --ark-*) no elemento, ou "" sem elemento ou fora do navegador. */
+function readToken(element: Element | undefined, name: string): string {
+  if (!element || typeof getComputedStyle !== "function") return "";
+  return getComputedStyle(element).getPropertyValue(name).trim();
+}
+
+/** "250ms" ou "0.25s" em milissegundos; null para qualquer outra coisa. */
+function parseCssDurationMs(value: string): number | null {
+  const match = /^(-?\d*\.?\d+)(ms|s)$/.exec(value);
+  if (!match) return null;
+  const amount = Number(match[1]);
+  return match[2] === "s" ? amount * 1000 : amount;
+}
+
+/** "cubic-bezier(a, b, c, d)" ou "linear" como os quatro pontos que a lib Motion aceita; null para o resto. */
+function parseCubicBezier(value: string): [number, number, number, number] | null {
+  if (value === "linear") return [0, 0, 1, 1];
+  const match = /^cubic-bezier\(([^)]+)\)$/.exec(value);
+  if (!match) return null;
+  const points = match[1].split(",").map((part) => Number(part.trim()));
+  return points.length === 4 && points.every(Number.isFinite) ? (points as [number, number, number, number]) : null;
+}
+
 /**
  * Normaliza seletor, elemento, array ou NodeList numa lista de HTMLElement.
  * @param targets O(s) alvo(s) a serem normalizados.
@@ -44,12 +67,18 @@ export function resolveTargets(targets: ArkMotionTargets): HTMLElement[] {
 }
 
 /**
- * Resolve a duração em segundos a partir de um valor em milissegundos ou token ArkDuration.
+ * Resolve a duração em segundos a partir de um valor em milissegundos ou token ArkDuration. O token vem da
+ * página (--ark-duration-* no elemento) e cai no espelho JS quando o CSS da lib não está carregado.
+ * @param element O elemento de onde ler o token.
  * @param duration A duração desejada em milissegundos ou como token ArkDuration.
  * @param fallback O token ArkDuration a ser usado caso duration não seja fornecido.
  * @returns A duração em segundos, respeitando a preferência de redução de movimento.
  */
-export function resolveDurationSec(duration: ArkDuration | number | undefined, fallback: ArkDuration): number {
+export function resolveDurationSec(
+  element: Element | undefined,
+  duration: ArkDuration | number | undefined,
+  fallback: ArkDuration
+): number {
   // Retorna 0 se o usuário preferir animações reduzidas.
   if (prefersReducedMotion()) {
     return 0;
@@ -60,28 +89,34 @@ export function resolveDurationSec(duration: ArkDuration | number | undefined, f
     return Math.max(0, duration) / 1000;
   }
 
-  // Converte o token ArkDuration em milissegundos e depois para segundos.
-  return ARK_DURATION_MS[duration ?? fallback] / 1000;
+  // Token: o valor da página, senão o espelho JS; depois para segundos.
+  const token = duration ?? fallback;
+  return (parseCssDurationMs(readToken(element, `--ark-duration-${token}`)) ?? ARK_DURATION_MS[token]) / 1000;
 }
 
 /**
- * Resolve a curva de animação a partir de um token ArkEasing, array bezier ou nome.
+ * Resolve a curva de animação a partir de um token ArkEasing, array bezier ou nome. O token vem da página
+ * (--ark-ease-* no elemento) e cai no espelho JS quando o CSS da lib não está carregado.
+ * @param element O elemento de onde ler o token.
  * @param ease A curva desejada como token ArkEasing, array bezier ou nome.
  * @returns A curva de animação correspondente, padrão: token out.
  */
-export function resolveEase(ease: ArkEasing | number[] | string | undefined): number[] | string {
-  // Retorna a curva de animação correspondente, padrão: token out.
+export function resolveEase(
+  element: Element | undefined,
+  ease: ArkEasing | number[] | string | undefined
+): number[] | string {
   if (Array.isArray(ease)) {
     return ease;
   }
 
-  // Verifica se o ease é uma string correspondente a um token ArkEasing.
-  if (typeof ease === "string" && ease in ARK_EASE_BEZIER) {
-    return ARK_EASE_BEZIER[ease as ArkEasing];
+  // Token (ou nenhum valor, que é o token out): a curva da página, senão o espelho JS.
+  const token = ease === undefined ? "out" : ease in ARK_EASE_BEZIER ? (ease as ArkEasing) : null;
+  if (token) {
+    return parseCubicBezier(readToken(element, `--ark-ease-${token}`)) ?? ARK_EASE_BEZIER[token];
   }
 
-  // Retorna a curva de animação padrão caso nenhum valor válido seja fornecido.
-  return ease ?? ARK_EASE_BEZIER.out;
+  // Nome próprio da lib Motion ("easeInOut"...), repassado como veio.
+  return ease as string;
 }
 
 /**
@@ -91,8 +126,8 @@ export function resolveEase(ease: ArkEasing | number[] | string | undefined): nu
  * @returns A distância em pixels.
  */
 export function resolveDistancePx(element: HTMLElement | undefined, distance?: string): number {
-  // Usa a distância fornecida ou o valor padrão ARK_MOTION_DISTANCE.
-  const value = distance || ARK_MOTION_DISTANCE;
+  // A distância pedida, senão o token da página (--ark-motion-distance), senão o espelho JS.
+  const value = distance || readToken(element, "--ark-motion-distance") || ARK_MOTION_DISTANCE;
   const amount = Number.parseFloat(value);
 
   // Retorna um valor padrão caso a distância não seja um número finito.

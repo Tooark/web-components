@@ -51,8 +51,8 @@ export async function arkStaggerEnter(targets: ArkMotionTargets, options: ArkSta
 
   // Aplica a animação aos elementos com os keyframes e as opções de stagger.
   await animate(elements, keyframes, {
-    duration: resolveDurationSec(options.duration, "default"),
-    ease: resolveEase(options.ease) as never,
+    duration: resolveDurationSec(elements[0], options.duration, "default"),
+    ease: resolveEase(elements[0], options.ease) as never,
     delay: stagger((options.interval ?? 60) / 1000, { from: options.from ?? "first" })
   });
 }
