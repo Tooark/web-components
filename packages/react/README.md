@@ -26,9 +26,9 @@ Typed React wrappers for the Tooark Web Components: camelCase props, custom even
 
 The `@tooark/react` package provides:
 
-- one component per element (33 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) with typed props that extend the `Ark*StyleOptions` from `@tooark/core`;
-- camelCase props map to attributes; booleans are passed as present/absent; object props (`events`, `rows`, `options`, `localeJson`) are serialized or assigned as properties for you;
-- custom events become handlers receiving the `CustomEvent` (`onChange`, `onClose`, `onSelect`, `onEventClick`, …); native events (`onClick`, `onInput`) work as usual, and `ArkButtonProps` extends `React.HTMLAttributes<HTMLElement>`, so `onClick`, `onFocus`, `id`, `style`, … are typed (a `disabled` or `loading` button never fires `onClick`);
+- one component per element (41 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) with typed props that extend the `Ark*StyleOptions` from `@tooark/core`;
+- camelCase props map to attributes; booleans are passed as present/absent; object props (`events`, `rows`, `options`, and `localeJson` on `ArkCalendar`/`ArkDatepicker`) are serialized or assigned as properties for you (on the other wrappers `localeJson` is a JSON string);
+- custom events become handlers receiving the `CustomEvent` (`onChange`, `onClose`, `onSelect`, …) or, on the calendar, datepicker, clock, carousel and scheduler, its `detail`; native events (`onClick`, `onInput`) work as usual, and `ArkButtonProps` extends `React.HTMLAttributes<HTMLElement>`, so `onClick`, `onFocus`, `id`, `style`, … are typed (a `disabled` or `loading` button never fires `onClick`);
 - the elements register themselves on first render (`ensureTooarkComponentsRegistered`), browser only, so SSR frameworks are fine;
 - `IntrinsicElements` typings for every `ark-*` tag, for the side packages or when you prefer the raw element;
 - `toast`, `showToast`, `dismissToast` re-exported from `@tooark/core`.
@@ -38,8 +38,10 @@ The `@tooark/react` package provides:
 ## 🔧 Installation
 
 ```bash
-pnpm add @tooark/react   # brings @tooark/web-components, @tooark/core and @tooark/tokens
+pnpm add @tooark/react @tooark/web-components
 ```
+
+`@tooark/react` already depends on `@tooark/web-components`, `@tooark/core` and `@tooark/tokens`, but pnpm does not expose transitive dependencies to your app, and the stylesheet import below comes from `@tooark/web-components`: install it directly. `toast` is re-exported by `@tooark/react`.
 
 Peer dependencies: `react` and `react-dom` ≥ 18.
 
@@ -60,7 +62,7 @@ import "@tooark/web-components/styles.css";
 One wrapper per element, named after it: `ark-button` → `ArkButton`, `ark-kv-editor` → `ArkKvEditor`, `ark-command-palette` → `ArkCommandPalette` + `ArkCommandItem`. Each exports its props type (`ArkButtonProps`, …).
 
 - Props: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, plus the element's JS properties where they matter (`events`, `rows`, `options`, `sizes`, `colors`).
-- Events: `on<Event>` for the custom events, receiving the `CustomEvent` (`onChange` on `ArkSelect`/`ArkKvEditor`, `onClose` on `ArkDialog`/`ArkDrawer`, `onSelect` on `ArkMenu`/`ArkCommandPalette`, `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` on `ArkScheduler`, …). Native events bubble from the inner control (`onInput` on `ArkInput`: read `event.target.value`).
+- Events: `on<Event>` for the custom events, receiving the `CustomEvent` (`onChange` on `ArkSelect`/`ArkKvEditor`, `onClose` on `ArkDialog`/`ArkDrawer`, `onSelect` on `ArkMenu`/`ArkCommandPalette`, …); `onChange` on `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `onSlideChange` on `ArkCarousel` and `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` on `ArkScheduler` receive the `detail` itself. Native events bubble from the inner control (`onInput` on `ArkInput`: read `event.target.value`).
 - State: attributes like `open` are the source of truth (`ArkDialog open={bool}` + `onClose`), so controlled rendering works and the exit still animates.
 
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
@@ -145,8 +147,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                          | Version     | Description                                                      |
 | -------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.0.0      | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.0.0      | The `ark-*` Custom Elements and their stylesheet                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.1.0      | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.1.0      | The `ark-*` Custom Elements and their stylesheet                 |
 | [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer) | React 18 or 19                                                   |
 | [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer) | React DOM renderer                                               |
 
