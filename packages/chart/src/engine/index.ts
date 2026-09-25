@@ -44,6 +44,15 @@ export function createChart(container: HTMLElement, options: ArkChartOptions): A
 
   let chart = init();
 
+  // autoResize (padrão): acompanha o tamanho do container; o ark-chart desliga e usa o seu, controlado por atributo.
+  const resizeObserver =
+    options.autoResize !== false && typeof ResizeObserver !== "undefined"
+      ? new ResizeObserver(() => {
+          if (!chart.isDisposed()) chart.resize();
+        })
+      : null;
+  resizeObserver?.observe(container);
+
   return {
     get chart() {
       return chart;
@@ -64,6 +73,7 @@ export function createChart(container: HTMLElement, options: ArkChartOptions): A
     },
     resolvedTheme: () => resolved,
     destroy: () => {
+      resizeObserver?.disconnect();
       if (!chart.isDisposed()) chart.dispose();
     }
   };

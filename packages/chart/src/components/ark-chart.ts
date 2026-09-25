@@ -117,7 +117,9 @@ export class ArkChart extends HTMLElement {
     this.instance = createChart(container, {
       option: this.pendingOption,
       theme: this.getTheme(),
-      renderer: this.getRenderer()
+      renderer: this.getRenderer(),
+      // O elemento tem o próprio observer, que o atributo auto-resize liga e desliga em tempo de execução.
+      autoResize: false
     });
 
     this.instance.chart.on("click", (params) => {
