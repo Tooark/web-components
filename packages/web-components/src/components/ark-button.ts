@@ -375,7 +375,8 @@ export class ArkButton extends HTMLElement {
       variant === "success" ||
       variant === "warning" ||
       variant === "danger" ||
-      variant === "info"
+      variant === "info" ||
+      variant === "neutral"
     ) {
       return {
         styleVariant: "solid",

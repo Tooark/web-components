@@ -19,7 +19,8 @@ export const ArkButton = defineComponent({
   },
   props: {
     variant: { type: String as PropType<ArkButtonVariant>, default: "primary" },
-    intent: { type: String as PropType<ArkIntent>, default: "primary" },
+    // Sem padrão: um intent fixo venceria o de `variant="danger"` (o elemento usa intent || variant).
+    intent: { type: String as PropType<ArkIntent>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     size: { type: String as PropType<ArkSize>, default: "md" },
     rounded: { type: String as PropType<ArkRounded>, default: "md" },

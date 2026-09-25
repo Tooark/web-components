@@ -108,7 +108,7 @@ export const Variants = {
     wrap.style.flexWrap = "wrap";
     wrap.style.gap = "12px";
 
-    ["primary", "secondary", "success", "warning", "danger", "info", "outline", "ghost"].forEach((v) => {
+    ["primary", "secondary", "success", "warning", "danger", "info", "neutral", "outline", "ghost"].forEach((v) => {
       const el = document.createElement("ark-button");
       el.setAttribute("variant", v);
       el.setAttribute("theme", theme);
@@ -118,6 +118,27 @@ export const Variants = {
     });
 
     return wrap;
+  },
+  // Um intent como variant vira solid nessa cor (neutral inclusive); um `intent` explícito ainda vence.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    // secondary sólido é a superfície com borda, não uma cor própria.
+    const solid: Record<string, string> = {
+      primary: "ark:bg-primary",
+      secondary: "ark:bg-surface",
+      success: "ark:bg-success",
+      warning: "ark:bg-warning",
+      danger: "ark:bg-danger",
+      info: "ark:bg-info",
+      neutral: "ark:bg-neutral"
+    };
+    for (const [intent, bg] of Object.entries(solid)) {
+      const el = Array.from(canvasElement.querySelectorAll("ark-button")).find((b) => b.textContent === intent)!;
+      await expect(el.classList.contains(bg)).toBe(true);
+    }
+    const override = canvasElement.querySelector('ark-button[variant="danger"]') as HTMLElement;
+    override.setAttribute("intent", "success");
+    await expect(override.classList.contains("ark:bg-success")).toBe(true);
+    override.removeAttribute("intent");
   }
 };
 
