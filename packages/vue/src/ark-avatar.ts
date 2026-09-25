@@ -6,6 +6,8 @@ export const ArkAvatar = defineComponent({
   name: "ArkAvatar",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     name: { type: String, default: undefined },
     src: { type: String, default: undefined },
     size: { type: String as PropType<ArkSize>, default: "md" },
@@ -18,6 +20,7 @@ export const ArkAvatar = defineComponent({
     return () =>
       h("ark-avatar", {
         ...attrs,
+        testid: props.testid,
         name: props.name,
         src: props.src,
         size: props.size,

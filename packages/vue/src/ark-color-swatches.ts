@@ -7,6 +7,8 @@ export const ArkColorSwatches = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     colors: { type: Array as PropType<ArkColorSwatch[]>, default: undefined },
     label: { type: String, default: undefined },
@@ -19,6 +21,7 @@ export const ArkColorSwatches = defineComponent({
     return () =>
       h("ark-color-swatches", {
         ...attrs,
+        testid: props.testid,
         value: props.value,
         colors: props.colors ? JSON.stringify(props.colors) : undefined,
         label: props.label,

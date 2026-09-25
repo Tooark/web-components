@@ -6,6 +6,8 @@ export const ArkCarousel = defineComponent({
   name: "ArkCarousel",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
     accentColor: { type: String, default: undefined },
@@ -37,6 +39,7 @@ export const ArkCarousel = defineComponent({
         "ark-carousel",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           theme: props.theme,
           intent: props.intent,

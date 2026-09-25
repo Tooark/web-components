@@ -7,6 +7,8 @@ export const ArkDrawer = defineComponent({
   inheritAttrs: false,
   emits: ["ark-open", "ark-close"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     open: { type: Boolean, default: false },
     side: { type: String as PropType<ArkDrawerSide>, default: "right" },
     mode: { type: String as PropType<ArkDrawerMode>, default: "overlay" },
@@ -40,6 +42,7 @@ export const ArkDrawer = defineComponent({
         "ark-drawer",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           open: props.open ? "" : undefined,
           side: props.side,

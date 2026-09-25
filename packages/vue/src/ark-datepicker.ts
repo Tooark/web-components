@@ -6,6 +6,8 @@ export const ArkDatepicker = defineComponent({
   name: "ArkDatepicker",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
     localeJson: { type: [String, Object], default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
@@ -47,6 +49,7 @@ export const ArkDatepicker = defineComponent({
 
       return h("ark-datepicker", {
         ...attrs,
+        testid: props.testid,
         ref: elRef,
         lang: props.lang,
         theme: props.theme,

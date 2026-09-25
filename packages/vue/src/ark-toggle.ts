@@ -7,6 +7,8 @@ export const ArkToggle = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     pressed: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
@@ -21,6 +23,7 @@ export const ArkToggle = defineComponent({
         "ark-toggle",
         {
           ...attrs,
+          testid: props.testid,
           intent: props.intent,
           theme: props.theme,
           size: props.size,
@@ -39,6 +42,8 @@ export const ArkToggleGroup = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     multiple: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -53,6 +58,7 @@ export const ArkToggleGroup = defineComponent({
         "ark-toggle-group",
         {
           ...attrs,
+          testid: props.testid,
           value: props.value,
           intent: props.intent,
           theme: props.theme,

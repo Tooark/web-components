@@ -6,6 +6,8 @@ export const ArkTextarea = defineComponent({
   name: "ArkTextarea",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     label: { type: String, default: undefined },
     placeholder: { type: String, default: undefined },
     value: { type: String, default: undefined },
@@ -39,6 +41,7 @@ export const ArkTextarea = defineComponent({
         "ark-textarea",
         {
           ...attrs,
+          testid: props.testid,
           label: props.label,
           placeholder: props.placeholder,
           value: props.value,

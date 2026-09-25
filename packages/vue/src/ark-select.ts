@@ -7,6 +7,8 @@ export const ArkSelect = defineComponent({
   inheritAttrs: false,
   emits: ["change", "input"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     label: { type: String, default: undefined },
     placeholder: { type: String, default: undefined },
     options: { type: Array as PropType<ArkSelectOption[]>, default: undefined },
@@ -29,6 +31,7 @@ export const ArkSelect = defineComponent({
         "ark-select",
         {
           ...attrs,
+          testid: props.testid,
           label: props.label,
           placeholder: props.placeholder,
           options: props.options ? JSON.stringify(props.options) : undefined,

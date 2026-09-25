@@ -6,6 +6,8 @@ export const ArkTooltip = defineComponent({
   name: "ArkTooltip",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     content: { type: String, default: undefined },
     side: { type: String as PropType<ArkTooltipSide>, default: "top" },
     delay: { type: Number, default: undefined },
@@ -19,6 +21,7 @@ export const ArkTooltip = defineComponent({
         "ark-tooltip",
         {
           ...attrs,
+          testid: props.testid,
           content: props.content,
           side: props.side,
           delay: props.delay,

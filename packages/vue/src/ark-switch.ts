@@ -7,6 +7,8 @@ export const ArkSwitch = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     checked: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
@@ -26,6 +28,7 @@ export const ArkSwitch = defineComponent({
     return () =>
       h("ark-switch", {
         ...attrs,
+        testid: props.testid,
         intent: props.intent,
         theme: props.theme,
         size: props.size,

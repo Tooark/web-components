@@ -7,6 +7,8 @@ export const ArkFileInput = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     accept: { type: String, default: undefined },
     multiple: { type: Boolean, default: false },
     label: { type: String, default: undefined },
@@ -28,6 +30,7 @@ export const ArkFileInput = defineComponent({
     return () =>
       h("ark-file-input", {
         ...attrs,
+        testid: props.testid,
         accept: props.accept,
         multiple: props.multiple ? "" : undefined,
         label: props.label,

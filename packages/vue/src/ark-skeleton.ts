@@ -6,6 +6,8 @@ export const ArkSkeleton = defineComponent({
   name: "ArkSkeleton",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     rows: { type: Number, default: undefined },
     animated: { type: Boolean, default: false },
     rounded: { type: String as PropType<ArkRounded>, default: undefined },
@@ -20,6 +22,7 @@ export const ArkSkeleton = defineComponent({
         "ark-skeleton",
         {
           ...attrs,
+          testid: props.testid,
           rows: props.rows,
           animated: props.animated ? "" : undefined,
           rounded: props.rounded,

@@ -7,6 +7,8 @@ export const ArkKvEditor = defineComponent({
   inheritAttrs: false,
   emits: ["change", "ark-add", "ark-delete"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     rows: { type: Array as PropType<ArkKvRow[]>, default: undefined },
     bulk: { type: Boolean, default: false },
     bulkFormat: { type: String as PropType<ArkKvBulkFormat>, default: undefined },
@@ -48,6 +50,7 @@ export const ArkKvEditor = defineComponent({
     return () =>
       h("ark-kv-editor", {
         ...attrs,
+        testid: props.testid,
         ref: elRef,
         bulk: props.bulk ? "" : undefined,
         "bulk-format": props.bulkFormat,

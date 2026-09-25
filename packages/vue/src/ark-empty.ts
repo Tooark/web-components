@@ -6,6 +6,8 @@ export const ArkEmpty = defineComponent({
   name: "ArkEmpty",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     heading: { type: String, default: undefined },
     description: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" }
@@ -17,6 +19,7 @@ export const ArkEmpty = defineComponent({
         "ark-empty",
         {
           ...attrs,
+          testid: props.testid,
           heading: props.heading,
           description: props.description,
           theme: props.theme

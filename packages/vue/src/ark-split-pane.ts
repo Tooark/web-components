@@ -7,6 +7,8 @@ export const ArkSplitPane = defineComponent({
   inheritAttrs: false,
   emits: ["ark-resize"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     direction: { type: String as PropType<ArkSplitPaneDirection>, default: "horizontal" },
     sizes: { type: Array as PropType<number[]>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
@@ -27,6 +29,7 @@ export const ArkSplitPane = defineComponent({
         "ark-split-pane",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           direction: props.direction,
           sizes: props.sizes ? props.sizes.join(",") : undefined,

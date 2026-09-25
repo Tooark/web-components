@@ -6,6 +6,8 @@ export const ArkProgress = defineComponent({
   name: "ArkProgress",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: Number, default: undefined },
     max: { type: Number, default: undefined },
     indeterminate: { type: Boolean, default: false },
@@ -20,6 +22,7 @@ export const ArkProgress = defineComponent({
     return () =>
       h("ark-progress", {
         ...attrs,
+        testid: props.testid,
         value: props.value,
         max: props.max,
         indeterminate: props.indeterminate ? "" : undefined,
