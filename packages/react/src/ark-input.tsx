@@ -83,7 +83,7 @@ export function ArkInput(props: ArkInputProps): React.JSX.Element {
     };
   }, [onInput, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
+  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
     ...rest,
     ref,
     class: className,
@@ -94,13 +94,15 @@ export function ArkInput(props: ArkInputProps): React.JSX.Element {
     required: required ? "" : undefined,
     readonly: readonly ? "" : undefined,
     reveal: reveal ? "" : undefined,
-    autofocus: autofocus ? "" : undefined,
+    // Booleanos, não strings: o React 19 grava nas propriedades nativas autofocus/spellcheck do host (onde "" seria
+    // false e "false" seria true), e o React 18 os serializa no atributo.
+    autofocus: autofocus || undefined,
     maxlength: attr(maxlength),
     minlength: attr(minlength),
     min: attr(min),
     max: attr(max),
     step: attr(step),
-    spellcheck: spellcheck === undefined ? undefined : spellcheck ? "true" : "false"
+    spellcheck
   };
 
   return createElement("ark-input", attrs, children);

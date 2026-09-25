@@ -79,7 +79,7 @@ export function ArkTextarea(props: ArkTextareaProps): React.JSX.Element {
     };
   }, [onInput, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
+  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
     ...rest,
     ref,
     class: className,
@@ -91,10 +91,12 @@ export function ArkTextarea(props: ArkTextareaProps): React.JSX.Element {
     disabled: disabled ? "" : undefined,
     required: required ? "" : undefined,
     readonly: readonly ? "" : undefined,
-    autofocus: autofocus ? "" : undefined,
+    // Booleanos, não strings: o React 19 grava nas propriedades nativas autofocus/spellcheck do host (onde "" seria
+    // false e "false" seria true), e o React 18 os serializa no atributo.
+    autofocus: autofocus || undefined,
     maxlength: attr(maxlength),
     minlength: attr(minlength),
-    spellcheck: spellcheck === undefined ? undefined : spellcheck ? "true" : "false"
+    spellcheck
   };
 
   return createElement("ark-textarea", attrs, children);
