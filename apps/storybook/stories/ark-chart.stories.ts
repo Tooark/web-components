@@ -1,4 +1,5 @@
 import type { ArkChart, EChartsOption } from "@tooark/chart";
+import { createChart } from "@tooark/chart";
 import { expect, waitFor } from "storybook/test";
 
 const meta = {
@@ -187,5 +188,26 @@ export const OptionBeforeConnect = {
     const canvas = await waitFor(() => chart.querySelector('[part="canvas"]') as HTMLElement);
     await expect(canvas.getBoundingClientRect().width).toBeGreaterThan(0);
     await expect(chart.resolvedTheme).not.toBeNull();
+  }
+};
+
+// Engine sem o elemento: autoResize (padrão) acompanha o tamanho do container.
+export const EngineAutoResize = {
+  render: () => {
+    const box = document.createElement("div");
+    box.style.width = "320px";
+    box.style.height = "200px";
+    return box;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const box = canvasElement.firstElementChild as HTMLElement;
+    const instance = createChart(box, { option: buildOption("line") });
+    try {
+      await expect(instance.chart.getWidth()).toBe(320);
+      box.style.width = "480px";
+      await waitFor(() => expect(instance.chart.getWidth()).toBe(480));
+    } finally {
+      instance.destroy();
+    }
   }
 };
