@@ -4,6 +4,9 @@ import { applyTestHooks } from "./test-hooks";
 /** Contador para o id do balão, que o `aria-describedby` do gatilho referencia. */
 let tooltipSeq = 0;
 
+/** Tolerância para o ponteiro atravessar o espaço entre gatilho e balão sem fechar a dica. */
+const HIDE_GRACE_MS = 100;
+
 /**
  * Dica de contexto. O host envolve o gatilho do usuário (primeiro filho sem
  * `slot`) sem movê-lo e cria o balão: `role="tooltip"` com `popover="manual"`,
@@ -13,8 +16,9 @@ let tooltipSeq = 0;
  * components.css). O gatilho recebe `aria-describedby` do balão e precisa ser
  * focável por conta própria.
  *
- * Abre em hover (depois de `delay`) e em foco (na hora); fecha ao sair, ao
- * perder o foco, com Esc e no pointerdown. Posicionado por `positionAnchored`
+ * Abre em hover (depois de `delay`) e em foco (na hora); fecha ao sair (com
+ * uma tolerância para o ponteiro chegar ao balão, que mantém a dica aberta),
+ * ao perder o foco, com Esc e no pointerdown. Posicionado por `positionAnchored`
  * de core, com flip quando não cabe. Entrada `fade` quick, sem saída animada.
  */
 export class ArkTooltip extends HTMLElement {
@@ -29,6 +33,7 @@ export class ArkTooltip extends HTMLElement {
   private bubble: HTMLElement | null = null;
   private trigger: HTMLElement | null = null;
   private openTimer: ReturnType<typeof setTimeout> | null = null;
+  private hideTimer: ReturnType<typeof setTimeout> | null = null;
   private disposePosition: (() => void) | null = null;
   private isOpen = false;
   private syncingOpen = false;
@@ -66,6 +71,7 @@ export class ArkTooltip extends HTMLElement {
     this.observer?.disconnect();
     this.observer = null;
     this.clearTimer();
+    this.cancelHide();
     document.removeEventListener("keydown", this.handleDocumentKeydown, true);
     this.disposePosition?.();
     this.disposePosition = null;
@@ -129,6 +135,7 @@ export class ArkTooltip extends HTMLElement {
   /** Fecha na hora, sem animação de saída. */
   hide(): void {
     this.clearTimer();
+    this.cancelHide();
     if (!this.isOpen) return;
 
     this.isOpen = false;
@@ -175,6 +182,22 @@ export class ArkTooltip extends HTMLElement {
     }
   }
 
+  private cancelHide(): void {
+    if (this.hideTimer !== null) {
+      clearTimeout(this.hideTimer);
+      this.hideTimer = null;
+    }
+  }
+
+  private scheduleHide(): void {
+    this.clearTimer();
+    if (!this.isOpen || this.hideTimer !== null) return;
+    this.hideTimer = setTimeout(() => {
+      this.hideTimer = null;
+      this.hide();
+    }, HIDE_GRACE_MS);
+  }
+
   private scheduleShow(): void {
     if (this.isOpen || this.openTimer !== null) return;
     const delay = this.getDelay();
@@ -207,12 +230,14 @@ export class ArkTooltip extends HTMLElement {
 
   private readonly handlePointerOver = (event: PointerEvent): void => {
     if (this.isInside(event.relatedTarget)) return;
+    // Voltou (ao gatilho ou ao balão) dentro da tolerância: a dica fica.
+    this.cancelHide();
     this.scheduleShow();
   };
 
   private readonly handlePointerOut = (event: PointerEvent): void => {
     if (this.isInside(event.relatedTarget)) return;
-    this.hide();
+    this.scheduleHide();
   };
 
   // Clicar no gatilho dispensa a dica; ela volta só depois de sair e entrar de novo.
@@ -282,7 +307,6 @@ export class ArkTooltip extends HTMLElement {
       if (!this.ownBubble) {
         const bubble = document.createElement("div");
         bubble.setAttribute("data-ark-chrome", "bubble");
-        bubble.className = "ark:pointer-events-none";
         this.appendChild(bubble);
         this.ownBubble = bubble;
       }
