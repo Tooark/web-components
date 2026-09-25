@@ -1,5 +1,5 @@
 import type { ArkCalendarStyleOptions, ArkDatepickerLang } from "@tooark/core";
-import { expect, userEvent } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 const meta = {
   title: "Core/ArkCalendar",
@@ -239,5 +239,20 @@ export const KeyboardNavigation = {
 
     await userEvent.keyboard("{Home}");
     await expect(document.activeElement?.getAttribute("data-date")).toMatch(/-01$/);
+  }
+};
+
+// A troca de mês vai ao leitor de tela pelo anunciador do core, não por um aria-live no botão do título.
+export const AnnouncesPeriod = {
+  args: { lang: "pt", value: "2026-09-15" },
+  render: Playground.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const title = canvasElement.querySelector('[data-ark="calendar-title"]') as HTMLElement;
+    const announcer = (): string => document.querySelector('[data-ark="announcer"]')?.textContent ?? "";
+    await expect(title).not.toHaveAttribute("aria-live");
+    await userEvent.click(canvasElement.querySelector('[data-ark="calendar-next"]')!);
+    const next = (canvasElement.querySelector('[data-ark="calendar-title"]') as HTMLElement).textContent ?? "";
+    await expect(next).not.toBe(title.textContent);
+    await waitFor(() => expect(announcer()).toContain(next));
   }
 };

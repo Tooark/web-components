@@ -1,5 +1,5 @@
 import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
-import { type ArkLocale, arkEnter, resolveLocale } from "@tooark/core";
+import { type ArkLocale, announce, arkEnter, resolveLocale } from "@tooark/core";
 import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -39,6 +39,8 @@ export class ArkCalendar extends HTMLElement {
   private eventsProp: ArkCalendarEvent[] | null = null;
   /** Direção da navegação de mês por clique nas setas: dirige o slide do grid. */
   private navDirection: "prev" | "next" | null = null;
+  /** Último período anunciado (título do cabeçalho); o primeiro build só registra, sem anunciar. */
+  private announcedPeriod: string | null = null;
   /** Última seleção feita pelo usuário: recebe um "pop" de entrada. */
   private justSelectedISO: string | null = null;
 
@@ -431,6 +433,13 @@ export class ArkCalendar extends HTMLElement {
     return grid;
   }
 
+  // A troca de período vai ao leitor de tela pelo anunciador do core: um aria-live no título entraria no nome do
+  // controle e, recriado a cada build, nem seria anunciado.
+  private announcePeriod(text: string): void {
+    if (this.announcedPeriod !== null && this.announcedPeriod !== text) announce(text);
+    this.announcedPeriod = text;
+  }
+
   private build(): void {
     if (!this.locale) this.locale = this.getLocale();
     const loc = this.locale;
@@ -507,7 +516,6 @@ export class ArkCalendar extends HTMLElement {
     title.type = "button";
     title.className = `${palette.headerText} ark:rounded ark:px-2 ark:py-0.5 ark:transition ark:hover:opacity-75 ark:focus:outline-none ark:focus:ring-2 ${palette.focusRing}`;
     applyTestHooks(this, "calendar", title, "title");
-    title.setAttribute("aria-live", "polite");
     if (this.view === "days") {
       title.textContent = `${loc.months[this.viewDate.getMonth()]} ${this.viewDate.getFullYear()}`;
     } else if (this.view === "months") {
@@ -516,6 +524,7 @@ export class ArkCalendar extends HTMLElement {
       const start = this.yearsBlockStart();
       title.textContent = `${start}–${start + 11}`;
     }
+    this.announcePeriod(title.textContent);
     title.addEventListener("click", () => {
       this.view = this.view === "days" ? "months" : this.view === "months" ? "years" : "days";
       this.build();

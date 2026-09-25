@@ -1,5 +1,5 @@
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView } from "@tooark/core";
-import { type ArkLocale, arkEnter, resolveLocale } from "@tooark/core";
+import { type ArkLocale, announce, arkEnter, resolveLocale } from "@tooark/core";
 import {
   addDays,
   addMonths,
@@ -60,6 +60,8 @@ export class ArkScheduler extends HTMLElement {
   private refDate: Date = new Date();
   private nowTimer: number | null = null;
   private navDirection: "prev" | "next" | null = null;
+  /** Último período anunciado (título do cabeçalho); o primeiro build só registra, sem anunciar. */
+  private announcedPeriod: string | null = null;
   private syncingAttr = false;
   /** Linhas de "agora" vivas na tela: reposicionadas sem rebuild a cada minuto. */
   private nowLines: HTMLElement[] = [];
@@ -457,8 +459,8 @@ export class ArkScheduler extends HTMLElement {
 
     const title = document.createElement("h2");
     title.className = `${palette.headerText} ark:ml-1`;
-    title.setAttribute("aria-live", "polite");
     title.textContent = this.getTitle();
+    this.announcePeriod(title.textContent);
     applyTestHooks(this, "scheduler", title, "title");
 
     left.appendChild(todayBtn);
@@ -905,6 +907,13 @@ export class ArkScheduler extends HTMLElement {
       line.hidden = false;
       line.style.top = `${((nowMinutes - hourStart * 60) / totalMinutes) * bodyHeight}px`;
     }
+  }
+
+  // A troca de período vai ao leitor de tela pelo anunciador do core: um aria-live no título entraria no nome do
+  // controle e, recriado a cada build, nem seria anunciado.
+  private announcePeriod(text: string): void {
+    if (this.announcedPeriod !== null && this.announcedPeriod !== text) announce(text);
+    this.announcedPeriod = text;
   }
 
   private build(): void {
