@@ -107,3 +107,27 @@ export const SelectsTime = {
     await expect(minute).toHaveAttribute("aria-selected", "true");
   }
 };
+
+// lang="custom" com locale-json troca os rótulos das colunas, direto e através do ark-datepicker.
+export const CustomLocale = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.gap = "24px";
+    const clock = document.createElement("ark-clock");
+    clock.setAttribute("lang", "custom");
+    clock.setAttribute("locale-json", JSON.stringify({ hours: "Hrs", minutes: "Mins" }));
+    const picker = document.createElement("ark-datepicker");
+    picker.setAttribute("mode", "time");
+    picker.setAttribute("lang", "custom");
+    picker.setAttribute("locale-json", JSON.stringify({ hours: "Horas*" }));
+    wrap.append(clock, picker);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const [own, inner] = Array.from(canvasElement.querySelectorAll("ark-clock"));
+    await expect(own.querySelector('[data-ark="clock-hours"]')).toHaveAttribute("aria-label", "Hrs");
+    await expect(own.querySelector('[data-ark="clock-minutes"]')).toHaveAttribute("aria-label", "Mins");
+    await expect(inner.querySelector('[data-ark="clock-hours"]')).toHaveAttribute("aria-label", "Horas*");
+  }
+};
