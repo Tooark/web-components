@@ -127,7 +127,10 @@ export const ARK_WYSIWYG_DEFAULT_TOOLBAR: ArkWysiwygToolbarGroup[] = [
 /** Tipo de arquivo que o editor envia ao gancho de upload. */
 export type ArkWysiwygUploadKind = "image" | "video";
 
-/** O que o gancho de upload devolve: a URL final (http(s) ou relativa; nunca base64) e metadados opcionais. */
+/**
+ * O que o gancho de upload devolve: a URL final e metadados opcionais. A URL é http(s) ou relativa iniciada por `/`,
+ * `#`, `?`, `./` ou `../`; base64, `blob:` ou caminho sem prefixo falham com "invalid-src".
+ */
 export type ArkWysiwygUploadResult = {
   /** URL onde o arquivo ficou. */
   src: string;

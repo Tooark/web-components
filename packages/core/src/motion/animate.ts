@@ -6,10 +6,7 @@ import type { ArkDuration, ArkEasing } from "@tooark/tokens";
 import { ARK_DURATION_MS, ARK_EASING_CSS, ARK_MOTION_DISTANCE } from "@tooark/tokens";
 import type { ArkMotionOptions, ArkMotionPreset } from "./types";
 
-/**
- * Indica se o usuário pediu movimento reduzido no sistema.
- * @returns `true` se o usuário pediu movimento reduzido, `false` caso contrário.
- */
+/** Indica se o usuário pediu movimento reduzido no sistema (false fora do navegador). */
 export function prefersReducedMotion(): boolean {
   return (
     typeof window !== "undefined" &&
@@ -18,12 +15,7 @@ export function prefersReducedMotion(): boolean {
   );
 }
 
-/**
- * Lê o valor de uma custom property CSS do elemento.
- * @param element O elemento do qual ler a custom property.
- * @param name O nome da custom property CSS.
- * @returns O valor da custom property CSS como string.
- */
+/** Lê o valor de uma custom property CSS do elemento ("" fora do navegador). */
 function readToken(element: HTMLElement, name: string): string {
   // Se não houver window ou getComputedStyle, retorna string vazia.
   if (typeof window === "undefined" || typeof window.getComputedStyle !== "function") {
@@ -33,11 +25,7 @@ function readToken(element: HTMLElement, name: string): string {
   return window.getComputedStyle(element).getPropertyValue(name).trim();
 }
 
-/**
- * Converte uma duração CSS em milissegundos.
- * @param value O valor da duração CSS (ex: "200ms", "0.3s").
- * @returns A duração em milissegundos, ou `null` se o valor não for válido.
- */
+/** Converte uma duração CSS ("200ms", "0.3s") em milissegundos, ou null se o valor não for válido. */
 function parseCssDuration(value: string): number | null {
   const match = /^(-?\d*\.?\d+)(ms|s)$/.exec(value);
 
@@ -53,12 +41,7 @@ function parseCssDuration(value: string): number | null {
   return match[2] === "s" ? amount * 1000 : amount;
 }
 
-/**
- * Resolve a duração de animação considerando movimento reduzido e valores CSS.
- * @param element O elemento para o qual resolver a duração.
- * @param duration A duração como número ou chave de ArkDuration.
- * @returns A duração em milissegundos.
- */
+/** Resolve a duração em milissegundos considerando movimento reduzido (0) e valores CSS. */
 function resolveDuration(element: HTMLElement, duration: ArkDuration | number): number {
   // Se o usuário pediu movimento reduzido, retorna 0.
   if (prefersReducedMotion()) {
@@ -77,12 +60,7 @@ function resolveDuration(element: HTMLElement, duration: ArkDuration | number): 
   return fromCss ?? ARK_DURATION_MS[duration];
 }
 
-/**
- * Resolve a função de easing considerando valores CSS.
- * @param element O elemento para o qual resolver a easing.
- * @param easing A easing como string ou chave de ArkEasing.
- * @returns A função de easing como string.
- */
+/** Resolve a função de easing considerando valores CSS; o que não é token passa como veio. */
 function resolveEasing(element: HTMLElement, easing: ArkEasing | string): string {
   // Se a easing for uma chave de ArkEasing, tenta ler o valor da custom property CSS correspondente.
   if (easing in ARK_EASING_CSS) {
@@ -93,23 +71,13 @@ function resolveEasing(element: HTMLElement, easing: ArkEasing | string): string
   return easing;
 }
 
-/**
- * Resolve a distância de animação considerando valores CSS.
- * @param element O elemento para o qual resolver a distância.
- * @param distance A distância como string opcional.
- * @returns A distância como string.
- */
+/** Resolve a distância de animação: a pedida, senão --ark-motion-distance do elemento, senão o espelho JS. */
 function resolveDistance(element: HTMLElement, distance?: string): string {
   // Retorna a distância fornecida, ou a distância definida na custom property CSS, ou o valor padrão.
   return distance || readToken(element, "--ark-motion-distance") || ARK_MOTION_DISTANCE;
 }
 
-/**
- * Transforma o elemento para o estado oculto correspondente ao preset e à distância fornecida.
- * @param preset O preset de animação.
- * @param distance A distância de animação como string.
- * @returns A transformação CSS correspondente ao estado oculto.
- */
+/** Transform CSS do estado oculto correspondente ao preset e à distância fornecida. */
 function hiddenTransform(preset: ArkMotionPreset, distance: string): string {
   if (preset === "slide-up") {
     return `translateY(${distance})`;
@@ -129,11 +97,7 @@ function hiddenTransform(preset: ArkMotionPreset, distance: string): string {
   return "none";
 }
 
-/**
- * Aguarda a conclusão de uma animação.
- * @param animation A animação cuja conclusão será aguardada.
- * @returns Uma Promise que resolve quando a animação termina.
- */
+/** Aguarda a conclusão de uma animação; resolve também quando ela é cancelada. */
 function afterAnimation(animation: Animation): Promise<void> {
   return animation.finished.then(
     () => undefined,
@@ -141,15 +105,7 @@ function afterAnimation(animation: Animation): Promise<void> {
   );
 }
 
-/**
- * Executa a animação no elemento fornecido com os keyframes e opções especificadas.
- * @param element O elemento a ser animado.
- * @param keyframes Os keyframes da animação.
- * @param options As opções de animação fornecidas pelo usuário.
- * @param defaults Os valores padrão para duração e easing.
- * @param fill O modo de preenchimento da animação.
- * @returns Uma Promise que resolve quando a animação termina.
- */
+/** Executa os keyframes no elemento com as opções (ou os defaults de duração e easing); resolve ao terminar. */
 function runAnimation(
   element: HTMLElement,
   keyframes: Keyframe[],
@@ -174,12 +130,8 @@ function runAnimation(
 }
 
 /**
- * Anima a entrada de um elemento (estado oculto do preset → estado natural).
- * Resolve quando a animação termina (imediatamente com movimento reduzido).
- * @param element O elemento a ser animado.
- * @param preset O preset de animação a ser usado.
- * @param options As opções de animação fornecidas pelo usuário.
- * @returns Uma Promise que resolve quando a animação termina.
+ * Anima a entrada de um elemento (estado oculto do preset → estado natural), com duração "default" e easing "out"
+ * quando as opções não dizem. Resolve quando a animação termina (imediatamente com movimento reduzido).
  */
 export function arkEnter(
   element: HTMLElement,
@@ -200,12 +152,9 @@ export function arkEnter(
 }
 
 /**
- * Anima a saída de um elemento (estado natural → estado oculto do preset).
- * O elemento permanece no DOM oculto (fill forwards) até o caller removê-lo.
- * @param element O elemento a ser animado.
- * @param preset O preset de animação a ser usado.
- * @param options As opções de animação fornecidas pelo usuário.
- * @returns Uma Promise que resolve quando a animação termina.
+ * Anima a saída de um elemento (estado natural → estado oculto do preset), com duração "quick" e easing "in" quando
+ * as opções não dizem. Resolve quando a animação termina; o elemento permanece no DOM oculto (fill forwards) até o
+ * caller removê-lo.
  */
 export function arkExit(
   element: HTMLElement,

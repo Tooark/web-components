@@ -4,13 +4,9 @@ import { resolveTargets } from "./internal";
 import type { ArkFlipOptions, ArkMotionTargets } from "./types";
 
 /**
- * Animação FLIP: mede a posição dos elementos, aplica a mutação de DOM
- * (reordenar, inserir, filtrar) e anima cada item da posição antiga para
- * a nova com física de spring.
- * @param targets Os elementos a serem animados.
- * @param mutate A função que aplica a mutação de DOM.
- * @param options As opções de animação FLIP.
- * @returns Uma Promise que resolve quando todas as animações terminarem.
+ * Animação FLIP: mede a posição dos elementos, aplica a mutação de DOM (reordenar, inserir, filtrar) e anima cada
+ * item da posição antiga para a nova com física de spring. Resolve quando todas as animações terminam; com movimento
+ * reduzido só aplica a mutação.
  */
 export async function arkFlip(
   targets: ArkMotionTargets,

@@ -70,8 +70,8 @@ export class ArkButton extends HTMLElementBase {
   private formDisabled = false;
 
   /**
-   * Observa os atributos do elemento para reagir a mudanças.
-   * @returns Uma lista de atributos observados pelo componente.
+   * Atributos observados pelo componente, a que ele reage em attributeChangedCallback.
+   * @returns Array de nomes de atributos observados.
    */
   static get observedAttributes(): string[] {
     return [
@@ -129,7 +129,9 @@ export class ArkButton extends HTMLElementBase {
 
   /**
    * Chamado pelo navegador quando um atributo observado do elemento é alterado.
-   * @param name O nome do atributo que foi alterado.
+   * @param name Nome do atributo alterado.
+   * @param oldValue Valor antigo do atributo.
+   * @param newValue Novo valor do atributo.
    */
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     // Se o atributo alterado for "class", reaplica apenas as classes próprias do componente.
@@ -255,7 +257,7 @@ export class ArkButton extends HTMLElementBase {
 
   /**
    * Manipula o clique no botão, tratando submissão e reset de formulários.
-   * @param event Evento de clique no botão.
+   * @param event Evento de clique.
    */
   private readonly handleClick = (event: MouseEvent): void => {
     // Se o botão é um link ou do tipo "button", não faz nada.
@@ -291,7 +293,7 @@ export class ArkButton extends HTMLElementBase {
 
   /**
    * Manipula o pressionamento de tecla no botão, tratando Enter e Espaço.
-   * @param event Evento de teclado no botão.
+   * @param event Evento de teclado.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
     // Se o botão é um link, não é o alvo do evento ou está desabilitado, não faz nada.
@@ -311,8 +313,7 @@ export class ArkButton extends HTMLElementBase {
 
   /**
    * Manipula o keyup no botão, tratando a tecla Espaço.
-   * @param event Evento de teclado no botão.
-   * @returns void
+   * @param event Evento de teclado.
    */
   private readonly handleKeyup = (event: KeyboardEvent): void => {
     // Se o botão é um link, não é o alvo do evento ou está desabilitado, não faz nada.
@@ -330,8 +331,8 @@ export class ArkButton extends HTMLElementBase {
   // --- Estilo ---
 
   /**
-   * Normaliza o valor do intent, garantindo que seja um dos valores válidos.
-   * @param value Valor do intent.
+   * Normaliza o valor do intent, caindo em "primary" quando não é um dos valores válidos.
+   * @param value Valor do intent a ser normalizado.
    * @returns Intent normalizado.
    */
   private normalizeIntent(value: string | null): ArkIntent {
@@ -354,8 +355,8 @@ export class ArkButton extends HTMLElementBase {
   }
 
   /**
-   * Resolve a variante e o intent do botão com base nos atributos.
-   * @returns Objeto contendo a variante de estilo e o intent.
+   * Resolve a variante de estilo e o intent do botão com base nos atributos.
+   * @returns Objeto contendo a variante de estilo (`styleVariant`) e o intent (`intent`) do botão.
    */
   private resolveVariantAndIntent(): { styleVariant: ArkStyleVariant; intent: ArkIntent } {
     const variant = (this.getAttribute("variant") || "primary").toLowerCase();

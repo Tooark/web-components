@@ -291,7 +291,7 @@ export type ArkKvEditorStyleOptions = {
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos (add, bulkEdit, tableEdit, entries, noEntries, deleteRow). Padrão: "en". */
+  /** Idioma dos rótulos (add, bulkEdit, tableEdit, entries, noEntries, deleteRow, type, secret). Padrão: "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -458,7 +458,7 @@ export type ArkDatepickerStyleOptions = {
   theme?: ArkTheme;
   /** Intenção semântica de cor, repassada aos painéis internos. Padrão: "primary". */
   intent?: ArkIntent;
-  /** Cor CSS custom de destaque, com precedência sobre intent. */
+  /** Cor CSS custom de destaque do calendário interno, com precedência sobre intent. */
   accentColor?: string;
   /** Partes editáveis. Padrão: "datetime", com valor YYYY-MM-DDTHH:mm:ss. */
   mode?: ArkDatepickerMode;
@@ -469,11 +469,12 @@ export type ArkDatepickerStyleOptions = {
   /** Nome no formulário; o valor ISO é submetido por um input hidden. */
   name?: string;
   /**
-   * Formato de exibição do campo, com os tokens YYYY MM DD HH mm ss (sensível a
-   * maiúsculas). Padrão: "MM/DD/YYYY HH:mm" em en e "DD/MM/YYYY HH:mm" nos demais.
+   * Formato de exibição do campo, com os tokens YYYY MM DD HH mm ss (sensível a maiúsculas). Padrão conforme mode:
+   * a data ("MM/DD/YYYY" em en, "DD/MM/YYYY" nos demais) em "date", a hora ("HH:mm", ou "HH:mm:ss" com seconds)
+   * em "time" e as duas separadas por espaço em "datetime".
    */
   format?: string;
-  /** Inclui segundos no valor e na coluna de tempo. */
+  /** Mostra a coluna de segundos e o ss no formato padrão; com ou sem ela, a hora do valor é HH:mm:ss. */
   seconds?: boolean;
   /** Bloqueia a interação no campo e nos painéis. */
   disabled?: boolean;
@@ -506,7 +507,7 @@ export type ArkSchedulerEvent = {
   location?: string;
   /** Cor CSS custom; tem precedência sobre intent. */
   color?: string;
-  /** Intenção semântica de cor do bloco. Padrão: "primary". */
+  /** Intenção semântica de cor do bloco. Padrão: o intent do ark-scheduler. */
   intent?: ArkIntent;
 };
 
@@ -516,7 +517,7 @@ export type ArkSchedulerStyleOptions = {
   testid?: string;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Intenção semântica de cor dos eventos e da linha de agora. Padrão: "primary". */
+  /** Intenção semântica de cor dos eventos sem cor própria; a linha de agora é sempre danger. Padrão: "primary". */
   intent?: ArkIntent;
   /** Visualização atual, sincronizada ao trocar pelo seletor. Padrão: "week". */
   view?: ArkSchedulerView;
@@ -856,9 +857,12 @@ export type ArkCarouselStyleOptions = {
   testid?: string;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Intenção semântica de cor das setas e dos dots. Padrão: "primary". */
+  /**
+   * Intenção semântica de cor do dot ativo e da borda do quadro (neutra em primary e secondary); as setas têm cor
+   * fixa. Padrão: "primary".
+   */
   intent?: ArkIntent;
-  /** Cor CSS custom de destaque, com precedência sobre intent. */
+  /** Cor CSS custom do dot ativo e da borda das setas, com precedência sobre intent. */
   accentColor?: string;
   /** Slides visíveis por vez. Padrão: 1. */
   slidesPerView?: number;
@@ -870,7 +874,7 @@ export type ArkCarouselStyleOptions = {
   loop?: boolean;
   /** Avança sozinho; pausa em hover/foco e desliga com prefers-reduced-motion. */
   autoplay?: boolean;
-  /** Intervalo do autoplay em ms. Padrão: 4200. */
+  /** Intervalo do autoplay em ms, com mínimo de 1200. Padrão: 4200. */
   autoplayDelay?: number;
   /** Mostra os indicadores de slide. Padrão: true. */
   showDots?: boolean;

@@ -5,9 +5,6 @@ import type { ArkSwipeDirection, ArkSwipeOptions } from "./types";
 /**
  * Gesto de swipe com feedback visual e retorno com física de spring.
  * Retorna uma função de cleanup que remove os listeners.
- * @param element O elemento HTML que receberá o gesto de swipe.
- * @param options As opções de configuração do swipe, incluindo eixo, limiar, resistência e callback.
- * @returns Uma função de cleanup que remove os listeners.
  */
 export function arkSwipe(element: HTMLElement, options: ArkSwipeOptions): () => void {
   const axis = options.axis ?? "x";

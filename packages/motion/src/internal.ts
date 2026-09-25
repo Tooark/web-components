@@ -2,11 +2,7 @@ import type { ArkDuration, ArkEasing, ArkMotionPreset } from "@tooark/core";
 import { ARK_DURATION_MS, ARK_MOTION_DISTANCE, prefersReducedMotion } from "@tooark/core";
 import type { ArkMotionTargets } from "./types";
 
-/**
- * Curvas dos tokens --ark-ease-* no formato aceito pela lib Motion (linear = bezier identidade).
- * @remarks As curvas são definidas como arrays de quatro números representando os pontos de controle
- * da função bezier cúbica.
- */
+/** Curvas dos tokens --ark-ease-* nos quatro pontos de cubic-bezier que a lib Motion aceita (linear = identidade). */
 export const ARK_EASE_BEZIER: Record<ArkEasing, [number, number, number, number]> = {
   linear: [0, 0, 1, 1],
   standard: [0.2, 0, 0, 1],
@@ -40,11 +36,7 @@ function parseCubicBezier(value: string): [number, number, number, number] | nul
   return points.length === 4 && points.every(Number.isFinite) ? (points as [number, number, number, number]) : null;
 }
 
-/**
- * Normaliza seletor, elemento, array ou NodeList numa lista de HTMLElement.
- * @param targets O(s) alvo(s) a serem normalizados.
- * @returns Uma lista de elementos HTML.
- */
+/** Normaliza seletor, elemento, array ou NodeList numa lista de HTMLElement (vazia sem document, como no SSR). */
 export function resolveTargets(targets: ArkMotionTargets): HTMLElement[] {
   // Verifica se o alvo é uma string (seletor CSS) e resolve os elementos correspondentes.
   if (typeof targets === "string") {
@@ -67,12 +59,9 @@ export function resolveTargets(targets: ArkMotionTargets): HTMLElement[] {
 }
 
 /**
- * Resolve a duração em segundos a partir de um valor em milissegundos ou token ArkDuration. O token vem da
- * página (--ark-duration-* no elemento) e cai no espelho JS quando o CSS da lib não está carregado.
- * @param element O elemento de onde ler o token.
- * @param duration A duração desejada em milissegundos ou como token ArkDuration.
- * @param fallback O token ArkDuration a ser usado caso duration não seja fornecido.
- * @returns A duração em segundos, respeitando a preferência de redução de movimento.
+ * Resolve a duração em segundos a partir de um valor em milissegundos ou token ArkDuration (`fallback` quando
+ * `duration` falta); 0 com movimento reduzido. O token vem da página (--ark-duration-* no elemento) e cai no espelho
+ * JS quando o CSS da lib não está carregado.
  */
 export function resolveDurationSec(
   element: Element | undefined,
@@ -95,11 +84,8 @@ export function resolveDurationSec(
 }
 
 /**
- * Resolve a curva de animação a partir de um token ArkEasing, array bezier ou nome. O token vem da página
- * (--ark-ease-* no elemento) e cai no espelho JS quando o CSS da lib não está carregado.
- * @param element O elemento de onde ler o token.
- * @param ease A curva desejada como token ArkEasing, array bezier ou nome.
- * @returns A curva de animação correspondente, padrão: token out.
+ * Resolve a curva de animação a partir de um token ArkEasing, array bezier ou nome; sem valor, o token out. O token
+ * vem da página (--ark-ease-* no elemento) e cai no espelho JS quando o CSS da lib não está carregado.
  */
 export function resolveEase(
   element: Element | undefined,
@@ -120,10 +106,8 @@ export function resolveEase(
 }
 
 /**
- * Converte a distância CSS ("0.75rem", "24px") para px.
- * @param element O elemento HTML de referência para unidades relativas (em).
- * @param distance A distância desejada como string CSS.
- * @returns A distância em pixels.
+ * Converte a distância CSS ("0.75rem", "24px") para px: a pedida, senão --ark-motion-distance da página, senão o
+ * espelho JS. rem segue a fonte da raiz, em a do elemento, e um valor não numérico vira 12.
  */
 export function resolveDistancePx(element: HTMLElement | undefined, distance?: string): number {
   // A distância pedida, senão o token da página (--ark-motion-distance), senão o espelho JS.
@@ -153,12 +137,7 @@ export function resolveDistancePx(element: HTMLElement | undefined, distance?: s
   return amount;
 }
 
-/**
- * Offset inicial (x/y/scale) do estado oculto de cada preset.
- * @param preset O preset de animação desejado.
- * @param distancePx A distância em pixels para o deslocamento.
- * @returns Um objeto contendo os offsets iniciais (x/y/scale) correspondentes.
- */
+/** Offset inicial (x/y/scale) do estado oculto de cada preset, com a distância em px nos presets de slide. */
 export function hiddenOffset(preset: ArkMotionPreset, distancePx: number): { x?: number; y?: number; scale?: number } {
   // Determina o offset inicial com base no preset de animação.
   if (preset === "slide-up") {
