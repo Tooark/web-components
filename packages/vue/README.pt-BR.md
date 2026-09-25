@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@tooark/vue?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/vue)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/Tooark/web-components/blob/main/LICENSE)
 
-Wrappers Vue 3 dos Tooark Web Components: props tipadas, eventos com o nome nativo entregando o `CustomEvent`, props de objeto serializadas por você.
+Wrappers Vue 3 dos Tooark Web Components: props tipadas, eventos com o nome nativo entregando o `CustomEvent` (ou o `detail` dele), props de objeto serializadas para você.
 
 🌍 **Idiomas:** [![USA Flag](https://flagcdn.com/w20/us.png) English](./README.md) · ![Brazil Flag](https://flagcdn.com/w20/br.png) **Português (este arquivo)**
 
@@ -27,8 +27,8 @@ Wrappers Vue 3 dos Tooark Web Components: props tipadas, eventos com o nome nati
 O pacote `@tooark/vue` fornece:
 
 - um `defineComponent` por elemento (`ArkButton`, `ArkInput`, `ArkDialog`, …) com props tipadas e `inheritAttrs: false`, então atributos extras e listeners nativos vão direto ao elemento;
-- eventos customizados reemitidos com o nome nativo (`@ark-change`, `@ark-close`, `@ark-select`, `@change` no `ArkSelect`, …) entregando o `CustomEvent`;
-- props de objeto (`events`, `rows`, `options`, `localeJson`) serializadas ou atribuídas como propriedade por você;
+- eventos customizados reemitidos com o nome nativo (`@ark-close`, `@ark-select`, `@change` no `ArkSelect`, …) entregando o `CustomEvent` ou, no calendário, datepicker, relógio, carrossel e agenda, o `detail` dele;
+- props de objeto (`events`, `rows`, `options` e o `localeJson` de `ArkCalendar`/`ArkDatepicker`) serializadas ou atribuídas como propriedade para você (nos demais wrappers o `localeJson` é uma string JSON);
 - os elementos se registram no primeiro render, só no navegador (seguro para Nuxt);
 - `toast` reexportado do `@tooark/core`.
 
@@ -37,8 +37,10 @@ O pacote `@tooark/vue` fornece:
 ## 🔧 Instalação
 
 ```bash
-pnpm add @tooark/vue   # traz @tooark/web-components, @tooark/core e @tooark/tokens
+pnpm add @tooark/vue @tooark/web-components
 ```
+
+O `@tooark/vue` já depende de `@tooark/web-components`, `@tooark/core` e `@tooark/tokens`, mas o pnpm não expõe dependências transitivas ao seu app, e o import da folha de estilo abaixo vem do `@tooark/web-components`: instale-o diretamente. O `toast` é reexportado pelo `@tooark/vue`.
 
 Peer dependency: `vue` ≥ 3.
 
@@ -68,8 +70,8 @@ export default {
 
 Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-editor` → `ArkKvEditor`, `ark-command-palette` → `ArkCommandPalette` + `ArkCommandItem`.
 
-- Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`) mais as propriedades JS onde importam (`events`, `rows`, `options`, `sizes`).
-- Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, `@ark-event-click` em `ArkScheduler`, …); eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
+- Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `testid` para os hooks de E2E, mais as propriedades JS onde importam (`events`, `rows`, `options`, `sizes`).
+- Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, …); `@ark-change` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `@ark-slide-change` em `ArkCarousel` e `@ark-event-click`/`@ark-slot-click`/`@ark-view-change`/`@ark-range-change` em `ArkScheduler` entregam o próprio `detail`; eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`).
 
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
@@ -80,7 +82,7 @@ Referência completa de atributos, guia de tema e hooks de E2E: [https://github.
 
 ### Um formulário com diálogo de confirmação e toast
 
-```ts
+```vue
 <script setup lang="ts">
 import { ArkButton, ArkDialog, ArkInput, ArkSelect, ArkToaster, toast } from "@tooark/vue";
 import { ref } from "vue";
@@ -120,7 +122,7 @@ function publicar() {
 
 ### Um elemento cru de um pacote lateral
 
-```ts
+```vue
 <script setup lang="ts">
 import { registerTooarkCode } from "@tooark/code";
 import { onMounted, ref } from "vue";
@@ -130,6 +132,10 @@ onMounted(() => {
   registerTooarkCode();
   editor.value!.value = JSON.stringify({ ola: "mundo" }, null, 2);
 });
+
+function salvar(valor: string) {
+  localStorage.setItem("config", valor);
+}
 </script>
 
 <template>
@@ -145,8 +151,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                           | Versão     | Descrição                                                            |
 | -------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.0.0     | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.0.0     | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.1.0     | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.1.0     | Os Custom Elements `ark-*` e a folha de estilo deles                 |
 | [`vue`](https://www.npmjs.com/package/vue)                                       | >=3 (peer) | Vue 3                                                                |
 
 ---

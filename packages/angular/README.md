@@ -27,18 +27,21 @@ Standalone Angular wrappers for the Tooark Web Components: `@Input()`s for the a
 The `@tooark/angular` package provides:
 
 - one standalone component per element (`ArkButtonComponent`, `ArkInputComponent`, `ArkDialogComponent`, …) with the `<ark-*-wrapper>` selector and `CUSTOM_ELEMENTS_SCHEMA`;
-- `@Input()`s bound to the element's attributes (`[attr.*]`), object inputs serialized for you (`events`, `rows`, `options`, `localeJson`);
-- `@Output()`s re-emitting the custom events (`arkChange`, `arkClose`, `arkSelect`, `changed`, `arkEventClick`, …) as the original `CustomEvent`;
+- `@Input()`s bound to the element's attributes (`[attr.*]`), object inputs serialized for you (`events`, `options`, and `localeJson` on the calendar and datepicker; elsewhere `localeJson` is a JSON string), and the key/value editor's `rows` assigned as a property;
+- `@Output()`s re-emitting the custom events (`arkClose`, `arkSelect`, `changed`, …) as the original `CustomEvent` or, on the calendar, clock, datepicker, carousel and scheduler (`arkChange`, `arkSlideChange`, `arkEventClick`, …), its `detail`;
 - registration in each wrapper constructor, skipped without `customElements` — SSR and Angular Universal safe;
-- built with ng-packagr in partial Ivy: works in AOT production builds.
+- built with ng-packagr in partial Ivy: works in AOT production builds;
+- `toast`, `showToast`, `dismissToast` re-exported from `@tooark/core`.
 
 ---
 
 ## 🔧 Installation
 
 ```bash
-pnpm add @tooark/angular   # brings @tooark/web-components, @tooark/core and @tooark/tokens
+pnpm add @tooark/angular @tooark/web-components
 ```
+
+`@tooark/angular` already brings `@tooark/web-components`, `@tooark/core` and `@tooark/tokens`; add `@tooark/web-components` to your own dependencies as well, because `angular.json` points at its stylesheet and package managers with isolated dependencies (pnpm) do not place transitive packages at the root of your `node_modules`.
 
 Peer dependencies: `@angular/core` and `@angular/common` ≥ 21.2.19 (the workspace's security floor).
 
@@ -59,8 +62,8 @@ Add the stylesheet to `angular.json` (or import it from your global `styles.css`
 
 One standalone component per element: `ark-button` → `ArkButtonComponent` (`<ark-button-wrapper>`), `ark-kv-editor` → `ArkKvEditorComponent` (`<ark-kv-editor-wrapper>`), and so on.
 
-- Inputs: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`) plus `ariaLabel`; object inputs where they matter (`events`, `rows`, `options`).
-- Outputs: the custom events in camelCase (`(arkClose)` on the dialog and drawer, `(arkSelect)` on the menu and palette, `(changed)` on the select and the key/value editor, `(arkEventClick)`/`(arkSlotClick)`/`(arkViewChange)`/`(arkRangeChange)` on the scheduler, …) delivering the `CustomEvent`; native events bubble from the inner control (`(input)` on the input: read `$any($event.target).value`).
+- Inputs: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`) plus `ariaLabel` on the input, textarea, select, checkbox, radio, switch, toggle, color-swatches, shape-picker, button, copy-button, avatar, dialog, drawer, command palette and menu; object inputs where they matter (`events`, `rows`, `options`).
+- Outputs: the custom events in camelCase (`(arkClose)` on the dialog and drawer, `(arkSelect)` on the menu and palette, `(changed)` on the select and the key/value editor, …) delivering the `CustomEvent`; `(arkChange)` on the calendar, clock and datepicker, `(arkSlideChange)` on the carousel and `(arkEventClick)`/`(arkSlotClick)`/`(arkViewChange)`/`(arkRangeChange)` on the scheduler deliver the `detail` itself; native events bubble from the inner control (`(input)` on the input: read `$any($event.target).value`).
 - State: attributes like `open` are the source of truth (`[open]="bool"` + `(arkClose)`).
 - Raw `ark-*` tags (side packages): add `schemas: [CUSTOM_ELEMENTS_SCHEMA]` to your component and call the `registerTooark*()` function in the browser.
 
@@ -80,8 +83,8 @@ import {
   ArkInputComponent,
   ArkSelectComponent,
   ArkToasterComponent,
+  toast,
 } from "@tooark/angular";
-import { toast } from "@tooark/core";
 
 @Component({
   selector: "app-profile-form",
@@ -161,8 +164,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                          | Version          | Description                                                      |
 | -------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.0.0           | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.0.0           | The `ark-*` Custom Elements and their stylesheet                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.1.0           | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.1.0           | The `ark-*` Custom Elements and their stylesheet                 |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                   | ^2.8.1           | TypeScript runtime helpers                                       |
 | [`@angular/common`](https://www.npmjs.com/package/@angular/common)               | >=21.2.19 (peer) | Angular common                                                   |
 | [`@angular/core`](https://www.npmjs.com/package/@angular/core)                   | >=21.2.19 (peer) | Angular core (security floor of the workspace)                   |

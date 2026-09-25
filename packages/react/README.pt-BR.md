@@ -26,9 +26,9 @@ Wrappers React tipados dos Tooark Web Components: props camelCase, eventos custo
 
 O pacote `@tooark/react` fornece:
 
-- um componente por elemento (33 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) com props tipadas que estendem os `Ark*StyleOptions` do `@tooark/core`;
-- props camelCase viram atributos; booleanos vão como presente/ausente; props de objeto (`events`, `rows`, `options`, `localeJson`) são serializadas ou atribuídas como propriedade por você;
-- eventos customizados viram handlers que recebem o `CustomEvent` (`onChange`, `onClose`, `onSelect`, `onEventClick`, …); eventos nativos (`onClick`, `onInput`) funcionam como sempre, e o `ArkButtonProps` estende `React.HTMLAttributes<HTMLElement>`, então `onClick`, `onFocus`, `id`, `style`, … são tipados (um botão `disabled` ou `loading` nunca dispara o `onClick`);
+- um componente por elemento (41 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) com props tipadas que estendem os `Ark*StyleOptions` do `@tooark/core`;
+- props camelCase viram atributos; booleanos vão como presente/ausente; props de objeto (`events`, `rows`, `options` e o `localeJson` de `ArkCalendar`/`ArkDatepicker`) são serializadas ou atribuídas como propriedade para você (nos demais wrappers o `localeJson` é uma string JSON);
+- eventos customizados viram handlers que recebem o `CustomEvent` (`onChange`, `onClose`, `onSelect`, …) ou, no calendário, datepicker, relógio, carrossel e agenda, o `detail` dele; eventos nativos (`onClick`, `onInput`) funcionam como sempre, e o `ArkButtonProps` estende `React.HTMLAttributes<HTMLElement>`, então `onClick`, `onFocus`, `id`, `style`, … são tipados (um botão `disabled` ou `loading` nunca dispara o `onClick`);
 - os elementos se registram no primeiro render (`ensureTooarkComponentsRegistered`), só no navegador, então frameworks com SSR funcionam;
 - tipagens `IntrinsicElements` de toda tag `ark-*`, para os pacotes laterais ou quando você preferir o elemento cru;
 - `toast`, `showToast`, `dismissToast` reexportados do `@tooark/core`.
@@ -38,8 +38,10 @@ O pacote `@tooark/react` fornece:
 ## 🔧 Instalação
 
 ```bash
-pnpm add @tooark/react   # traz @tooark/web-components, @tooark/core e @tooark/tokens
+pnpm add @tooark/react @tooark/web-components
 ```
+
+O `@tooark/react` já depende de `@tooark/web-components`, `@tooark/core` e `@tooark/tokens`, mas o pnpm não expõe dependências transitivas ao seu app, e o import da folha de estilo abaixo vem do `@tooark/web-components`: instale-o diretamente. O `toast` é reexportado pelo `@tooark/react`.
 
 Peer dependencies: `react` e `react-dom` ≥ 18.
 
@@ -60,7 +62,7 @@ import "@tooark/web-components/styles.css";
 Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-editor` → `ArkKvEditor`, `ark-command-palette` → `ArkCommandPalette` + `ArkCommandItem`. Cada um exporta o tipo das props (`ArkButtonProps`, …).
 
 - Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, mais as propriedades JS do elemento onde importam (`events`, `rows`, `options`, `sizes`, `colors`).
-- Eventos: `on<Evento>` para os eventos customizados, recebendo o `CustomEvent` (`onChange` em `ArkSelect`/`ArkKvEditor`, `onClose` em `ArkDialog`/`ArkDrawer`, `onSelect` em `ArkMenu`/`ArkCommandPalette`, `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` em `ArkScheduler`, …). Eventos nativos sobem do controle interno (`onInput` em `ArkInput`: leia `event.target.value`).
+- Eventos: `on<Evento>` para os eventos customizados, recebendo o `CustomEvent` (`onChange` em `ArkSelect`/`ArkKvEditor`, `onClose` em `ArkDialog`/`ArkDrawer`, `onSelect` em `ArkMenu`/`ArkCommandPalette`, …); `onChange` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `onSlideChange` em `ArkCarousel` e `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` em `ArkScheduler` recebem o próprio `detail`. Eventos nativos sobem do controle interno (`onInput` em `ArkInput`: leia `event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`ArkDialog open={bool}` + `onClose`), então renderização controlada funciona e a saída continua animando.
 
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
@@ -145,8 +147,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                           | Versão      | Descrição                                                            |
 | -------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.0.0      | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.0.0      | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.1.0      | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.1.0      | Os Custom Elements `ark-*` e a folha de estilo deles                 |
 | [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer) | React 18 ou 19                                                       |
 | [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer) | Renderizador React DOM                                               |
 
