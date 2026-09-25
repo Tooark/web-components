@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkLocale, type ArkRounded, type ArkSize, resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 const INPUT_TYPES = ["text", "password", "email", "number", "tel", "url", "search", "date", "time", "datetime-local"];
@@ -47,7 +48,7 @@ let arkInputIdCounter = 0;
  * um botão de mostrar/ocultar na ponta direita. Atributos nativos como
  * `maxlength` ou `inputmode` são espelhados no <input> sem interpretação.
  */
-export class ArkInput extends HTMLElement {
+export class ArkInput extends HTMLElementBase {
   static readonly tagName = "ark-input";
 
   private inputEl: HTMLInputElement | null = null;

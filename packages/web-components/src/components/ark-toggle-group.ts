@@ -1,4 +1,5 @@
 import type { ArkToggle } from "./ark-toggle";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -6,7 +7,7 @@ import { applyTestHooks } from "./test-hooks";
  * (`role="group"` + classes): os itens do usuário ficam onde estão, então
  * frameworks podem adicionar/remover toggles livremente.
  */
-export class ArkToggleGroup extends HTMLElement {
+export class ArkToggleGroup extends HTMLElementBase {
   static readonly tagName = "ark-toggle-group";
 
   private observer: MutationObserver | null = null;

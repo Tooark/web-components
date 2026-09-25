@@ -14,6 +14,7 @@ import {
   trapFocus,
   unlockScroll
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -47,7 +48,7 @@ type ArkDrawerState = "closed" | "open" | "closing";
  * verdade, como no ark-dialog, e em overlay a página para de rolar enquanto
  * aberta, salvo com `no-scroll-lock`.
  */
-export class ArkDrawer extends HTMLElement {
+export class ArkDrawer extends HTMLElementBase {
   static readonly tagName = "ark-drawer";
 
   private headerEl: HTMLDivElement | null = null;

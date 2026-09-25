@@ -68,6 +68,10 @@ jobs:
         if: steps.check.outputs.published == 'false'
         run: pnpm check:publish
 
+      - name: SSR smoke test
+        if: steps.check.outputs.published == 'false'
+        run: pnpm check:ssr
+
       - name: Install Playwright Chromium
         if: steps.check.outputs.published == 'false'
         run: pnpm exec playwright install chromium --with-deps

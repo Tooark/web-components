@@ -1,4 +1,5 @@
 import { type ArkRounded, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -27,7 +28,7 @@ const RADIUS: Record<ArkRounded, string> = {
  * substitui o skeleton
  * entra com `.ark-animate-fade-in`, sem elemento próprio para isso.
  */
-export class ArkSkeleton extends HTMLElement {
+export class ArkSkeleton extends HTMLElementBase {
   static readonly tagName = "ark-skeleton";
 
   private ownClasses: string[] = [];

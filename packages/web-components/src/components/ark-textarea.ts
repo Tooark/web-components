@@ -1,4 +1,5 @@
 import type { ArkIntent, ArkRounded, ArkSize } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -14,7 +15,7 @@ let arkTextareaIdCounter = 0;
  * (`field-sizing: content` nativo, com fallback por JS), `monospace` e
  * `resize` atendem edição de código e de dados.
  */
-export class ArkTextarea extends HTMLElement {
+export class ArkTextarea extends HTMLElementBase {
   static readonly tagName = "ark-textarea";
 
   private textareaEl: HTMLTextAreaElement | null = null;

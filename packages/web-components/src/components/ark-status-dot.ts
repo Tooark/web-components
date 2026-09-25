@@ -1,4 +1,5 @@
 import type { ArkIntent, ArkSize } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -8,7 +9,7 @@ import { applyTestHooks } from "./test-hooks";
  * (`aria-hidden`), para o texto ao lado ser o que conta. Estático por
  * design: nunca pulsa.
  */
-export class ArkStatusDot extends HTMLElement {
+export class ArkStatusDot extends HTMLElementBase {
   static readonly tagName = "ark-status-dot";
 
   private ownClasses: string[] = [];

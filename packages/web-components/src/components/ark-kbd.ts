@@ -1,4 +1,5 @@
 import type { ArkSize } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -7,7 +8,7 @@ import { applyTestHooks } from "./test-hooks";
  * usuário. Não é interativo e não tem role próprio; para leitores de tela é
  * texto comum, como um <kbd>.
  */
-export class ArkKbd extends HTMLElement {
+export class ArkKbd extends HTMLElementBase {
   static readonly tagName = "ark-kbd";
 
   private ownClasses: string[] = [];

@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -16,7 +17,7 @@ type ArkProgressSizing = {
  * loop, com duração fixa e isento de movimento reduzido, como o spinner: é o
  * único sinal de progresso.
  */
-export class ArkProgress extends HTMLElement {
+export class ArkProgress extends HTMLElementBase {
   static readonly tagName = "ark-progress";
 
   private ownClasses: string[] = [];

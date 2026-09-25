@@ -1,4 +1,5 @@
 import { type ArkTooltipSide, coerceBooleanAttr, isPopoverOpen, openPopover, positionAnchored } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Contador para o id do balão, que o `aria-describedby` do gatilho referencia. */
@@ -21,7 +22,7 @@ const HIDE_GRACE_MS = 100;
  * ao perder o foco, com Esc e no pointerdown. Posicionado por `positionAnchored`
  * de core, com flip quando não cabe. Entrada `fade` quick, sem saída animada.
  */
-export class ArkTooltip extends HTMLElement {
+export class ArkTooltip extends HTMLElementBase {
   static readonly tagName = "ark-tooltip";
 
   private ownClasses: string[] = [];

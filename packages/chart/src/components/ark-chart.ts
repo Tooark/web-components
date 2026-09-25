@@ -2,6 +2,7 @@ import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import type { EChartsOption } from "echarts";
 import { type ArkChartInstance, createChart } from "../engine";
 import type { ArkChartRenderer, ArkChartTheme } from "../types";
+import { HTMLElementBase } from "./html-element-base";
 
 /**
  * Custom Element que renderiza um gráfico ECharts.
@@ -21,7 +22,7 @@ import type { ArkChartRenderer, ArkChartTheme } from "../types";
  * Eventos: dispara `ark-chart-click` (bubbles/composed) ao clicar em uma série,
  * com `detail` = params nativos do ECharts.
  */
-export class ArkChart extends HTMLElement {
+export class ArkChart extends HTMLElementBase {
   static readonly tagName = "ark-chart";
 
   private container: HTMLDivElement | null = null;

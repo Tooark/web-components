@@ -1,4 +1,5 @@
 import type { ArkIntent, ArkRounded, ArkSelectOption, ArkSize } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -18,7 +19,7 @@ let arkSelectIdCounter = 0;
  * propriedade JS), nunca de filhos: o <select> exige os <option> dentro dele
  * e a lib não move filhos do usuário.
  */
-export class ArkSelect extends HTMLElement {
+export class ArkSelect extends HTMLElementBase {
   static readonly tagName = "ark-select";
 
   private selectEl: HTMLSelectElement | null = null;

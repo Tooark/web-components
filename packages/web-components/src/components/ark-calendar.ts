@@ -1,5 +1,6 @@
 import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
 import { type ArkLocale, announce, arkEnter, resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -26,7 +27,7 @@ type ArkCalendarView = "days" | "months" | "years";
  * eventos por dia (`events` + `event-display`). O ark-datepicker embute este
  * componente (modo inline e no popup do modo input).
  */
-export class ArkCalendar extends HTMLElement {
+export class ArkCalendar extends HTMLElementBase {
   static readonly tagName = "ark-calendar";
 
   private root: HTMLDivElement | null = null;

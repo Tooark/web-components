@@ -16,6 +16,7 @@ import {
   type ArkWysiwygUploadError,
   type ArkWysiwygUploader
 } from "../types";
+import { HTMLElementBase } from "./html-element-base";
 
 type ToolbarAction = {
   icon: ArkWysiwygIcon;
@@ -183,7 +184,7 @@ type Segment = { group: ArkWysiwygToolbarGroup; items: ArkWysiwygToolbarItem[] }
  * não aparecem na toolbar e arquivos colados ou arrastados são recusados
  * (`ark-wysiwyg-upload-error`), nunca embutidos em base64.
  */
-export class ArkWysiwygEditor extends HTMLElement {
+export class ArkWysiwygEditor extends HTMLElementBase {
   static readonly tagName = "ark-wysiwyg-editor";
 
   private instance: ArkWysiwygInstance | null = null;

@@ -52,7 +52,8 @@
     "format": "biome format --write .",
     "check": "biome check .",
     "check:fix": "biome check --write .",
-    "check:publish": "node scripts/check-publish.mjs"
+    "check:publish": "node scripts/check-publish.mjs",
+    "check:ssr": "node scripts/check-ssr.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",

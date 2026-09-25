@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkSwitchPalette = {
@@ -30,7 +31,7 @@ const CROSS_SVG =
  * submetendo `name`/`value` apenas quando marcado. Tem tabela de proporções
  * própria, em vez da escala de altura dos demais controles.
  */
-export class ArkSwitch extends HTMLElement {
+export class ArkSwitch extends HTMLElementBase {
   static readonly tagName = "ark-switch";
 
   private trackEl: HTMLButtonElement | null = null;

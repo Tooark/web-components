@@ -3,6 +3,7 @@ import { type ArkLocale, closePopover, openPopover, positionAnchored, resolveLoc
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -38,7 +39,7 @@ const CLOCK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" heigh
  *   core (abre abaixo, vira para cima sem espaço) e animado com `scale` a
  *   partir da origem.
  */
-export class ArkDatepicker extends HTMLElement {
+export class ArkDatepicker extends HTMLElementBase {
   static readonly tagName = "ark-datepicker";
 
   private calendarEl: ArkCalendar | null = null;

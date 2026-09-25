@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkLocale, type ArkSize, resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Mesmo SVG do ark-button: gira pelo preset `.ark-animate-spin` do core, isento de movimento reduzido. */
@@ -15,7 +16,7 @@ const SPINNER_SVG = `
  * string `loading` do idioma). Gira sempre, inclusive sob movimento reduzido:
  * é o único sinal de progresso. Sem `intent` herda a cor do texto ao redor.
  */
-export class ArkSpinner extends HTMLElement {
+export class ArkSpinner extends HTMLElementBase {
   static readonly tagName = "ark-spinner";
 
   private ownClasses: string[] = [];

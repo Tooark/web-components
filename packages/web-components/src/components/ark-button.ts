@@ -8,6 +8,7 @@ import {
   announce,
   coerceBooleanAttr
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -54,7 +55,7 @@ let arkButtonIdCounter = 0;
  * donos deles. Com `href`, um `<a>` "esticado" cobre o host, recebe o foco e
  * é nomeado pelo conteúdo do host (`aria-labelledby`).
  */
-export class ArkButton extends HTMLElement {
+export class ArkButton extends HTMLElementBase {
   // `string`, e não o literal, para subclasses (ark-copy-button) redeclararem o próprio tag.
   static readonly tagName: string = "ark-button";
   static readonly formAssociated = true;

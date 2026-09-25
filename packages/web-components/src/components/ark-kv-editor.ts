@@ -12,6 +12,7 @@ import type { ArkCheckbox } from "./ark-checkbox";
 import type { ArkInput } from "./ark-input";
 import type { ArkSelect } from "./ark-select";
 import type { ArkTextarea } from "./ark-textarea";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Ícone do botão de remover linha (chrome próprio). */
@@ -92,7 +93,7 @@ type RowParts = {
  * adicionar e remover anunciam a contagem ao leitor de tela. A célula de
  * valor é um ark-input comum: autocomplete de variáveis fica no app.
  */
-export class ArkKvEditor extends HTMLElement {
+export class ArkKvEditor extends HTMLElementBase {
   static readonly tagName = "ark-kv-editor";
 
   private model: ArkKvRow[] = [];

@@ -2,6 +2,7 @@ import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import { type ArkWysiwygInstance, createWysiwygViewer } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
+import { HTMLElementBase } from "./html-element-base";
 
 /**
  * Viewer somente-leitura (Custom Element) que renderiza o mesmo JSON do editor.
@@ -13,7 +14,7 @@ import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
  *
  * Conteúdo via propriedade `content` (JSON do Tiptap). Atributo: `theme`.
  */
-export class ArkWysiwygViewer extends HTMLElement {
+export class ArkWysiwygViewer extends HTMLElementBase {
   static readonly tagName = "ark-wysiwyg-viewer";
 
   private instance: ArkWysiwygInstance | null = null;

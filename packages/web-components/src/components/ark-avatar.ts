@@ -1,4 +1,5 @@
 import type { ArkAvatarShape, ArkSize } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Glifo de pessoa para o avatar sem nome e sem imagem (chrome próprio). */
@@ -20,7 +21,7 @@ type ArkAvatarSizing = {
  * (`aria-hidden`, a menos que o host tenha aria-label próprio). `color` troca
  * o tint primary por uma cor própria (texto na cor, fundo suave).
  */
-export class ArkAvatar extends HTMLElement {
+export class ArkAvatar extends HTMLElementBase {
   static readonly tagName = "ark-avatar";
 
   private ownClasses: string[] = [];

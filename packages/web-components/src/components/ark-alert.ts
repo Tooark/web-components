@@ -7,6 +7,7 @@ import {
   coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -35,7 +36,7 @@ type ArkAlertPalette = {
  * anima a saída (slide-down, quick), emite `ark-dismiss` e esconde o host com
  * `hidden`; remover é do app, que também pode tirar o `hidden` para reexibir.
  */
-export class ArkAlert extends HTMLElement {
+export class ArkAlert extends HTMLElementBase {
   static readonly tagName = "ark-alert";
 
   private ownClasses: string[] = [];

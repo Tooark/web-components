@@ -1,4 +1,5 @@
 import type { ArkCardPadding, ArkRounded } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -12,7 +13,7 @@ import { applyTestHooks } from "./test-hooks";
  * escala o espaçamento interno (padding do host e gap entre as linhas) e
  * `rounded` os cantos. Não é interativo e não tem role próprio.
  */
-export class ArkCard extends HTMLElement {
+export class ArkCard extends HTMLElementBase {
   static readonly tagName = "ark-card";
 
   private ownClasses: string[] = [];

@@ -1,5 +1,6 @@
 import type { ArkTabsVariant } from "@tooark/core";
 import type { ArkTab } from "./ark-tab";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Atributos do grupo propagados a cada aba. */
@@ -16,7 +17,7 @@ const PROPAGATED_ATTRS = ["variant", "size", "intent", "rounded", "fill", "theme
  * inserido de uma vez o grupo pode rodar antes de as abas serem upgraded, e
  * uma propriedade escrita antes do upgrade esconderia o accessor da classe.
  */
-export class ArkTabs extends HTMLElement {
+export class ArkTabs extends HTMLElementBase {
   static readonly tagName = "ark-tabs";
 
   private observer: MutationObserver | null = null;
