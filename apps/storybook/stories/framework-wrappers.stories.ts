@@ -6,7 +6,12 @@ import {
   ArkMenuItem as ReactArkMenuItem,
   ArkScheduler as ReactArkScheduler
 } from "@tooark/react";
-import { ArkButton as VueArkButton, ArkScheduler as VueArkScheduler } from "@tooark/vue";
+import {
+  ArkButton as VueArkButton,
+  ArkMenu as VueArkMenu,
+  ArkMenuItem as VueArkMenuItem,
+  ArkScheduler as VueArkScheduler
+} from "@tooark/vue";
 import { createElement, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
@@ -189,5 +194,65 @@ export const VueButtonVariantIntent = {
     await expect(danger.hasAttribute("intent")).toBe(false);
     await expect(danger.classList.contains("ark:bg-danger")).toBe(true);
     await expect(outline.classList.contains("ark:border-success-border")).toBe(true);
+  }
+};
+
+// `checked` tem três estados: ausente é item comum, true marca e false desmarca um item checkbox.
+const roleOf = (el: Element | null): string | null => el?.getAttribute("role") ?? null;
+
+export const VueMenuItemChecked = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const checked = ref<boolean | undefined>(true);
+    const app = createApp({
+      setup: () => () =>
+        h(VueArkMenu, { "aria-label": "Exibir" }, () => [
+          h(VueArkMenuItem, { value: "plain" }, () => "Comum"),
+          h(VueArkMenuItem, { value: "grid", checked: checked.value }, () => "Grade")
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    const [plain, grid] = Array.from(canvasElement.querySelectorAll("ark-menu-item"));
+
+    await expect(roleOf(plain)).toBe("menuitem");
+    await expect(roleOf(grid)).toBe("menuitemcheckbox");
+    await expect(grid).toHaveAttribute("aria-checked", "true");
+    checked.value = false;
+    await nextTick();
+    await expect(roleOf(grid)).toBe("menuitemcheckbox");
+    await expect(grid).toHaveAttribute("aria-checked", "false");
+    checked.value = undefined;
+    await nextTick();
+    await expect(roleOf(grid)).toBe("menuitem");
+    await expect(problems).toEqual([]);
+  }
+};
+
+export const ReactMenuItemChecked = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const tree = (checked: boolean | undefined): ReactNode =>
+      createElement(
+        ReactArkMenu,
+        { "aria-label": "Exibir" },
+        createElement(ReactArkMenuItem, { key: "p", value: "plain" }, "Comum"),
+        createElement(ReactArkMenuItem, { key: "g", value: "grid", checked }, "Grade")
+      );
+
+    render(tree(true));
+    const [plain, grid] = Array.from(canvasElement.querySelectorAll("ark-menu-item"));
+    await expect(roleOf(plain)).toBe("menuitem");
+    await expect(grid).toHaveAttribute("aria-checked", "true");
+    render(tree(false));
+    await expect(roleOf(grid)).toBe("menuitemcheckbox");
+    await expect(grid).toHaveAttribute("aria-checked", "false");
+    // Tirar a prop: o React 19 grava undefined na propriedade, que precisa voltar a item comum.
+    render(tree(undefined));
+    await expect(roleOf(grid)).toBe("menuitem");
+    await expect(errors).toEqual([]);
   }
 };

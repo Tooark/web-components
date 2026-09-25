@@ -58,8 +58,8 @@ export const ArkMenuItem = defineComponent({
     value: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
     intent: { type: String as PropType<ArkIntent>, default: undefined },
-    // true marca, "false" (string) e um checkbox desmarcado; false/ausente e um item comum.
-    checked: { type: [Boolean, String] as PropType<boolean | "true" | "false">, default: false },
+    // true/"true" marca e false/"false" desmarca um item checkbox; ausente (undefined) e um item comum, como no React.
+    checked: { type: [Boolean, String] as PropType<boolean | "true" | "false">, default: undefined },
     divider: { type: Boolean, default: false },
     static: { type: Boolean, default: false }
   },
@@ -73,8 +73,13 @@ export const ArkMenuItem = defineComponent({
           value: props.value,
           intent: props.intent,
           disabled: props.disabled ? "" : undefined,
-          checked:
-            props.checked === true || props.checked === "true" ? "" : props.checked === "false" ? "false" : undefined,
+          // "^" grava como atributo: pela propriedade o Vue converteria o undefined em false (checkbox desmarcado).
+          "^checked":
+            props.checked === true || props.checked === "true"
+              ? ""
+              : props.checked === false || props.checked === "false"
+                ? "false"
+                : undefined,
           divider: props.divider ? "" : undefined,
           static: props.static ? "" : undefined
         },
