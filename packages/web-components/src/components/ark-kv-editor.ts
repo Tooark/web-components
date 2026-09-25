@@ -597,9 +597,12 @@ export class ArkKvEditor extends HTMLElement {
         applyTestHooks(this, "kv-editor", input, name);
       }
 
-      // Campo de valor: senha com o olho quando é segredo; senão o tipo da linha (number, date...) ou texto.
+      // Tipo efetivo: com a coluna de tipos, o que o select mostra (o da linha se está na lista, senão o primeiro).
+      const rowType = types.length > 0 ? (row.type && types.includes(row.type) ? row.type : types[0]) : row.type;
+
+      // Campo de valor: senha com o olho quando é segredo; senão o tipo efetivo (number, date...) ou texto.
       const isSecret = withSecret && row.secret === true;
-      parts.value.setAttribute("type", isSecret ? "password" : (VALUE_INPUT_TYPES[row.type ?? ""] ?? "text"));
+      parts.value.setAttribute("type", isSecret ? "password" : (VALUE_INPUT_TYPES[rowType ?? ""] ?? "text"));
       parts.value.toggleAttribute("reveal", isSecret);
 
       if (parts.secret) {
@@ -619,8 +622,7 @@ export class ArkKvEditor extends HTMLElement {
 
       if (parts.type) {
         parts.type.options = types.map((type) => ({ value: type, label: type }));
-        const current = row.type && types.includes(row.type) ? row.type : types[0];
-        if (parts.type.value !== current) parts.type.value = current;
+        if (rowType && parts.type.value !== rowType) parts.type.value = rowType;
         parts.type.setAttribute("aria-label", locale.type);
         parts.type.setAttribute("size", size);
         parts.type.toggleAttribute("disabled", readonly);
