@@ -2,9 +2,11 @@ import type { ArkSchedulerEvent } from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
   ArkDatepicker as ReactArkDatepicker,
+  ArkInput as ReactArkInput,
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
-  ArkScheduler as ReactArkScheduler
+  ArkScheduler as ReactArkScheduler,
+  ArkTextarea as ReactArkTextarea
 } from "@tooark/react";
 import {
   ArkButton as VueArkButton,
@@ -254,5 +256,24 @@ export const ReactMenuItemChecked = {
     render(tree(undefined));
     await expect(roleOf(grid)).toBe("menuitem");
     await expect(errors).toEqual([]);
+  }
+};
+
+// autofocus e spellcheck também são propriedades nativas booleanas do host: o React 19 grava nelas.
+export const ReactNativeBooleanProps = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    render([
+      createElement(ReactArkTextarea, { key: "t", label: "Notas", spellcheck: false }),
+      createElement(ReactArkInput, { key: "i", label: "Busca", autofocus: true, spellcheck: false })
+    ]);
+    await expect(errors).toEqual([]);
+    const input = canvasElement.querySelector("ark-input input") as HTMLInputElement;
+    const textarea = canvasElement.querySelector("ark-textarea textarea") as HTMLTextAreaElement;
+    await expect(input.spellcheck).toBe(false);
+    await expect(textarea.spellcheck).toBe(false);
+    await waitFor(() => expect(document.activeElement).toBe(input));
   }
 };
