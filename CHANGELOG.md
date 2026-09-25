@@ -72,6 +72,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `@tooark/chart`: `createChart` honors `autoResize` (it was ignored), and an `option` set before `ark-chart` is
   connected no longer initializes ECharts on a detached, zero-width container.
 - `@tooark/core`: `resolveLocale(lang)` no longer requires the second argument.
+- Documentation (READMEs, API comments) aligned with the code after an audit: what each wrapper's handlers receive
+  (the `detail` for calendar, clock, datepicker, carousel and scheduler), installing `@tooark/web-components` (and
+  `@tooark/core` for `toast`) next to a wrapper with pnpm, the E2E hook names (`calendar-day`, the datepicker
+  composition), the variables `tokens.css` really defines, the chart theming (ECharts light/dark, no tree-shaking
+  promise), and many defaults, keyboard details and JS members.
 
 ### Security
 
@@ -104,8 +109,8 @@ First public release of the Tooark Web Components family.
 
 ### Added
 
-- `@tooark/tokens`: design primitives (intent colors as `light-dark()`, size scale, radii, motion tokens with a
-  `--text-2xs` step and the `sheet` easing), `resolveColorScheme` and `observeColorScheme`.
+- `@tooark/tokens`: design primitives (intent colors as `light-dark()`, size scale, a `--text-2xs` type step and
+  motion tokens with the `sheet` easing), `resolveColorScheme` and `observeColorScheme`.
 - `@tooark/core`: types, i18n (`en`, `pt`, `es`), `toast` and `announce` services, dependency-free motion
   (`arkEnter`/`arkExit`), overlay helpers (`trapFocus`, `openPopover`/`closePopover` with `lockScroll`,
   `positionAnchored`), `coerceBooleanAttr`.
