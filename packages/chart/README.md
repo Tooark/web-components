@@ -3,7 +3,7 @@
 [![npm](https://img.shields.io/npm/v/@tooark/chart?logo=npm&color=CB3837)](https://www.npmjs.com/package/@tooark/chart)
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue)](https://github.com/Tooark/web-components/blob/main/LICENSE)
 
-`<ark-chart>`: an ECharts chart as a Custom Element, themed by the Tooark tokens, with auto-resize and a click event — plus the imperative engine for use without the element.
+`<ark-chart>`: an ECharts chart as a Custom Element that follows the page's light/dark theme, with auto-resize and a click event — plus the imperative engine for use without the element.
 
 🌍 **Languages:** ![USA Flag](https://flagcdn.com/w20/us.png) **English (this file)** · [![Brazil Flag](https://flagcdn.com/w20/br.png) Português](./README.pt-BR.md)
 
@@ -29,7 +29,7 @@ The `@tooark/chart` package provides:
 - `ark-chart` with the native ECharts `option` as a JS property, `theme` (`auto` follows the page's `color-scheme`, including runtime toggles), `renderer` (`canvas`/`svg`), `height` and `auto-resize`;
 - `ark-chart-click` (`bubbles`, `composed`) with the native ECharts params as `detail`;
 - `createChart(container, options)` engine: `setOption`, `setTheme`, `resize`, `resolvedTheme`, `destroy` and the raw `chart` instance;
-- ECharts is a peer dependency: you pick the version and tree-shaking stays yours.
+- ECharts is a peer dependency: you pick the version (the engine imports the whole `echarts` package, so it is not tree-shaken).
 
 ---
 
@@ -43,7 +43,7 @@ pnpm add @tooark/chart echarts   # echarts is a peer dependency (>= 5)
 
 ## ⚙️ Configuration
 
-Register the element once (browser only); the chart draws its own colors, so no stylesheet is required — the theme follows the page's `color-scheme` or the element's `theme` attribute:
+Register the element once (browser only); the chart draws its own colors with ECharts' default (light) or built-in `dark` theme, not the `--ark-color-*` tokens, so no stylesheet is required — the theme follows the page's `color-scheme` or the element's `theme` attribute:
 
 ```ts
 import { registerTooarkChart } from "@tooark/chart";
@@ -63,7 +63,7 @@ registerTooarkChart();
 
 ### Engine
 
-- `createChart(container, { option, theme?, renderer? })` → `{ chart, setOption(option, { notMerge }), setTheme(theme), resize(), resolvedTheme(), destroy() }`.
+- `createChart(container, { option, theme?, renderer?, autoResize? })` → `{ chart, setOption(option, { notMerge }), setTheme(theme), resize(), resolvedTheme(), destroy() }`; `autoResize` (default `true`) resizes the chart with the container.
 - `resolveChartTheme(theme, element)`.
 - Types: `ArkChartOptions`, `ArkChartTheme`, `ArkChartRenderer`, `ArkChartInstance`, `EChartsOption` (re-exported).
 
@@ -106,7 +106,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                          | Version    | Description                                                      |
 | ---------------------------------------------------------------- | ---------- | ---------------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.0.0     | Design tokens (colors, sizes, radii, motion) and primitive types |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.1.0     | Design tokens (colors, sizes, motion)    and primitive types |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1     | TypeScript runtime helpers                                       |
 | [`echarts`](https://www.npmjs.com/package/echarts)               | >=5 (peer) | Chart engine                                                     |
 
