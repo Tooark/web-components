@@ -497,6 +497,8 @@ export class ArkScheduler extends HTMLElement {
       this.dispatchEvent(
         new CustomEvent("ark-view-change", { detail: { view: detail.value }, bubbles: true, composed: true })
       );
+      // Outra view mostra outro intervalo (a semana vira o mês): quem carrega eventos por período precisa saber.
+      this.emitRangeChange();
     });
 
     header.appendChild(left);
@@ -796,6 +798,7 @@ export class ArkScheduler extends HTMLElement {
           this.dispatchEvent(
             new CustomEvent("ark-view-change", { detail: { view: "day" }, bubbles: true, composed: true })
           );
+          this.emitRangeChange();
         });
         cell.appendChild(more);
       }
