@@ -46,6 +46,8 @@ export class ArkDatepicker extends HTMLElement {
   private inputComp: ArkInput | null = null;
   private toggleEl: HTMLButtonElement | null = null;
   private popupEl: HTMLDivElement | null = null;
+  /** Calendário e/ou relógio: inline no host ou dentro do popup. */
+  private panelEl: HTMLDivElement | null = null;
   /** Para de reposicionar o popup em scroll/resize; só existe enquanto aberto. */
   private disposePosition: (() => void) | null = null;
   private hiddenInputEl: HTMLInputElement | null = null;
@@ -318,6 +320,7 @@ export class ArkDatepicker extends HTMLElement {
     this.inputComp = null;
     this.toggleEl = null;
     this.popupEl = null;
+    this.panelEl = null;
     this.hiddenInputEl = null;
   }
 
@@ -361,9 +364,16 @@ export class ArkDatepicker extends HTMLElement {
 
   private render(): void {
     const panel = this.buildPanel();
+    this.panelEl = panel;
+
+    // O valor vai ao formulário por um input oculto nos dois modos (inline também participa de <form>).
+    const hidden = document.createElement("input");
+    hidden.type = "hidden";
+    this.hiddenInputEl = hidden;
 
     if (!this.isInputMode()) {
       this.appendChild(panel);
+      this.appendChild(hidden);
       this.applyHooks();
       return;
     }
@@ -419,9 +429,6 @@ export class ArkDatepicker extends HTMLElement {
     popup.setAttribute("role", "dialog");
     popup.appendChild(panel);
 
-    const hidden = document.createElement("input");
-    hidden.type = "hidden";
-
     wrapper.appendChild(inputComp);
     wrapper.appendChild(popup);
     this.appendChild(wrapper);
@@ -430,7 +437,6 @@ export class ArkDatepicker extends HTMLElement {
     this.inputComp = inputComp;
     this.toggleEl = toggle;
     this.popupEl = popup;
-    this.hiddenInputEl = hidden;
     this.applyHooks();
   }
 
@@ -489,10 +495,23 @@ export class ArkDatepicker extends HTMLElement {
 
   /** Sincroniza aparência/estado do campo com os atributos atuais. */
   private syncField(): void {
-    if (!this.isInputMode() || !this.inputComp || !this.toggleEl || !this.hiddenInputEl || !this.popupEl) return;
+    const disabled = this.hasAttribute("disabled");
+
+    // Nos dois modos: o input oculto leva nome e valor ao formulário, e `disabled` tira os painéis de interação
+    // (inline eles estão à vista; no modo input o campo e o botão também ficam desabilitados abaixo).
+    if (this.hiddenInputEl) {
+      this.hiddenInputEl.name = this.getAttribute("name") || "";
+      this.hiddenInputEl.value = this.getAttribute("value") || "";
+      this.hiddenInputEl.disabled = disabled;
+    }
+    if (this.panelEl) {
+      this.panelEl.inert = disabled;
+      this.panelEl.classList.toggle("ark:opacity-50", disabled);
+    }
+
+    if (!this.isInputMode() || !this.inputComp || !this.toggleEl || !this.popupEl) return;
 
     const loc = this.getLocale();
-    const disabled = this.hasAttribute("disabled");
 
     this.forwardAttr(this.inputComp, "theme");
     this.inputComp.setAttribute("placeholder", this.getAttribute("placeholder") || this.getFormat().toLowerCase());
@@ -510,10 +529,6 @@ export class ArkDatepicker extends HTMLElement {
     this.popupEl.setAttribute("aria-label", loc.openCalendar);
     this.inputComp.inputElement?.setAttribute("aria-haspopup", "dialog");
     this.inputComp.inputElement?.setAttribute("aria-expanded", this.popupOpen ? "true" : "false");
-
-    this.hiddenInputEl.name = this.getAttribute("name") || "";
-    this.hiddenInputEl.value = this.getAttribute("value") || "";
-    this.hiddenInputEl.disabled = disabled;
 
     this.updateInputDisplay();
   }

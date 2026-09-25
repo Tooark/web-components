@@ -470,3 +470,32 @@ export const CustomAccent = {
   },
   render: Playground.render
 };
+
+// Inline também participa do formulário (`name`) e `disabled` tira calendário e relógio de interação.
+export const InlineFormAndDisabled = {
+  render: () => {
+    const form = document.createElement("form");
+    form.appendChild(createDatepicker({ mode: "date", lang: "pt", value: "2026-09-15", name: "entrega" }));
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    const picker = canvasElement.querySelector("ark-datepicker") as HTMLElement;
+    await expect(new FormData(form).get("entrega")).toBe("2026-09-15");
+
+    await userEvent.click(canvasElement.querySelector('[data-ark="calendar-day"][data-date="2026-09-20"]')!);
+    await expect(new FormData(form).get("entrega")).toBe("2026-09-20");
+
+    picker.setAttribute("disabled", "");
+    const day = canvasElement.querySelector('[data-ark="calendar-day"][data-date="2026-09-22"]') as HTMLElement;
+    // inert: fora do alcance do ponteiro e do foco (um click() sintético ainda dispararia, então testa o foco).
+    await expect(day.closest("[inert]")).not.toBeNull();
+    day.focus();
+    await expect(document.activeElement).not.toBe(day);
+    // Como qualquer controle desabilitado, o valor não vai no submit.
+    await expect(new FormData(form).has("entrega")).toBe(false);
+
+    picker.removeAttribute("disabled");
+    await expect(day.closest("[inert]")).toBeNull();
+  }
+};
