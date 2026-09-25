@@ -1,14 +1,4 @@
-import {
-  type AfterViewInit,
-  Component,
-  CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
-  EventEmitter,
-  Input,
-  type OnDestroy,
-  Output,
-  ViewChild
-} from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
 import type { ArkDrawerCloseReason, ArkDrawerMode, ArkDrawerSide, ArkLang, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -18,7 +8,6 @@ import { ensureTooarkComponentsRegistered } from "./register";
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
   <ark-drawer
-    #drawer
     [attr.testid]="testid"
     [attr.open]="open ? '' : null"
     [attr.side]="side"
@@ -31,11 +20,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.theme]="theme"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
-    [attr.aria-label]="ariaLabel">
+    [attr.aria-label]="ariaLabel"
+    (ark-open)="openHandler($event)"
+    (ark-close)="closeHandler($event)">
     <ng-content></ng-content>
   </ark-drawer>`
 })
-export class ArkDrawerComponent implements AfterViewInit, OnDestroy {
+export class ArkDrawerComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
   }
@@ -65,18 +56,8 @@ export class ArkDrawerComponent implements AfterViewInit, OnDestroy {
   /** O fechamento começou; detail.reason diz por quê (escape, backdrop, close-button, api). */
   @Output() arkClose = new EventEmitter<CustomEvent<{ reason: ArkDrawerCloseReason }>>();
 
-  @ViewChild("drawer", { static: false }) drawerRef!: ElementRef<HTMLElement>;
-
-  private openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
-  private closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
-
-  ngAfterViewInit(): void {
-    this.drawerRef?.nativeElement?.addEventListener("ark-open", this.openHandler);
-    this.drawerRef?.nativeElement?.addEventListener("ark-close", this.closeHandler);
-  }
-
-  ngOnDestroy(): void {
-    this.drawerRef?.nativeElement?.removeEventListener("ark-open", this.openHandler);
-    this.drawerRef?.nativeElement?.removeEventListener("ark-close", this.closeHandler);
-  }
+  // Ligados no template, e não no ngAfterViewInit: o listener existe desde a criação da view, então o ark-open de um
+  // overlay que já nasce aberto (o elemento o emite num microtask) não se perde, nem na hidratação de SSR.
+  protected openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
+  protected closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
 }

@@ -2,6 +2,7 @@ import type { ArkCommandItemStyleOptions, ArkCommandPaletteStyleOptions } from "
 import type React from "react";
 import { createElement, type PropsWithChildren, useEffect, useRef } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkCommandPaletteProps = PropsWithChildren<
   ArkCommandPaletteStyleOptions & {
@@ -49,7 +50,7 @@ export function ArkCommandPalette(props: ArkCommandPaletteProps): React.JSX.Elem
     ensureTooarkComponentsRegistered();
   }, []);
 
-  useEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const el = ref.current;
     if (!el) return;
 
