@@ -48,6 +48,8 @@ import {
  * para garantir que eles estejam disponíveis como elementos personalizados.
  */
 export function registerTooarkComponents(): void {
+  // Fora do navegador (SSR) não há registro de elementos: no-op, e o cliente registra na hidratação.
+  if (typeof customElements === "undefined") return;
   if (!customElements.get(ArkAlert.tagName)) {
     customElements.define(ArkAlert.tagName, ArkAlert);
   }

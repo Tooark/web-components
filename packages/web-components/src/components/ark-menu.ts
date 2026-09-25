@@ -1,5 +1,6 @@
 import { type ArkAnchorRect, coerceBooleanAttr, positionAnchored } from "@tooark/core";
 import type { ArkMenuItem } from "./ark-menu-item";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Atributos do menu propagados a cada item. */
@@ -21,7 +22,7 @@ let menuSeq = 0;
  * a saída são transições CSS em components.css, porque o light dismiss de um
  * popover auto não pode ser interceptado por JS para animar antes de esconder.
  */
-export class ArkMenu extends HTMLElement {
+export class ArkMenu extends HTMLElementBase {
   static readonly tagName = "ark-menu";
 
   private ownClasses: string[] = [];

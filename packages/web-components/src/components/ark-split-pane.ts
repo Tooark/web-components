@@ -1,4 +1,5 @@
 import { type ArkLocale, type ArkSplitPaneDirection, resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Passo das setas em pontos percentuais; com Shift, o grande. */
@@ -25,7 +26,7 @@ type Drag = {
  * reescrito a cada mudança) e `ark-resize` publica os tamanhos; persistir é
  * do app. Nada anima: redimensionar é interação de alta frequência.
  */
-export class ArkSplitPane extends HTMLElement {
+export class ArkSplitPane extends HTMLElementBase {
   static readonly tagName = "ark-split-pane";
 
   private handles: HTMLDivElement[] = [];

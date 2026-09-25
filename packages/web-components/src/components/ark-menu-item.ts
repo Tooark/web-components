@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
@@ -20,7 +21,7 @@ type ArkMenuItemKind = "item" | "divider" | "static";
  * item. Seleção, foco e teclado são coordenados pelo ark-menu; `size` e
  * `theme` chegam propagados dele.
  */
-export class ArkMenuItem extends HTMLElement {
+export class ArkMenuItem extends HTMLElementBase {
   static readonly tagName = "ark-menu-item";
 
   private ownClasses: string[] = [];

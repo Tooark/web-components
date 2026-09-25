@@ -1,4 +1,5 @@
 import { coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -11,7 +12,7 @@ import { applyTestHooks } from "./test-hooks";
  * filtro e do nome (padrão: o texto dos filhos sem slot). A paleta escreve
  * `id`, `hidden`, `aria-selected` e a ordem visual.
  */
-export class ArkCommandItem extends HTMLElement {
+export class ArkCommandItem extends HTMLElementBase {
   static readonly tagName = "ark-command-item";
 
   private ownClasses: string[] = [];

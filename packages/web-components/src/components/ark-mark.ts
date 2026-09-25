@@ -1,4 +1,5 @@
 import type { ArkMarkShape } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Um path por forma, no viewBox 0 0 24 24; o ark-shape-picker desenha as mesmas. */
@@ -34,7 +35,7 @@ function cssLength(value: string | null): string | null {
  * nomeado; sem ele é decorativo (`aria-hidden`): o texto ao lado é o que
  * conta.
  */
-export class ArkMark extends HTMLElement {
+export class ArkMark extends HTMLElementBase {
   static readonly tagName = "ark-mark";
 
   private ownClasses: string[] = [];

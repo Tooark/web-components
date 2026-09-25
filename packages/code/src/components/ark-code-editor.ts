@@ -10,6 +10,7 @@ import type {
   ArkCodeLineEnding,
   ArkCodeTheme
 } from "../types";
+import { HTMLElementBase } from "./html-element-base";
 
 // Mesma regra do coerceBooleanAttr de @tooark/core (este pacote só depende de tokens): frameworks passam o valor do
 // atributo como propriedade, então "" é presente e "false" é ausente.
@@ -38,7 +39,7 @@ function truthy(value: unknown): boolean {
  * @tooark/tokens). O nó do CodeMirror leva `data-ark="code-editor"` e o
  * `testid` como `data-testid`.
  */
-export class ArkCodeEditor extends HTMLElement {
+export class ArkCodeEditor extends HTMLElementBase {
   static readonly tagName = "ark-code-editor";
 
   private instance: ArkCodeEditorInstance | null = null;

@@ -677,6 +677,7 @@ pnpm install          # instala as dependências do workspace
 pnpm build            # compila todos os pacotes
 pnpm dev:storybook    # roda o Storybook em http://localhost:6006
 pnpm check:publish    # empacota cada pacote e valida os tarballs (publint + attw)
+pnpm check:ssr        # importa cada build num Node sem DOM e renderiza os wrappers React/Vue para string
 pnpm clean            # remove os artefatos de build
 pnpm check            # lint, formatação e ordem de imports (Biome)
 pnpm check:fix        # aplica as correções e a formatação do Biome

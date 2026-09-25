@@ -1,5 +1,6 @@
 import type { ArkCarouselSnap, ArkIntent } from "@tooark/core";
 import { prefersReducedMotion } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCarouselPalette = {
@@ -22,7 +23,7 @@ const CHROME_ATTR = "data-ark-chrome";
  * Setas e dots vivem num overlay `position: sticky` (ver components.css).
  * Arrasto com mouse é emulado; touch/trackpad usam a rolagem nativa.
  */
-export class ArkCarousel extends HTMLElement {
+export class ArkCarousel extends HTMLElementBase {
   static readonly tagName = "ark-carousel";
 
   private overlayEl: HTMLDivElement | null = null;

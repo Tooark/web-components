@@ -13,6 +13,7 @@ import {
   startOfDay,
   startOfWeek
 } from "./date-utils";
+import { HTMLElementBase } from "./html-element-base";
 import { intentColors } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
@@ -51,7 +52,7 @@ const DEFAULT_EVENT_MINUTES = 60;
  * eventos são o conteúdo: clicar num evento emite `ark-event-click` e clicar num
  * espaço livre emite `ark-slot-click` (útil para criar um evento).
  */
-export class ArkScheduler extends HTMLElement {
+export class ArkScheduler extends HTMLElementBase {
   static readonly tagName = "ark-scheduler";
 
   private root: HTMLDivElement | null = null;

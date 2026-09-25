@@ -677,6 +677,7 @@ pnpm install          # install all workspace dependencies
 pnpm build            # build every package
 pnpm dev:storybook    # run Storybook at http://localhost:6006
 pnpm check:publish    # pack every package and lint the tarballs (publint + attw)
+pnpm check:ssr        # import every build in Node without a DOM and render the React/Vue wrappers to string
 pnpm clean            # remove build outputs
 pnpm check            # lint, formatting and import order (Biome)
 pnpm check:fix        # apply Biome fixes and formatting

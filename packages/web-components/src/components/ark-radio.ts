@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkRadioPalette = {
@@ -26,7 +27,7 @@ let nextId = 0;
  * marcado, ou o primeiro habilitado). `label`, aria-label e filhos nomeiam a
  * opção como no ark-checkbox.
  */
-export class ArkRadio extends HTMLElement {
+export class ArkRadio extends HTMLElementBase {
   static readonly tagName = "ark-radio";
 
   private ownClasses: string[] = [];

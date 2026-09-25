@@ -1,5 +1,6 @@
 import type { ArkMotionPreset, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 import { arkEnter, arkExit, isPopoverOpen, resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkToastItem = ArkToastOptions & {
@@ -28,7 +29,7 @@ type ArkToasterPalette = {
  * dialogs e menus, e é reaberta a cada toast novo para voltar ao topo da
  * pilha do top layer quando um overlay abriu depois dela.
  */
-export class ArkToaster extends HTMLElement {
+export class ArkToaster extends HTMLElementBase {
   static readonly tagName = "ark-toaster";
 
   private root: HTMLDivElement | null = null;

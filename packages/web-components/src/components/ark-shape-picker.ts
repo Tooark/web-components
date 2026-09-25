@@ -1,5 +1,6 @@
 import { type ArkLocale, type ArkMarkShape, type ArkSize, coerceBooleanAttr, resolveLocale } from "@tooark/core";
 import { ARK_MARK_SHAPES, type ArkMark, normalizeMarkShape } from "./ark-mark";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Chave do nome localizado de cada forma. */
@@ -19,7 +20,7 @@ const SHAPE_LABEL: Record<ArkMarkShape, keyof ArkLocale> = {
  * e nomeada pelo nome localizado da forma. Mesmo teclado do
  * ark-color-swatches. `change` só quando a seleção muda pelo usuário.
  */
-export class ArkShapePicker extends HTMLElement {
+export class ArkShapePicker extends HTMLElementBase {
   static readonly tagName = "ark-shape-picker";
 
   private ownClasses: string[] = [];

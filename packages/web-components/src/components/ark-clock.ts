@@ -1,5 +1,6 @@
 import type { ArkDatepickerLang, ArkIntent } from "@tooark/core";
 import { resolveLocale } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -18,7 +19,7 @@ type ArkClockPalette = {
  * (/segundo), no estilo DigitalClock do MUI. Valor sempre em 24h "HH:mm:ss";
  * `hours-format="12"` só muda a exibição (coluna AM/PM).
  */
-export class ArkClock extends HTMLElement {
+export class ArkClock extends HTMLElementBase {
   static readonly tagName = "ark-clock";
 
   private root: HTMLDivElement | null = null;

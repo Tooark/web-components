@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 
@@ -13,7 +14,7 @@ type ArkTogglePalette = {
  * (classes, role, foco, teclado): os filhos do usuário ficam onde estão.
  * Dentro de um ark-toggle-group vira item de segmented control.
  */
-export class ArkToggle extends HTMLElement {
+export class ArkToggle extends HTMLElementBase {
   static readonly tagName = "ark-toggle";
 
   private ownClasses: string[] = [];

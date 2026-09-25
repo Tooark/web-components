@@ -194,11 +194,14 @@ fails with the list of unsigned commits; fix them with
 - Releases are cut by the maintainers from `main`: `pnpm version <patch|minor|major>`
   (or `prerelease --preid next`), a `chore(release): vX.Y.Z` commit that also adds the
   `## [X.Y.Z]` section to `CHANGELOG.md`, merge. The `release.yml` workflow sees a version
-  that is not on npm yet, runs lint, build, `pnpm check:publish` and the test suite, publishes
+  that is not on npm yet, runs lint, build, `pnpm check:publish`, `pnpm check:ssr` and the test suite, publishes
   every package (`latest`, or `next` for prereleases) with provenance, creates the `vX.Y.Z`
   tag and a GitHub Release with that changelog section. Contributors do not bump versions in PRs.
 - `pnpm check:publish` packs every package and runs publint + attw on the tarballs; run it
   when you touch a `package.json`, an `exports` map or a Rollup config.
+- `pnpm check:ssr` imports every built package in Node without a DOM and renders the React and
+  Vue wrappers to string; run it after `pnpm build` when you add an element or anything that
+  runs at module load. Elements extend `HTMLElementBase`, never `HTMLElement` directly.
 - Breaking changes must be called out in the PR ("Notes for reviewers") and in
   the commit body (`BREAKING CHANGE:` footer).
 

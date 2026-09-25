@@ -10,6 +10,7 @@ import {
   trapFocus,
   unlockScroll
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /** Ícone do botão de fechar (chrome próprio do componente). */
@@ -45,7 +46,7 @@ type ArkDialogState = "closed" | "open" | "closing";
  * navegando por cursor virtual ainda alcança o conteúdo atrás. A página para
  * de rolar enquanto aberto (`lockScroll` de core), salvo com `no-scroll-lock`.
  */
-export class ArkDialog extends HTMLElement {
+export class ArkDialog extends HTMLElementBase {
   static readonly tagName = "ark-dialog";
 
   private headerEl: HTMLDivElement | null = null;

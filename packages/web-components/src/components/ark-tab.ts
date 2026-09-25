@@ -8,6 +8,7 @@ import {
   coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
@@ -34,7 +35,7 @@ type ArkTabPalette = {
  * Seleção e roving tabindex são coordenados pelo ark-tabs; `variant`,
  * `size`, `intent`, `theme` e idioma chegam propagados dele.
  */
-export class ArkTab extends HTMLElement {
+export class ArkTab extends HTMLElementBase {
   static readonly tagName = "ark-tab";
 
   private ownClasses: string[] = [];

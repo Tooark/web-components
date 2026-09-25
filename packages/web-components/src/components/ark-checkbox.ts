@@ -1,4 +1,5 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 type ArkCheckboxPalette = {
@@ -29,7 +30,7 @@ let nextId = 0;
  * caixa por aria-labelledby e a alternam ao clique. Os nós próprios ficam no
  * início do host, marcados data-ark-chrome, antes dos filhos do usuário.
  */
-export class ArkCheckbox extends HTMLElement {
+export class ArkCheckbox extends HTMLElementBase {
   static readonly tagName = "ark-checkbox";
 
   private ownClasses: string[] = [];

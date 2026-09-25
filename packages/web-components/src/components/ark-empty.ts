@@ -1,3 +1,4 @@
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -8,7 +9,7 @@ import { applyTestHooks } from "./test-hooks";
  * `description`, em nós do componente ao fim do host. Filhos sem slot entram
  * entre a descrição e a ação. Não é interativo e não tem role próprio.
  */
-export class ArkEmpty extends HTMLElement {
+export class ArkEmpty extends HTMLElementBase {
   static readonly tagName = "ark-empty";
 
   private ownClasses: string[] = [];

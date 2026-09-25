@@ -1,4 +1,5 @@
 import type { ArkBadgeSize, ArkBadgeVariant, ArkIntent, ArkRounded } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -9,7 +10,7 @@ type ArkBadgePalette = Record<ArkBadgeVariant, string>;
  * hooks): os filhos do usuário, ícone e texto, ficam onde estão. Não é
  * interativo; um badge clicável é um ark-button pequeno.
  */
-export class ArkBadge extends HTMLElement {
+export class ArkBadge extends HTMLElementBase {
   static readonly tagName = "ark-badge";
 
   private ownClasses: string[] = [];

@@ -7,6 +7,7 @@ import {
   coerceBooleanAttr,
   resolveLocale
 } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
 
@@ -42,7 +43,7 @@ type ArkFileInputPalette = {
  * tela. O rótulo aponta para o input (associação nativa) e nomeia o botão
  * junto do próprio texto dele.
  */
-export class ArkFileInput extends HTMLElement {
+export class ArkFileInput extends HTMLElementBase {
   static readonly tagName = "ark-file-input";
 
   private inputEl: HTMLInputElement | null = null;

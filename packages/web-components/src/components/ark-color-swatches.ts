@@ -1,4 +1,5 @@
 import { type ArkColorSwatch, type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 /**
@@ -9,7 +10,7 @@ import { applyTestHooks } from "./test-hooks";
  * movem e selecionam dando a volta, Home/End, Espaço seleciona. `change` só
  * quando a seleção muda pelo usuário.
  */
-export class ArkColorSwatches extends HTMLElement {
+export class ArkColorSwatches extends HTMLElementBase {
   static readonly tagName = "ark-color-swatches";
 
   private ownClasses: string[] = [];

@@ -39,6 +39,10 @@ jobs:
       - name: Check the tarballs (publint, attw)
         run: pnpm check:publish
 
+      # Importa cada dist num Node sem DOM e renderiza os wrappers React/Vue para string, como um servidor SSR.
+      - name: SSR smoke test
+        run: pnpm check:ssr
+
       - name: Install Playwright Chromium
         run: pnpm exec playwright install chromium --with-deps
 

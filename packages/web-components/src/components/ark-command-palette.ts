@@ -9,6 +9,7 @@ import {
 } from "@tooark/core";
 import { ArkCommandItem } from "./ark-command-item";
 import type { ArkInput } from "./ark-input";
+import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 
 let paletteSeq = 0;
@@ -34,7 +35,7 @@ function normalize(text: string): string {
  * Enter seleciona, Esc fecha; `hotkey` abre de qualquer lugar da página. A
  * página para de rolar enquanto aberta, salvo com `no-scroll-lock`.
  */
-export class ArkCommandPalette extends HTMLElement {
+export class ArkCommandPalette extends HTMLElementBase {
   static readonly tagName = "ark-command-palette";
 
   private inputEl: ArkInput | null = null;
