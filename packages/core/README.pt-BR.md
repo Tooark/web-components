@@ -27,7 +27,7 @@ Fundação compartilhada dos componentes Tooark: tipos, i18n, os serviços de to
 O pacote `@tooark/core` fornece:
 
 - os tipos `Ark*StyleOptions` de todo componente (o que os wrappers de framework estendem) e as primitivas compartilhadas reexportadas do `@tooark/tokens`;
-- i18n: locales `en`, `pt`, `es` e `resolveLocale(lang, localeJson)` com JSON próprio mesclado sobre o inglês;
+- i18n: locales `en`, `pt`, `es` e `resolveLocale(lang, localeJson?)`, que mescla o JSON próprio sobre o inglês com `lang="custom"`;
 - serviços: `toast()` (alimenta o `ark-toaster` por eventos em window) e `announce()` (uma única live region de leitor de tela para a página);
 - motion: `arkEnter`/`arkExit` (WAAPI sobre os tokens, respeitando reduced-motion) e os presets CSS `.ark-animate-*`;
 - helpers de overlay sobre a Popover API: `trapFocus`, `openPopover`/`closePopover` (com `lockScroll`), `positionAnchored`, `focusableElements`, `isPopoverOpen`;
@@ -41,7 +41,7 @@ O pacote `@tooark/core` fornece:
 pnpm add @tooark/core
 ```
 
-Instalado automaticamente com o `@tooark/web-components`; adicione você mesmo quando só precisar dos serviços, do motion ou dos helpers de overlay.
+O `@tooark/web-components` depende dele, mas só como dependência transitiva: com pnpm (`node_modules` isolado) o seu app não consegue importá-lo por ali. Adicione você mesmo sempre que o seu código importar do `@tooark/core` (`toast`, `announce`, os helpers de motion ou de overlay), com ou sem os componentes; os wrappers de React, Vue e Angular reexportam `toast`, `showToast` e `dismissToast`.
 
 ---
 
@@ -59,7 +59,7 @@ import "@tooark/core/styles.css"; // tokens + presets de motion
 
 ### Serviços
 
-- `toast(title, options?)`, `toast.success|info|warning|error|loading(...)`, `dismissToast(id?)`, `showToast(options)` — opções: `id`, `title`, `description`, `type`, `duration` (ms, `0` mantém), `actionLabel`/`actionId`, `cancelLabel`.
+- `toast(title, options?)`, `toast.success|info|warning|error|loading(...)`, `toast.custom(options)`, `toast.dismiss(id?)` / `dismissToast(id?)` (sem `id` dispensa todos), `showToast(options)` — opções: `id`, `title`, `description`, `type`, `duration` (ms, `0` mantém), `actionLabel`/`actionId`, `cancelLabel`.
 - `announce(text, politeness = "polite")` — `"polite" | "assertive"`.
 
 ### Motion
@@ -131,10 +131,10 @@ async function fechar() {
 
 Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta (os ranges são os que o pacote declara).
 
-| Pacote                                                           | Versão | Descrição                                                         |
-| ---------------------------------------------------------------- | ------ | ----------------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.0.0 | Design tokens (cores, tamanhos, raios, motion) e tipos primitivos |
-| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1 | Helpers de runtime do TypeScript                                  |
+| Pacote                                                           | Versão | Descrição                                                  |
+| ---------------------------------------------------------------- | ------ | ---------------------------------------------------------- |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.1.0 | Design tokens (cores, tamanhos, motion) e tipos primitivos |
+| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1 | Helpers de runtime do TypeScript                           |
 
 ---
 

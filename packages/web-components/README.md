@@ -37,10 +37,16 @@ The `@tooark/web-components` package provides:
 ## 🔧 Installation
 
 ```bash
-pnpm add @tooark/web-components   # brings @tooark/core and @tooark/tokens
+pnpm add @tooark/web-components   # brings @tooark/core and @tooark/tokens as its own dependencies
 ```
 
-Using React, Vue or Angular? Install `@tooark/react`, `@tooark/vue` or `@tooark/angular` instead: they depend on this package and add typed wrappers.
+Those dependencies are transitive: with pnpm (isolated `node_modules`) your code cannot import them. When it imports `toast` or `announce` from `@tooark/core` (as in the examples below), install the core too:
+
+```bash
+pnpm add @tooark/web-components @tooark/core
+```
+
+Using React, Vue or Angular? Install `@tooark/react`, `@tooark/vue` or `@tooark/angular` instead: they depend on this package, add typed wrappers and re-export `toast`.
 
 ---
 
@@ -55,7 +61,7 @@ import "@tooark/web-components/styles.css";
 registerTooarkComponents(); // idempotent
 ```
 
-Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `locale-json`) on the elements that show text.
+Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text.
 
 ---
 
@@ -74,8 +80,8 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-command-item` — Command palette item (the host is the `role="option"`): free children, `slot="trailing"` for a shortcut, `value`, `group`, `label` (filter text), `disabled`. Emits `ark-select`.
 - `ark-command-palette` — Command palette on the Popover API: search field (an `ark-input` of its own), `ark-command-item` children grouped and filtered (`filter`) or searched by the app (`ark-query`), arrows + Enter, `hotkey` (`/`, `mod+k`). Emits `ark-select`, `ark-query`, `ark-open`, `ark-close`.
 - `ark-copy-button` — Copy button: extends `ark-button` (same variants, sizes, `icon-only`, forms, hooks); copies `value` or the `for` element, swaps the icon for a check and the text/`title` for "copied" for `feedback-ms`, announces it. Emits `ark-copy`.
-- `ark-datepicker` — Date picker: inline (embeds `ark-calendar`) or `input` mode with field + popup, localized formatting, typed input parsing, forms.
-- `ark-dialog` — Modal dialog on the Popover API (top layer, `::backdrop` scrim, no portal): the host is the panel, your children are the body, `slot="footer"` is the footer; header from `label`, focus trap, Esc/scrim, `sm`–`xl`.
+- `ark-datepicker` — Date/time picker composing `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (default)/date/time, inline or `input` mode with field + popup, localized formatting, typed input parsing, forms.
+- `ark-dialog` — Modal dialog on the Popover API (top layer, `::backdrop` scrim, no portal): the host is the panel, your children are the body, `slot="footer"` is the footer; header from `label`, focus trap, Esc/scrim, `sm`–`xl` or `full`.
 - `ark-drawer` — Drawer anchored to an edge: `overlay` (Popover API, scrim, focus trap, Esc) or `inline` (in the page flow, e.g. a bottom console); `side`, `size` preset or CSS length, header from `label`, `slot="footer"`, slide with the `sheet` easing. Emits `ark-open`/`ark-close`.
 - `ark-empty` — Empty state: dashed box with a dimmed `slot="icon"`, `heading` (h3), `description` and an optional `slot="action"` button; children stay in place, ordered by CSS.
 - `ark-file-input` — File field with the `ark-input` grid (label, helper/error): hidden native `<input type="file">` for forms, drop zone with `dragover` highlight, keyboard-accessible choose button, list of selected names, `accept`/`multiple`. Emits `change` with the files and announces them.
@@ -90,7 +96,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-scheduler` — Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.
 - `ark-select` — Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.
 - `ark-shape-picker` — Shape picker as a `radiogroup`: the six `ark-mark` shapes drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.
-- `ark-skeleton` — Loading placeholder: the host is the block (`.ark-skeleton`, `aria-hidden`), sized by your class/style; `rows` renders bars, `animated` opts into the pulse, `rounded`.
+- `ark-skeleton` — Loading placeholder: the host is the block (`.ark-skeleton`, `aria-hidden`), sized by your class/style; `rows` renders bars, `animated` opts into the shimmer (a sweeping highlight), `rounded`.
 - `ark-spinner` — Standalone loading indicator (`role="status"`): the button's spinner SVG on `.ark-animate-spin` (keeps spinning under reduced motion), screen-reader label by `lang` or `label`, `size`, optional `intent` (inherits the text color otherwise).
 - `ark-split-pane` — Resizable panels: your children are the panels, the handles are the component's own nodes at the end of the host; `direction`, `sizes` (percentages, rewritten on every change), `data-min`/`data-max` per panel, keyboard and pointer-capture drag. Emits `ark-resize`.
 - `ark-status-dot` — Status dot: the host is the circle in the intent color (default `neutral`); `label` makes it a named `role="img"`, without it it is decorative; `size`. Static, never pulses.
@@ -176,8 +182,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                          | Version | Description                                                      |
 | ---------------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.0.0  | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.0.0  | Design tokens (colors, sizes, radii, motion) and primitive types |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.1.0  | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.1.0  | Design tokens (colors, sizes, motion) and primitive types        |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1  | TypeScript runtime helpers                                       |
 
 ---
