@@ -52,7 +52,8 @@ export class ArkCopyButtonComponent implements AfterViewInit, OnDestroy {
   /** Duração do feedback "copiado" em ms. Padrão: 1500. */
   @Input() feedbackMs: number | undefined;
   @Input() variant: ArkButtonVariant = "primary";
-  @Input() intent: ArkIntent = "primary";
+  /** Sem padrão: um intent fixo venceria o de `variant="danger"` (o elemento usa intent || variant). */
+  @Input() intent: ArkIntent | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() size: ArkSize = "md";
   @Input() rounded: ArkRounded = "md";

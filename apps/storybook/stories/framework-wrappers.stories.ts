@@ -173,3 +173,21 @@ export const VueControlledEvents = {
     await expect(scheduler.events.map((event) => event.id)).toEqual(["a", "b"]);
   }
 };
+
+export const VueButtonVariantIntent = {
+  render: () => document.createElement("div"),
+  // O wrapper não pode mandar um intent padrão: `variant="danger"` sem `intent` é um botão danger.
+  play: async ({ canvasElement }: Ctx) => {
+    const app = createApp({
+      setup: () => () => [
+        h(VueArkButton, { variant: "danger" }, () => "Excluir"),
+        h(VueArkButton, { variant: "outline", intent: "success" }, () => "Salvar")
+      ]
+    });
+    app.mount(mountPoint(canvasElement));
+    const [danger, outline] = Array.from(canvasElement.querySelectorAll("ark-button"));
+    await expect(danger.hasAttribute("intent")).toBe(false);
+    await expect(danger.classList.contains("ark:bg-danger")).toBe(true);
+    await expect(outline.classList.contains("ark:border-success-border")).toBe(true);
+  }
+};
