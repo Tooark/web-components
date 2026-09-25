@@ -1,5 +1,5 @@
 import type { ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkTheme } from "@tooark/core";
-import { expect, userEvent } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 const meta = {
   title: "Core/ArkScheduler",
@@ -303,5 +303,20 @@ export const ClickingSlotEmits = {
 
     await expect(received).toHaveLength(1);
     await expect(received[0].start).toMatch(/T09:00$/);
+  }
+};
+
+// A troca de período vai ao leitor de tela pelo anunciador do core, não por um aria-live no título.
+export const AnnouncesPeriod = {
+  args: { view: "week", date: "2026-09-15" },
+  render: Playground.render,
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const titleText = (): string => canvasElement.querySelector('[data-ark="scheduler-title"]')?.textContent ?? "";
+    const announcer = (): string => document.querySelector('[data-ark="announcer"]')?.textContent ?? "";
+    await expect(canvasElement.querySelector('[data-ark="scheduler-title"]')).not.toHaveAttribute("aria-live");
+    const before = titleText();
+    await userEvent.click(canvasElement.querySelector('[data-ark="scheduler-next"]')!);
+    await expect(titleText()).not.toBe(before);
+    await waitFor(() => expect(announcer()).toContain(titleText()));
   }
 };
