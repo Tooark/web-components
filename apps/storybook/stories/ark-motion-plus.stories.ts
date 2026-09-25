@@ -123,6 +123,29 @@ export const Stagger = {
   }
 };
 
+// Os helpers leem os tokens da página (aqui sobrescritos no contêiner) antes dos espelhos JS.
+export const UsesPageTokens = {
+  render: (): HTMLElement => {
+    const container = document.createElement("div");
+    container.className = "mx-auto grid max-w-md grid-cols-2 gap-3";
+    container.style.setProperty("--ark-duration-default", "1500ms");
+    container.style.setProperty("--ark-ease-out", "linear");
+    for (let i = 0; i < 2; i++) container.appendChild(createCard(`Lento ${i + 1}`, 140 + i * 30));
+    return container;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const cards = Array.from(canvasElement.querySelectorAll<HTMLElement>(".grid > div"));
+    const done = arkStaggerEnter(cards, { interval: 0 });
+    // Com o espelho JS (250 ms) a entrada já teria acabado; com o token da página (1500 ms, linear) está no meio.
+    await tick(400);
+    const opacity = Number(getComputedStyle(cards[0]).opacity);
+    await expect(opacity).toBeGreaterThan(0);
+    await expect(opacity).toBeLessThan(0.9);
+    await done;
+    await settled(...cards);
+  }
+};
+
 export const ScrollReveal = {
   parameters: {
     layout: "fullscreen",
