@@ -7,9 +7,6 @@ import type { ArkMotionTargets, ArkRevealOptions } from "./types";
 /**
  * Scroll reveal: esconde os alvos e anima a entrada quando cada um aparece
  * na viewport. Retorna uma função de cleanup que para a observação.
- * @param targets Os elementos a serem observados.
- * @param options As opções de configuração do reveal.
- * @returns Uma função de cleanup que para a observação dos elementos.
  */
 export function arkReveal(targets: ArkMotionTargets, options: ArkRevealOptions = {}): () => void {
   // Resolve os elementos de destino para garantir que estamos lidando com uma lista de elementos.

@@ -6,9 +6,6 @@ import type { ArkMotionTargets, ArkStaggerOptions } from "./types";
 /**
  * Entrada escalonada de uma lista de elementos usando os motion tokens.
  * Resolve quando todos os itens terminam (imediatamente com reduced motion).
- * @param targets Os elementos a serem animados.
- * @param options As opções de configuração do stagger.
- * @returns Uma Promise que resolve quando todos os itens terminam a animação.
  */
 export async function arkStaggerEnter(targets: ArkMotionTargets, options: ArkStaggerOptions = {}): Promise<void> {
   // Resolve os elementos de destino para garantir que estamos lidando com uma lista de elementos.

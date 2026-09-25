@@ -24,19 +24,12 @@ type ArkToastFn = ((title: string, options?: ArkToastMethodOptions) => string) &
   dismiss: (id?: string) => void;
 };
 
-/**
- * Gera um ID único para um toast.
- * @returns O ID gerado para o toast.
- */
+/** Gera um ID único para um toast. */
 function generateId(): string {
   return `ark-toast-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-/**
- * Despacha um evento de toast no `window` com os detalhes fornecidos.
- * @param detail Os detalhes do toast a ser despachado.
- * @returns O ID do toast despachado.
- */
+/** Despacha um evento de toast no `window` com os detalhes fornecidos e devolve o ID do toast. */
 function dispatchToast(detail: ArkToastDetail): string {
   // verifica se o ambiente é um navegador antes de despachar o evento
   if (typeof window !== "undefined") {
@@ -52,11 +45,7 @@ function dispatchToast(detail: ArkToastDetail): string {
   return detail.id;
 }
 
-/**
- * Dispara um toast e devolve o id, gerando um quando `options.id` vem vazio.
- * @param options As opções do toast a ser exibido.
- * @returns O ID do toast exibido.
- */
+/** Dispara um toast e devolve o id, gerando um quando `options.id` vem vazio. */
 export function showToast(options: ArkToastOptions): string {
   const detail: ArkToastDetail = {
     ...options,
@@ -67,13 +56,7 @@ export function showToast(options: ArkToastOptions): string {
   return dispatchToast(detail);
 }
 
-/**
- * Dispara um toast de tipo específico com título e opções fornecidas.
- * @param type O tipo do toast a ser exibido.
- * @param title O título do toast.
- * @param options As opções do toast a ser exibido.
- * @returns O ID do toast exibido.
- */
+/** Dispara um toast de tipo específico com título e opções fornecidas e devolve o ID. */
 function showTypedToast(type: ArkToastType, title: string, options?: ArkToastMethodOptions): string {
   return showToast({
     ...options,
@@ -82,12 +65,7 @@ function showTypedToast(type: ArkToastType, title: string, options?: ArkToastMet
   });
 }
 
-/**
- * Dispara um toast do tipo padrão com título e opções fornecidas.
- * @param title O título do toast.
- * @param options As opções do toast a ser exibido.
- * @returns O ID do toast exibido.
- */
+/** Dispara um toast do tipo padrão com título e opções fornecidas e devolve o ID. */
 function baseToast(title: string, options?: ArkToastMethodOptions): string {
   return showTypedToast("default", title, options);
 }
@@ -114,10 +92,7 @@ export const toast: ArkToastFn = Object.assign(baseToast, {
   dismiss: (id?: string) => dismissToast(id)
 });
 
-/**
- * Dispensa o toast de id informado, ou todos quando id é omitido.
- * @param id O ID do toast a ser dispensado. Se omitido, todos os toasts serão dispensados.
- */
+/** Dispensa o toast de id informado, ou todos quando id é omitido. */
 export function dismissToast(id?: string): void {
   // Se não houver window, não faz nada.
   if (typeof window === "undefined") {
