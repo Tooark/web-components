@@ -7,6 +7,8 @@ export const ArkAlert = defineComponent({
   inheritAttrs: false,
   emits: ["ark-dismiss"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     intent: { type: String as PropType<ArkIntent>, default: "info" },
     variant: { type: String as PropType<ArkAlertVariant>, default: "box" },
     heading: { type: String, default: undefined },
@@ -30,6 +32,7 @@ export const ArkAlert = defineComponent({
         "ark-alert",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           intent: props.intent,
           variant: props.variant,

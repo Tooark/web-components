@@ -6,6 +6,8 @@ export const ArkMark = defineComponent({
   name: "ArkMark",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     shape: { type: String as PropType<ArkMarkShape>, default: "circle" },
     color: { type: String, default: undefined },
     size: { type: [Number, String], default: undefined },
@@ -17,6 +19,7 @@ export const ArkMark = defineComponent({
     return () =>
       h("ark-mark", {
         ...attrs,
+        testid: props.testid,
         shape: props.shape,
         color: props.color,
         size: props.size,

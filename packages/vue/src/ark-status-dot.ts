@@ -6,6 +6,8 @@ export const ArkStatusDot = defineComponent({
   name: "ArkStatusDot",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     intent: { type: String as PropType<ArkIntent>, default: "neutral" },
     label: { type: String, default: undefined },
     size: { type: String as PropType<ArkSize>, default: "md" },
@@ -16,6 +18,7 @@ export const ArkStatusDot = defineComponent({
     return () =>
       h("ark-status-dot", {
         ...attrs,
+        testid: props.testid,
         intent: props.intent,
         label: props.label,
         size: props.size,

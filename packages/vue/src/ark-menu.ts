@@ -7,6 +7,8 @@ export const ArkMenu = defineComponent({
   inheritAttrs: false,
   emits: ["ark-select", "ark-open", "ark-close"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     for: { type: String, default: undefined },
     open: { type: Boolean, default: false },
     align: { type: String as PropType<ArkMenuAlign>, default: "start" },
@@ -38,6 +40,7 @@ export const ArkMenu = defineComponent({
         "ark-menu",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           for: props.for,
           open: props.open ? "" : undefined,
@@ -55,6 +58,8 @@ export const ArkMenuItem = defineComponent({
   name: "ArkMenuItem",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
     intent: { type: String as PropType<ArkIntent>, default: undefined },
@@ -70,6 +75,7 @@ export const ArkMenuItem = defineComponent({
         "ark-menu-item",
         {
           ...attrs,
+          testid: props.testid,
           value: props.value,
           intent: props.intent,
           disabled: props.disabled ? "" : undefined,

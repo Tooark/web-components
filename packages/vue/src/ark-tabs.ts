@@ -7,6 +7,8 @@ export const ArkTabs = defineComponent({
   inheritAttrs: false,
   emits: ["change", "ark-close"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     variant: { type: String as PropType<ArkTabsVariant>, default: "underline" },
     size: { type: String as PropType<ArkSize>, default: "md" },
@@ -32,6 +34,7 @@ export const ArkTabs = defineComponent({
         "ark-tabs",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           value: props.value,
           variant: props.variant,
@@ -54,6 +57,8 @@ export const ArkTab = defineComponent({
   name: "ArkTab",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, required: true },
     disabled: { type: Boolean, default: false },
     controls: { type: String, default: undefined },
@@ -67,6 +72,7 @@ export const ArkTab = defineComponent({
         "ark-tab",
         {
           ...attrs,
+          testid: props.testid,
           value: props.value,
           controls: props.controls,
           disabled: props.disabled ? "" : undefined,

@@ -7,6 +7,8 @@ export const ArkCopyButton = defineComponent({
   inheritAttrs: false,
   emits: ["ark-copy"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     for: { type: String, default: undefined },
     feedbackMs: { type: Number, default: undefined },
@@ -39,6 +41,7 @@ export const ArkCopyButton = defineComponent({
         "ark-copy-button",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           value: props.value,
           for: props.for,

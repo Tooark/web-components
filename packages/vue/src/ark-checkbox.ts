@@ -7,6 +7,8 @@ export const ArkCheckbox = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     checked: { type: Boolean, default: false },
     indeterminate: { type: Boolean, default: false },
     disabled: { type: Boolean, default: false },
@@ -24,6 +26,7 @@ export const ArkCheckbox = defineComponent({
         "ark-checkbox",
         {
           ...attrs,
+          testid: props.testid,
           intent: props.intent,
           theme: props.theme,
           size: props.size,

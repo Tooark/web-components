@@ -7,6 +7,8 @@ export const ArkToaster = defineComponent({
   inheritAttrs: false,
   emits: ["ark-toast-action"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     position: { type: String as PropType<ArkToastPosition>, default: "bottom-right" },
     richColors: { type: Boolean, default: false },
@@ -21,6 +23,7 @@ export const ArkToaster = defineComponent({
     return () =>
       h("ark-toaster", {
         ...attrs,
+        testid: props.testid,
         theme: props.theme,
         position: props.position,
         "max-visible": props.maxVisible,

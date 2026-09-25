@@ -6,6 +6,8 @@ export const ArkBadge = defineComponent({
   name: "ArkBadge",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     intent: { type: String as PropType<ArkIntent>, default: "neutral" },
     variant: { type: String as PropType<ArkBadgeVariant>, default: "soft" },
     size: { type: String as PropType<ArkBadgeSize>, default: "md" },
@@ -20,6 +22,7 @@ export const ArkBadge = defineComponent({
         "ark-badge",
         {
           ...attrs,
+          testid: props.testid,
           intent: props.intent,
           variant: props.variant,
           size: props.size,

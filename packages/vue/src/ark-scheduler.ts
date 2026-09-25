@@ -7,6 +7,8 @@ export const ArkScheduler = defineComponent({
   inheritAttrs: false,
   emits: ["ark-event-click", "ark-slot-click", "ark-view-change", "ark-range-change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     view: { type: String as PropType<ArkSchedulerView>, default: "week" },
     date: { type: String, default: undefined },
     events: { type: Array as PropType<ArkSchedulerEvent[]>, default: undefined },
@@ -25,6 +27,7 @@ export const ArkScheduler = defineComponent({
     return () =>
       h("ark-scheduler", {
         ...attrs,
+        testid: props.testid,
         view: props.view,
         date: props.date,
         lang: props.lang,

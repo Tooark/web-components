@@ -7,6 +7,8 @@ export const ArkShapePicker = defineComponent({
   inheritAttrs: false,
   emits: ["change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String as PropType<ArkMarkShape>, default: undefined },
     color: { type: String, default: undefined },
     label: { type: String, default: undefined },
@@ -21,6 +23,7 @@ export const ArkShapePicker = defineComponent({
     return () =>
       h("ark-shape-picker", {
         ...attrs,
+        testid: props.testid,
         value: props.value,
         color: props.color,
         label: props.label,

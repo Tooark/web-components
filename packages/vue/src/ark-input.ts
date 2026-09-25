@@ -6,6 +6,8 @@ export const ArkInput = defineComponent({
   name: "ArkInput",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     type: { type: String, default: "text" },
     label: { type: String, default: undefined },
     placeholder: { type: String, default: undefined },
@@ -43,6 +45,7 @@ export const ArkInput = defineComponent({
         "ark-input",
         {
           ...attrs,
+          testid: props.testid,
           type: props.type,
           label: props.label,
           placeholder: props.placeholder,

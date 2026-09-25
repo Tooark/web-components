@@ -6,6 +6,8 @@ export const ArkCard = defineComponent({
   name: "ArkCard",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     heading: { type: String, default: undefined },
     padding: { type: String as PropType<ArkCardPadding>, default: undefined },
     rounded: { type: String as PropType<ArkRounded>, default: undefined },
@@ -18,6 +20,7 @@ export const ArkCard = defineComponent({
         "ark-card",
         {
           ...attrs,
+          testid: props.testid,
           heading: props.heading,
           padding: props.padding,
           rounded: props.rounded,

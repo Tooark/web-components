@@ -6,6 +6,8 @@ export const ArkSpinner = defineComponent({
   name: "ArkSpinner",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     size: { type: String as PropType<ArkSize>, default: "md" },
     intent: { type: String as PropType<ArkIntent>, default: undefined },
     label: { type: String, default: undefined },
@@ -18,6 +20,7 @@ export const ArkSpinner = defineComponent({
     return () =>
       h("ark-spinner", {
         ...attrs,
+        testid: props.testid,
         size: props.size,
         intent: props.intent,
         label: props.label,

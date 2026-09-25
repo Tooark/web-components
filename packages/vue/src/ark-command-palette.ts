@@ -7,6 +7,8 @@ export const ArkCommandPalette = defineComponent({
   inheritAttrs: false,
   emits: ["ark-select", "ark-query", "ark-open", "ark-close"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     open: { type: Boolean, default: false },
     placeholder: { type: String, default: undefined },
     hotkey: { type: String, default: undefined },
@@ -41,6 +43,7 @@ export const ArkCommandPalette = defineComponent({
         "ark-command-palette",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           open: props.open ? "" : undefined,
           placeholder: props.placeholder,
@@ -62,6 +65,8 @@ export const ArkCommandItem = defineComponent({
   name: "ArkCommandItem",
   inheritAttrs: false,
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, required: true },
     group: { type: String, default: undefined },
     label: { type: String, default: undefined },
@@ -74,6 +79,7 @@ export const ArkCommandItem = defineComponent({
         "ark-command-item",
         {
           ...attrs,
+          testid: props.testid,
           value: props.value,
           group: props.group,
           label: props.label,

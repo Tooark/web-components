@@ -18,6 +18,8 @@ export const ArkButton = defineComponent({
     click: (_event: MouseEvent) => true
   },
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     variant: { type: String as PropType<ArkButtonVariant>, default: "primary" },
     // Sem padrão: um intent fixo venceria o de `variant="danger"` (o elemento usa intent || variant).
     intent: { type: String as PropType<ArkIntent>, default: undefined },
@@ -43,6 +45,7 @@ export const ArkButton = defineComponent({
         "ark-button",
         {
           ...attrs,
+          testid: props.testid,
           onClick: (event: MouseEvent) => emit("click", event),
           variant: props.variant,
           intent: props.intent,

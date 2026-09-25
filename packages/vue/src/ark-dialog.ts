@@ -7,6 +7,8 @@ export const ArkDialog = defineComponent({
   inheritAttrs: false,
   emits: ["ark-open", "ark-close"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     open: { type: Boolean, default: false },
     label: { type: String, default: undefined },
     noCloseButton: { type: Boolean, default: false },
@@ -40,6 +42,7 @@ export const ArkDialog = defineComponent({
         "ark-dialog",
         {
           ...attrs,
+          testid: props.testid,
           ref: elRef,
           open: props.open ? "" : undefined,
           label: props.label,

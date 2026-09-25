@@ -7,6 +7,8 @@ export const ArkClock = defineComponent({
   inheritAttrs: false,
   emits: ["ark-change"],
   props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
@@ -20,6 +22,7 @@ export const ArkClock = defineComponent({
     return () =>
       h("ark-clock", {
         ...attrs,
+        testid: props.testid,
         value: props.value,
         lang: props.lang,
         theme: props.theme,
