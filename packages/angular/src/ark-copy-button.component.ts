@@ -20,6 +20,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   <ark-copy-button
     #button
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.value]="value"
     [attr.for]="for"
     [attr.feedback-ms]="feedbackMs"
@@ -45,6 +46,8 @@ export class ArkCopyButtonComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   /** Texto a copiar. */
   @Input() value: string | undefined;
   /** id de um elemento: copia o value de inputs/textareas ou o textContent. */

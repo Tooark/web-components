@@ -24,6 +24,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.date]="date"
     [attr.events]="eventsStr"
     [attr.lang]="lang"
+    [attr.locale-json]="localeJson"
     [attr.theme]="theme"
     [attr.intent]="intent"
     [attr.views]="views"
@@ -43,6 +44,8 @@ export class ArkSchedulerComponent implements AfterViewInit, OnDestroy {
   @Input() date: string | undefined;
   @Input() events: ArkSchedulerEvent[] | undefined;
   @Input() lang: ArkDatepickerLang = "en";
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  @Input() localeJson: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() intent: ArkIntent = "primary";
   @Input() views: string | undefined;

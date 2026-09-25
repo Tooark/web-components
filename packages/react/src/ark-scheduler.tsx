@@ -4,6 +4,8 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSchedulerProps = ArkSchedulerStyleOptions & {
   lang?: ArkDatepickerLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
   className?: string;
   onEventClick?: (detail: { event: ArkSchedulerEvent; id: string | null }) => void;
   onSlotClick?: (detail: { start: string; end: string; allDay: boolean }) => void;
@@ -19,6 +21,7 @@ export function ArkScheduler(props: ArkSchedulerProps): React.JSX.Element {
     hourEnd,
     slotMinutes,
     hoursFormat,
+    localeJson,
     onEventClick,
     onSlotClick,
     onViewChange,
@@ -63,7 +66,8 @@ export function ArkScheduler(props: ArkSchedulerProps): React.JSX.Element {
     "hour-start": hourStart !== undefined ? String(hourStart) : undefined,
     "hour-end": hourEnd !== undefined ? String(hourEnd) : undefined,
     "slot-minutes": slotMinutes !== undefined ? String(slotMinutes) : undefined,
-    "hours-format": hoursFormat
+    "hours-format": hoursFormat,
+    "locale-json": localeJson
   };
 
   return createElement("ark-scheduler", attrs);

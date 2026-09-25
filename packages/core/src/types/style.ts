@@ -898,6 +898,8 @@ export type ArkToasterStyleOptions = {
   maxVisible?: number;
   /** Tempo em tela em ms; 0 mantém o toast até ser fechado. Padrão: 4000. */
   duration?: number;
+  /** Idioma do rótulo do botão de fechar (`close`). Padrão: "en". */
+  lang?: ArkLang;
 };
 
 /** Conteúdo e comportamento de um toast disparado pelo serviço toast. */

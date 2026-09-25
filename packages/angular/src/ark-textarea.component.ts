@@ -32,6 +32,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.maxlength]="maxlength"
     [attr.minlength]="minlength"
     [attr.spellcheck]="spellcheckAttr"
+    [attr.wrap]="wrap"
     [attr.aria-label]="ariaLabel">
     <ng-content></ng-content>
   </ark-textarea>`
@@ -68,6 +69,8 @@ export class ArkTextareaComponent {
   @Input() maxlength: number | undefined;
   @Input() minlength: number | undefined;
   @Input() spellcheck: boolean | undefined;
+  /** Quebra de linha do valor enviado (soft/hard) ou sem quebra visual (off), como no <textarea>. */
+  @Input() wrap: "soft" | "hard" | "off" | undefined;
   @Input() ariaLabel: string | undefined;
 
   get spellcheckAttr(): string | null {

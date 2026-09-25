@@ -27,6 +27,8 @@ export type ArkTextareaProps = PropsWithChildren<
     maxlength?: number;
     minlength?: number;
     spellcheck?: boolean;
+    /** Quebra de linha do valor enviado (soft/hard) ou sem quebra visual (off), como no <textarea>. */
+    wrap?: "soft" | "hard" | "off";
     "aria-label"?: string;
     className?: string;
     onInput?: (event: Event) => void;

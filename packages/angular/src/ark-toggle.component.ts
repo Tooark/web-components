@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-toggle
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.pressed]="pressed ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.intent]="intent"
@@ -25,6 +26,8 @@ export class ArkToggleComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() pressed = false;
   @Input() disabled = false;
   @Input() intent: ArkIntent = "primary";

@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-checkbox
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.checked]="checked ? '' : null"
     [attr.indeterminate]="indeterminate ? '' : null"
     [attr.disabled]="disabled ? '' : null"
@@ -28,6 +29,8 @@ export class ArkCheckboxComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() checked = false;
   /** Estado misto (aria-checked="mixed", traço); o próximo clique o limpa. */
   @Input() indeterminate = false;

@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-radio
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.checked]="checked ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.intent]="intent"
@@ -27,6 +28,8 @@ export class ArkRadioComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() checked = false;
   @Input() disabled = false;
   @Input() intent: ArkIntent = "primary";

@@ -14,6 +14,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.label]="label"
     [attr.helper]="helper"
     [attr.error-message]="errorMessage"
+    [attr.error]="error ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.required]="required ? '' : null"
     [attr.name]="name"
@@ -41,6 +42,8 @@ export class ArkFileInputComponent {
   @Input() helper: string | undefined;
   /** Mensagem de erro; liga aria-invalid e a borda de erro. */
   @Input() errorMessage: string | undefined;
+  /** Estado de erro sem mensagem (borda danger e aria-invalid). */
+  @Input() error = false;
   @Input() disabled = false;
   @Input() required = false;
   /** Nome no formulário (input nativo oculto). */

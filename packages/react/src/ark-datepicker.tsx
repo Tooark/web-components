@@ -35,7 +35,8 @@ export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
     events,
     eventDisplay,
     stepMinutes,
-    hoursFormat
+    hoursFormat,
+    ...rest
   } = props;
   const ref = React.useRef<HTMLElement>(null);
 
@@ -60,7 +61,9 @@ export function ArkDatepicker(props: ArkDatepickerProps): React.JSX.Element {
     return () => el.removeEventListener("ark-change", handleChange);
   }, [handleChange]);
 
-  const attrs: Record<string, string | undefined> = {
+  // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
+  const attrs: Record<string, unknown> = {
+    ...rest,
     lang,
     theme,
     intent,

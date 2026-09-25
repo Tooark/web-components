@@ -28,7 +28,8 @@ export function ArkCarousel(props: ArkCarouselProps): React.JSX.Element {
     snap,
     onSlideChange,
     className,
-    testid
+    testid,
+    ...rest
   } = props;
 
   const ref = React.useRef<HTMLElement>(null);
@@ -54,7 +55,9 @@ export function ArkCarousel(props: ArkCarouselProps): React.JSX.Element {
     return () => el.removeEventListener("ark-slide-change", handleSlideChange);
   }, [handleSlideChange]);
 
-  const attrs: Record<string, string | number | boolean | undefined> = {
+  // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
+  const attrs: Record<string, unknown> = {
+    ...rest,
     theme,
     intent,
     "accent-color": accentColor,

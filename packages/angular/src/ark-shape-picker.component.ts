@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-shape-picker
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.value]="value"
     [attr.color]="color"
     [attr.label]="label"
@@ -26,6 +27,8 @@ export class ArkShapePickerComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   /** Forma selecionada. */
   @Input() value: ArkMarkShape | undefined;
   /** Cor CSS em que as formas são desenhadas. Padrão: a cor do texto ao redor. */

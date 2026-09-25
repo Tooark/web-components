@@ -9,6 +9,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-switch
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.checked]="checked ? '' : null"
     [attr.disabled]="disabled ? '' : null"
     [attr.labels]="labels ? '' : null"
@@ -31,6 +32,8 @@ export class ArkSwitchComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() checked = false;
   @Input() disabled = false;
   @Input() labels = false;

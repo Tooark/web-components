@@ -17,6 +17,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
   template: `
   <ark-button
     [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
     [attr.type]="type"
     [attr.disabled]="disabled ? '' : null"
     [attr.loading]="loading ? '' : null"
@@ -42,6 +43,8 @@ export class ArkButtonComponent {
   }
 
   @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
   @Input() type: ArkButtonType = "button";
   @Input() disabled = false;
   @Input() loading = false;
