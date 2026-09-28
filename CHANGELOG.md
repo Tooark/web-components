@@ -9,6 +9,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed
+
+- The root README lists every package with its npm version, downloads and install command.
+
 ## [1.2.1] - 2026-09-28
 
 ### Fixed
