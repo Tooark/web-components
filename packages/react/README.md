@@ -147,8 +147,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                          | Version     | Description                                                      |
 | -------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.2.1      | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.2.1      | The `ark-*` Custom Elements and their stylesheet                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.2.2      | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.2.2      | The `ark-*` Custom Elements and their stylesheet                 |
 | [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer) | React 18 or 19                                                   |
 | [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer) | React DOM renderer                                               |
 

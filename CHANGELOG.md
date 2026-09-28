@@ -9,10 +9,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.2] - 2026-09-28
+
 ### Changed
 
 - `@tooark/motion` depends on `motion` `^13.4.4` (was `^13.4.0`); its README dependency table follows.
 - The root README lists every package with its npm version, downloads and install command.
+- Development dependencies updated (Angular 21.2.24, React 19.3, Vue 3.5.43, Vite 8.3.1, Rollup 4.63.5, CodeMirror
+  state/view, `@types/node`); the published code does not change.
 
 ## [1.2.1] - 2026-09-28
 
@@ -171,7 +175,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.2...HEAD
+[1.2.2]: https://github.com/Tooark/web-components/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/Tooark/web-components/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Tooark/web-components/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Tooark/web-components/compare/v1.0.1...v1.1.0

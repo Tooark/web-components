@@ -1,6 +1,6 @@
 {
   "name": "@tooark/tokens",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Tooark Tokens — design primitives (colors by intent, sizes, motion) as CSS tokens and TypeScript types",
   "keywords": [
     "tooark",

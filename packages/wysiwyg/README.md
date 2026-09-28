@@ -126,7 +126,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 | [`@tiptap/extension-text-style`](https://www.npmjs.com/package/@tiptap/extension-text-style)   | ^3.31.3 | Text style mark with color                                               |
 | [`@tiptap/pm`](https://www.npmjs.com/package/@tiptap/pm)                                       | ^3.31.3 | ProseMirror packages used by Tiptap                                      |
 | [`@tiptap/starter-kit`](https://www.npmjs.com/package/@tiptap/starter-kit)                     | ^3.31.3 | Base nodes and marks (paragraph, heading, lists, bold, link, underline…) |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.2.1  | Design tokens (colors, sizes, motion) and primitive types                |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.2.2  | Design tokens (colors, sizes, motion) and primitive types                |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                                 | ^2.8.1  | TypeScript runtime helpers                                               |
 
 ---
