@@ -164,8 +164,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                           | Versão           | Descrição                                                            |
 | -------------------------------------------------------------------------------- | ---------------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.2.0           | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.2.0           | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.2.1           | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.2.1           | Os Custom Elements `ark-*` e a folha de estilo deles                 |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                   | ^2.8.1           | Helpers de runtime do TypeScript                                     |
 | [`@angular/common`](https://www.npmjs.com/package/@angular/common)               | >=21.2.19 (peer) | Angular common                                                       |
 | [`@angular/core`](https://www.npmjs.com/package/@angular/core)                   | >=21.2.19 (peer) | Núcleo do Angular (piso de segurança do workspace)                   |
