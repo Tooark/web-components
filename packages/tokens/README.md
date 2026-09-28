@@ -28,7 +28,7 @@ The `@tooark/tokens` package provides:
 
 - `tokens.css`: a `@theme static` block with semantic colors (`primary`, `secondary`, `success`, `warning`, `danger`, `info`, `neutral`, plus `surface*`, `fg*`, `border*`, `muted`, `ring`) as `light-dark()` values, the size scale (`--size-xs…xl`) and the `--text-2xs` step (no radii: the `rounded` scale is Tailwind's own, `ArkRounded` only types it);
 - motion tokens outside `@theme`: `--ark-duration-*` (eight steps), `--ark-ease-*` (`linear`, `standard`, `in`, `out`, `in-out`, `overshoot`, `sheet`) and `--ark-motion-distance`, zeroed under `prefers-reduced-motion`;
-- JS mirrors of the motion tokens (`ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`) for WAAPI fallbacks;
+- JS mirrors of the motion tokens (`ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`) for WAAPI fallbacks, and of the size scale (`ARK_SIZE_CSS`) and each intent's soft colors (`ARK_INTENT_SOFT_CSS`) for `var()` fallbacks when the tokens CSS is not on the page;
 - `resolveColorScheme(element)` and `observeColorScheme(element, onChange)` to resolve and follow the page theme;
 - the primitive types every package shares: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkTheme`, `ArkDuration`, `ArkEasing`.
 
@@ -79,6 +79,7 @@ Names as the Tooark stylesheets expose them; in your own Tailwind entry the `@th
 - `resolveColorScheme(element?)` → `"light" | "dark"` from the element's computed `color-scheme` (system preference when the page leaves it at `light dark`).
 - `observeColorScheme(element, onChange)` → dispose function; watches `class`, `style`, `data-theme` and `theme` on `<html>`/`<body>` plus the system preference.
 - `ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`.
+- `ARK_SIZE_CSS` (`{ xs: "1.5rem", … }`, mirror of `--ark-size-*`) and `ARK_INTENT_SOFT_CSS` (`{ primary: { soft, softFg }, … }`, the `light-dark()` values of `--ark-color-<intent>-soft`/`-soft-fg`, resolved by the `color-scheme` of the element that uses them): `var(--ark-color-info-soft, ${ARK_INTENT_SOFT_CSS.info.soft})`.
 - Types: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkStyleVariant`, `ArkTheme`, `ArkThemeSelected`, `ArkDuration`, `ArkEasing`.
 
 ---

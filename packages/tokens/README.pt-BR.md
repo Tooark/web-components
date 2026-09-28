@@ -28,7 +28,7 @@ O pacote `@tooark/tokens` fornece:
 
 - `tokens.css`: um bloco `@theme static` com as cores semânticas (`primary`, `secondary`, `success`, `warning`, `danger`, `info`, `neutral`, mais `surface*`, `fg*`, `border*`, `muted`, `ring`) em `light-dark()`, a escala de tamanhos (`--size-xs…xl`) e o degrau `--text-2xs` (sem raios: a escala de `rounded` é a do próprio Tailwind, o `ArkRounded` só a tipa);
 - tokens de motion fora do `@theme`: `--ark-duration-*` (oito passos), `--ark-ease-*` (`linear`, `standard`, `in`, `out`, `in-out`, `overshoot`, `sheet`) e `--ark-motion-distance`, zerados sob `prefers-reduced-motion`;
-- espelhos JS dos tokens de motion (`ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`) para fallback em WAAPI;
+- espelhos JS dos tokens de motion (`ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`) para fallback em WAAPI, e da escala de tamanhos (`ARK_SIZE_CSS`) e das cores suaves de cada intent (`ARK_INTENT_SOFT_CSS`) para fallback em `var()` quando o CSS dos tokens não está na página;
 - `resolveColorScheme(element)` e `observeColorScheme(element, onChange)` para resolver e acompanhar o tema da página;
 - os tipos primitivos que todos os pacotes compartilham: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkTheme`, `ArkDuration`, `ArkEasing`.
 
@@ -79,6 +79,7 @@ Nomes como as folhas de estilo do Tooark os expõem; na sua própria entrada do 
 - `resolveColorScheme(element?)` → `"light" | "dark"` pelo `color-scheme` computado do elemento (preferência do sistema quando a página deixa em `light dark`).
 - `observeColorScheme(element, onChange)` → função de dispose; observa `class`, `style`, `data-theme` e `theme` em `<html>`/`<body>` mais a preferência do sistema.
 - `ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`.
+- `ARK_SIZE_CSS` (`{ xs: "1.5rem", … }`, espelho de `--ark-size-*`) e `ARK_INTENT_SOFT_CSS` (`{ primary: { soft, softFg }, … }`, os `light-dark()` de `--ark-color-<intent>-soft`/`-soft-fg`, que resolvem pelo `color-scheme` do elemento que os usa): `var(--ark-color-info-soft, ${ARK_INTENT_SOFT_CSS.info.soft})`.
 - Tipos: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkStyleVariant`, `ArkTheme`, `ArkThemeSelected`, `ArkDuration`, `ArkEasing`.
 
 ---
