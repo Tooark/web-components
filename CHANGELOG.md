@@ -9,6 +9,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-09-28
+
+### Fixed
+
+- `@tooark/code` declares the CodeMirror versions it really needs: `@codemirror/view` `>=6.27` (the Ctrl+M /
+  Shift+Alt+M tab-focus toggle the README documents needs `setTabFocusMode`, 6.27, and `variables` needs
+  `outerDecorations`, 6.23) and `@codemirror/commands` `>=6.6` (the `toggleTabFocusMode` binding). With `>=6`, an
+  older copy installed without a warning and those features failed at runtime; the other peers stay at `>=6`.
+
 ## [1.2.0] - 2026-09-28
 
 ### Added
@@ -157,7 +166,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/Tooark/web-components/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Tooark/web-components/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Tooark/web-components/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/Tooark/web-components/compare/v1.0.0...v1.0.1
