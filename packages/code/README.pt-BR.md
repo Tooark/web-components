@@ -154,20 +154,20 @@ editor.addEventListener("ark-format-error", (event) => toast.error(String((event
 
 Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta (os ranges são os que o pacote declara).
 
-| Pacote                                                                                     | Versão     | Descrição                                                  |
-| ------------------------------------------------------------------------------------------ | ---------- | ---------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.2.0     | Design tokens (cores, tamanhos, motion) e tipos primitivos |
-| [`tslib`](https://www.npmjs.com/package/tslib)                                             | ^2.8.1     | Helpers de runtime do TypeScript                           |
-| [`@codemirror/autocomplete`](https://www.npmjs.com/package/@codemirror/autocomplete)       | >=6 (peer) | Completions e fechamento de pares                          |
-| [`@codemirror/commands`](https://www.npmjs.com/package/@codemirror/commands)               | >=6 (peer) | Atalhos, histórico, comandos de recuo                      |
-| [`@codemirror/lang-javascript`](https://www.npmjs.com/package/@codemirror/lang-javascript) | >=6 (peer) | Linguagem JavaScript e completions                         |
-| [`@codemirror/lang-json`](https://www.npmjs.com/package/@codemirror/lang-json)             | >=6 (peer) | Linguagem JSON                                             |
-| [`@codemirror/lang-yaml`](https://www.npmjs.com/package/@codemirror/lang-yaml)             | >=6 (peer) | Linguagem YAML                                             |
-| [`@codemirror/language`](https://www.npmjs.com/package/@codemirror/language)               | >=6 (peer) | Suporte a linguagens, dobra, recuo                         |
-| [`@codemirror/search`](https://www.npmjs.com/package/@codemirror/search)                   | >=6 (peer) | Painel de busca e ocorrências da seleção                   |
-| [`@codemirror/state`](https://www.npmjs.com/package/@codemirror/state)                     | >=6 (peer) | Estado do editor (uma cópia por página)                    |
-| [`@codemirror/view`](https://www.npmjs.com/package/@codemirror/view)                       | >=6 (peer) | View e DOM do editor                                       |
-| [`@lezer/highlight`](https://www.npmjs.com/package/@lezer/highlight)                       | >=1 (peer) | Tags de realce de sintaxe                                  |
+| Pacote                                                                                     | Versão        | Descrição                                                  |
+| ------------------------------------------------------------------------------------------ | ------------- | ---------------------------------------------------------- |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.2.0        | Design tokens (cores, tamanhos, motion) e tipos primitivos |
+| [`tslib`](https://www.npmjs.com/package/tslib)                                             | ^2.8.1        | Helpers de runtime do TypeScript                           |
+| [`@codemirror/autocomplete`](https://www.npmjs.com/package/@codemirror/autocomplete)       | >=6 (peer)    | Completions e fechamento de pares                          |
+| [`@codemirror/commands`](https://www.npmjs.com/package/@codemirror/commands)               | >=6.6 (peer)  | Atalhos, histórico, comandos de recuo                      |
+| [`@codemirror/lang-javascript`](https://www.npmjs.com/package/@codemirror/lang-javascript) | >=6 (peer)    | Linguagem JavaScript e completions                         |
+| [`@codemirror/lang-json`](https://www.npmjs.com/package/@codemirror/lang-json)             | >=6 (peer)    | Linguagem JSON                                             |
+| [`@codemirror/lang-yaml`](https://www.npmjs.com/package/@codemirror/lang-yaml)             | >=6 (peer)    | Linguagem YAML                                             |
+| [`@codemirror/language`](https://www.npmjs.com/package/@codemirror/language)               | >=6 (peer)    | Suporte a linguagens, dobra, recuo                         |
+| [`@codemirror/search`](https://www.npmjs.com/package/@codemirror/search)                   | >=6 (peer)    | Painel de busca e ocorrências da seleção                   |
+| [`@codemirror/state`](https://www.npmjs.com/package/@codemirror/state)                     | >=6 (peer)    | Estado do editor (uma cópia por página)                    |
+| [`@codemirror/view`](https://www.npmjs.com/package/@codemirror/view)                       | >=6.27 (peer) | View e DOM do editor                                       |
+| [`@lezer/highlight`](https://www.npmjs.com/package/@lezer/highlight)                       | >=1 (peer)    | Tags de realce de sintaxe                                  |
 
 ---
 

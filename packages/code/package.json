@@ -72,14 +72,14 @@
   },
   "peerDependencies": {
     "@codemirror/autocomplete": ">=6",
-    "@codemirror/commands": ">=6",
+    "@codemirror/commands": ">=6.6",
     "@codemirror/lang-javascript": ">=6",
     "@codemirror/lang-json": ">=6",
     "@codemirror/lang-yaml": ">=6",
     "@codemirror/language": ">=6",
     "@codemirror/search": ">=6",
     "@codemirror/state": ">=6",
-    "@codemirror/view": ">=6",
+    "@codemirror/view": ">=6.27",
     "@lezer/highlight": ">=1"
   },
   "dependencies": {
