@@ -29,6 +29,7 @@ O pacote `@tooark/code` fornece:
 - `language` json / javascript / yaml / text, numeração, dobra, busca (Ctrl+F), pares de colchetes, linha ativa, placeholder, `readonly`, `wrap`, `min-height`;
 - Tab recua (Shift+Tab desfaz; Esc e depois Tab sai do editor), `indent-style` espaços ou tabulação, `indent-size`, `line-ending` `auto`/`lf`/`crlf` convertido na fronteira do valor;
 - completions: as da linguagem, `variableKeys` depois de `{{`, `completions` (palavras em qualquer linguagem) e `completionSource`; `autocomplete="false"` desliga;
+- opcionais, desligados até você passá-los: `variables` pinta cada `{{chave}}` pelo intent da variável (escopo livre, tooltip com escopo e valor), `mark-unknown-variables` marca as chaves não definidas e `single-line` faz do editor um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`;
 - `format()` e Shift+Alt+F: JSON de fábrica com o recuo configurado, outras linguagens pelo gancho `formatter` (o Prettier fica no app);
 - chrome sobre os tokens `--ark-color-*` com fallback, `theme="auto"` seguindo a página em tempo de execução; engine `createCodeEditor` sem o elemento;
 - pacotes do CodeMirror como peer dependencies, para a página ter uma cópia de `@codemirror/state`.
@@ -61,16 +62,30 @@ registerTooarkCode();
 
 ### `ark-code-editor`
 
-- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `theme`, `testid`.
-- Propriedades: `value`, `variableKeys`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (o `EditorView`), e uma por atributo exceto `testid`; métodos `format()`, `focus()`.
-- Eventos: `change` (`detail: { value }`, só edições do usuário), `ark-format-error` (`detail: { error }`).
+- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, padrão `md`: fonte e recuo lateral, e a altura em `single-line`), `theme`, `testid`.
+- Propriedades: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (o `EditorView`), e uma por atributo exceto `testid`; métodos `format()`, `focus()`.
+- Eventos: `change` (`detail: { value }`, só edições do usuário), `ark-format-error` (`detail: { error }`), `ark-submit` (`detail: { value }`, Enter em `single-line`).
 - Teclas: Ctrl/Cmd+F busca, Ctrl/Cmd+Z desfazer, Ctrl+Y refazer (Cmd+Shift+Z no macOS), Ctrl+Espaço completions, Shift+Alt+F formatar, Tab/Shift+Tab recuo, Esc+Tab sair, Ctrl+M (Shift+Alt+M no macOS) alterna o modo tab-focus do CodeMirror.
+- Hooks: a raiz do CodeMirror leva `data-ark="code-editor"` e o `testid` como `data-testid`; cada variável pintada, `data-ark="code-editor-variable"` com `data-key`; o tooltip dela, `data-ark="code-editor-variable-tooltip"`.
+
+### Variáveis com escopo
+
+Nada muda até o app passar `variables` ou ligar `mark-unknown-variables`; `variableKeys` sozinho continua só completando.
+
+- `variables`: `ArkCodeVariable[]`, um `{ key, scope?, intent?, value? }` por chave. A biblioteca não conhece escopo nenhum: `scope` é o nome que o app usar, e quando uma chave existe em vários escopos o app resolve a precedência e manda só a vencedora (chave repetida fica com a primeira entrada).
+- Cada `{{chave}}` (espaços internos permitidos; chaves com letras, dígitos, `_`, `.`, `-` e `$`) vira `<span class="cm-ark-variable cm-ark-variable-<intent>" data-key data-scope data-intent>` com o fundo e o texto suaves do intent (`--ark-color-<intent>-soft`/`-soft-fg`, padrão `primary`), inclusive dentro de strings JSON, e cada variável fica num span só. Os matizes distintos são `info`, `success`, `warning`/`primary` e `danger` (que também marca as chaves desconhecidas); `secondary` e `neutral` ficam perto da cor do texto. Para mais escopos, ou uma paleta própria, troque as cores de um escopo por CSS, por exemplo `ark-code-editor .cm-ark-variable[data-scope="global"] { background: …; color: … }`.
+- Variável com `scope` ou `value` mostra um tooltip ao passar o mouse, com o escopo (no intent dela) e o valor; a completion depois de `{{` mostra o escopo como detalhe e o valor como info. Todo esse texto é do app: deixe `value` de fora para segredos.
+- `mark-unknown-variables`: o `{{chave}}` que não está em `variables` nem em `variableKeys` ganha `cm-ark-variable-unknown` e `data-unknown`, pintado em `danger` com sublinhado ondulado (não só pela cor).
+
+### Campo de uma linha
+
+`single-line` faz um campo como a barra de endereço: a altura dos controles do mesmo `size` (alinha com `ark-button` e `ark-input`), sem calhas nem linha ativa, Enter emite `ark-submit` em vez de quebrar a linha (com a lista de completions aberta, o Enter aceita a completion), quebras coladas são removidas como num `<input>`, Tab sai do campo e Ctrl/Cmd+F fica com o navegador. Ligar sobre um texto de várias linhas junta as linhas sem `change`. Variáveis e completions funcionam igual.
 
 ### Engine
 
-- `createCodeEditor(parent, options)` → `{ view, getValue, setValue, setLanguage, setTheme, setReadonly, setPlaceholder, setLineNumbers, setFold, setWrap, setMinHeight, setIndent, setLineEnding, resolvedLineEnding, setTabIndent, setAutocomplete, setVariableKeys, setCompletions, setCompletionSource, setFormatter, format, canFormat, resolvedTheme, focus, destroy }`.
+- `createCodeEditor(parent, options)` → `{ view, getValue, setValue, setLanguage, setTheme, setReadonly, setPlaceholder, setLineNumbers, setFold, setWrap, setMinHeight, setIndent, setLineEnding, resolvedLineEnding, setTabIndent, setAutocomplete, setVariableKeys, setVariables, setMarkUnknownVariables, setSingleLine, setSize, setCompletions, setCompletionSource, setFormatter, format, canFormat, resolvedTheme, focus, destroy }`; as opções espelham atributos e propriedades, mais `onChange`, `onFormatError` e `onSubmit`.
 - `resolveCodeTheme(theme, element)`.
-- Tipos: `ArkCodeEditorInstance`, `ArkCodeEditorOptions`, `ArkCodeLanguage`, `ArkCodeTheme`, `ArkCodeIndentStyle`, `ArkCodeLineEnding`, `ArkCodeCompletion`, `ArkCodeCompletionSource`, `ArkCodeFormatter`.
+- Tipos: `ArkCodeEditorInstance`, `ArkCodeEditorOptions`, `ArkCodeVariable`, `ArkCodeLanguage`, `ArkCodeTheme`, `ArkCodeIndentStyle`, `ArkCodeLineEnding`, `ArkCodeCompletion`, `ArkCodeCompletionSource`, `ArkCodeFormatter`.
 
 ---
 
@@ -88,6 +103,32 @@ editor.addEventListener("change", (event) => salvar((event as CustomEvent<{ valu
 
 botaoFormatar.hidden = !editor.canFormat;
 botaoFormatar.addEventListener("click", () => editor.format()); // também Shift+Alt+F
+```
+
+### Um campo de URL com variáveis por escopo
+
+```html
+<ark-code-editor id="url" single-line mark-unknown-variables placeholder="{{baseUrl}}/caminho"></ark-code-editor>
+```
+
+```ts
+const url = document.querySelector("ark-code-editor")!;
+// A precedência entre escopos é resolvida pelo app: uma entrada por chave.
+url.variables = [
+  { key: "baseUrl", scope: "global", intent: "info", value: "https://api.exemplo.com" },
+  { key: "token", scope: "environment", intent: "success" }, // sem value: fica fora do tooltip
+  { key: "userId", scope: "local", intent: "primary", value: "42" },
+];
+url.value = "{{baseUrl}}/users/{{userId}}";
+url.addEventListener("ark-submit", (event) => enviar((event as CustomEvent<{ value: string }>).detail.value));
+```
+
+```css
+/* cor própria para um escopo, em vez de um intent */
+ark-code-editor .cm-ark-variable[data-scope="environment"] {
+  background: #ecfeff;
+  color: #0e7490;
+}
 ```
 
 ### YAML com chaves do schema e formatador do app

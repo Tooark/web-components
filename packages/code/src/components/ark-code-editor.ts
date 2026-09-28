@@ -1,5 +1,5 @@
 import type { EditorView } from "@codemirror/view";
-import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
+import { ARK_SIZE_CSS, type ArkSize, type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import { type ArkCodeEditorInstance, createCodeEditor } from "../engine";
 import type {
   ArkCodeCompletion,
@@ -8,7 +8,8 @@ import type {
   ArkCodeIndentStyle,
   ArkCodeLanguage,
   ArkCodeLineEnding,
-  ArkCodeTheme
+  ArkCodeTheme,
+  ArkCodeVariable
 } from "../types";
 import { HTMLElementBase } from "./html-element-base";
 
@@ -38,6 +39,12 @@ function truthy(value: unknown): boolean {
  * acompanha a troca em tempo de execução (`observeColorScheme` de
  * @tooark/tokens). O nó do CodeMirror leva `data-ark="code-editor"` e o
  * `testid` como `data-testid`.
+ *
+ * Opcionais, desligados até o app pedir: a propriedade `variables` pinta
+ * cada `{{chave}}` pelo intent da variável, com tooltip do escopo e do valor;
+ * `mark-unknown-variables` pinta em `danger` a chave desconhecida;
+ * `single-line` vira um campo de uma linha na altura dos controles (`size`),
+ * com Enter emitindo `ark-submit` (`detail: { value }`).
  */
 export class ArkCodeEditor extends HTMLElementBase {
   static readonly tagName = "ark-code-editor";
@@ -46,6 +53,7 @@ export class ArkCodeEditor extends HTMLElementBase {
   /** Texto antes de montar, ou o último conhecido depois de desmontar. */
   private pendingValue = "";
   private keys: string[] = [];
+  private vars: ArkCodeVariable[] = [];
   private items: ArkCodeCompletion[] = [];
   private source: ArkCodeCompletionSource | undefined;
   private formatFn: ArkCodeFormatter | undefined;
@@ -66,6 +74,9 @@ export class ArkCodeEditor extends HTMLElementBase {
       "line-ending",
       "tab-indent",
       "autocomplete",
+      "mark-unknown-variables",
+      "single-line",
+      "size",
       "theme",
       "testid"
     ];
@@ -90,6 +101,46 @@ export class ArkCodeEditor extends HTMLElementBase {
   set variableKeys(next: string[] | null | undefined) {
     this.keys = Array.isArray(next) ? next.filter((key) => typeof key === "string" && key.length > 0) : [];
     this.instance?.setVariableKeys(this.keys);
+  }
+
+  /** Variáveis com escopo e cor (propriedade JS): completam depois de `{{` e pintam o `{{chave}}` no texto. */
+  get variables(): ArkCodeVariable[] {
+    return this.vars.map((variable) => ({ ...variable }));
+  }
+
+  set variables(next: ArkCodeVariable[] | null | undefined) {
+    this.vars = Array.isArray(next)
+      ? next.filter((variable) => variable && typeof variable.key === "string" && variable.key.length > 0)
+      : [];
+    this.instance?.setVariables(this.vars);
+  }
+
+  /** Pinta em `danger` o `{{chave}}` fora de `variables` e `variableKeys` (atributo `mark-unknown-variables`). */
+  get markUnknownVariables(): boolean {
+    return this.hasAttribute("mark-unknown-variables");
+  }
+
+  set markUnknownVariables(value: boolean | string | null | undefined) {
+    this.toggleAttribute("mark-unknown-variables", truthy(value));
+  }
+
+  /** Campo de uma linha na altura dos controles (atributo `single-line`); Enter emite `ark-submit`. */
+  get singleLine(): boolean {
+    return this.hasAttribute("single-line");
+  }
+
+  set singleLine(value: boolean | string | null | undefined) {
+    this.toggleAttribute("single-line", truthy(value));
+  }
+
+  /** Escala da fonte e do recuo; em `single-line`, também a altura (atributo `size`). Padrão: "md". */
+  get size(): ArkSize {
+    const value = (this.getAttribute("size") || "md").toLowerCase();
+    return Object.keys(ARK_SIZE_CSS).includes(value) ? (value as ArkSize) : "md";
+  }
+
+  set size(value: ArkSize) {
+    this.setAttribute("size", value);
   }
 
   /** Palavras oferecidas como completion em qualquer linguagem (propriedade JS, formato do CodeMirror). */
@@ -289,6 +340,9 @@ export class ArkCodeEditor extends HTMLElementBase {
     if (name === "line-ending") this.instance.setLineEnding(this.lineEnding);
     if (name === "tab-indent") this.instance.setTabIndent(this.tabIndent);
     if (name === "autocomplete") this.instance.setAutocomplete(this.autocomplete);
+    if (name === "mark-unknown-variables") this.instance.setMarkUnknownVariables(this.markUnknownVariables);
+    if (name === "single-line") this.instance.setSingleLine(this.singleLine);
+    if (name === "size") this.instance.setSize(this.size);
     if (name === "theme") {
       this.instance.setTheme(this.theme);
       this.syncThemeObserver();
@@ -331,12 +385,19 @@ export class ArkCodeEditor extends HTMLElementBase {
       tabIndent: this.tabIndent,
       autocomplete: this.autocomplete,
       variableKeys: this.keys,
+      variables: this.vars,
+      markUnknownVariables: this.markUnknownVariables,
+      singleLine: this.singleLine,
+      size: this.size,
       completions: this.items,
       completionSource: this.source,
       formatter: this.formatFn,
       onChange: (value) => {
         this.pendingValue = value;
         this.dispatchEvent(new CustomEvent("change", { detail: { value }, bubbles: true, composed: true }));
+      },
+      onSubmit: (value) => {
+        this.dispatchEvent(new CustomEvent("ark-submit", { detail: { value }, bubbles: true, composed: true }));
       },
       onFormatError: (error) => {
         this.dispatchEvent(new CustomEvent("ark-format-error", { detail: { error }, bubbles: true, composed: true }));
