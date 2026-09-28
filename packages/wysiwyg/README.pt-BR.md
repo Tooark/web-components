@@ -126,7 +126,7 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 | [`@tiptap/extension-text-style`](https://www.npmjs.com/package/@tiptap/extension-text-style)   | ^3.31.3 | Marca de estilo de texto com cor                                          |
 | [`@tiptap/pm`](https://www.npmjs.com/package/@tiptap/pm)                                       | ^3.31.3 | Pacotes ProseMirror usados pelo Tiptap                                    |
 | [`@tiptap/starter-kit`](https://www.npmjs.com/package/@tiptap/starter-kit)                     | ^3.31.3 | Nós e marcas base (parágrafo, título, listas, negrito, link, sublinhado…) |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.1.0  | Design tokens (cores, tamanhos, motion) e tipos primitivos                |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.2.0  | Design tokens (cores, tamanhos, motion) e tipos primitivos                |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                                 | ^2.8.1  | Helpers de runtime do TypeScript                                          |
 
 ---

@@ -9,6 +9,36 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-09-28
+
+### Added
+
+- `@tooark/code`: opt-in scoped variables and a single-line field; an editor without the new options behaves
+  exactly as before (`variableKeys` alone still only completes).
+  - `variables` (`ArkCodeVariable[]`: `{ key, scope?, intent?, value? }`) paints each `{{key}}` with the intent's soft
+    colors, also inside JSON strings, as a single span with `data-key`/`data-scope`/`data-intent` for CSS overrides
+    (`data-ark="code-editor-variable"` for E2E); a variable with `scope` or `value` gets a hover tooltip, and the
+    completion shows the scope as detail and the value as info. The scope is free-form and the precedence between
+    scopes stays with the app. Needs `@codemirror/view` 6.23 or later.
+  - `mark-unknown-variables` paints a `{{key}}` found in neither `variables` nor `variableKeys` as `danger` with a
+    wavy underline.
+  - `single-line` turns the editor into a one-line field at the height of the controls of the same `size` (no
+    gutters or active line, Enter emits `ark-submit`, pasted line breaks are removed, Tab leaves, Ctrl/Cmd+F stays
+    with the browser); `size` (`xs` … `xl`, default `md`) also scales the font and side padding in the regular editor.
+  - Engine: `setVariables`, `setMarkUnknownVariables`, `setSingleLine`, `setSize` and the `onSubmit` option; completion
+    keys also accept `$` (`{{$guid}}`).
+- `@tooark/tokens`: `ARK_SIZE_CSS` and `ARK_INTENT_SOFT_CSS`, JS mirrors of `--ark-size-*` and of each intent's
+  `-soft`/`-soft-fg` colors for `var()` fallbacks.
+
+### Changed
+
+- `@tooark/code` depends on `@tooark/tokens` 1.2.0 (the new mirrors are its fallbacks); the dependency tables of
+  every README list the 1.2.0 ranges.
+- Storybook `Code/ArkCodeEditor`: the docs page groups every attribute, property, event and method by topic with
+  its type and default, each story is a preset of the same controls, "Show code" prints the HTML and JS for the
+  story's args, and the Playground calls `format()`/`focus()` and logs `change`, `ark-submit` and
+  `ark-format-error`.
+
 ## [1.1.0] - 2026-09-25
 
 ### Added
@@ -127,7 +157,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Tooark/web-components/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Tooark/web-components/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/Tooark/web-components/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/Tooark/web-components/releases/tag/v1.0.0
