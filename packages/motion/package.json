@@ -73,7 +73,7 @@
   "dependencies": {
     "@tooark/core": "workspace:^",
     "@tooark/tokens": "workspace:^",
-    "motion": "^13.4.0",
+    "motion": "^13.4.4",
     "tslib": "^2.8.1"
   },
   "devDependencies": {
