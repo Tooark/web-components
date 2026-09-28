@@ -1,5 +1,5 @@
 import type { Completion, CompletionContext, CompletionResult } from "@codemirror/autocomplete";
-import type { ArkThemeSelected } from "@tooark/tokens";
+import type { ArkIntent, ArkSize, ArkThemeSelected } from "@tooark/tokens";
 
 /** Tema do editor. "auto" segue o color-scheme do host, ou a preferência do sistema sem lado fixo. */
 export type ArkCodeTheme = "auto" | ArkThemeSelected;
@@ -26,6 +26,21 @@ export type ArkCodeCompletionSource = (
  * Sem ele, só `json` tem formatação (nativa, com o recuo configurado).
  */
 export type ArkCodeFormatter = (value: string, language: ArkCodeLanguage) => string | Promise<string>;
+
+/**
+ * Variável `{{chave}}` informada pelo app: oferecida depois de `{{` e pintada no texto. O escopo é livre (a lib não
+ * conhece nenhum); quando a mesma chave existe em mais de um escopo, o app manda só a que vale.
+ */
+export type ArkCodeVariable = {
+  /** Chave usada em `{{chave}}`: letras, dígitos, `_`, `.`, `-` e `$`. */
+  key: string;
+  /** Nome do escopo: vai para `data-scope` no token, para o detalhe da completion e para o tooltip. */
+  scope?: string;
+  /** Cor do token (fundo e texto suaves do intent). Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Valor mostrado no tooltip e na completion; o app deixa de fora o que for segredo. */
+  value?: string;
+};
 
 /** Opções de `createCodeEditor`; cada uma tem um `set*` correspondente na instância. */
 export type ArkCodeEditorOptions = {
@@ -59,6 +74,21 @@ export type ArkCodeEditorOptions = {
   autocomplete?: boolean;
   /** Chaves oferecidas como completions depois de `{{`; a escolha insere `{{chave}}`. Padrão: nenhuma. */
   variableKeys?: string[];
+  /**
+   * Variáveis com escopo e cor: oferecidas depois de `{{` como `variableKeys` e pintadas no texto, com tooltip do
+   * escopo e do valor. Padrão: nenhuma (nada é pintado).
+   */
+  variables?: ArkCodeVariable[];
+  /** Pinta em `danger`, sublinhado, o `{{chave}}` que não está em `variables` nem em `variableKeys`. Padrão: false. */
+  markUnknownVariables?: boolean;
+  /**
+   * Campo de uma linha na altura dos controles (`size`): sem calhas nem linha ativa, Enter chama `onSubmit` em vez
+   * de quebrar a linha, quebras coladas são removidas (como num `<input>`), Tab sai do editor e Ctrl+F fica com o
+   * navegador. Padrão: false.
+   */
+  singleLine?: boolean;
+  /** Escala da fonte e do recuo lateral; em `singleLine`, também a altura (`--ark-size-*`). Padrão: "md". */
+  size?: ArkSize;
   /** Palavras oferecidas como completion em qualquer linguagem (chaves de um schema, nomes conhecidos). */
   completions?: ArkCodeCompletion[];
   /** Fonte de completion própria, além das da linguagem. */
@@ -67,6 +97,8 @@ export type ArkCodeEditorOptions = {
   formatter?: ArkCodeFormatter;
   /** Chamado a cada edição do usuário com o texto atual (não dispara em `setValue`). */
   onChange?: (value: string) => void;
+  /** Chamado com o texto atual quando Enter é pressionado em `singleLine` (fora da lista de completions). */
+  onSubmit?: (value: string) => void;
   /** Chamado quando `format()` falha (JSON inválido, formatador lançou). */
   onFormatError?: (error: unknown) => void;
 };

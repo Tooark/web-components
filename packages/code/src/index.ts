@@ -17,5 +17,6 @@ export type {
   ArkCodeIndentStyle,
   ArkCodeLanguage,
   ArkCodeLineEnding,
-  ArkCodeTheme
+  ArkCodeTheme,
+  ArkCodeVariable
 } from "./types";
