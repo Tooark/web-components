@@ -106,7 +106,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                          | Version    | Description                                                      |
 | ---------------------------------------------------------------- | ---------- | ---------------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.2.1     | Design tokens (colors, sizes, motion)    and primitive types |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.2.2     | Design tokens (colors, sizes, motion)    and primitive types |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1     | TypeScript runtime helpers                                       |
 | [`echarts`](https://www.npmjs.com/package/echarts)               | >=5 (peer) | Chart engine                                                     |
 
