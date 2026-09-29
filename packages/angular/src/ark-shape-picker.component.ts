@@ -11,6 +11,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.testid]="testid"
     [attr.aria-label]="ariaLabel"
     [attr.value]="value"
+    [attr.shapes]="shapesAttr"
     [attr.color]="color"
     [attr.label]="label"
     [attr.disabled]="disabled ? '' : null"
@@ -31,6 +32,8 @@ export class ArkShapePickerComponent {
   @Input() ariaLabel: string | undefined;
   /** Forma selecionada. */
   @Input() value: ArkMarkShape | undefined;
+  /** Formas oferecidas, na ordem, ou "all" para as dez. Padrão: as seis originais. */
+  @Input() shapes: ArkMarkShape[] | "all" | undefined;
   /** Cor CSS em que as formas são desenhadas. Padrão: a cor do texto ao redor. */
   @Input() color: string | undefined;
   /** Nome acessível do radiogroup. */
@@ -42,6 +45,11 @@ export class ArkShapePickerComponent {
   @Input() localeJson: string | undefined;
   /** Seleção mudou pelo usuário: detail.value é a forma. */
   @Output() changed = new EventEmitter<CustomEvent<{ value: ArkMarkShape }>>();
+
+  get shapesAttr(): string | null {
+    if (Array.isArray(this.shapes)) return this.shapes.length > 0 ? this.shapes.join(",") : null;
+    return this.shapes ?? null;
+  }
 
   onChange(event: Event): void {
     this.changed.emit(event as CustomEvent<{ value: ArkMarkShape }>);

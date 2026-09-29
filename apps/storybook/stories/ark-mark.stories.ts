@@ -1,7 +1,18 @@
 import type { ArkMarkShape, ArkTheme } from "@tooark/core";
 import { expect, within } from "storybook/test";
 
-const SHAPES: ArkMarkShape[] = ["circle", "square", "triangle", "diamond", "star", "hexagon"];
+const SHAPES: ArkMarkShape[] = [
+  "circle",
+  "square",
+  "triangle",
+  "diamond",
+  "star",
+  "hexagon",
+  "cross",
+  "pentagon",
+  "moon",
+  "asterisk"
+];
 
 const meta = {
   title: "Core/ArkMark",
@@ -60,6 +71,13 @@ export const Shapes = {
       wrap.appendChild(item);
     }
     return wrap;
+  },
+  // As dez formas desenham, cada uma com um path próprio.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const paths = Array.from(canvasElement.querySelectorAll("ark-mark path")).map((path) => path.getAttribute("d"));
+    await expect(paths).toHaveLength(10);
+    await expect(paths.every(Boolean)).toBe(true);
+    await expect(new Set(paths).size).toBe(10);
   }
 };
 

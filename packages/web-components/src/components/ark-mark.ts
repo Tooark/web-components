@@ -9,11 +9,27 @@ export const ARK_MARK_PATHS: Record<ArkMarkShape, string> = {
   triangle: "M12 2 22 21H2Z",
   diamond: "M12 1 23 12 12 23 1 12Z",
   star: "M12 1.5 15.2 8.6 23 9.6l-5.7 5.3 1.5 7.6L12 18.8 5.2 22.5l1.5-7.6L1 9.6l7.8-1Z",
-  hexagon: "M7 2h10l5 10-5 10H7L2 12Z"
+  hexagon: "M7 2h10l5 10-5 10H7L2 12Z",
+  cross: "M9 2h6v7h7v6h-7v7H9v-7H2V9h7Z",
+  pentagon: "M12 2l10.5 7.6-4 12.3h-13l-4-12.3Z",
+  moon: "M12 2a7.1 7.1 0 0 0 10 10 10 10 0 1 1-10-10Z",
+  asterisk:
+    "M9.9 1.5h4.2v6.86l5.94-3.43 2.1 3.64L16.2 12l5.94 3.43-2.1 3.64-5.94-3.43v6.86H9.9v-6.86l-5.94 3.43-2.1-3.64L7.8 12 1.86 8.57l2.1-3.64 5.94 3.43Z"
 };
 
-/** As seis formas, na ordem em que o ark-shape-picker as oferece. */
-export const ARK_MARK_SHAPES: ArkMarkShape[] = ["circle", "square", "triangle", "diamond", "star", "hexagon"];
+/** As dez formas, na ordem canônica (a de `shapes="all"` no ark-shape-picker). */
+export const ARK_MARK_SHAPES: ArkMarkShape[] = [
+  "circle",
+  "square",
+  "triangle",
+  "diamond",
+  "star",
+  "hexagon",
+  "cross",
+  "pentagon",
+  "moon",
+  "asterisk"
+];
 
 /** Normaliza o valor de `shape`; inválido cai em "circle". */
 export function normalizeMarkShape(value: string | null | undefined): ArkMarkShape {

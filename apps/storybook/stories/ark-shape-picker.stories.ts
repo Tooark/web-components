@@ -4,7 +4,11 @@ import { expect, userEvent, within } from "storybook/test";
 const meta = {
   title: "Core/ArkShapePicker",
   argTypes: {
-    value: { control: "select", options: ["circle", "square", "triangle", "diamond", "star", "hexagon"] },
+    value: {
+      control: "select",
+      options: ["circle", "square", "triangle", "diamond", "star", "hexagon", "cross", "pentagon", "moon", "asterisk"]
+    },
+    shapes: { control: "text" },
     color: { control: "color" },
     disabled: { control: "boolean" },
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
@@ -13,6 +17,7 @@ const meta = {
   },
   args: {
     value: "hexagon",
+    shapes: "",
     color: "#2563eb",
     disabled: false,
     size: "md",
@@ -25,6 +30,7 @@ export default meta;
 
 type StoryArgs = {
   value: ArkMarkShape;
+  shapes: string;
   color: string;
   disabled: boolean;
   size: ArkSize;
@@ -33,12 +39,17 @@ type StoryArgs = {
   testid?: string;
 };
 
-type PickerEl = HTMLElement & { value: ArkMarkShape | ""; select: (value: ArkMarkShape) => void };
+type PickerEl = HTMLElement & {
+  value: ArkMarkShape | "";
+  shapes: ArkMarkShape[];
+  select: (value: ArkMarkShape) => void;
+};
 
 function createPicker(args: Partial<StoryArgs>): PickerEl {
   const el = document.createElement("ark-shape-picker") as PickerEl;
   el.setAttribute("label", "Forma do workspace");
   if (args.value) el.setAttribute("value", args.value);
+  if (args.shapes) el.setAttribute("shapes", args.shapes);
   if (args.color) el.setAttribute("color", args.color);
   if (args.disabled) el.setAttribute("disabled", "");
   if (args.size) el.setAttribute("size", args.size);
@@ -160,5 +171,75 @@ export const TestHooks = {
     await expect(options).toHaveLength(6);
     await expect(options[3]).toHaveAttribute("data-testid", "formas-option");
     await expect(options[3]).toHaveAttribute("data-value", "diamond");
+  }
+};
+
+// Opcional: `shapes` escolhe quais formas e em que ordem ("all" oferece as dez); sem ele ficam as seis de sempre.
+export const CustomShapes = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-3";
+    const all = createPicker({ value: "moon", shapes: "all", color: "#7c3aed", lang: "pt" });
+    all.setAttribute("label", "Todas as formas");
+    const subset = createPicker({
+      value: "hexagon",
+      shapes: "moon, cross, star, moon, nada",
+      color: "#16a34a",
+      lang: "pt"
+    });
+    subset.setAttribute("label", "Algumas formas");
+    wrap.append(all, subset);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const [all, subset] = Array.from(canvasElement.querySelectorAll("ark-shape-picker")) as PickerEl[];
+    const names = (host: PickerEl) =>
+      within(host)
+        .getAllByRole("radio")
+        .map((radio) => radio.getAttribute("aria-label"));
+
+    await expect(names(all)).toEqual([
+      "Círculo",
+      "Quadrado",
+      "Triângulo",
+      "Losango",
+      "Estrela",
+      "Hexágono",
+      "Cruz",
+      "Pentágono",
+      "Lua",
+      "Asterisco"
+    ]);
+    await expect(within(all).getByRole("radio", { name: "Lua" })).toHaveAttribute("aria-checked", "true");
+    within(all).getByRole("radio", { name: "Lua" }).focus();
+    await userEvent.keyboard("{End}");
+    await expect(all.value).toBe("asterisk");
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(all.value).toBe("circle");
+
+    // Ordem do atributo, repetidas e inválidas descartadas; um valor fora da lista não marca nenhuma opção.
+    await expect(subset.shapes).toEqual(["moon", "cross", "star"]);
+    await expect(names(subset)).toEqual(["Lua", "Cruz", "Estrela"]);
+    const radios = within(subset).getAllByRole("radio");
+    await expect(radios.every((radio) => radio.getAttribute("aria-checked") === "false")).toBe(true);
+    await expect(radios[0].tabIndex).toBe(0);
+    subset.select("square");
+    await expect(subset.value).toBe("hexagon");
+    await userEvent.click(within(subset).getByRole("radio", { name: "Cruz" }));
+    await expect(subset.value).toBe("cross");
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(subset.value).toBe("star");
+
+    // A propriedade aceita a lista; a string do atributo (o que um wrapper grava) também.
+    subset.shapes = ["pentagon", "asterisk"];
+    await expect(subset.getAttribute("shapes")).toBe("pentagon,asterisk");
+    await expect(names(subset)).toEqual(["Pentágono", "Asterisco"]);
+    (subset as unknown as { shapes: string }).shapes = "hexagon,circle";
+    await expect(names(subset)).toEqual(["Hexágono", "Círculo"]);
+    // Nenhuma válida (ou atributo removido) volta às seis padrão.
+    subset.setAttribute("shapes", "nada");
+    await expect(names(subset)).toHaveLength(6);
+    subset.removeAttribute("shapes");
+    await expect(names(subset)).toEqual(["Círculo", "Quadrado", "Triângulo", "Losango", "Estrela", "Hexágono"]);
   }
 };

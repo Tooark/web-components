@@ -10,6 +10,8 @@ export const ArkShapePicker = defineComponent({
     /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
     testid: { type: String, default: undefined },
     value: { type: String as PropType<ArkMarkShape>, default: undefined },
+    /** Formas oferecidas, na ordem, ou "all" para as dez. Padrao: as seis originais. */
+    shapes: { type: [Array, String] as PropType<ArkMarkShape[] | "all">, default: undefined },
     color: { type: String, default: undefined },
     label: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
@@ -25,6 +27,11 @@ export const ArkShapePicker = defineComponent({
         ...attrs,
         testid: props.testid,
         value: props.value,
+        shapes: Array.isArray(props.shapes)
+          ? props.shapes.length > 0
+            ? props.shapes.join(",")
+            : undefined
+          : props.shapes,
         color: props.color,
         label: props.label,
         disabled: props.disabled ? "" : undefined,

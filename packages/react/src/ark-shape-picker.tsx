@@ -8,6 +8,8 @@ import { useForwardedRef } from "./use-forwarded-ref.js";
 export type ArkShapePickerProps = ArkShapePickerStyleOptions & {
   /** Forma selecionada. */
   value?: ArkMarkShape;
+  /** Formas oferecidas, na ordem, ou "all" para as dez. Padrao: as seis originais. */
+  shapes?: ArkMarkShape[] | "all";
   /** Nome acessivel do radiogroup. */
   label?: string;
   disabled?: boolean;
@@ -18,7 +20,7 @@ export type ArkShapePickerProps = ArkShapePickerStyleOptions & {
 
 export const ArkShapePicker = forwardRef<ArkShapePickerElement, ArkShapePickerProps>(
   function ArkShapePicker(props, forwardedRef): React.JSX.Element {
-    const { className, disabled, localeJson, onChange, ...rest } = props;
+    const { className, disabled, shapes, localeJson, onChange, ...rest } = props;
     const [ref, setRef] = useForwardedRef<ArkShapePickerElement>(forwardedRef);
 
     useEffect(() => {
@@ -39,6 +41,7 @@ export const ArkShapePicker = forwardRef<ArkShapePickerElement, ArkShapePickerPr
       ref: setRef,
       class: className,
       disabled: disabled ? "" : undefined,
+      shapes: Array.isArray(shapes) ? (shapes.length > 0 ? shapes.join(",") : undefined) : shapes,
       "locale-json": localeJson
     };
 

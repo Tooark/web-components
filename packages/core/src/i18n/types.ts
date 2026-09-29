@@ -98,6 +98,14 @@ export interface ArkLocale {
   shapeStar: string;
   /** Nome da forma hexágono. */
   shapeHexagon: string;
+  /** Nome da forma cruz. */
+  shapeCross: string;
+  /** Nome da forma pentágono. */
+  shapePentagon: string;
+  /** Nome da forma lua. */
+  shapeMoon: string;
+  /** Nome da forma asterisco. */
+  shapeAsterisk: string;
   /** Rótulo acessível da alça que redimensiona painéis. */
   resize: string;
   /** Rótulo acessível da coluna de tipo do editor chave/valor. */
