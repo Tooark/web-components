@@ -17,24 +17,14 @@ const SHAPE_LABEL: Record<ArkMarkShape, keyof ArkLocale> = {
   asterisk: "shapeAsterisk"
 };
 
-/** As seis formas que o ark-shape-picker oferece sem `shapes`, na ordem em que aparecem. */
-export const ARK_SHAPE_PICKER_DEFAULT_SHAPES: ArkMarkShape[] = [
-  "circle",
-  "square",
-  "triangle",
-  "diamond",
-  "star",
-  "hexagon"
-];
-
 /**
  * Seletor de forma da marca de escopo: o PRÓPRIO host é o `role="radiogroup"`
  * com uma opção `role="radio"` por forma, renderizada pelo componente, cada
  * uma um ark-mark desenhado em `color` (a cor atual, para o usuário ver o par
- * real) e nomeada pelo nome localizado da forma. Sem `shapes` são as seis
- * formas padrão; `shapes` escolhe quais e em que ordem, e `all` oferece as
- * dez. Mesmo teclado do ark-color-swatches. `change` só quando a seleção muda
- * pelo usuário.
+ * real) e nomeada pelo nome localizado da forma. Sem `shapes` são as dez
+ * formas do ark-mark, na ordem de `ARK_MARK_SHAPES`; `shapes` escolhe quais e
+ * em que ordem. Mesmo teclado do ark-color-swatches. `change` só quando a
+ * seleção muda pelo usuário.
  */
 export class ArkShapePicker extends HTMLElementBase {
   static readonly tagName = "ark-shape-picker";
@@ -96,7 +86,7 @@ export class ArkShapePicker extends HTMLElementBase {
     }
   }
 
-  /** Formas oferecidas, na ordem (atributo `shapes`, separado por vírgula, ou "all"); sem nenhuma válida, as seis padrão. */
+  /** Formas oferecidas, na ordem (atributo `shapes`, separado por vírgula, ou "all"); sem nenhuma válida, as dez. */
   get shapes(): ArkMarkShape[] {
     const raw = (this.getAttribute("shapes") || "").trim().toLowerCase();
     if (raw === "all") return [...ARK_MARK_SHAPES];
@@ -105,7 +95,7 @@ export class ArkShapePicker extends HTMLElementBase {
       const shape = token.trim() as ArkMarkShape;
       if (ARK_MARK_SHAPES.includes(shape) && !list.includes(shape)) list.push(shape);
     }
-    return list.length > 0 ? list : [...ARK_SHAPE_PICKER_DEFAULT_SHAPES];
+    return list.length > 0 ? list : [...ARK_MARK_SHAPES];
   }
 
   set shapes(value: ArkMarkShape[] | string | null | undefined) {

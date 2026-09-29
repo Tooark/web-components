@@ -258,7 +258,7 @@ export type ArkColorSwatchesStyleOptions = {
 export type ArkShapePickerStyleOptions = {
   /** Propagado como data-testid ao host e sufixado nas opções. */
   testid?: string;
-  /** Cor CSS em que as seis formas são desenhadas. Padrão: a cor do texto ao redor. */
+  /** Cor CSS em que as formas são desenhadas. Padrão: a cor do texto ao redor. */
   color?: string;
   /** Tamanho das opções na escala de espaçamento. Padrão: "md". */
   size?: ArkSize;
