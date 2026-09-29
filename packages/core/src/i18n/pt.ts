@@ -44,6 +44,7 @@ export const pt: ArkLocale = {
   copied: "Copiado",
   noResults: "Nenhum resultado",
   search: "Buscar",
+  searching: "Buscando…",
   chooseFile: "Escolher arquivo",
   dropHint: "ou arraste e solte aqui",
   noFile: "Nenhum arquivo selecionado",

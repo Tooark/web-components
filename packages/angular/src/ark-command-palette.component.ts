@@ -20,6 +20,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.filter]="filter ? '' : null"
     [attr.query-delay]="queryDelay"
     [attr.label]="label"
+    [attr.hint]="hint"
+    [attr.busy]="busy ? '' : null"
     [attr.theme]="theme"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
@@ -58,6 +60,10 @@ export class ArkCommandPaletteComponent {
   @Input() queryDelay: number | undefined;
   /** Nome acessível do diálogo. */
   @Input() label: string | undefined;
+  /** Mensagem sem opções enquanto o campo está vazio (no lugar de `noResults`). */
+  @Input() hint: string | undefined;
+  /** Busca assíncrona em andamento: sem opções a mensagem vira `searching`, e o listbox fica aria-busy. */
+  @Input() busy = false;
   @Input() theme: ArkTheme = "auto";
   @Input() lang: ArkLang | undefined;
   @Input() localeJson: string | undefined;

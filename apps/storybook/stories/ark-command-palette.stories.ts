@@ -159,6 +159,86 @@ export const AsyncQuery = {
 
 const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0));
 
+// Busca assíncrona com `hint` e `busy`: sem itens, o campo vazio mostra a dica do app; ao digitar o app liga `busy`
+// (a mensagem vira "Buscando…" e o listbox fica aria-busy) e o desliga quando os resultados chegam.
+export const HintAndBusy = {
+  render: () => {
+    const palette = createPalette({ lang: "pt", queryDelay: 50, testid: "busca" }, []);
+    palette.setAttribute("hint", "Digite para buscar requisicoes e variaveis");
+    const clearItems = () => {
+      for (const item of Array.from(palette.querySelectorAll("ark-command-item"))) item.remove();
+    };
+    // O app liga busy já no input, para o intervalo do debounce não mostrar "Nenhum resultado".
+    palette.addEventListener("input", () => {
+      const pending = palette.query.trim() !== "";
+      (palette as PaletteEl & { busy: boolean }).busy = pending;
+      if (!pending) clearItems();
+    });
+    palette.addEventListener("ark-query", (event) => {
+      const query = (event as CustomEvent<{ query: string }>).detail.query.trim();
+      if (!query) return;
+      window.setTimeout(() => {
+        if (palette.query.trim() !== query) return;
+        clearItems();
+        if (query !== "zzz") {
+          for (const method of ["GET", "POST"]) {
+            palette.appendChild(
+              createItem({ value: `${method}-${query}`, label: `${method} /${query}`, group: "Resultados" })
+            );
+          }
+        }
+        (palette as PaletteEl & { busy: boolean }).busy = false;
+      }, 150);
+    });
+    return createScene(palette, 'Digite um caminho; "zzz" nao encontra nada.');
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const palette = canvasElement.querySelector("ark-command-palette") as PaletteEl & { busy: boolean };
+    const empty = () => canvasElement.querySelector('[data-testid="busca-empty"]') as HTMLElement;
+    const list = () => canvasElement.querySelector('[data-testid="busca-list"]') as HTMLElement;
+
+    palette.show();
+    await settled(palette);
+    const combobox = canvas.getByRole("combobox");
+    await expect(empty()).toBeVisible();
+    await expect(empty().textContent).toBe("Digite para buscar requisicoes e variaveis");
+    await expect(list()).not.toHaveAttribute("aria-busy");
+
+    // Digitando: busy até os resultados chegarem.
+    await userEvent.type(combobox, "users");
+    await expect(palette.busy).toBe(true);
+    await expect(empty().textContent).toBe("Buscando…");
+    await expect(list()).toHaveAttribute("aria-busy", "true");
+    await waitFor(() => expect(palette.querySelectorAll("ark-command-item")).toHaveLength(2));
+    await expect(empty()).not.toBeVisible();
+    await expect(list()).not.toHaveAttribute("aria-busy");
+
+    // Busca sem resultado: noResults, como antes.
+    await userEvent.clear(combobox);
+    await expect(empty().textContent).toBe("Digite para buscar requisicoes e variaveis");
+    await userEvent.type(combobox, "zzz");
+    await waitFor(() => expect(palette.busy).toBe(false));
+    await expect(empty()).toBeVisible();
+    await expect(empty().textContent).toBe("Nenhum resultado");
+
+    // busy com resultados na tela: a lista fica aria-busy e a mensagem continua oculta.
+    await userEvent.clear(combobox);
+    palette.appendChild(createItem({ value: "recente", label: "GET /recente" }));
+    palette.busy = true;
+    await expect(list()).toHaveAttribute("aria-busy", "true");
+    await waitFor(() => expect(empty()).not.toBeVisible());
+
+    // Sem hint, o campo vazio sem itens volta a mostrar noResults.
+    palette.busy = false;
+    palette.querySelector("ark-command-item")?.remove();
+    palette.removeAttribute("hint");
+    await waitFor(() => expect(empty().textContent).toBe("Nenhum resultado"));
+    palette.close();
+    await waitFor(() => expect(palette.matches(":popover-open")).toBe(false));
+  }
+};
+
 // Dialogo em popover com o combobox focado; filtro por label com grupos que somem junto; setas movem a ativa
 // (aria-activedescendant, pulando desabilitada, dando a volta); Enter seleciona e fecha; ark-query com
 // debounce; hotkey abre de fora e e ignorado num campo de texto; Esc fecha.
