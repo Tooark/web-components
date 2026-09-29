@@ -1,4 +1,4 @@
-import type { ArkKvBulkFormat, ArkKvRow, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkKvBulkFormat, ArkKvRow, ArkKvValueField, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref, watch } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
@@ -19,6 +19,8 @@ export const ArkKvEditor = defineComponent({
     valuePlaceholder: { type: String, default: undefined },
     descriptionPlaceholder: { type: String, default: undefined },
     readonly: { type: Boolean, default: false },
+    /** Cria a celula de valor de cada linha no lugar do ark-input; linhas secretas mantem o campo de senha. */
+    valueField: { type: Function as PropType<ArkKvValueField>, default: undefined },
     size: { type: String as PropType<ArkSize>, default: "md" },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     lang: { type: String as PropType<ArkLang>, default: undefined },
@@ -26,7 +28,7 @@ export const ArkKvEditor = defineComponent({
   },
   setup(props, { attrs, emit }) {
     ensureTooarkComponentsRegistered();
-    const elRef = ref<(HTMLElement & { rows: ArkKvRow[] }) | null>(null);
+    const elRef = ref<(HTMLElement & { rows: ArkKvRow[]; valueField: ArkKvValueField | null }) | null>(null);
 
     // `rows` e propriedade (objetos), nao atributo.
     const syncRows = () => {
@@ -34,11 +36,20 @@ export const ArkKvEditor = defineComponent({
     };
     watch(() => props.rows, syncRows, { deep: true });
 
+    // `valueField` e funcao, entao propriedade; so e gravada quando o app da uma, para o editor sem ela nao recriar
+    // as linhas na montagem. Uma funcao nova recria as celulas de valor.
+    const syncValueField = () => {
+      const el = elRef.value;
+      if (el && (props.valueField || el.valueField)) el.valueField = props.valueField ?? null;
+    };
+    watch(() => props.valueField, syncValueField);
+
     // Eventos customizados do DOM: ouvidos no elemento, nao pelo h(), que nao mapeia nomes com hifen.
     const addHandler = (event: Event) => emit("ark-add", event as CustomEvent<{ id: string }>);
     const deleteHandler = (event: Event) => emit("ark-delete", event as CustomEvent<{ id: string }>);
     onMounted(() => {
       syncRows();
+      syncValueField();
       elRef.value?.addEventListener("ark-add", addHandler);
       elRef.value?.addEventListener("ark-delete", deleteHandler);
     });

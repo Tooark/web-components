@@ -1,4 +1,4 @@
-import type { ArkKvEditorStyleOptions, ArkKvRow } from "@tooark/core";
+import type { ArkKvEditorStyleOptions, ArkKvRow, ArkKvValueField } from "@tooark/core";
 import type { ArkKvEditor as ArkKvEditorElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
@@ -20,6 +20,11 @@ export type ArkKvEditorProps = ArkKvEditorStyleOptions & {
   valuePlaceholder?: string;
   descriptionPlaceholder?: string;
   readonly?: boolean;
+  /**
+   * Cria a celula de valor de cada linha no lugar do ark-input (um campo com autocomplete de variaveis, por exemplo);
+   * linhas secretas mantem o campo de senha. Precisa ser estavel (useCallback): uma funcao nova recria as celulas.
+   */
+  valueField?: ArkKvValueField;
   className?: string;
   /** Qualquer edicao, inclusive ao sair do modo em massa: detail.rows sao as linhas. */
   onChange?: (event: CustomEvent<{ rows: ArkKvRow[] }>) => void;
@@ -41,6 +46,7 @@ export const ArkKvEditor = forwardRef<ArkKvEditorElement, ArkKvEditorProps>(
       valuePlaceholder,
       descriptionPlaceholder,
       readonly,
+      valueField,
       localeJson,
       onChange,
       onAdd,
@@ -57,6 +63,13 @@ export const ArkKvEditor = forwardRef<ArkKvEditorElement, ArkKvEditorProps>(
     useEffect(() => {
       if (ref.current && rows) ref.current.rows = rows;
     }, [ref, rows]);
+
+    // `valueField` e funcao, entao propriedade; so passa a ser gravada quando o app da uma, para o editor sem ela nao
+    // recriar as linhas na montagem.
+    useEffect(() => {
+      const el = ref.current;
+      if (el && (valueField || el.valueField)) el.valueField = valueField ?? null;
+    }, [ref, valueField]);
 
     useEffect(() => {
       const el = ref.current;

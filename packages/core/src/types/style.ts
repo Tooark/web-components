@@ -291,6 +291,22 @@ export type ArkKvRow = {
   secret?: boolean;
 };
 
+/** O que o ark-kv-editor entrega a `valueField` ao criar a célula de valor de uma linha. */
+export type ArkKvValueFieldContext = {
+  /** A linha (cópia), com o valor atual. */
+  row: ArkKvRow;
+  /** Tipo efetivo do valor (o da coluna de tipos, ou o da linha); vazio é texto. */
+  type: string;
+  /** Tamanho do editor, para a célula acompanhar a altura dos outros campos. */
+  size: ArkSize;
+};
+
+/**
+ * Cria a célula de valor de uma linha no lugar do ark-input (um campo com autocomplete de variáveis, por exemplo).
+ * O elemento expõe `value` (texto) e emite `input` ou `change` a cada edição; `null` mantém o ark-input na linha.
+ */
+export type ArkKvValueField = (context: ArkKvValueFieldContext) => HTMLElement | null | undefined;
+
 /** Props de estilo do ark-kv-editor. */
 export type ArkKvEditorStyleOptions = {
   /** Propagado como data-testid ao host e sufixado nas partes internas. */

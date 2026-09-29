@@ -167,6 +167,17 @@
     opacity: 0.5;
   }
 
+  /* ---------- ark-kv-editor: célula de valor vinda do app (valueField) ---------- */
+
+  /*
+   * A coluna do valor é minmax(0, 1fr), mas um item de grid tem min-width:
+   * auto: um campo do app com uma linha longa (um editor de código de uma
+   * linha, por exemplo) alargaria a linha em vez de rolar dentro da célula.
+   */
+  ark-kv-editor [data-ark-field="value"] {
+    min-width: 0;
+  }
+
   /* ---------- ark-dialog: painel em popover; cabeçalho e rodapé fixos por sticky ---------- */
 
   /*
