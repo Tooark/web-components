@@ -210,7 +210,17 @@ export type ArkRadioStyleOptions = {
 // Exports types específicos dos componentes de marca de escopo (mark, color-swatches, shape-picker)
 
 /** Formas do ark-mark. */
-export type ArkMarkShape = "circle" | "square" | "triangle" | "diamond" | "star" | "hexagon";
+export type ArkMarkShape =
+  | "circle"
+  | "square"
+  | "triangle"
+  | "diamond"
+  | "star"
+  | "hexagon"
+  | "cross"
+  | "pentagon"
+  | "moon"
+  | "asterisk";
 
 /** Props de estilo do ark-mark. */
 export type ArkMarkStyleOptions = {

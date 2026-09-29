@@ -10,15 +10,31 @@ const SHAPE_LABEL: Record<ArkMarkShape, keyof ArkLocale> = {
   triangle: "shapeTriangle",
   diamond: "shapeDiamond",
   star: "shapeStar",
-  hexagon: "shapeHexagon"
+  hexagon: "shapeHexagon",
+  cross: "shapeCross",
+  pentagon: "shapePentagon",
+  moon: "shapeMoon",
+  asterisk: "shapeAsterisk"
 };
+
+/** As seis formas que o ark-shape-picker oferece sem `shapes`, na ordem em que aparecem. */
+export const ARK_SHAPE_PICKER_DEFAULT_SHAPES: ArkMarkShape[] = [
+  "circle",
+  "square",
+  "triangle",
+  "diamond",
+  "star",
+  "hexagon"
+];
 
 /**
  * Seletor de forma da marca de escopo: o PRÓPRIO host é o `role="radiogroup"`
- * com seis opções `role="radio"` renderizadas pelo componente, cada uma um
- * ark-mark desenhado em `color` (a cor atual, para o usuário ver o par real)
- * e nomeada pelo nome localizado da forma. Mesmo teclado do
- * ark-color-swatches. `change` só quando a seleção muda pelo usuário.
+ * com uma opção `role="radio"` por forma, renderizada pelo componente, cada
+ * uma um ark-mark desenhado em `color` (a cor atual, para o usuário ver o par
+ * real) e nomeada pelo nome localizado da forma. Sem `shapes` são as seis
+ * formas padrão; `shapes` escolhe quais e em que ordem, e `all` oferece as
+ * dez. Mesmo teclado do ark-color-swatches. `change` só quando a seleção muda
+ * pelo usuário.
  */
 export class ArkShapePicker extends HTMLElementBase {
   static readonly tagName = "ark-shape-picker";
@@ -26,10 +42,14 @@ export class ArkShapePicker extends HTMLElementBase {
   private ownClasses: string[] = [];
   private syncingClass = false;
   private options: HTMLButtonElement[] = [];
+  /** Formas das opções renderizadas, na ordem dos botões. */
+  private offered: ArkMarkShape[] = [];
+  private rendered = false;
 
   static get observedAttributes(): string[] {
     return [
       "value",
+      "shapes",
       "color",
       "label",
       "aria-label",
@@ -49,7 +69,7 @@ export class ArkShapePicker extends HTMLElementBase {
   }
 
   connectedCallback(): void {
-    if (this.options.length === 0) this.render();
+    this.rendered = true;
     this.updateAppearance();
   }
 
@@ -58,7 +78,7 @@ export class ArkShapePicker extends HTMLElementBase {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
     }
-    if (this.options.length === 0 || !this.isConnected) return;
+    if (!this.rendered || !this.isConnected) return;
     this.updateAppearance();
   }
 
@@ -76,6 +96,27 @@ export class ArkShapePicker extends HTMLElementBase {
     }
   }
 
+  /** Formas oferecidas, na ordem (atributo `shapes`, separado por vírgula, ou "all"); sem nenhuma válida, as seis padrão. */
+  get shapes(): ArkMarkShape[] {
+    const raw = (this.getAttribute("shapes") || "").trim().toLowerCase();
+    if (raw === "all") return [...ARK_MARK_SHAPES];
+    const list: ArkMarkShape[] = [];
+    for (const token of raw.split(",")) {
+      const shape = token.trim() as ArkMarkShape;
+      if (ARK_MARK_SHAPES.includes(shape) && !list.includes(shape)) list.push(shape);
+    }
+    return list.length > 0 ? list : [...ARK_SHAPE_PICKER_DEFAULT_SHAPES];
+  }
+
+  set shapes(value: ArkMarkShape[] | string | null | undefined) {
+    const list = Array.isArray(value) ? value.join(",") : value || "";
+    if (list) {
+      this.setAttribute("shapes", list);
+    } else {
+      this.removeAttribute("shapes");
+    }
+  }
+
   get disabled(): boolean {
     return this.hasAttribute("disabled");
   }
@@ -84,12 +125,12 @@ export class ArkShapePicker extends HTMLElementBase {
     this.toggleAttribute("disabled", coerceBooleanAttr(value));
   }
 
-  /** Seleciona uma forma como o usuário faria: muda `value`, foca a opção e emite `change`. */
+  /** Seleciona uma forma oferecida como o usuário faria: muda `value`, foca a opção e emite `change`. */
   select(value: ArkMarkShape): void {
     const shape = normalizeMarkShape(value);
-    if (this.disabled || shape === this.value) return;
+    if (this.disabled || shape === this.value || !this.shapes.includes(shape)) return;
     this.setAttribute("value", shape);
-    this.options[ARK_MARK_SHAPES.indexOf(shape)]?.focus();
+    this.options[this.offered.indexOf(shape)]?.focus();
     this.dispatchEvent(new CustomEvent("change", { detail: { value: shape }, bubbles: true, composed: true }));
   }
 
@@ -118,7 +159,7 @@ export class ArkShapePicker extends HTMLElementBase {
     if (next === null) return;
     event.preventDefault();
     this.options[next].focus();
-    this.select(ARK_MARK_SHAPES[next]);
+    this.select(this.offered[next]);
   };
 
   private getLocale(): ArkLocale {
@@ -137,8 +178,13 @@ export class ArkShapePicker extends HTMLElementBase {
     return sizes[size] ?? sizes.md;
   }
 
-  private render(): void {
-    this.options = ARK_MARK_SHAPES.map((shape) => {
+  // Recria as opções só quando a lista oferecida muda (atributo `shapes`); cada botão sabe a própria forma.
+  private syncOptions(): void {
+    const shapes = this.shapes;
+    if (shapes.join(",") === this.offered.join(",")) return;
+    for (const option of this.options) option.remove();
+    this.offered = shapes;
+    this.options = shapes.map((shape) => {
       const button = document.createElement("button");
       button.type = "button";
       button.setAttribute("role", "radio");
@@ -171,6 +217,7 @@ export class ArkShapePicker extends HTMLElementBase {
     const sizing = this.getSizing();
     const color = this.getAttribute("color")?.trim() || "";
 
+    this.syncOptions();
     this.setAttribute("role", "radiogroup");
     // Só quando muda: aria-label é observado e um set igual reentraria aqui.
     const label = this.getAttribute("label");
@@ -187,10 +234,10 @@ export class ArkShapePicker extends HTMLElementBase {
         .filter(Boolean)
     );
 
-    const selectedIndex = value ? ARK_MARK_SHAPES.indexOf(value) : -1;
+    const selectedIndex = value ? this.offered.indexOf(value) : -1;
     const stop = selectedIndex >= 0 ? selectedIndex : 0;
     this.options.forEach((option, index) => {
-      const shape = ARK_MARK_SHAPES[index];
+      const shape = this.offered[index];
       const selected = index === selectedIndex;
       option.setAttribute("aria-label", String(locale[SHAPE_LABEL[shape]]));
       option.setAttribute("aria-checked", selected ? "true" : "false");
