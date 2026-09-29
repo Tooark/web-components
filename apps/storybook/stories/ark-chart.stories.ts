@@ -1,6 +1,6 @@
 import type { ArkChart, EChartsOption } from "@tooark/chart";
 import { createChart } from "@tooark/chart";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 
 const meta = {
   title: "Chart/ArkChart",
@@ -209,5 +209,28 @@ export const EngineAutoResize = {
     } finally {
       instance.destroy();
     }
+  }
+};
+
+// Hooks de E2E: o contêiner do gráfico leva `data-ark="chart"` e o `testid` como `data-testid`.
+export const TestHooks = {
+  render: () => {
+    const chart = document.createElement("ark-chart") as ArkChart;
+    chart.setAttribute("height", "200px");
+    chart.setAttribute("testid", "vendas");
+    chart.option = buildOption("bar");
+    return chart;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const chart = canvasElement.querySelector("ark-chart") as ArkChart;
+    const container = await waitFor(() => within(canvasElement).getByTestId("vendas"));
+    await expect(container).toHaveAttribute("data-ark", "chart");
+    await expect(container).toBe(chart.querySelector('[part="canvas"]'));
+
+    chart.setAttribute("testid", "receita");
+    await expect(container).toHaveAttribute("data-testid", "receita");
+    chart.removeAttribute("testid");
+    await expect(container.hasAttribute("data-testid")).toBe(false);
+    await expect(container).toHaveAttribute("data-ark", "chart");
   }
 };

@@ -3,6 +3,7 @@ import { type ArkWysiwygInstance, createWysiwygViewer } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
 /**
@@ -13,7 +14,8 @@ import { upgradeProperties } from "./upgrade-properties";
  * sanitizado ao entrar (`sanitizeWysiwygContent`), sem injetar HTML
  * arbitrário; links abrem em nova aba com `rel="noopener noreferrer nofollow"`.
  *
- * Conteúdo via propriedade `content` (JSON do Tiptap). Atributo: `theme`.
+ * Conteúdo via propriedade `content` (JSON do Tiptap). Atributos: `theme` e
+ * `testid` (`data-ark="wysiwyg-viewer"` na raiz e `-content` no conteúdo).
  */
 export class ArkWysiwygViewer extends HTMLElementBase {
   static readonly tagName = "ark-wysiwyg-viewer";
@@ -25,7 +27,7 @@ export class ArkWysiwygViewer extends HTMLElementBase {
   private disposeTheme: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
-    return ["theme"];
+    return ["theme", "testid"];
   }
 
   /** Conteúdo a renderizar como JSON do Tiptap. */
@@ -59,6 +61,7 @@ export class ArkWysiwygViewer extends HTMLElementBase {
       this.applyTheme(this.getTheme());
       this.syncThemeObserver();
     }
+    if (name === "testid") this.applyHooks();
   }
 
   private getTheme(): ArkWysiwygTheme {
@@ -89,7 +92,15 @@ export class ArkWysiwygViewer extends HTMLElementBase {
       theme: this.getTheme()
     });
     this.root.setAttribute("data-ark-theme", this.instance.resolvedTheme());
+    this.applyHooks();
     this.syncThemeObserver();
+  }
+
+  // Raiz e conteúdo levam os hooks de E2E, como os componentes de @tooark/web-components.
+  private applyHooks(): void {
+    if (!this.root || !this.instance) return;
+    applyTestHooks(this, "wysiwyg-viewer", this.root);
+    applyTestHooks(this, "wysiwyg-viewer", this.instance.editor.view.dom, "content");
   }
 
   // Em `auto`, a troca de tema da página re-resolve o tema do viewer; com tema fixo não há o que observar.

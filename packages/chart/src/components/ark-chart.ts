@@ -16,9 +16,11 @@ import { upgradeProperties } from "./upgrade-properties";
  *   document.body.appendChild(el);
  *
  * Atributos: `theme` ("auto" | "light" | "dark"), `renderer` ("canvas" | "svg"),
- * `height` (ex.: "320px" | "20rem") e `auto-resize` ("false" desliga). Em
- * `auto` o tema segue o color-scheme da página e acompanha a troca em
- * tempo de execução (`observeColorScheme` de @tooark/tokens).
+ * `height` (ex.: "320px" | "20rem"), `auto-resize` ("false" desliga) e
+ * `testid`. Em `auto` o tema segue o color-scheme da página e acompanha a
+ * troca em tempo de execução (`observeColorScheme` de @tooark/tokens). O
+ * contêiner do gráfico leva `data-ark="chart"` e o `testid` como
+ * `data-testid`.
  *
  * Eventos: dispara `ark-chart-click` (bubbles/composed) ao clicar em uma série,
  * com `detail` = params nativos do ECharts.
@@ -34,7 +36,7 @@ export class ArkChart extends HTMLElementBase {
   private disposeTheme: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
-    return ["theme", "renderer", "height", "auto-resize"];
+    return ["theme", "renderer", "height", "auto-resize", "testid"];
   }
 
   /** Opções nativas do ECharts. Atribuir re-renderiza o gráfico. */
@@ -81,6 +83,11 @@ export class ArkChart extends HTMLElementBase {
       return;
     }
 
+    if (name === "testid") {
+      this.applyHooks();
+      return;
+    }
+
     // theme / renderer exigem reconstrução da instância.
     this.render();
   }
@@ -117,6 +124,7 @@ export class ArkChart extends HTMLElementBase {
     container.style.height = this.getHeight();
     this.appendChild(container);
     this.container = container;
+    this.applyHooks();
 
     this.instance = createChart(container, {
       option: this.pendingOption,
@@ -138,6 +146,18 @@ export class ArkChart extends HTMLElementBase {
 
     this.syncAutoResize();
     this.syncThemeObserver();
+  }
+
+  // O contêiner leva o hook de E2E, como os componentes de @tooark/web-components.
+  private applyHooks(): void {
+    if (!this.container) return;
+    this.container.setAttribute("data-ark", "chart");
+    const testid = this.getAttribute("testid");
+    if (testid) {
+      this.container.setAttribute("data-testid", testid);
+    } else {
+      this.container.removeAttribute("data-testid");
+    }
   }
 
   // Em `auto`, a troca de tema da página (classe/atributo em html ou body, preferência do sistema) re-resolve o

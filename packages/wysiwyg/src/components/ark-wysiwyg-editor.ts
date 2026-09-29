@@ -17,6 +17,7 @@ import {
   type ArkWysiwygUploader
 } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
 type ToolbarAction = {
@@ -211,7 +212,8 @@ export class ArkWysiwygEditor extends HTMLElementBase {
       "locale-json",
       "colors",
       "highlights",
-      "max-file-size"
+      "max-file-size",
+      "testid"
     ];
   }
 
@@ -285,6 +287,10 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     if (name === "editable") {
       this.instance.setEditable(this.isEditable());
       this.syncToolbar();
+      return;
+    }
+    if (name === "testid") {
+      this.applyHooks();
       return;
     }
     // placeholder, toolbar, rótulos, paletas e limite exigem reconstrução.
@@ -429,7 +435,16 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     this.instance.editor.on("transaction", this.syncToolbar);
     this.syncToolbar();
     this.root.setAttribute("data-ark-theme", this.instance.resolvedTheme());
+    this.applyHooks();
     this.syncThemeObserver();
+  }
+
+  // Raiz, toolbar e conteúdo editável levam os hooks de E2E, como os componentes de @tooark/web-components.
+  private applyHooks(): void {
+    if (!this.root || !this.instance) return;
+    applyTestHooks(this, "wysiwyg-editor", this.root);
+    if (this.toolbarEl) applyTestHooks(this, "wysiwyg-editor", this.toolbarEl, "toolbar");
+    applyTestHooks(this, "wysiwyg-editor", this.instance.editor.view.dom, "content");
   }
 
   // Em `auto`, a troca de tema da página re-resolve o tema do editor; com tema fixo não há o que observar.
