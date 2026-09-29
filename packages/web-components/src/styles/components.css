@@ -276,6 +276,27 @@
     padding-bottom: 1.5rem;
   }
 
+  /* Ações do usuário (um container, como o rodapé) na linha do cabeçalho, entre o título e o fechar: vêm antes dele
+     (order), na altura da linha do título (pt-6 do cabeçalho), e ele sobe por cima delas com -mt-12 posto pelo
+     componente. Presas com ele ao rolar, acima do fundo dele; o título reserva a largura delas, medida pelo componente. */
+  ark-drawer > [slot="actions"] {
+    order: -1;
+    position: sticky;
+    top: 1.5rem;
+    z-index: 11;
+    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  /* O fechar ocupa 1.5rem (2rem com -mr-2) mais o gap-4 do cabeçalho. */
+  ark-drawer:where(:has(> [data-ark="drawer-header"] > [data-ark="drawer-close"])) > [slot="actions"] {
+    margin-right: 2.5rem;
+  }
+
   ark-drawer > [slot="footer"] {
     order: 1;
     position: sticky;

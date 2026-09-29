@@ -43,11 +43,12 @@ type ArkDrawerState = "closed" | "open" | "closing";
  * página e só anima (o console inferior, um painel lateral fixo). Os filhos
  * do usuário são o corpo e ficam onde estão; um filho `slot="footer"` vai ao
  * fim por CSS. O cabeçalho (título `h2` de `label` e botão de fechar) é o
- * primeiro filho, marcado `data-ark-chrome`. `side` escolhe a borda, a
- * direção do slide (com o easing `sheet`) e a borda desenhada; `size` é um
- * preset ou um comprimento CSS no eixo da gaveta. `open` é a fonte da
- * verdade, como no ark-dialog, e em overlay a página para de rolar enquanto
- * aberta, salvo com `no-scroll-lock`.
+ * primeiro filho, marcado `data-ark-chrome`; um container `slot="actions"`
+ * entra na linha dele por CSS, entre o título e o fechar. `side` escolhe a
+ * borda, a direção do slide (com o easing `sheet`) e a borda desenhada;
+ * `size` é um preset ou um comprimento CSS no eixo da gaveta. `open` é a fonte
+ * da verdade, como no ark-dialog, e em overlay a página para de rolar
+ * enquanto aberta, salvo com `no-scroll-lock`.
  */
 export class ArkDrawer extends HTMLElementBase {
   static readonly tagName = "ark-drawer";
@@ -56,6 +57,10 @@ export class ArkDrawer extends HTMLElementBase {
   private titleEl: HTMLHeadingElement | null = null;
   private closeEl: HTMLButtonElement | null = null;
   private observer: MutationObserver | null = null;
+  /** Mede o filho `slot="actions"`: a largura dele é o espaço que o título deixa livre na linha do cabeçalho. */
+  private actionsObserver: ResizeObserver | null = null;
+  /** O filho `slot="actions"` que o actionsObserver mede. */
+  private observedActions: HTMLElement | null = null;
   private ownClasses: string[] = [];
   private syncingClass = false;
   private state: ArkDrawerState = "closed";
@@ -93,7 +98,8 @@ export class ArkDrawer extends HTMLElementBase {
   connectedCallback(): void {
     upgradeProperties(this);
     if (!this.observer) {
-      this.observer = new MutationObserver(() => this.syncFooter());
+      // Rodapé e ações que chegam depois (frameworks) ganham o hook; as ações também mudam o cabeçalho.
+      this.observer = new MutationObserver(() => this.updateAppearance());
       this.observer.observe(this, { childList: true });
     }
     this.updateAppearance();
@@ -107,6 +113,9 @@ export class ArkDrawer extends HTMLElementBase {
   disconnectedCallback(): void {
     this.observer?.disconnect();
     this.observer = null;
+    this.actionsObserver?.disconnect();
+    this.actionsObserver = null;
+    this.observedActions = null;
     this.releaseTrap?.();
     this.releaseTrap = null;
     unlockScroll(this);
@@ -341,8 +350,8 @@ export class ArkDrawer extends HTMLElementBase {
       .filter(Boolean);
   }
 
-  private syncHeader(label: string | null, showClose: boolean): void {
-    if (!label && !showClose) {
+  private syncHeader(label: string | null, showClose: boolean, withActions: boolean): void {
+    if (!label && !showClose && !withActions) {
       this.headerEl?.remove();
       this.headerEl = null;
       this.titleEl = null;
@@ -356,8 +365,14 @@ export class ArkDrawer extends HTMLElementBase {
       this.prepend(header);
       this.headerEl = header;
     }
-    this.headerEl.className =
-      "ark:sticky ark:top-0 ark:z-10 ark:-mx-6 ark:flex ark:items-start ark:gap-4 ark:bg-surface ark:px-6 ark:pt-6 ark:pb-4";
+    // As ações vêm antes do cabeçalho (order) e ocupam 3rem até o fim da linha do título: ele sobe por cima desse
+    // espaço e guarda ao menos a altura dessa linha.
+    this.headerEl.className = [
+      "ark:sticky ark:top-0 ark:z-10 ark:-mx-6 ark:flex ark:items-start ark:gap-4 ark:bg-surface ark:px-6 ark:pt-6 ark:pb-4",
+      withActions ? "ark:-mt-12 ark:min-h-16" : ""
+    ]
+      .join(" ")
+      .trim();
 
     if (label) {
       if (!this.titleEl) {
@@ -367,7 +382,13 @@ export class ArkDrawer extends HTMLElementBase {
         this.titleEl = title;
       }
       this.titleEl.textContent = label;
-      this.titleEl.className = "ark:min-w-0 ark:flex-1 ark:text-base ark:leading-6 ark:font-semibold ark:text-fg";
+      // Com ações, o título deixa livre a largura medida delas mais o espaço entre as duas.
+      this.titleEl.className = [
+        "ark:min-w-0 ark:flex-1 ark:text-base ark:leading-6 ark:font-semibold ark:text-fg",
+        withActions ? "ark:me-[calc(var(--ark-drawer-actions-width,0px)+1rem)]" : ""
+      ]
+        .join(" ")
+        .trim();
     } else {
       this.titleEl?.remove();
       this.titleEl = null;
@@ -396,6 +417,26 @@ export class ArkDrawer extends HTMLElementBase {
   private syncFooter(): void {
     const footer = this.querySelector<HTMLElement>(':scope > [slot="footer"]');
     if (footer) applyTestHooks(this, "drawer", footer, "footer");
+  }
+
+  // Passa a medir o filho `slot="actions"` atual (ou nenhum). Sem ResizeObserver (SSR, jsdom) o título não reserva
+  // a largura delas, só o espaço entre os dois.
+  private syncActions(actions: HTMLElement | null): void {
+    if (actions) applyTestHooks(this, "drawer", actions, "actions");
+    if (actions === this.observedActions) return;
+    this.actionsObserver?.disconnect();
+    this.observedActions = actions;
+    if (!actions) {
+      this.style.removeProperty("--ark-drawer-actions-width");
+      return;
+    }
+    if (typeof ResizeObserver === "undefined") return;
+    if (!this.actionsObserver) {
+      this.actionsObserver = new ResizeObserver(() => {
+        this.style.setProperty("--ark-drawer-actions-width", `${this.observedActions?.offsetWidth ?? 0}px`);
+      });
+    }
+    this.actionsObserver.observe(actions);
   }
 
   private applyOwnClasses(next: string[]): void {
@@ -434,7 +475,9 @@ export class ArkDrawer extends HTMLElementBase {
     this.setAttribute("data-ark-side", this.side);
     this.setAttribute("data-ark-mode", this.mode);
 
-    this.syncHeader(label, !this.hasAttribute("no-close-button"));
+    const actions = this.querySelector<HTMLElement>(':scope > [slot="actions"]');
+    this.syncHeader(label, !this.hasAttribute("no-close-button"), actions !== null);
+    this.syncActions(actions);
 
     // Nome acessível: o título; sem ele um aria-label do usuário fica.
     if (label && this.titleEl) {
