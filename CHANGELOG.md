@@ -9,12 +9,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-09-28
+
 ### Added
 
 - `ark-mark`: four more shapes, `cross`, `pentagon`, `moon` and `asterisk` (ten in all), with their localized names
   (`shapeCross`, `shapePentagon`, `shapeMoon`, `shapeAsterisk` in en/pt/es); `ARK_MARK_SHAPES` lists the ten.
-- `ark-shape-picker` offers the ten shapes, and the opt-in `shapes` (comma-separated, or `all`) picks which ones and
-  in what order. `shapes` prop on the React, Vue and Angular wrappers.
+- `ark-shape-picker`: opt-in `shapes` (comma-separated, or `all`) picks which shapes are offered and in what order;
+  `shapes` prop on the React, Vue and Angular wrappers.
 - `ark-kv-editor`: opt-in `valueField` JS property (`ArkKvValueField`/`ArkKvValueFieldContext` in core), a function
   that creates each row's value cell in place of the `ark-input`, for a field with `{{variable}}` autocomplete such as
   a single-line `ark-code-editor`. Secret rows keep the password field, returning `null` keeps the `ark-input` in
@@ -51,6 +53,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Changed
 
+- `ark-shape-picker` offers all ten `ark-mark` shapes by default (it offered six); set `shapes` to keep a subset,
+  e.g. `shapes="circle,square,triangle,diamond,star,hexagon"` for the previous six.
+- `@tooark/react`: the wrappers are `forwardRef` components, so their declarations are
+  `ForwardRefExoticComponent<Props & RefAttributes<Element>>`; JSX usage and the `Ark*Props` types are unchanged.
 - README: the `ark-code-editor` section covers 1.2.0's scoped variables and single-line field; a note on the
   attributes mirrored on the host (`placeholder`, `aria-label` on `ark-input` and the fields built on it) and the test
   queries that find only the control; the side packages and `@tooark/motion` READMEs show how to use them in React,
@@ -58,6 +64,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - Storybook `Integration/Framework Props` also checks `ark-chart`, `ark-code-editor` and the wysiwyg tags, and new
   stories assign every property of every tag, and `open` on the overlays, before the element is registered.
   `pnpm check:ssr` checks that each Angular wrapper's `element` queries its own tag.
+- The dependency tables of every package README list the 1.3.0 ranges.
 
 ## [1.2.2] - 2026-09-28
 
@@ -225,7 +232,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.2.2...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/Tooark/web-components/compare/v1.2.2...v1.3.0
 [1.2.2]: https://github.com/Tooark/web-components/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/Tooark/web-components/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/Tooark/web-components/compare/v1.1.0...v1.2.0
