@@ -811,6 +811,24 @@ Bugs e pedidos de funcionalidade entram pelos [templates de issue](https://githu
 
 ---
 
+## Ajuda & Segurança
+
+- ❓ **Dúvidas, bugs e ideias** — veja o [SUPPORT.md](SUPPORT.md) para escolher o canal certo
+- 🔒 **Vulnerabilidades de segurança** — **não** abra issue pública; siga o [SECURITY.md](SECURITY.md)
+
+---
+
+## Apoie
+
+Se este projeto ajuda no seu dia a dia, considere apoiar o desenvolvimento:
+
+- 💙 [GitHub Sponsors](https://github.com/sponsors/paulosfjunior)
+- ☕ [Ko-fi](https://ko-fi.com/paulosfjunior)
+
+Cada contribuição ajuda a manter o projeto ativo e em evolução. Obrigado! 🙏
+
+---
+
 ## Licença
 
 Licenciado sob a [Apache License 2.0](LICENSE) © 2026 Tooark.

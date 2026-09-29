@@ -18,6 +18,8 @@
 - [Usage examples](#-usage-examples)
 - [Dependencies](#-dependencies)
 - [Contributing](#-contributing)
+- [Help & Security](#-help--security)
+- [Support](#-support)
 - [License](#-license)
 
 ---
@@ -176,6 +178,24 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 ## 🪪 Contributing
 
 Contributions are welcome! Open issues and pull requests in the [Tooark/web-components](https://github.com/Tooark/web-components/issues) repository; [CONTRIBUTING.md](https://github.com/Tooark/web-components/blob/main/CONTRIBUTING.md) covers the workflow, the commit convention and the checklist. `@tooark/code` is released in lockstep with every other `@tooark/*` package.
+
+---
+
+## 🆘 Help & Security
+
+- ❓ **Questions, bugs, feature ideas** — see [SUPPORT.md](https://github.com/Tooark/web-components/blob/main/SUPPORT.md) for the right channel
+- 🔒 **Security vulnerabilities** — do **not** open a public issue; follow [SECURITY.md](https://github.com/Tooark/web-components/blob/main/SECURITY.md)
+
+---
+
+## 💖 Support
+
+If this project helps your workflow, consider supporting its development:
+
+- 💙 [GitHub Sponsors](https://github.com/sponsors/paulosfjunior)
+- ☕ [Ko-fi](https://ko-fi.com/paulosfjunior)
+
+Every contribution helps keep the project maintained and improving. Thank you! 🙏
 
 ---
 

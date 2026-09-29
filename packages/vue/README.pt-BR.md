@@ -18,6 +18,8 @@ Wrappers Vue 3 dos Tooark Web Components: props tipadas, eventos com o nome nati
 - [Exemplos de Uso](#-exemplos-de-uso)
 - [Dependências](#-dependências)
 - [Contribuição](#-contribuição)
+- [Ajuda & Segurança](#-ajuda--segurança)
+- [Apoie](#-apoie)
 - [Licença](#-licença)
 
 ---
@@ -160,6 +162,24 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 ## 🪪 Contribuição
 
 Contribuições são bem-vindas! Abra issues e pull requests no repositório [Tooark/web-components](https://github.com/Tooark/web-components/issues); o [CONTRIBUTING.md](https://github.com/Tooark/web-components/blob/main/CONTRIBUTING.md) cobre o fluxo, a convenção de commits e o checklist. O `@tooark/vue` é publicado em conjunto com todos os outros pacotes `@tooark/*`, numa única versão.
+
+---
+
+## 🆘 Ajuda & Segurança
+
+- ❓ **Dúvidas, bugs e ideias** — veja o [SUPPORT.md](https://github.com/Tooark/web-components/blob/main/SUPPORT.md) para escolher o canal certo
+- 🔒 **Vulnerabilidades de segurança** — **não** abra issue pública; siga o [SECURITY.md](https://github.com/Tooark/web-components/blob/main/SECURITY.md)
+
+---
+
+## 💖 Apoie
+
+Se este projeto ajuda no seu dia a dia, considere apoiar o desenvolvimento:
+
+- 💙 [GitHub Sponsors](https://github.com/sponsors/paulosfjunior)
+- ☕ [Ko-fi](https://ko-fi.com/paulosfjunior)
+
+Cada contribuição ajuda a manter o projeto ativo e em evolução. Obrigado! 🙏
 
 ---
 
