@@ -1,4 +1,4 @@
-import { type ArkKvRow, type ArkSchedulerEvent, toast } from "@tooark/core";
+import { type ArkKvRow, type ArkKvValueField, type ArkMarkShape, type ArkSchedulerEvent, toast } from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
@@ -10,15 +10,18 @@ import {
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
   ArkScheduler as ReactArkScheduler,
+  ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
   ArkTextarea as ReactArkTextarea,
   ArkToaster as ReactArkToaster
 } from "@tooark/react";
 import {
   ArkButton as VueArkButton,
+  ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
   ArkScheduler as VueArkScheduler,
+  ArkShapePicker as VueArkShapePicker,
   ArkToaster as VueArkToaster
 } from "@tooark/vue";
 import type {
@@ -432,5 +435,105 @@ export const ReactForwardedRef = {
     await expect(kvCalls.map((node) => node?.tagName ?? null)).toEqual(["ARK-KV-EDITOR", null]);
     await expect(switchCalls).toHaveLength(1);
     await expect(switchCleanups).toBe(1);
+  }
+};
+
+// Célula de valor do app para os testes de wrapper: um <input> nativo basta para provar o encanamento.
+const nativeValueField: ArkKvValueField = () => {
+  const input = document.createElement("input");
+  input.setAttribute("data-origem", "app");
+  return input;
+};
+
+const VALUE_ROWS: ArkKvRow[] = [{ id: "v1", key: "host", value: "{{baseUrl}}", enabled: true }];
+
+function valueCells(root: HTMLElement): HTMLElement[] {
+  return Array.from(root.querySelectorAll('ark-kv-editor [data-ark-chrome="row"] > [data-ark-field="value"]'));
+}
+
+// `valueField` vai como propriedade (função) e `shapes` como a lista do atributo; sem `valueField` o editor fica como
+// sempre, sem a propriedade gravada.
+export const ReactKvValueFieldAndShapes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const changes: ArkKvRow[][] = [];
+    const onChange = (event: CustomEvent<{ rows: ArkKvRow[] }>) => changes.push(event.detail.rows);
+    const tree = (withField: boolean) =>
+      createElement("div", null, [
+        createElement(ReactArkKvEditor, {
+          key: "kv",
+          rows: VALUE_ROWS,
+          valueField: withField ? nativeValueField : undefined,
+          onChange
+        }),
+        createElement(ReactArkShapePicker, { key: "shapes", shapes: ["moon", "cross", "asterisk"] })
+      ]);
+
+    render(tree(false));
+    const editor = canvasElement.querySelector("ark-kv-editor") as ArkKvEditorElement;
+    await expect(editor.valueField).toBeNull();
+    await expect(valueCells(canvasElement)[0].localName).toBe("ark-input");
+
+    render(tree(true));
+    const [cell] = valueCells(canvasElement) as HTMLInputElement[];
+    await expect(cell).toHaveAttribute("data-origem", "app");
+    await expect(cell.value).toBe("{{baseUrl}}");
+    cell.value = "{{baseUrl}}/v2";
+    cell.dispatchEvent(new Event("input", { bubbles: true }));
+    await expect(changes[changes.length - 1]?.[0].value).toBe("{{baseUrl}}/v2");
+
+    render(tree(false));
+    await expect(valueCells(canvasElement)[0].localName).toBe("ark-input");
+
+    const radios = Array.from(canvasElement.querySelectorAll('ark-shape-picker [role="radio"]'));
+    await expect(radios.map((radio) => radio.getAttribute("data-value"))).toEqual(["moon", "cross", "asterisk"]);
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueKvValueFieldAndShapes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const field = ref<ArkKvValueField | undefined>(undefined);
+    const shapes = ref<ArkMarkShape[] | "all">(["pentagon", "star"]);
+    const changes: ArkKvRow[][] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(VueArkKvEditor, {
+            rows: VALUE_ROWS,
+            valueField: field.value,
+            onChange: (event: CustomEvent<{ rows: ArkKvRow[] }>) => changes.push(event.detail.rows)
+          }),
+          h(VueArkShapePicker, { shapes: shapes.value })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+
+    const editor = canvasElement.querySelector("ark-kv-editor") as ArkKvEditorElement;
+    await expect(editor.valueField).toBeNull();
+    await expect(valueCells(canvasElement)[0].localName).toBe("ark-input");
+
+    field.value = nativeValueField;
+    await nextTick();
+    const [cell] = valueCells(canvasElement) as HTMLInputElement[];
+    await expect(cell).toHaveAttribute("data-origem", "app");
+    cell.value = "{{baseUrl}}/v3";
+    cell.dispatchEvent(new Event("input", { bubbles: true }));
+    await expect(changes[changes.length - 1]?.[0].value).toBe("{{baseUrl}}/v3");
+
+    const picker = canvasElement.querySelector("ark-shape-picker") as HTMLElement;
+    const values = () =>
+      Array.from(picker.querySelectorAll('[role="radio"]')).map((radio) => radio.getAttribute("data-value"));
+    await expect(values()).toEqual(["pentagon", "star"]);
+    shapes.value = "all";
+    await nextTick();
+    await expect(values()).toHaveLength(10);
+    await expect(problems).toEqual([]);
   }
 };

@@ -72,6 +72,8 @@ export type {
   ArkKvBulkFormat,
   ArkKvEditorStyleOptions,
   ArkKvRow,
+  ArkKvValueField,
+  ArkKvValueFieldContext,
   ArkLang,
   ArkMarkShape,
   ArkMarkStyleOptions,

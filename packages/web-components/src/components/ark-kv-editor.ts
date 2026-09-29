@@ -1,6 +1,7 @@
 import {
   type ArkKvBulkFormat,
   type ArkKvRow,
+  type ArkKvValueField,
   type ArkLocale,
   type ArkSize,
   announce,
@@ -67,11 +68,14 @@ function cloneRow(row: Partial<ArkKvRow>): ArkKvRow {
   return next;
 }
 
+/** Célula de valor: o ark-input do componente ou o elemento que `valueField` criou. */
+type ValueCell = HTMLElement & { value: string };
+
 /** Nós de uma linha renderizada. */
 type RowParts = {
   enabled: ArkCheckbox;
   key: ArkInput;
-  value: ArkInput;
+  value: ValueCell;
   secret: ArkButton | null;
   type: ArkSelect | null;
   description: ArkInput | null;
@@ -91,7 +95,9 @@ type RowParts = {
  * preservados por posição) ou "json" (array com todos os campos). `change`
  * publica as linhas a cada edição, inclusive ao sair do modo em massa;
  * adicionar e remover anunciam a contagem ao leitor de tela. A célula de
- * valor é um ark-input comum: autocomplete de variáveis fica no app.
+ * valor é um ark-input; a propriedade `valueField` troca pelo elemento que o
+ * app criar (um campo com autocomplete de `{{variável}}`, por exemplo), exceto
+ * nas linhas secretas, que mantêm o campo de senha.
  */
 export class ArkKvEditor extends HTMLElementBase {
   static readonly tagName = "ark-kv-editor";
@@ -114,6 +120,10 @@ export class ArkKvEditor extends HTMLElementBase {
   private bulkBase: ArkKvRow[] | null = null;
   /** Último texto em massa que o próprio componente escreveu, para não sobrescrever o que o usuário digita. */
   private bulkWritten = "";
+  /** Fábrica da célula de valor (`valueField`); sem ela, todo valor é um ark-input. */
+  private valueFactory: ArkKvValueField | null = null;
+  /** Células de valor criadas pela fábrica, que não recebem `type`/`reveal` do ark-input. */
+  private customCells = new WeakSet<Element>();
 
   static get observedAttributes(): string[] {
     return [
@@ -241,6 +251,21 @@ export class ArkKvEditor extends HTMLElementBase {
     this.toggleAttribute("secret", coerceBooleanAttr(value));
   }
 
+  /**
+   * Fábrica da célula de valor (propriedade JS): o elemento que ela devolve substitui o ark-input da linha, exceto
+   * nas linhas secretas, que mantêm o campo de senha; `null` numa linha mantém o ark-input nela.
+   */
+  get valueField(): ArkKvValueField | null {
+    return this.valueFactory;
+  }
+
+  set valueField(value: ArkKvValueField | null | undefined) {
+    this.valueFactory = typeof value === "function" ? value : null;
+    // As células de valor são recriadas com a fábrica nova.
+    this.resetRows();
+    if (this.isConnected) this.updateAppearance();
+  }
+
   get readonly(): boolean {
     return this.hasAttribute("readonly");
   }
@@ -294,6 +319,11 @@ export class ArkKvEditor extends HTMLElementBase {
 
   private getLocale(): ArkLocale {
     return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+  }
+
+  // Tipo efetivo: com a coluna de tipos, o que o select mostra (o da linha se está na lista, senão o primeiro).
+  private effectiveType(row: ArkKvRow, types: string[]): string | undefined {
+    return types.length > 0 ? (row.type && types.includes(row.type) ? row.type : types[0]) : row.type;
   }
 
   private getSize(): ArkSize {
@@ -461,14 +491,7 @@ export class ArkKvEditor extends HTMLElementBase {
     });
 
     const key = this.createField(row.id, "key", size);
-    const value = this.createField(row.id, "value", size);
-    // Enter no valor da última linha acrescenta a próxima, como numa tabela.
-    value.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" || this.readonly) return;
-      if (this.model[this.model.length - 1]?.id !== row.id) return;
-      event.preventDefault();
-      this.add();
-    });
+    const value = this.createValueCell(row, size);
 
     const remove = document.createElement("ark-button") as ArkButton;
     remove.setAttribute("variant", "ghost");
@@ -516,15 +539,66 @@ export class ArkKvEditor extends HTMLElementBase {
     return el;
   }
 
+  // Célula de valor: com `valueField` e fora das linhas secretas, o elemento da fábrica; senão o ark-input.
+  private createValueCell(row: ArkKvRow, size: ArkSize): ValueCell {
+    const custom =
+      this.valueFactory && !(this.secret && row.secret === true)
+        ? this.valueFactory({ row: { ...row }, type: this.effectiveType(row, this.types) ?? "", size })
+        : null;
+
+    if (!(custom instanceof HTMLElement)) {
+      const value = this.createField(row.id, "value", size);
+      // Enter no valor da última linha acrescenta a próxima, como numa tabela.
+      value.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" || this.readonly) return;
+        if (this.model[this.model.length - 1]?.id !== row.id) return;
+        event.preventDefault();
+        this.add();
+      });
+      return value;
+    }
+
+    const cell = custom as ValueCell;
+    cell.setAttribute("data-ark-field", "value");
+    this.customCells.add(cell);
+    // O campo do app pode emitir `input` antes de atualizar `value` (e `change` depois): só um valor novo conta.
+    const sync = (): void => {
+      const current = this.model.find((item) => item.id === row.id);
+      const next = cell.value;
+      if (!current || typeof next !== "string" || next === current.value) return;
+      current.value = next;
+      this.emitChange();
+    };
+    cell.addEventListener("input", (event) => {
+      event.stopPropagation();
+      sync();
+    });
+    cell.addEventListener("change", sync);
+    // Enter que o campo não consumiu, ou o `ark-submit` de um campo que consome o Enter, na última linha acrescenta
+    // a próxima.
+    const addNext = (event: Event): void => {
+      if (this.readonly || event.defaultPrevented) return;
+      if (this.model[this.model.length - 1]?.id !== row.id) return;
+      if (event.cancelable) event.preventDefault();
+      this.add();
+    };
+    cell.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") addNext(event);
+    });
+    cell.addEventListener("ark-submit", addNext);
+    return cell;
+  }
+
+  // Filhos diretos da linha: uma célula de valor do app pode ter botões, selects e campos próprios dentro.
   private rowParts(el: HTMLDivElement): RowParts {
     return {
-      enabled: el.querySelector("ark-checkbox") as ArkCheckbox,
-      key: el.querySelector('ark-input[data-ark-field="key"]') as ArkInput,
-      value: el.querySelector('ark-input[data-ark-field="value"]') as ArkInput,
-      secret: this.secret ? (el.querySelector("ark-button") as ArkButton) : null,
-      type: el.querySelector("ark-select"),
-      description: el.querySelector('ark-input[data-ark-field="description"]'),
-      remove: el.querySelector("ark-button:last-of-type") as ArkButton
+      enabled: el.querySelector(":scope > ark-checkbox") as ArkCheckbox,
+      key: el.querySelector(':scope > ark-input[data-ark-field="key"]') as ArkInput,
+      value: el.querySelector(':scope > [data-ark-field="value"]') as ValueCell,
+      secret: this.secret ? (el.querySelector(":scope > ark-button") as ArkButton) : null,
+      type: el.querySelector(":scope > ark-select"),
+      description: el.querySelector(':scope > ark-input[data-ark-field="description"]'),
+      remove: el.querySelector(":scope > ark-button:last-of-type") as ArkButton
     };
   }
 
@@ -570,6 +644,19 @@ export class ArkKvEditor extends HTMLElementBase {
       if (el !== anchor) this.listEl.insertBefore(el, anchor);
       previous = el;
 
+      const rowType = this.effectiveType(row, types);
+      const isSecret = withSecret && row.secret === true;
+
+      // Com `valueField`, segredo e tipo decidem a célula (a fábrica recebe o tipo, o segredo fica no campo de
+      // senha): quando mudam, a célula de valor é recriada. Sem fábrica o ark-input só troca de `type`.
+      if (this.valueFactory) {
+        const valueKey = `${isSecret}|${rowType ?? ""}`;
+        if (el.dataset.arkValueKey !== undefined && el.dataset.arkValueKey !== valueKey) {
+          this.rowParts(el).value.replaceWith(this.createValueCell(row, size));
+        }
+        el.dataset.arkValueKey = valueKey;
+      }
+
       const parts = this.rowParts(el);
       el.className = [
         "ark:grid ark:items-center ark:gap-2 ark:px-3 ark:py-1.5",
@@ -583,7 +670,7 @@ export class ArkKvEditor extends HTMLElementBase {
       parts.enabled.disabled = readonly;
       parts.enabled.setAttribute("size", size);
 
-      const fields: Array<[ArkInput | null, string, string, string]> = [
+      const fields: Array<[ValueCell | null, string, string, string]> = [
         [parts.key, row.key, keyPlaceholder, "key"],
         [parts.value, row.value, valuePlaceholder, "value"],
         [parts.description, row.description ?? "", descriptionPlaceholder, "description"]
@@ -598,13 +685,12 @@ export class ArkKvEditor extends HTMLElementBase {
         applyTestHooks(this, "kv-editor", input, name);
       }
 
-      // Tipo efetivo: com a coluna de tipos, o que o select mostra (o da linha se está na lista, senão o primeiro).
-      const rowType = types.length > 0 ? (row.type && types.includes(row.type) ? row.type : types[0]) : row.type;
-
-      // Campo de valor: senha com o olho quando é segredo; senão o tipo efetivo (number, date...) ou texto.
-      const isSecret = withSecret && row.secret === true;
-      parts.value.setAttribute("type", isSecret ? "password" : (VALUE_INPUT_TYPES[rowType ?? ""] ?? "text"));
-      parts.value.toggleAttribute("reveal", isSecret);
+      // Campo de valor: senha com o olho quando é segredo; senão o tipo efetivo (number, date...) ou texto. A célula
+      // da fábrica decide o próprio tipo (recebe `type` no contexto).
+      if (!this.customCells.has(parts.value)) {
+        parts.value.setAttribute("type", isSecret ? "password" : (VALUE_INPUT_TYPES[rowType ?? ""] ?? "text"));
+        parts.value.toggleAttribute("reveal", isSecret);
+      }
 
       if (parts.secret) {
         parts.secret.setAttribute("aria-label", locale.secret);

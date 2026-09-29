@@ -11,7 +11,7 @@ import {
   type SimpleChanges,
   ViewChild
 } from "@angular/core";
-import type { ArkKvBulkFormat, ArkKvRow, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkKvBulkFormat, ArkKvRow, ArkKvValueField, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -60,6 +60,8 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
   @Input() valuePlaceholder: string | undefined;
   @Input() descriptionPlaceholder: string | undefined;
   @Input() readonly = false;
+  /** Cria a célula de valor de cada linha no lugar do ark-input; linhas secretas mantêm o campo de senha. */
+  @Input() valueField: ArkKvValueField | undefined;
   @Input() size: ArkSize = "md";
   @Input() theme: ArkTheme = "auto";
   @Input() lang: ArkLang | undefined;
@@ -69,7 +71,9 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
   @Output() arkAdd = new EventEmitter<CustomEvent<{ id: string }>>();
   @Output() arkDelete = new EventEmitter<CustomEvent<{ id: string }>>();
 
-  @ViewChild("editor", { static: false }) editorRef!: ElementRef<HTMLElement & { rows: ArkKvRow[] }>;
+  @ViewChild("editor", { static: false }) editorRef!: ElementRef<
+    HTMLElement & { rows: ArkKvRow[]; valueField: ArkKvValueField | null }
+  >;
 
   get typesAttr(): string | null {
     return this.types && this.types.length > 0 ? this.types.join(",") : null;
@@ -80,6 +84,7 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
 
   ngAfterViewInit(): void {
     this.syncRows();
+    this.syncValueField();
     this.editorRef?.nativeElement?.addEventListener("ark-add", this.addHandler);
     this.editorRef?.nativeElement?.addEventListener("ark-delete", this.deleteHandler);
   }
@@ -87,6 +92,7 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
   ngOnChanges(changes: SimpleChanges): void {
     // Só um `rows` novo substitui o modelo: bulk, readonly ou theme mudando não podem apagar o que o usuário editou.
     if (changes.rows) this.syncRows();
+    if (changes.valueField) this.syncValueField();
   }
 
   ngOnDestroy(): void {
@@ -101,5 +107,11 @@ export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy
   private syncRows(): void {
     const el = this.editorRef?.nativeElement;
     if (el && this.rows) el.rows = this.rows;
+  }
+
+  // Função, então propriedade; só é gravada quando o app dá uma, para o editor sem ela não recriar as linhas.
+  private syncValueField(): void {
+    const el = this.editorRef?.nativeElement;
+    if (el && (this.valueField || el.valueField)) el.valueField = this.valueField ?? null;
   }
 }

@@ -1,4 +1,5 @@
-import type { ArkKvBulkFormat, ArkKvRow, ArkSize, ArkTheme } from "@tooark/core";
+import type { EditorView } from "@codemirror/view";
+import type { ArkKvBulkFormat, ArkKvRow, ArkKvValueField, ArkSize, ArkTheme } from "@tooark/core";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -8,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Editor de pares chave/valor: linhas { id, key, value, enabled } com ativar, editar, remover e adicionar. Colunas opcionais: `types` (select do tipo do valor por linha: string, number, date, time, datetime, email, url; o campo de valor segue o tipo), `secret` (cadeado por linha: fechado, o valor vira campo de senha com o olho para revelar) e `description`. Modo em massa em `bulk-format` lines (`chave:valor` por linha, `#` desativa) ou json (array com todos os campos). Compoe ark-checkbox, ark-input, ark-select, ark-textarea e ark-button porque renderiza tudo a partir de `rows`. `change` publica as linhas a cada edicao; adicionar e remover anunciam a contagem. A celula de valor e um ark-input comum: autocomplete de variaveis fica no app."
+          "Editor de pares chave/valor: linhas { id, key, value, enabled } com ativar, editar, remover e adicionar. Colunas opcionais: `types` (select do tipo do valor por linha: string, number, date, time, datetime, email, url; o campo de valor segue o tipo), `secret` (cadeado por linha: fechado, o valor vira campo de senha com o olho para revelar) e `description`. Modo em massa em `bulk-format` lines (`chave:valor` por linha, `#` desativa) ou json (array com todos os campos). Compoe ark-checkbox, ark-input, ark-select, ark-textarea e ark-button porque renderiza tudo a partir de `rows`. `change` publica as linhas a cada edicao; adicionar e remover anunciam a contagem. A celula de valor e um ark-input; a propriedade `valueField` troca pelo campo que o app criar (um ark-code-editor de uma linha com `{{variavel}}`, por exemplo), exceto nas linhas secretas."
       }
     }
   },
@@ -70,6 +71,7 @@ type EditorEl = HTMLElement & {
   secret: boolean;
   add: (row?: Partial<ArkKvRow>) => ArkKvRow;
   delete: (id: string) => void;
+  valueField: ArkKvValueField | null;
 };
 
 const HEADERS: ArkKvRow[] = [
@@ -442,5 +444,98 @@ export const TestHooks = {
         `cabecalhos-${part}`
       );
     }
+  }
+};
+
+type CodeFieldEl = HTMLElement & { value: string; view: EditorView | null; variables: unknown[] };
+
+// O caso que a costura resolve: um ark-code-editor de uma linha, com as variaveis pintadas e completadas depois de
+// `{{`, no lugar do ark-input de cada valor. Linhas de tipo number ficam com o ark-input (a fabrica devolve null).
+function variableField({ size, type }: Parameters<ArkKvValueField>[0]): HTMLElement | null {
+  if (type === "number") return null;
+  const field = document.createElement("ark-code-editor") as CodeFieldEl;
+  field.setAttribute("single-line", "");
+  field.setAttribute("size", size);
+  field.variables = [
+    { key: "token", scope: "Ambiente", intent: "success", value: "abc123" },
+    { key: "baseUrl", scope: "Global", intent: "info", value: "https://api.exemplo.dev" }
+  ];
+  return field;
+}
+
+export const ValueField = {
+  render: () => {
+    const args = { lang: "pt", keyPlaceholder: "Chave", valuePlaceholder: "Valor", testid: "cabecalhos" } as const;
+    const editor = createEditor({ ...args, secret: true, types: "string,number" }, [
+      ...HEADERS.slice(0, 2),
+      { id: "h4", key: "X-Api-Key", value: "segredo", enabled: true, secret: true }
+    ]);
+    editor.valueField = variableField;
+    return editor;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvasElement.querySelector("ark-kv-editor") as EditorEl;
+    const published: ArkKvRow[][] = [];
+    editor.addEventListener("change", (event) =>
+      published.push((event as CustomEvent<{ rows: ArkKvRow[] }>).detail.rows)
+    );
+    const valueCell = (index: number) =>
+      editor.querySelectorAll('[data-ark-chrome="row"]')[index].querySelector(':scope > [data-ark-field="value"]') as
+        | CodeFieldEl
+        | HTMLElement;
+
+    // As linhas comuns ganham o campo do app, com o valor, os hooks e o nome acessivel no conteudo editavel.
+    const first = valueCell(0) as CodeFieldEl;
+    await expect(first.localName).toBe("ark-code-editor");
+    await waitFor(() => expect(first.view).not.toBeNull());
+    await expect(first.value).toBe("application/json");
+    await expect((valueCell(1) as CodeFieldEl).value).toBe("Bearer {{token}}");
+    await expect(first).toHaveAttribute("data-ark", "kv-editor-value");
+    await expect(first).toHaveAttribute("data-testid", "cabecalhos-value");
+    await expect(first.querySelector(".cm-content")).toHaveAttribute("aria-label", "Valor");
+    // A linha secreta fica no campo de senha do componente.
+    await expect(valueCell(2).localName).toBe("ark-input");
+    await expect(valueCell(2)).toHaveAttribute("type", "password");
+
+    // Edicao no campo do app chega ao modelo e ao `change` do editor.
+    const view = first.view as EditorView;
+    view.dispatch({ changes: { from: view.state.doc.length, insert: "; charset={{enc}}" } });
+    await waitFor(() => expect(editor.rows[0].value).toBe("application/json; charset={{enc}}"));
+    await expect(published[published.length - 1]?.[0].value).toBe("application/json; charset={{enc}}");
+
+    // Enter no campo de uma linha vira `ark-submit`; na ultima linha acrescenta uma so linha nova.
+    editor.delete("h4");
+    const last = valueCell(1) as CodeFieldEl;
+    await waitFor(() => expect(last.view).not.toBeNull());
+    (last.view as EditorView).contentDOM.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })
+    );
+    await expect(editor.rows).toHaveLength(3);
+    await expect(document.activeElement?.closest('[data-ark-field="key"]')).not.toBeNull();
+
+    // Tipo e segredo trocados recriam a celula: number volta ao ark-input (null da fabrica), o cadeado tambem.
+    await userEvent.selectOptions(
+      within(editor.querySelectorAll('[data-ark-chrome="row"]')[0] as HTMLElement).getByRole("combobox"),
+      "number"
+    );
+    await expect(valueCell(0).localName).toBe("ark-input");
+    await expect(valueCell(0)).toHaveAttribute("type", "number");
+    await userEvent.selectOptions(
+      within(editor.querySelectorAll('[data-ark-chrome="row"]')[0] as HTMLElement).getByRole("combobox"),
+      "string"
+    );
+    await expect(valueCell(0).localName).toBe("ark-code-editor");
+    await userEvent.click(canvas.getAllByRole("button", { name: "Segredo" })[1]);
+    await expect(valueCell(1).localName).toBe("ark-input");
+    await expect(valueCell(1)).toHaveAttribute("type", "password");
+
+    // readonly chega a celula do app; sem a fabrica, tudo volta ao ark-input.
+    editor.setAttribute("readonly", "");
+    await expect(valueCell(0)).toHaveAttribute("readonly");
+    editor.removeAttribute("readonly");
+    editor.valueField = null;
+    await expect(valueCell(0).localName).toBe("ark-input");
+    await expect(editor.rows[0].value).toBe("application/json; charset={{enc}}");
   }
 };
