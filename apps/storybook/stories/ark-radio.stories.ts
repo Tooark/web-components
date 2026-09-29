@@ -38,6 +38,7 @@ type RadioOptions = Partial<StoryArgs> & {
   name: string;
   value: string;
   label?: string;
+  helper?: string;
   ariaLabel?: string;
   html?: string;
   isChecked?: boolean;
@@ -48,6 +49,7 @@ function createRadio(args: RadioOptions): RadioEl {
   el.setAttribute("name", args.name);
   el.setAttribute("value", args.value);
   if (args.label) el.setAttribute("label", args.label);
+  if (args.helper) el.setAttribute("helper", args.helper);
   if (args.ariaLabel) el.setAttribute("aria-label", args.ariaLabel);
   if (args.html) el.innerHTML = args.html;
   if (args.intent) el.setAttribute("intent", args.intent);
@@ -204,6 +206,48 @@ export const ArrowKeys = {
     await expect(post).toHaveAttribute("aria-checked", "false");
     await userEvent.keyboard(" ");
     await expect(post).toHaveAttribute("aria-checked", "true");
+  }
+};
+
+// `helper` descreve a opção e fica abaixo do rótulo (host em grid), com o grupo funcionando igual: clique na dica
+// marca, setas movem e marcam. A opção sem helper continua em flex.
+export const WithHelper = {
+  render: () => {
+    const group = document.createElement("fieldset");
+    group.setAttribute("role", "radiogroup");
+    group.setAttribute("aria-label", "Chave ativa");
+    group.className = "flex flex-col items-start gap-3";
+    group.append(
+      createRadio({ name: "chave", value: "pessoal", label: "Pessoal", helper: "Criada em 12/09", isChecked: true }),
+      createRadio({ name: "chave", value: "equipe", label: "Equipe", helper: "Compartilhada com 4 pessoas" }),
+      createRadio({ name: "chave", value: "nenhuma", label: "Nenhuma" })
+    );
+    return group;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const personal = canvas.getByRole("radio", { name: "Pessoal" });
+    const team = canvas.getByRole("radio", { name: "Equipe" });
+    const none = canvas.getByRole("radio", { name: "Nenhuma" });
+    const hosts = Array.from(canvasElement.querySelectorAll("ark-radio")) as HTMLElement[];
+
+    await expect(personal).toHaveAccessibleDescription("Criada em 12/09");
+    await expect(team).toHaveAccessibleDescription("Compartilhada com 4 pessoas");
+    await expect(none).not.toHaveAttribute("aria-describedby");
+    // Blockificados na coluna flex: grid/flex em vez de inline-grid/inline-flex.
+    await expect(hosts.map((host) => getComputedStyle(host).display)).toEqual(["grid", "grid", "flex"]);
+    const teamHelper = hosts[1].querySelector('[data-ark="radio-helper"]') as HTMLElement;
+    const teamLabel = hosts[1].querySelector('[data-ark="radio-label"]') as HTMLElement;
+    await expect(teamHelper.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+      teamLabel.getBoundingClientRect().bottom - 1
+    );
+
+    await userEvent.click(teamHelper);
+    await expect(team).toHaveAttribute("aria-checked", "true");
+    await expect(personal).toHaveAttribute("aria-checked", "false");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(none).toHaveFocus();
+    await expect(none).toHaveAttribute("aria-checked", "true");
   }
 };
 

@@ -13,6 +13,8 @@ export type ArkCheckboxProps = PropsWithChildren<
     value?: string;
     /** Rotulo proprio (<label for>); sem ele use aria-label ou filhos como rotulo livre. */
     label?: string;
+    /** Dica abaixo do rotulo, ligada ao controle por aria-describedby. */
+    helper?: string;
     className?: string;
     onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
   }

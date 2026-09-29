@@ -11,6 +11,7 @@ type ArkCheckboxPalette = {
 type ArkCheckboxSizing = {
   box: string;
   label: string;
+  helper: string;
 };
 
 /** Glifo de marcado (chrome próprio do componente). */
@@ -28,8 +29,10 @@ let nextId = 0;
  * formulário; os dois são controles nativos, então <fieldset disabled> os
  * desabilita sem JS. `label` vira um <label for> próprio; sem ele o host
  * precisa de aria-label, ou de filhos (texto livre, links), que dão nome à
- * caixa por aria-labelledby e a alternam ao clique. Os nós próprios ficam no
- * início do host, marcados data-ark-chrome, antes dos filhos do usuário.
+ * caixa por aria-labelledby e a alternam ao clique. `helper` acrescenta uma
+ * dica abaixo do rótulo, que descreve a caixa por aria-describedby. Os nós
+ * próprios ficam no início do host, marcados data-ark-chrome, antes dos filhos
+ * do usuário.
  */
 export class ArkCheckbox extends HTMLElementBase {
   static readonly tagName = "ark-checkbox";
@@ -39,6 +42,7 @@ export class ArkCheckbox extends HTMLElementBase {
   private boxEl: HTMLButtonElement | null = null;
   private iconEl: HTMLSpanElement | null = null;
   private labelEl: HTMLLabelElement | null = null;
+  private helperEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
   private observer: MutationObserver | null = null;
   /** Glifo em exibição; a troca depois do primeiro render entra com scale-in. */
@@ -52,6 +56,7 @@ export class ArkCheckbox extends HTMLElementBase {
       "name",
       "value",
       "label",
+      "helper",
       "aria-label",
       "size",
       "intent",
@@ -230,11 +235,11 @@ export class ArkCheckbox extends HTMLElementBase {
   private getSizing(): ArkCheckboxSizing {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const sizes: Record<ArkSize, ArkCheckboxSizing> = {
-      xs: { box: "ark:h-3.5 ark:w-3.5 ark:p-px", label: "ark:text-xs" },
-      sm: { box: "ark:h-4 ark:w-4 ark:p-px", label: "ark:text-sm" },
-      md: { box: "ark:h-5 ark:w-5 ark:p-0.5", label: "ark:text-sm" },
-      lg: { box: "ark:h-6 ark:w-6 ark:p-0.5", label: "ark:text-base" },
-      xl: { box: "ark:h-7 ark:w-7 ark:p-1", label: "ark:text-lg" }
+      xs: { box: "ark:h-3.5 ark:w-3.5 ark:p-px", label: "ark:text-xs", helper: "ark:text-2xs" },
+      sm: { box: "ark:h-4 ark:w-4 ark:p-px", label: "ark:text-sm", helper: "ark:text-xs" },
+      md: { box: "ark:h-5 ark:w-5 ark:p-0.5", label: "ark:text-sm", helper: "ark:text-xs" },
+      lg: { box: "ark:h-6 ark:w-6 ark:p-0.5", label: "ark:text-base", helper: "ark:text-sm" },
+      xl: { box: "ark:h-7 ark:w-7 ark:p-1", label: "ark:text-lg", helper: "ark:text-base" }
     };
     return sizes[size] ?? sizes.md;
   }
@@ -284,7 +289,33 @@ export class ArkCheckbox extends HTMLElementBase {
     }
     this.labelEl.htmlFor = this.boxEl?.id ?? "";
     this.labelEl.textContent = text;
-    this.labelEl.className = ["ark:cursor-[inherit] ark:select-none ark:text-fg", sizing.label].join(" ");
+    this.labelEl.className = ["ark:col-start-2 ark:cursor-[inherit] ark:select-none ark:text-fg", sizing.label].join(
+      " "
+    );
+  }
+
+  // Dica própria: um <span> depois do rótulo, só enquanto `helper` existir, que descreve a caixa por aria-describedby.
+  // Com ela o host vira grid (updateAppearance): a caixa na primeira coluna, rótulo e dica empilhados na segunda.
+  private syncHelper(sizing: ArkCheckboxSizing): void {
+    if (!this.boxEl) return;
+    const text = this.getAttribute("helper");
+    if (!text) {
+      this.helperEl?.remove();
+      this.helperEl = null;
+      this.boxEl.removeAttribute("aria-describedby");
+      return;
+    }
+    if (!this.helperEl) {
+      const helper = document.createElement("span");
+      helper.setAttribute("data-ark-chrome", "helper");
+      helper.id = `${this.boxEl.id}-helper`;
+      (this.labelEl ?? this.inputEl)?.after(helper);
+      this.helperEl = helper;
+    }
+    if (this.helperEl.textContent !== text) this.helperEl.textContent = text;
+    // order: 1 põe a dica depois do rótulo livre do usuário, que vem depois dos nós próprios.
+    this.helperEl.className = ["ark:col-start-2 ark:order-1 ark:text-fg-muted", sizing.helper].join(" ");
+    this.boxEl.setAttribute("aria-describedby", this.helperEl.id);
   }
 
   // Nome acessível da caixa: o <label for> próprio; senão aria-label; senão os filhos do usuário, via
@@ -311,6 +342,16 @@ export class ArkCheckbox extends HTMLElementBase {
     } else {
       this.boxEl.removeAttribute("aria-label");
       this.boxEl.removeAttribute("aria-labelledby");
+    }
+
+    // Nomeada pelo host, a dica entraria no nome: sai da árvore e segue como descrição (aria-describedby alcança
+    // nós ocultos).
+    if (this.helperEl) {
+      if (this.boxEl.getAttribute("aria-labelledby") === this.id) {
+        this.helperEl.setAttribute("aria-hidden", "true");
+      } else {
+        this.helperEl.removeAttribute("aria-hidden");
+      }
     }
   }
 
@@ -348,16 +389,23 @@ export class ArkCheckbox extends HTMLElementBase {
     const indeterminate = this.indeterminate;
     const disabled = this.disabled;
 
+    // Com `helper` o host é grid: caixa na primeira coluna, rótulo e dica empilhados na segunda.
+    const layout = this.hasAttribute("helper")
+      ? "ark:inline-grid ark:grid-cols-[auto_minmax(0,1fr)] ark:gap-x-2 ark:gap-y-0.5"
+      : "ark:inline-flex ark:gap-2";
     // O host dimeriza tudo (caixa e rótulo) quando qualquer controle interno está desabilitado, inclusive
     // por <fieldset disabled>.
     this.applyOwnClasses(
-      "ark:inline-flex ark:cursor-pointer ark:items-center ark:gap-2 ark:align-middle ark:has-disabled:cursor-not-allowed ark:has-disabled:opacity-50".split(
-        " "
-      )
+      [
+        layout,
+        "ark:cursor-pointer ark:items-center ark:align-middle ark:has-disabled:cursor-not-allowed ark:has-disabled:opacity-50"
+      ]
+        .join(" ")
+        .split(" ")
     );
 
     this.boxEl.className = [
-      "ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:justify-center ark:rounded-sm ark:border ark:outline-none ark:transition-colors ark:duration-(--ark-duration-quick) ark:ease-(--ark-ease-out) ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:ring-offset-surface ark:disabled:cursor-not-allowed",
+      "ark:col-start-1 ark:row-start-1 ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:justify-center ark:rounded-sm ark:border ark:outline-none ark:transition-colors ark:duration-(--ark-duration-quick) ark:ease-(--ark-ease-out) ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:ring-offset-surface ark:disabled:cursor-not-allowed",
       palette.ring,
       sizing.box,
       checked || indeterminate
@@ -369,6 +417,7 @@ export class ArkCheckbox extends HTMLElementBase {
 
     this.syncIcon(indeterminate ? "mixed" : checked ? "check" : "none");
     this.syncLabel(sizing);
+    this.syncHelper(sizing);
     this.syncName();
 
     this.inputEl.checked = checked;
@@ -380,6 +429,7 @@ export class ArkCheckbox extends HTMLElementBase {
     applyTestHooks(this, "checkbox", this.boxEl);
     applyTestHooks(this, "checkbox", this.inputEl, "input");
     if (this.labelEl) applyTestHooks(this, "checkbox", this.labelEl, "label");
+    if (this.helperEl) applyTestHooks(this, "checkbox", this.helperEl, "helper");
   }
 }
 

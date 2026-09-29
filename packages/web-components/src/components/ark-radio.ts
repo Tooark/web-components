@@ -12,6 +12,7 @@ type ArkRadioSizing = {
   box: string;
   dot: string;
   label: string;
+  helper: string;
 };
 
 let nextId = 0;
@@ -26,7 +27,7 @@ let nextId = 0;
  * silêncio e `change` dispara só no que ganhou a marca; as setas movem o foco
  * e marcam, Espaço marca o focado, e um único deles fica na ordem de Tab (o
  * marcado, ou o primeiro habilitado). `label`, aria-label e filhos nomeiam a
- * opção como no ark-checkbox.
+ * opção e `helper` a descreve, como no ark-checkbox.
  */
 export class ArkRadio extends HTMLElementBase {
   static readonly tagName = "ark-radio";
@@ -36,6 +37,7 @@ export class ArkRadio extends HTMLElementBase {
   private boxEl: HTMLButtonElement | null = null;
   private dotEl: HTMLSpanElement | null = null;
   private labelEl: HTMLLabelElement | null = null;
+  private helperEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
   private observer: MutationObserver | null = null;
   /** Raiz do grupo no último connect, para ressincronizar os que ficam quando este sai. */
@@ -50,6 +52,7 @@ export class ArkRadio extends HTMLElementBase {
       "name",
       "value",
       "label",
+      "helper",
       "aria-label",
       "size",
       "intent",
@@ -294,11 +297,11 @@ export class ArkRadio extends HTMLElementBase {
   private getSizing(): ArkRadioSizing {
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const sizes: Record<ArkSize, ArkRadioSizing> = {
-      xs: { box: "ark:h-3.5 ark:w-3.5", dot: "ark:h-1.5 ark:w-1.5", label: "ark:text-xs" },
-      sm: { box: "ark:h-4 ark:w-4", dot: "ark:h-1.5 ark:w-1.5", label: "ark:text-sm" },
-      md: { box: "ark:h-5 ark:w-5", dot: "ark:h-2 ark:w-2", label: "ark:text-sm" },
-      lg: { box: "ark:h-6 ark:w-6", dot: "ark:h-2.5 ark:w-2.5", label: "ark:text-base" },
-      xl: { box: "ark:h-7 ark:w-7", dot: "ark:h-3 ark:w-3", label: "ark:text-lg" }
+      xs: { box: "ark:h-3.5 ark:w-3.5", dot: "ark:h-1.5 ark:w-1.5", label: "ark:text-xs", helper: "ark:text-2xs" },
+      sm: { box: "ark:h-4 ark:w-4", dot: "ark:h-1.5 ark:w-1.5", label: "ark:text-sm", helper: "ark:text-xs" },
+      md: { box: "ark:h-5 ark:w-5", dot: "ark:h-2 ark:w-2", label: "ark:text-sm", helper: "ark:text-xs" },
+      lg: { box: "ark:h-6 ark:w-6", dot: "ark:h-2.5 ark:w-2.5", label: "ark:text-base", helper: "ark:text-sm" },
+      xl: { box: "ark:h-7 ark:w-7", dot: "ark:h-3 ark:w-3", label: "ark:text-lg", helper: "ark:text-base" }
     };
     return sizes[size] ?? sizes.md;
   }
@@ -346,7 +349,33 @@ export class ArkRadio extends HTMLElementBase {
     }
     this.labelEl.htmlFor = this.boxEl?.id ?? "";
     this.labelEl.textContent = text;
-    this.labelEl.className = ["ark:cursor-[inherit] ark:select-none ark:text-fg", sizing.label].join(" ");
+    this.labelEl.className = ["ark:col-start-2 ark:cursor-[inherit] ark:select-none ark:text-fg", sizing.label].join(
+      " "
+    );
+  }
+
+  // Dica própria: um <span> depois do rótulo, só enquanto `helper` existir, que descreve a opção por aria-describedby.
+  // Com ela o host vira grid (updateAppearance): a opção na primeira coluna, rótulo e dica empilhados na segunda.
+  private syncHelper(sizing: ArkRadioSizing): void {
+    if (!this.boxEl) return;
+    const text = this.getAttribute("helper");
+    if (!text) {
+      this.helperEl?.remove();
+      this.helperEl = null;
+      this.boxEl.removeAttribute("aria-describedby");
+      return;
+    }
+    if (!this.helperEl) {
+      const helper = document.createElement("span");
+      helper.setAttribute("data-ark-chrome", "helper");
+      helper.id = `${this.boxEl.id}-helper`;
+      (this.labelEl ?? this.inputEl)?.after(helper);
+      this.helperEl = helper;
+    }
+    if (this.helperEl.textContent !== text) this.helperEl.textContent = text;
+    // order: 1 põe a dica depois do rótulo livre do usuário, que vem depois dos nós próprios.
+    this.helperEl.className = ["ark:col-start-2 ark:order-1 ark:text-fg-muted", sizing.helper].join(" ");
+    this.boxEl.setAttribute("aria-describedby", this.helperEl.id);
   }
 
   private syncName(): void {
@@ -371,6 +400,16 @@ export class ArkRadio extends HTMLElementBase {
     } else {
       this.boxEl.removeAttribute("aria-label");
       this.boxEl.removeAttribute("aria-labelledby");
+    }
+
+    // Nomeada pelo host, a dica entraria no nome: sai da árvore e segue como descrição (aria-describedby alcança
+    // nós ocultos).
+    if (this.helperEl) {
+      if (this.boxEl.getAttribute("aria-labelledby") === this.id) {
+        this.helperEl.setAttribute("aria-hidden", "true");
+      } else {
+        this.helperEl.removeAttribute("aria-hidden");
+      }
     }
   }
 
@@ -408,14 +447,21 @@ export class ArkRadio extends HTMLElementBase {
     const checked = this.checked;
     const disabled = this.disabled;
 
+    // Com `helper` o host é grid: caixa na primeira coluna, rótulo e dica empilhados na segunda.
+    const layout = this.hasAttribute("helper")
+      ? "ark:inline-grid ark:grid-cols-[auto_minmax(0,1fr)] ark:gap-x-2 ark:gap-y-0.5"
+      : "ark:inline-flex ark:gap-2";
     this.applyOwnClasses(
-      "ark:inline-flex ark:cursor-pointer ark:items-center ark:gap-2 ark:align-middle ark:has-disabled:cursor-not-allowed ark:has-disabled:opacity-50".split(
-        " "
-      )
+      [
+        layout,
+        "ark:cursor-pointer ark:items-center ark:align-middle ark:has-disabled:cursor-not-allowed ark:has-disabled:opacity-50"
+      ]
+        .join(" ")
+        .split(" ")
     );
 
     this.boxEl.className = [
-      "ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:justify-center ark:rounded-full ark:border ark:outline-none ark:transition-colors ark:duration-(--ark-duration-quick) ark:ease-(--ark-ease-out) ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:ring-offset-surface ark:disabled:cursor-not-allowed",
+      "ark:col-start-1 ark:row-start-1 ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:justify-center ark:rounded-full ark:border ark:outline-none ark:transition-colors ark:duration-(--ark-duration-quick) ark:ease-(--ark-ease-out) ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:ring-offset-surface ark:disabled:cursor-not-allowed",
       palette.ring,
       sizing.box,
       checked ? palette.on : "ark:border-border-strong ark:bg-surface ark:text-transparent ark:hover:bg-surface-muted"
@@ -425,6 +471,7 @@ export class ArkRadio extends HTMLElementBase {
 
     this.syncDot(checked, sizing);
     this.syncLabel(sizing);
+    this.syncHelper(sizing);
     this.syncName();
 
     this.inputEl.checked = checked;
@@ -436,6 +483,7 @@ export class ArkRadio extends HTMLElementBase {
     applyTestHooks(this, "radio", this.dotEl as Element, "dot");
     applyTestHooks(this, "radio", this.inputEl, "input");
     if (this.labelEl) applyTestHooks(this, "radio", this.labelEl, "label");
+    if (this.helperEl) applyTestHooks(this, "radio", this.helperEl, "helper");
   }
 }
 

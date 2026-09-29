@@ -18,6 +18,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   shows `noResults` as before.
 - `ark-avatar`: opt-in `variant="solid"` (`ArkAvatarVariant` in core) fills the background with `primary` (initials
   in `primary-fg`) or with `color` (white initials); `soft` stays the default. `variant` prop on the three wrappers.
+- `ark-checkbox` and `ark-radio`: opt-in `helper`, a hint below the label that describes the control through
+  `aria-describedby` (the host becomes a grid: the box, then the label and the hint stacked); when free children name
+  the control the hint is `aria-hidden`, so it stays out of the name. New hooks `checkbox-helper` and `radio-helper`,
+  `helper` prop on the three wrappers. Without it the host keeps its flex layout.
 
 ### Changed
 

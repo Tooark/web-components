@@ -20,6 +20,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.name]="name"
     [attr.value]="value"
     [attr.label]="label"
+    [attr.helper]="helper"
     (change)="onChange($event)">
     <ng-content></ng-content>
   </ark-checkbox>`
@@ -52,6 +53,8 @@ export class ArkCheckboxComponent {
   @Input() value: string | undefined;
   /** Rótulo próprio (<label for>); sem ele use aria-label ou o conteúdo projetado como rótulo livre. */
   @Input() label: string | undefined;
+  /** Dica abaixo do rótulo, ligada ao controle por aria-describedby. */
+  @Input() helper: string | undefined;
   @Output() changed = new EventEmitter<CustomEvent<{ checked: boolean }>>();
 
   onChange(event: Event): void {

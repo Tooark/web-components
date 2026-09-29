@@ -17,7 +17,8 @@ export const ArkCheckbox = defineComponent({
     size: { type: String as PropType<ArkSize>, default: "md" },
     name: { type: String, default: undefined },
     value: { type: String, default: undefined },
-    label: { type: String, default: undefined }
+    label: { type: String, default: undefined },
+    helper: { type: String, default: undefined }
   },
   setup(props, { attrs, slots, emit }) {
     ensureTooarkComponentsRegistered();
@@ -33,6 +34,7 @@ export const ArkCheckbox = defineComponent({
           name: props.name,
           value: props.value,
           label: props.label,
+          helper: props.helper,
           checked: props.checked ? "" : undefined,
           indeterminate: props.indeterminate ? "" : undefined,
           disabled: props.disabled ? "" : undefined,
