@@ -132,3 +132,56 @@ export const OpenOnConnectReachesLateListeners = {
     }
   }
 };
+
+// Propriedade gravada antes de registerTooark*(): vira propriedade própria do nó e, sem tratamento, esconderia o
+// setter da classe depois do upgrade. Um documento sem janela não faz upgrade, então o nó criado nele se comporta
+// como uma tag ainda não registrada até ser adotado pela página.
+export const PropertiesSetBeforeRegistration = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const detached = document.implementation.createHTMLDocument("");
+    const cases: Array<{ tag: string; prop: string; value: unknown; read: (el: HTMLElement) => unknown }> = [
+      {
+        tag: "ark-chart",
+        prop: "option",
+        value: { xAxis: { type: "category", data: ["a"] }, yAxis: {}, series: [{ type: "bar", data: [1] }] },
+        read: (el) => el.querySelector('[part="canvas"]') !== null
+      },
+      {
+        tag: "ark-code-editor",
+        prop: "value",
+        value: '{"a":1}',
+        read: (el) => (el as HTMLElement & { value: string }).value
+      },
+      {
+        tag: "ark-wysiwyg-editor",
+        prop: "colors",
+        value: ["#ff0000"],
+        read: (el) => el.getAttribute("colors")
+      },
+      {
+        tag: "ark-wysiwyg-viewer",
+        prop: "content",
+        value: { type: "doc", content: [{ type: "paragraph", content: [{ type: "text", text: "Olá" }] }] },
+        read: (el) => el.textContent?.includes("Olá")
+      }
+    ];
+    const expected: Record<string, unknown> = {
+      "ark-chart": true,
+      "ark-code-editor": '{"a":1}',
+      "ark-wysiwyg-editor": '["#ff0000"]',
+      "ark-wysiwyg-viewer": true
+    };
+
+    for (const { tag, prop, value, read } of cases) {
+      const el = detached.createElement(tag) as HTMLElement & Record<string, unknown>;
+      await expect(el instanceof (customElements.get(tag) as CustomElementConstructor)).toBe(false);
+      el[prop] = value;
+      canvasElement.appendChild(document.adoptNode(el));
+      await expect({ tag, value: read(el) }).toEqual({ tag, value: expected[tag] });
+      // Depois do upgrade o setter é o da classe, não uma propriedade própria do nó.
+      await expect({ tag, own: Object.getOwnPropertyDescriptor(el, prop) !== undefined }).toEqual({ tag, own: false });
+      el.remove();
+    }
+  }
+};

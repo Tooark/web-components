@@ -17,6 +17,7 @@ import {
   type ArkWysiwygUploader
 } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ToolbarAction = {
   icon: ArkWysiwygIcon;
@@ -263,6 +264,8 @@ export class ArkWysiwygEditor extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    // Gravadas antes do registro: o setter guarda e só a montagem abaixo constrói.
+    upgradeProperties(this, ["content", "uploadFile", "colors", "highlights"]);
     ensureWysiwygStyles();
     this.build();
   }

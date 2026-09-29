@@ -3,6 +3,7 @@ import { type ArkWysiwygInstance, createWysiwygViewer } from "../engine";
 import { ensureWysiwygStyles } from "../styles";
 import type { ArkWysiwygContent, ArkWysiwygTheme } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Viewer somente-leitura (Custom Element) que renderiza o mesmo JSON do editor.
@@ -43,6 +44,7 @@ export class ArkWysiwygViewer extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this, ["content"]);
     ensureWysiwygStyles();
     this.build();
   }
