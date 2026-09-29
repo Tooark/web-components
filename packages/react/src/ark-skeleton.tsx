@@ -1,5 +1,6 @@
 import type { ArkSkeletonStyleOptions } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkSkeleton as ArkSkeletonElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSkeletonProps = PropsWithChildren<
@@ -13,19 +14,22 @@ export type ArkSkeletonProps = PropsWithChildren<
   }
 >;
 
-export function ArkSkeleton(props: ArkSkeletonProps): React.JSX.Element {
-  const { children, className, rows, animated, ...rest } = props;
+export const ArkSkeleton = forwardRef<ArkSkeletonElement, ArkSkeletonProps>(
+  function ArkSkeleton(props, forwardedRef): React.JSX.Element {
+    const { children, className, rows, animated, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const attrs: Record<string, string | undefined | React.CSSProperties> = {
-    ...rest,
-    class: className,
-    rows: rows === undefined ? undefined : String(rows),
-    animated: animated ? "" : undefined
-  };
+    const attrs: Record<string, string | undefined | React.CSSProperties | React.Ref<ArkSkeletonElement>> = {
+      ...rest,
+      ref: forwardedRef,
+      class: className,
+      rows: rows === undefined ? undefined : String(rows),
+      animated: animated ? "" : undefined
+    };
 
-  return createElement("ark-skeleton", attrs, children);
-}
+    return createElement("ark-skeleton", attrs, children);
+  }
+);

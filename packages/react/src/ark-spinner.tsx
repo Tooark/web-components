@@ -1,6 +1,7 @@
 import type { ArkSpinnerStyleOptions } from "@tooark/core";
+import type { ArkSpinner as ArkSpinnerElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSpinnerProps = ArkSpinnerStyleOptions & {
@@ -9,18 +10,21 @@ export type ArkSpinnerProps = ArkSpinnerStyleOptions & {
   className?: string;
 };
 
-export function ArkSpinner(props: ArkSpinnerProps): React.JSX.Element {
-  const { className, localeJson, ...rest } = props;
+export const ArkSpinner = forwardRef<ArkSpinnerElement, ArkSpinnerProps>(
+  function ArkSpinner(props, forwardedRef): React.JSX.Element {
+    const { className, localeJson, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const attrs: Record<string, string | undefined> = {
-    ...rest,
-    class: className,
-    "locale-json": localeJson
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkSpinnerElement>> = {
+      ...rest,
+      ref: forwardedRef,
+      class: className,
+      "locale-json": localeJson
+    };
 
-  return createElement("ark-spinner", attrs);
-}
+    return createElement("ark-spinner", attrs);
+  }
+);

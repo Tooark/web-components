@@ -1,6 +1,8 @@
 import type { ArkCheckboxStyleOptions } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkCheckbox as ArkCheckboxElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkCheckboxProps = PropsWithChildren<
   ArkCheckboxStyleOptions & {
@@ -16,31 +18,33 @@ export type ArkCheckboxProps = PropsWithChildren<
   }
 >;
 
-export function ArkCheckbox(props: ArkCheckboxProps): React.JSX.Element {
-  const { children, className, checked, indeterminate, disabled, onChange, ...rest } = props;
-  const ref = React.useRef<HTMLElement>(null);
+export const ArkCheckbox = forwardRef<ArkCheckboxElement, ArkCheckboxProps>(
+  function ArkCheckbox(props, forwardedRef): React.JSX.Element {
+    const { children, className, checked, indeterminate, disabled, onChange, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkCheckboxElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ checked: boolean }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ checked: boolean }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    checked: checked ? "" : undefined,
-    indeterminate: indeterminate ? "" : undefined,
-    disabled: disabled ? "" : undefined
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkCheckboxElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      checked: checked ? "" : undefined,
+      indeterminate: indeterminate ? "" : undefined,
+      disabled: disabled ? "" : undefined
+    };
 
-  return createElement("ark-checkbox", attrs, children);
-}
+    return createElement("ark-checkbox", attrs, children);
+  }
+);

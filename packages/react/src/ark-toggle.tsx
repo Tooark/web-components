@@ -1,6 +1,8 @@
 import type { ArkToggleGroupStyleOptions, ArkToggleStyleOptions } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkToggle as ArkToggleElement, ArkToggleGroup as ArkToggleGroupElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkToggleProps = PropsWithChildren<
   ArkToggleStyleOptions & {
@@ -10,34 +12,36 @@ export type ArkToggleProps = PropsWithChildren<
   }
 >;
 
-export function ArkToggle(props: ArkToggleProps): React.JSX.Element {
-  const { children, className, pressed, disabled, onChange, ...rest } = props;
+export const ArkToggle = forwardRef<ArkToggleElement, ArkToggleProps>(
+  function ArkToggle(props, forwardedRef): React.JSX.Element {
+    const { children, className, pressed, disabled, onChange, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const ref = React.useRef<HTMLElement>(null);
+    const [ref, setRef] = useForwardedRef<ArkToggleElement>(forwardedRef);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ pressed: boolean; value: string }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ pressed: boolean; value: string }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    pressed: pressed ? "" : undefined,
-    disabled: disabled ? "" : undefined
-  };
+    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkToggleElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      pressed: pressed ? "" : undefined,
+      disabled: disabled ? "" : undefined
+    };
 
-  return createElement("ark-toggle", attrs, children);
-}
+    return createElement("ark-toggle", attrs, children);
+  }
+);
 
 export type ArkToggleGroupProps = PropsWithChildren<
   ArkToggleGroupStyleOptions & {
@@ -47,31 +51,33 @@ export type ArkToggleGroupProps = PropsWithChildren<
   }
 >;
 
-export function ArkToggleGroup(props: ArkToggleGroupProps): React.JSX.Element {
-  const { children, className, multiple, disabled, onChange, ...rest } = props;
+export const ArkToggleGroup = forwardRef<ArkToggleGroupElement, ArkToggleGroupProps>(
+  function ArkToggleGroup(props, forwardedRef): React.JSX.Element {
+    const { children, className, multiple, disabled, onChange, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const ref = React.useRef<HTMLElement>(null);
+    const [ref, setRef] = useForwardedRef<ArkToggleGroupElement>(forwardedRef);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ value?: string; values?: string[] }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ value?: string; values?: string[] }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    multiple: multiple ? "" : undefined,
-    disabled: disabled ? "" : undefined
-  };
+    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkToggleGroupElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      multiple: multiple ? "" : undefined,
+      disabled: disabled ? "" : undefined
+    };
 
-  return createElement("ark-toggle-group", attrs, children);
-}
+    return createElement("ark-toggle-group", attrs, children);
+  }
+);

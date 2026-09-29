@@ -1,6 +1,8 @@
 import type { ArkInputStyleOptions, ArkLang } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkInput as ArkInputElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkInputProps = PropsWithChildren<
   ArkInputStyleOptions & {
@@ -41,69 +43,71 @@ function attr(value: string | number | undefined): string | undefined {
   return value === undefined ? undefined : String(value);
 }
 
-export function ArkInput(props: ArkInputProps): React.JSX.Element {
-  const {
-    children,
-    className,
-    errorMessage,
-    error,
-    disabled,
-    required,
-    readonly,
-    reveal,
-    localeJson,
-    autofocus,
-    maxlength,
-    minlength,
-    min,
-    max,
-    step,
-    spellcheck,
-    onInput,
-    onChange,
-    ...rest
-  } = props;
-  const ref = React.useRef<HTMLElement>(null);
+export const ArkInput = forwardRef<ArkInputElement, ArkInputProps>(
+  function ArkInput(props, forwardedRef): React.JSX.Element {
+    const {
+      children,
+      className,
+      errorMessage,
+      error,
+      disabled,
+      required,
+      readonly,
+      reveal,
+      localeJson,
+      autofocus,
+      maxlength,
+      minlength,
+      min,
+      max,
+      step,
+      spellcheck,
+      onInput,
+      onChange,
+      ...rest
+    } = props;
+    const [ref, setRef] = useForwardedRef<ArkInputElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
 
-    const handleInput = (event: Event): void => onInput?.(event);
-    const handleChange = (event: Event): void => onChange?.(event);
-    el.addEventListener("input", handleInput);
-    el.addEventListener("change", handleChange);
-    return () => {
-      el.removeEventListener("input", handleInput);
-      el.removeEventListener("change", handleChange);
+      const handleInput = (event: Event): void => onInput?.(event);
+      const handleChange = (event: Event): void => onChange?.(event);
+      el.addEventListener("input", handleInput);
+      el.addEventListener("change", handleChange);
+      return () => {
+        el.removeEventListener("input", handleInput);
+        el.removeEventListener("change", handleChange);
+      };
+    }, [ref, onInput, onChange]);
+
+    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkInputElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      "error-message": errorMessage,
+      "locale-json": localeJson,
+      error: error ? "" : undefined,
+      disabled: disabled ? "" : undefined,
+      required: required ? "" : undefined,
+      readonly: readonly ? "" : undefined,
+      reveal: reveal ? "" : undefined,
+      // Booleanos, não strings: o React 19 grava nas propriedades nativas autofocus/spellcheck do host (onde "" seria
+      // false e "false" seria true), e o React 18 os serializa no atributo.
+      autofocus: autofocus || undefined,
+      maxlength: attr(maxlength),
+      minlength: attr(minlength),
+      min: attr(min),
+      max: attr(max),
+      step: attr(step),
+      spellcheck
     };
-  }, [onInput, onChange]);
 
-  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    "error-message": errorMessage,
-    "locale-json": localeJson,
-    error: error ? "" : undefined,
-    disabled: disabled ? "" : undefined,
-    required: required ? "" : undefined,
-    readonly: readonly ? "" : undefined,
-    reveal: reveal ? "" : undefined,
-    // Booleanos, não strings: o React 19 grava nas propriedades nativas autofocus/spellcheck do host (onde "" seria
-    // false e "false" seria true), e o React 18 os serializa no atributo.
-    autofocus: autofocus || undefined,
-    maxlength: attr(maxlength),
-    minlength: attr(minlength),
-    min: attr(min),
-    max: attr(max),
-    step: attr(step),
-    spellcheck
-  };
-
-  return createElement("ark-input", attrs, children);
-}
+    return createElement("ark-input", attrs, children);
+  }
+);

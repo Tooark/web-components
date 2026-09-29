@@ -1,7 +1,9 @@
 import type { ArkColorSwatch, ArkColorSwatchesStyleOptions } from "@tooark/core";
+import type { ArkColorSwatches as ArkColorSwatchesElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect, useRef } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkColorSwatchesProps = ArkColorSwatchesStyleOptions & {
   /** Cor selecionada (o value da amostra). */
@@ -16,30 +18,32 @@ export type ArkColorSwatchesProps = ArkColorSwatchesStyleOptions & {
   onChange?: (event: CustomEvent<{ value: string }>) => void;
 };
 
-export function ArkColorSwatches(props: ArkColorSwatchesProps): React.JSX.Element {
-  const { className, colors, disabled, onChange, ...rest } = props;
-  const ref = useRef<HTMLElement>(null);
+export const ArkColorSwatches = forwardRef<ArkColorSwatchesElement, ArkColorSwatchesProps>(
+  function ArkColorSwatches(props, forwardedRef): React.JSX.Element {
+    const { className, colors, disabled, onChange, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkColorSwatchesElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ value: string }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ value: string }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    colors: colors ? JSON.stringify(colors) : undefined,
-    disabled: disabled ? "" : undefined
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkColorSwatchesElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      colors: colors ? JSON.stringify(colors) : undefined,
+      disabled: disabled ? "" : undefined
+    };
 
-  return createElement("ark-color-swatches", attrs);
-}
+    return createElement("ark-color-swatches", attrs);
+  }
+);

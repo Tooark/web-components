@@ -1,6 +1,7 @@
 import type { ArkAvatarStyleOptions } from "@tooark/core";
+import type { ArkAvatar as ArkAvatarElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkAvatarProps = ArkAvatarStyleOptions & {
@@ -11,17 +12,20 @@ export type ArkAvatarProps = ArkAvatarStyleOptions & {
   className?: string;
 };
 
-export function ArkAvatar(props: ArkAvatarProps): React.JSX.Element {
-  const { className, ...rest } = props;
+export const ArkAvatar = forwardRef<ArkAvatarElement, ArkAvatarProps>(
+  function ArkAvatar(props, forwardedRef): React.JSX.Element {
+    const { className, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const attrs: Record<string, string | undefined> = {
-    ...rest,
-    class: className
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkAvatarElement>> = {
+      ...rest,
+      ref: forwardedRef,
+      class: className
+    };
 
-  return createElement("ark-avatar", attrs);
-}
+    return createElement("ark-avatar", attrs);
+  }
+);
