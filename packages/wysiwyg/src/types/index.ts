@@ -166,6 +166,8 @@ export type ArkWysiwygEditorOptions = {
   theme?: ArkWysiwygTheme;
   /** Texto exibido quando o editor está vazio. */
   placeholder?: string;
+  /** Nome acessível do conteúdo editável (`aria-label`), para quem não tem um rótulo visível. Padrão: nenhum. */
+  label?: string;
   /** Se o conteúdo é editável. Padrão: true. */
   editable?: boolean;
   /** Gancho de upload de imagem/vídeo; sem ele arquivos são recusados. */

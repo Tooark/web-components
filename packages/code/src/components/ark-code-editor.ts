@@ -57,7 +57,8 @@ function truthy(value: unknown): boolean {
  * `readonly`, `placeholder`, `min-height` (comprimento CSS), `line-numbers`,
  * `fold`, `tab-indent` e `autocomplete` (ligados por padrão; "false"
  * desliga), `wrap`, `indent-style` (space | tab), `indent-size`,
- * `line-ending` (lf | crlf | auto), `theme` (auto | light | dark) e
+ * `line-ending` (lf | crlf | auto), `theme` (auto | light | dark),
+ * `aria-label` (vai para o conteúdo editável, o `role="textbox"`) e
  * `testid`. Propriedades JS: `variableKeys` (completions depois de `{{`),
  * `completions` (palavras oferecidas em qualquer linguagem),
  * `completionSource` (fonte própria), `formatter` (formatador do app;
@@ -105,6 +106,7 @@ export class ArkCodeEditor extends HTMLElementBase {
       "single-line",
       "size",
       "theme",
+      "aria-label",
       "testid"
     ];
   }
@@ -360,6 +362,7 @@ export class ArkCodeEditor extends HTMLElementBase {
     if (name === "language") this.instance.setLanguage(this.language);
     if (name === "readonly") this.instance.setReadonly(this.readonly);
     if (name === "placeholder") this.instance.setPlaceholder(this.placeholder);
+    if (name === "aria-label") this.instance.setLabel(newValue || undefined);
     if (name === "min-height") this.instance.setMinHeight(this.minHeight);
     if (name === "line-numbers") this.instance.setLineNumbers(this.lineNumbers);
     if (name === "fold") this.instance.setFold(this.fold);
@@ -403,6 +406,7 @@ export class ArkCodeEditor extends HTMLElementBase {
       theme: this.theme,
       readonly: this.readonly,
       placeholder: this.placeholder || undefined,
+      label: this.getAttribute("aria-label") || undefined,
       lineNumbers: this.lineNumbers,
       fold: this.fold,
       wrap: this.wrap,

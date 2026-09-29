@@ -54,6 +54,8 @@ export type ArkCodeEditorOptions = {
   readonly?: boolean;
   /** Texto exibido com o documento vazio. */
   placeholder?: string;
+  /** Nome acessível do conteúdo editável (`aria-label`), para quem não tem um `<label>` visível. Padrão: nenhum. */
+  label?: string;
   /** Numeração das linhas na calha. Padrão: true. */
   lineNumbers?: boolean;
   /** Calha de dobra (fold) por bloco da linguagem. Padrão: true. */

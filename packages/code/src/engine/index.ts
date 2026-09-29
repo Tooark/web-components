@@ -87,6 +87,8 @@ export type ArkCodeEditorInstance = {
   setReadonly(readonly: boolean): void;
   /** Troca o texto do documento vazio; vazio remove. */
   setPlaceholder(text?: string): void;
+  /** Troca o nome acessível do conteúdo editável; vazio remove. */
+  setLabel(label?: string): void;
   /** Liga/desliga a numeração das linhas. */
   setLineNumbers(on: boolean): void;
   /** Liga/desliga a calha de dobra. */
@@ -581,6 +583,11 @@ function joinLines(tr: Transaction): TransactionSpec | readonly TransactionSpec[
   return [tr, { changes, sequential: true }];
 }
 
+// O conteúdo editável é o `role="textbox"` do CodeMirror: é nele que o nome acessível precisa estar.
+function labelExtension(label: string | undefined): Extension {
+  return label ? EditorView.contentAttributes.of({ "aria-label": label }) : [];
+}
+
 function singleLineExtensions(on: boolean, submit: () => void): Extension {
   if (!on) return [];
   // Com a lista de completions aberta o Enter é dela (o keymap do autocomplete vem antes); se ela acabou de abrir
@@ -669,6 +676,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
   const theme = new Compartment();
   const readonly = new Compartment();
   const placeholder = new Compartment();
+  const labelling = new Compartment();
   const gutterNumbers = new Compartment();
   const gutterFold = new Compartment();
   const wrapping = new Compartment();
@@ -802,6 +810,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
       theme.of(themeFor(resolved)),
       readonly.of(readonlyExtensions()),
       placeholder.of(options.placeholder ? placeholderExtension(options.placeholder) : []),
+      labelling.of(labelExtension(options.label)),
       wrapping.of(options.wrap ? EditorView.lineWrapping : []),
       indentation.of(indentExtensions(indentStyle, indentSize)),
       tabKey.of(tabExtension()),
@@ -848,6 +857,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
     },
     setPlaceholder: (text) =>
       view.dispatch({ effects: placeholder.reconfigure(text ? placeholderExtension(text) : []) }),
+    setLabel: (label) => view.dispatch({ effects: labelling.reconfigure(labelExtension(label)) }),
     setLineNumbers: (on) => {
       lineNumbersOn = on;
       view.dispatch({ effects: gutterNumbers.reconfigure(numbersExtension()) });

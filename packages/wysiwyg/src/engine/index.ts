@@ -163,6 +163,7 @@ type InternalOptions = {
   content?: JSONContent | null;
   theme?: ArkWysiwygTheme;
   placeholder?: string;
+  label?: string;
   editable: boolean;
   uploadFile?: ArkWysiwygEditorOptions["uploadFile"];
   maxFileSize?: number;
@@ -206,6 +207,8 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
     extensions: createWysiwygExtensions({ editable: options.editable, placeholder: options.placeholder }),
     content: EMPTY_DOC,
     editorProps: {
+      // O Tiptap já põe role="textbox" no conteúdo editável; o nome acessível vai junto, só quando o app dá um.
+      ...(options.label ? { attributes: { "aria-label": options.label } } : {}),
       handlePaste: (_view, event) => {
         const files = filesOf(event.clipboardData?.files);
         // Planilhas e editores copiam o texto junto de arquivos que não são mídia: aí o texto vence e cola normal.
@@ -315,6 +318,7 @@ export function createWysiwygEditor(element: HTMLElement, options: ArkWysiwygEdi
     content: options.content,
     theme: options.theme,
     placeholder: options.placeholder,
+    label: options.label,
     editable: options.editable ?? true,
     uploadFile: options.uploadFile,
     maxFileSize: options.maxFileSize,
