@@ -12,6 +12,33 @@ import type {
   ArkCodeVariable
 } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { upgradeProperties } from "./upgrade-properties";
+
+/** Propriedades que um framework pode gravar antes do registro; reaplicadas pelo setter ao conectar. */
+const UPGRADED_PROPERTIES = [
+  "value",
+  "variableKeys",
+  "variables",
+  "markUnknownVariables",
+  "singleLine",
+  "size",
+  "completions",
+  "completionSource",
+  "formatter",
+  "indentStyle",
+  "indentSize",
+  "lineEnding",
+  "tabIndent",
+  "autocomplete",
+  "language",
+  "readonly",
+  "wrap",
+  "lineNumbers",
+  "fold",
+  "placeholder",
+  "minHeight",
+  "theme"
+] as const;
 
 // Mesma regra do coerceBooleanAttr de @tooark/core (este pacote só depende de tokens): frameworks passam o valor do
 // atributo como propriedade, então "" é presente e "false" é ausente.
@@ -315,6 +342,7 @@ export class ArkCodeEditor extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this, UPGRADED_PROPERTIES);
     // O atributo `value` só dá o texto inicial; depois a propriedade manda.
     if (!this.instance && !this.pendingValue && this.hasAttribute("value")) {
       this.pendingValue = this.getAttribute("value") ?? "";

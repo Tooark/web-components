@@ -3,6 +3,7 @@ import type { EChartsOption } from "echarts";
 import { type ArkChartInstance, createChart } from "../engine";
 import type { ArkChartRenderer, ArkChartTheme } from "../types";
 import { HTMLElementBase } from "./html-element-base";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Custom Element que renderiza um gráfico ECharts.
@@ -57,7 +58,9 @@ export class ArkChart extends HTMLElementBase {
   }
 
   connectedCallback(): void {
-    this.render();
+    // Uma `option` gravada antes do registro já monta o gráfico ao passar pelo setter.
+    upgradeProperties(this, ["option"]);
+    if (!this.instance) this.render();
   }
 
   disconnectedCallback(): void {
