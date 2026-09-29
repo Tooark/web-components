@@ -1,5 +1,5 @@
 import type { ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
   title: "Core/ArkInput",
@@ -323,5 +323,45 @@ export const PassThroughAttributes = {
 
     host.removeAttribute("maxlength");
     await expect(input).not.toHaveAttribute("maxlength");
+  }
+};
+
+// Light DOM com atributos como API: `placeholder` e `aria-label` ficam no host (é onde o app escreve) e são
+// espelhados no <input>, então consultas pelo atributo acham os dois. O que acha só o campo: papel + nome (com
+// `label` ou `aria-label`; o Testing Library não usa o placeholder como nome), o `<label for>` do `label`, o testid e
+// qualquer consulta dentro do host. A story fixa esse contrato, que o README documenta.
+export const TestingQueries = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-3";
+    const search = document.createElement("ark-input");
+    search.setAttribute("placeholder", "Buscar pedidos");
+    search.setAttribute("aria-label", "Busca");
+    search.setAttribute("testid", "busca");
+    const email = document.createElement("ark-input");
+    email.setAttribute("label", "E-mail");
+    email.setAttribute("placeholder", "voce@empresa.com");
+    wrap.append(search, email);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [search, email] = Array.from(canvasElement.querySelectorAll("ark-input"));
+    const searchInput = search.querySelector("input") as HTMLInputElement;
+    const emailInput = email.querySelector("input") as HTMLInputElement;
+
+    // Pelo atributo: host e <input>.
+    await expect(canvas.getAllByPlaceholderText("Buscar pedidos")).toEqual([search, searchInput]);
+    await expect(canvas.getAllByLabelText("Busca")).toEqual([search, searchInput]);
+
+    // Só o campo.
+    await expect(canvas.getByRole("textbox", { name: "Busca" })).toBe(searchInput);
+    await expect(canvas.getByRole("textbox", { name: "E-mail" })).toBe(emailInput);
+    await expect(canvas.getByLabelText("E-mail")).toBe(emailInput);
+    await expect(canvas.getByTestId("busca")).toBe(searchInput);
+    await expect(within(search).getByPlaceholderText("Buscar pedidos")).toBe(searchInput);
+
+    await userEvent.type(canvas.getByRole("textbox", { name: "Busca" }), "123");
+    await expect(searchInput).toHaveValue("123");
   }
 };
