@@ -52,7 +52,12 @@ const TAGS = [
   "ark-toaster",
   "ark-toggle",
   "ark-toggle-group",
-  "ark-tooltip"
+  "ark-tooltip",
+  // Pacotes laterais: usados como tag crua nos frameworks, sem wrapper, então a regra vale igual.
+  "ark-chart",
+  "ark-code-editor",
+  "ark-wysiwyg-editor",
+  "ark-wysiwyg-viewer"
 ];
 
 // Um valor válido por atributo, no formato em que o wrapper o entrega; o resto usa FALLBACK.
@@ -94,7 +99,12 @@ function probe(tag: string): Mismatch[] {
       mismatches.push({ tag, attr, problem: `lança ${(error as Error).name}` });
       continue;
     }
-    if (el.getAttribute(attr) !== sample) {
+    if (el.getAttribute(attr) === sample) continue;
+    // Um setter pode normalizar a string (o `fold="true"` do ark-code-editor para o "" recebido): vale se o getter
+    // lê o mesmo que leria do atributo gravado direto.
+    const viaAttribute = document.createElement(tag) as HTMLElement & Record<string, unknown>;
+    viaAttribute.setAttribute(attr, sample);
+    if (JSON.stringify(el[attr]) !== JSON.stringify(viaAttribute[attr])) {
       mismatches.push({ tag, attr, problem: `atributo ficou ${JSON.stringify(el.getAttribute(attr))}` });
     }
   }
