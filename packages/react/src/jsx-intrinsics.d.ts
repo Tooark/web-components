@@ -537,12 +537,14 @@ interface ArkIntrinsicElements {
     lang?: ArkLang;
   };
   "ark-chart": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
     theme?: ArkTheme;
     renderer?: "canvas" | "svg";
     height?: string;
     "auto-resize"?: boolean | "false";
   };
   "ark-wysiwyg-editor": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
     theme?: ArkTheme;
     placeholder?: string;
     editable?: boolean | "false";
@@ -554,6 +556,7 @@ interface ArkIntrinsicElements {
     "max-file-size"?: number;
   };
   "ark-wysiwyg-viewer": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
     theme?: ArkTheme;
   };
   "ark-code-editor": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
@@ -571,6 +574,9 @@ interface ArkIntrinsicElements {
     "line-ending"?: "auto" | "lf" | "crlf";
     "tab-indent"?: boolean | "false";
     autocomplete?: boolean | "false";
+    "mark-unknown-variables"?: boolean;
+    "single-line"?: boolean;
+    size?: ArkSize;
   };
 }
 
