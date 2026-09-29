@@ -240,7 +240,7 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     return this.readPalette("colors", DEFAULT_COLORS);
   }
 
-  set colors(value: string[] | null | undefined) {
+  set colors(value: string[] | string | null | undefined) {
     this.writePalette("colors", value);
   }
 
@@ -249,7 +249,7 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     return this.readPalette("highlights", DEFAULT_HIGHLIGHTS);
   }
 
-  set highlights(value: string[] | null | undefined) {
+  set highlights(value: string[] | string | null | undefined) {
     this.writePalette("highlights", value);
   }
 
@@ -317,8 +317,12 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     }
   }
 
-  private writePalette(name: "colors" | "highlights", value: string[] | null | undefined): void {
-    if (Array.isArray(value)) {
+  private writePalette(name: "colors" | "highlights", value: string[] | string | null | undefined): void {
+    // Uma string é o JSON do atributo (React 19 e Vue gravam a prop como propriedade): vai como está, e a leitura
+    // filtra as cores inválidas.
+    if (typeof value === "string") {
+      this.setAttribute(name, value);
+    } else if (Array.isArray(value)) {
       this.setAttribute(name, JSON.stringify(value.filter(isSafeColor)));
     } else {
       this.removeAttribute(name);
