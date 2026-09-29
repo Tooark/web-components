@@ -113,7 +113,7 @@ export const WithSwatches = {
   }
 };
 
-// Seis radios nomeados no idioma; clique e setas selecionam e emitem change; cada opcao e um ark-mark na cor.
+// Dez radios nomeados no idioma; clique e setas selecionam e emitem change; cada opcao e um ark-mark na cor.
 export const Selection = {
   render: () => createPicker({ value: "circle", color: "rgb(37, 99, 235)", lang: "pt" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -129,7 +129,11 @@ export const Selection = {
       "Triângulo",
       "Losango",
       "Estrela",
-      "Hexágono"
+      "Hexágono",
+      "Cruz",
+      "Pentágono",
+      "Lua",
+      "Asterisco"
     ]);
     await expect(canvas.getByRole("radio", { name: "Círculo" })).toHaveAttribute("aria-checked", "true");
     const marks = Array.from(host.querySelectorAll("ark-mark"));
@@ -139,7 +143,11 @@ export const Selection = {
       "triangle",
       "diamond",
       "star",
-      "hexagon"
+      "hexagon",
+      "cross",
+      "pentagon",
+      "moon",
+      "asterisk"
     ]);
     await expect(getComputedStyle(marks[0].querySelector("path") as SVGPathElement).fill).toBe("rgb(37, 99, 235)");
 
@@ -149,9 +157,11 @@ export const Selection = {
     canvas.getByRole("radio", { name: "Estrela" }).focus();
     await userEvent.keyboard("{ArrowRight}");
     await expect(host.value).toBe("hexagon");
+    await userEvent.keyboard("{End}");
+    await expect(host.value).toBe("asterisk");
     await userEvent.keyboard("{ArrowRight}");
     await expect(host.value).toBe("circle");
-    await expect(values).toEqual(["star", "hexagon", "circle"]);
+    await expect(values).toEqual(["star", "hexagon", "asterisk", "circle"]);
 
     host.setAttribute("lang", "en");
     await expect(canvas.getByRole("radio", { name: "Hexagon" })).toBeVisible();
@@ -168,13 +178,13 @@ export const TestHooks = {
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     await expect(canvasElement.querySelector('[data-ark="shape-picker"]')).toHaveAttribute("data-testid", "formas");
     const options = canvasElement.querySelectorAll('[data-ark="shape-picker-option"]');
-    await expect(options).toHaveLength(6);
+    await expect(options).toHaveLength(10);
     await expect(options[3]).toHaveAttribute("data-testid", "formas-option");
     await expect(options[3]).toHaveAttribute("data-value", "diamond");
   }
 };
 
-// Opcional: `shapes` escolhe quais formas e em que ordem ("all" oferece as dez); sem ele ficam as seis de sempre.
+// Opcional: `shapes` escolhe quais formas e em que ordem ("all", como sem o atributo, oferece as dez).
 export const CustomShapes = {
   render: () => {
     const wrap = document.createElement("div");
@@ -236,10 +246,10 @@ export const CustomShapes = {
     await expect(names(subset)).toEqual(["Pentágono", "Asterisco"]);
     (subset as unknown as { shapes: string }).shapes = "hexagon,circle";
     await expect(names(subset)).toEqual(["Hexágono", "Círculo"]);
-    // Nenhuma válida (ou atributo removido) volta às seis padrão.
+    // Nenhuma válida (ou atributo removido) volta às dez.
     subset.setAttribute("shapes", "nada");
-    await expect(names(subset)).toHaveLength(6);
+    await expect(names(subset)).toHaveLength(10);
     subset.removeAttribute("shapes");
-    await expect(names(subset)).toEqual(["Círculo", "Quadrado", "Triângulo", "Losango", "Estrela", "Hexágono"]);
+    await expect(names(subset)).toEqual(names(all));
   }
 };

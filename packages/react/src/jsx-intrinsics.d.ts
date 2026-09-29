@@ -364,7 +364,7 @@ interface ArkIntrinsicElements {
   "ark-shape-picker": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     value?: ArkMarkShape;
-    /** Formas oferecidas, separadas por vírgula, ou "all"; sem ele, as seis originais. */
+    /** Formas oferecidas, separadas por vírgula, ou "all"; sem ele, as dez. */
     shapes?: string;
     color?: string;
     label?: string;

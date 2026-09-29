@@ -32,7 +32,7 @@ export class ArkShapePickerComponent {
   @Input() ariaLabel: string | undefined;
   /** Forma selecionada. */
   @Input() value: ArkMarkShape | undefined;
-  /** Formas oferecidas, na ordem, ou "all" para as dez. Padrão: as seis originais. */
+  /** Formas oferecidas, na ordem (ou "all"). Padrão: as dez. */
   @Input() shapes: ArkMarkShape[] | "all" | undefined;
   /** Cor CSS em que as formas são desenhadas. Padrão: a cor do texto ao redor. */
   @Input() color: string | undefined;

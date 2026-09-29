@@ -8,7 +8,7 @@ import { useForwardedRef } from "./use-forwarded-ref.js";
 export type ArkShapePickerProps = ArkShapePickerStyleOptions & {
   /** Forma selecionada. */
   value?: ArkMarkShape;
-  /** Formas oferecidas, na ordem, ou "all" para as dez. Padrao: as seis originais. */
+  /** Formas oferecidas, na ordem (ou "all"). Padrao: as dez. */
   shapes?: ArkMarkShape[] | "all";
   /** Nome acessivel do radiogroup. */
   label?: string;
