@@ -90,7 +90,8 @@ export class ArkTooltip extends HTMLElementBase {
     if (!this.isConnected) return;
 
     if (name === "open") {
-      if (this.syncingOpen) return;
+      // Sem o observer o connectedCallback ainda não rodou (upgrade de uma tag já no DOM): quem abre é ele.
+      if (this.syncingOpen || !this.observer) return;
       if (this.hasAttribute("open")) {
         this.show();
       } else {
@@ -109,8 +110,9 @@ export class ArkTooltip extends HTMLElementBase {
 
   set open(value: boolean | string | null | undefined) {
     const next = coerceBooleanAttr(value);
-    // Desconectado (React 19 e Vue gravam a prop antes de inserir o nó): só reflete; o connectedCallback abre.
-    if (!this.isConnected) {
+    // Antes do connectedCallback (React 19 e Vue gravam a prop antes de inserir o nó; o upgrade de uma tag já no DOM
+    // a reaplica ao conectar): só reflete, e o connectedCallback abre.
+    if (!this.isConnected || !this.observer) {
       this.toggleAttribute("open", next);
       return;
     }
