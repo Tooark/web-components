@@ -158,7 +158,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                                    | Version       | Description                                               |
 | ------------------------------------------------------------------------------------------ | ------------- | --------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.2.2        | Design tokens (colors, sizes, motion) and primitive types |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.3.0        | Design tokens (colors, sizes, motion) and primitive types |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                             | ^2.8.1        | TypeScript runtime helpers                                |
 | [`@codemirror/autocomplete`](https://www.npmjs.com/package/@codemirror/autocomplete)       | >=6 (peer)    | Completions and bracket closing                           |
 | [`@codemirror/commands`](https://www.npmjs.com/package/@codemirror/commands)               | >=6.6 (peer)  | Keymaps, history, indentation commands                    |
