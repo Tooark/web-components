@@ -56,14 +56,16 @@ import { registerTooarkCode } from "@tooark/code";
 registerTooarkCode();
 ```
 
+In React, Vue or Angular use the tag directly (the framework READMEs show how); a JS property the framework assigns before this call, such as `value` bound on the tag, is applied when the element upgrades, so the order does not matter.
+
 ---
 
 ## 📦 Components
 
 ### `ark-code-editor`
 
-- Attributes: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (default `8rem`), `line-numbers` and `fold` (on; `"false"` turns off), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (default 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` and `autocomplete` (on; `"false"` turns off), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, default `md`: font and side padding, plus the height in `single-line`), `theme`, `testid`.
-- Properties: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (the `EditorView`), and one per attribute except `testid`; methods `format()`, `focus()`.
+- Attributes: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (default `8rem`), `line-numbers` and `fold` (on; `"false"` turns off), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (default 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` and `autocomplete` (on; `"false"` turns off), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, default `md`: font and side padding, plus the height in `single-line`), `theme`, `aria-label` (names the editable content, CodeMirror's `role="textbox"`), `testid`.
+- Properties: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (the `EditorView`), and one per attribute except `aria-label` and `testid`; methods `format()`, `focus()`.
 - Events: `change` (`detail: { value }`, user edits only), `ark-format-error` (`detail: { error }`), `ark-submit` (`detail: { value }`, Enter in `single-line`).
 - Keys: Ctrl/Cmd+F search, Ctrl/Cmd+Z undo, Ctrl+Y redo (Cmd+Shift+Z on macOS), Ctrl+Space completions, Shift+Alt+F format, Tab/Shift+Tab indent, Esc+Tab leave, Ctrl+M (Shift+Alt+M on macOS) toggles CodeMirror's tab-focus mode.
 - Hooks: the CodeMirror root carries `data-ark="code-editor"` and the `testid` as `data-testid`; each painted variable `data-ark="code-editor-variable"` with `data-key`; its tooltip `data-ark="code-editor-variable-tooltip"`.

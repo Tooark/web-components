@@ -53,6 +53,8 @@ import { registerTooarkWysiwyg } from "@tooark/wysiwyg";
 registerTooarkWysiwyg();
 ```
 
+In React, Vue or Angular use the tag directly (the framework READMEs show how); a JS property the framework assigns before this call, such as `content` bound on the tag, is applied when the element upgrades, so the order does not matter.
+
 Pick the toolbar groups per instance with `toolbar` and, to enable images and videos, assign the `uploadFile` property (a function that stores the file and resolves `{ src, alt?, title?, poster? }`).
 
 ---
@@ -61,14 +63,16 @@ Pick the toolbar groups per instance with `toolbar` and, to enable images and vi
 
 ### `ark-wysiwyg-editor`
 
-- Attributes: `toolbar` (groups and/or items, comma-separated; `all`; `none`; default `style,marks,lists,link,blocks,clear,history`), `theme` (`auto` | `light` | `dark`), `placeholder`, `editable="false"`, `lang` (`en` | `pt` | `es`, or `custom` with `locale-json`), `colors`/`highlights` (JSON arrays of CSS colors: hex, a color name or `rgb()`/`hsl()`; others, such as `oklch()` or `var()`, are dropped), `max-file-size` (bytes, default 10 MiB).
+- Attributes: `toolbar` (groups and/or items, comma-separated; `all`; `none`; default `style,marks,lists,link,blocks,clear,history`), `theme` (`auto` | `light` | `dark`), `placeholder`, `editable="false"`, `lang` (`en` | `pt` | `es`, or `custom` with `locale-json`), `colors`/`highlights` (JSON arrays of CSS colors: hex, a color name or `rgb()`/`hsl()`; others, such as `oklch()` or `var()`, are dropped), `max-file-size` (bytes, default 10 MiB), `aria-label` (names the editable content, Tiptap's `role="textbox"`), `testid`.
 - Toolbar items, to mix with the groups in `toolbar` (unknown names are ignored; `image`/`video` only with `uploadFile`): `heading` (block style select), `heading-1` to `heading-4`, `bold`, `italic`, `underline`, `strike`, `code`, `text-color`, `highlight`, `align-left`, `align-center`, `align-right`, `align-justify`, `bullet-list`, `ordered-list`, `outdent`, `indent`, `link`, `image`, `video`, `blockquote`, `horizontal-rule`, `clear-format`, `undo`, `redo`.
-- Properties: `content` (Tiptap JSON, sanitized; setting it does not emit `ark-wysiwyg-change` and stays out of the undo history), `uploadFile`, `colors`, `highlights`, `resolvedTheme`, `editor` (the Tiptap instance); `insertFile(file)`.
+- Properties: `content` (Tiptap JSON, sanitized; setting it does not emit `ark-wysiwyg-change` and stays out of the undo history), `uploadFile`, `colors`, `highlights` (an array, or the attribute's JSON string, which is what a framework assigns), `resolvedTheme`, `editor` (the Tiptap instance); `insertFile(file)`.
 - Events: `ark-wysiwyg-change` (`detail` = JSON), `ark-wysiwyg-upload-error` (`detail: { reason, file, error? }`, reasons `no-uploader`, `unsupported-type`, `too-large`, `invalid-src`, `failed`).
+- Hooks: the root carries `data-ark="wysiwyg-editor"`, the toolbar `wysiwyg-editor-toolbar` and the editable content `wysiwyg-editor-content`; with `testid`, `data-testid` is the testid and `<testid>-toolbar`/`<testid>-content`.
 
 ### `ark-wysiwyg-viewer`
 
-- Attributes: `theme`. Properties: `content`, `resolvedTheme`.
+- Attributes: `theme`, `testid`. Properties: `content`, `resolvedTheme`.
+- Hooks: the root carries `data-ark="wysiwyg-viewer"` and the content `wysiwyg-viewer-content`, with the `testid` as in the editor.
 
 ### Engine and helpers
 

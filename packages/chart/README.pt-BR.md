@@ -51,15 +51,18 @@ import { registerTooarkChart } from "@tooark/chart";
 registerTooarkChart();
 ```
 
+Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram como); uma propriedade JS que o framework atribui antes desta chamada, como `option` ligada na tag, é aplicada quando o elemento faz o upgrade, então a ordem não importa.
+
 ---
 
 ## 📦 Componentes
 
 ### `ark-chart`
 
-- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga).
+- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga), `testid`.
 - Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`.
 - Eventos: `ark-chart-click` com os params do ECharts em `detail`.
+- Hooks: o contêiner do gráfico (`[part="canvas"]`) leva `data-ark="chart"` e o `testid` como `data-testid`.
 
 ### Engine
 

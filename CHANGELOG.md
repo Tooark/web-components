@@ -9,6 +9,48 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-mark`: four more shapes, `cross`, `pentagon`, `moon` and `asterisk` (ten in all), with their localized names
+  (`shapeCross`, `shapePentagon`, `shapeMoon`, `shapeAsterisk` in en/pt/es); `ARK_MARK_SHAPES` lists the ten.
+- `ark-shape-picker`: opt-in `shapes` (comma-separated, or `all`) picks which shapes are offered and in what order;
+  without it the picker offers the same six as before (`ARK_SHAPE_PICKER_DEFAULT_SHAPES`). `shapes` prop on the
+  React, Vue and Angular wrappers.
+- `ark-kv-editor`: opt-in `valueField` JS property (`ArkKvValueField`/`ArkKvValueFieldContext` in core), a function
+  that creates each row's value cell in place of the `ark-input`, for a field with `{{variable}}` autocomplete such as
+  a single-line `ark-code-editor`. Secret rows keep the password field, returning `null` keeps the `ark-input` in
+  that row, a row whose type or padlock changes gets a new cell, and Enter (when the field does not cancel it) or
+  `ark-submit` in the last row adds a row. Without it the editor renders and behaves as before. `valueField` prop on
+  the three wrappers.
+- `@tooark/react`: every wrapper forwards `ref` to its `ark-*` element (`forwardRef`, typed as the element class), so
+  `ref.current?.show()` or `focus()` work from the app; the wrapper's own listeners and properties keep working, and
+  a React 19 callback ref that returns a cleanup gets the cleanup on unmount.
+- `ark-code-editor` and `ark-wysiwyg-editor`: `aria-label` names the editable content (the `role="textbox"`), also as
+  the `label` engine option (plus `setLabel` in `@tooark/code`).
+- E2E hooks on the side packages that had none: `ark-chart` (`data-ark="chart"` on the chart container) and the
+  wysiwyg editor (root, `-toolbar`, `-content`) and viewer (root, `-content`), with `testid` as `data-testid`.
+
+### Fixed
+
+- `@tooark/chart`, `@tooark/code`, `@tooark/wysiwyg`: a JS property assigned before `registerTooark*()` (a framework
+  binding `option`, `value` or `content` to the raw tag before registration) stayed an own property of the node,
+  shadowed the class setter after the upgrade and never reached the element; the elements now re-apply it through
+  the setter when they connect.
+- `ark-wysiwyg-editor`: assigning `colors`/`highlights` a JSON string (what React 19 and Vue assign when the template
+  writes the attribute) removed the attribute and fell back to the default palette; the setter now takes the string
+  like the attribute.
+- `@tooark/react` `IntrinsicElements`: `ark-code-editor` gains `size`, `single-line` and `mark-unknown-variables`,
+  `ark-chart` and the wysiwyg tags gain `testid`, `ark-shape-picker` gains `shapes`.
+
+### Changed
+
+- README: the `ark-code-editor` section covers 1.2.0's scoped variables and single-line field; a note on the
+  attributes mirrored on the host (`placeholder`, `aria-label` on `ark-input` and the fields built on it) and the test
+  queries that find only the control; the side packages and `@tooark/motion` READMEs show how to use them in React,
+  Vue and Angular without a wrapper.
+- Storybook `Integration/Framework Props` also checks `ark-chart`, `ark-code-editor` and the wysiwyg tags, and a new
+  story assigns their properties before the element is registered.
+
 ## [1.2.2] - 2026-09-28
 
 ### Changed

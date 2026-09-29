@@ -62,7 +62,7 @@ Adicione a folha de estilo ao `angular.json` (ou importe-a do seu `styles.css` g
 
 Um componente standalone por elemento: `ark-button` → `ArkButtonComponent` (`<ark-button-wrapper>`), `ark-kv-editor` → `ArkKvEditorComponent` (`<ark-kv-editor-wrapper>`), e assim por diante.
 
-- Inputs: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`) mais `ariaLabel` no input, textarea, select, checkbox, radio, switch, toggle, color-swatches, shape-picker, button, copy-button, avatar, dialog, drawer, paleta de comandos e menu; inputs de objeto onde importam (`events`, `rows`, `options`).
+- Inputs: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`) mais `ariaLabel` no input, textarea, select, checkbox, radio, switch, toggle, color-swatches, shape-picker, button, copy-button, avatar, dialog, drawer, paleta de comandos e menu; inputs de objeto onde importam (`events`, `rows`, `options`, e `valueField` no editor chave/valor).
 - Outputs: os eventos customizados em camelCase (`(arkClose)` no dialog e no drawer, `(arkSelect)` no menu e na paleta, `(changed)` no select e no editor chave/valor, …) entregando o `CustomEvent`; `(arkChange)` no calendário, no relógio e no datepicker, `(arkSlideChange)` no carrossel e `(arkEventClick)`/`(arkSlotClick)`/`(arkViewChange)`/`(arkRangeChange)` na agenda entregam o próprio `detail`; eventos nativos sobem do controle interno (`(input)` no input: leia `$any($event.target).value`).
 - Estado: atributos como `open` são a fonte da verdade (`[open]="bool"` + `(arkClose)`).
 - Tags `ark-*` cruas (pacotes laterais): adicione `schemas: [CUSTOM_ELEMENTS_SCHEMA]` ao seu componente e chame a função `registerTooark*()` no navegador.
