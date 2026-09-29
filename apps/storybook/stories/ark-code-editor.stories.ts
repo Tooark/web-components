@@ -18,6 +18,7 @@ type StoryArgs = {
   theme: ArkCodeTheme;
   readonly: boolean;
   placeholder: string;
+  ariaLabel?: string;
   minHeight: string;
   lineNumbers: boolean;
   fold: boolean;
@@ -106,6 +107,7 @@ function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
   if (args.theme && args.theme !== "auto") attributes.push(["theme", args.theme]);
   if (args.readonly) attributes.push(["readonly", ""]);
   if (args.placeholder) attributes.push(["placeholder", args.placeholder]);
+  if (args.ariaLabel) attributes.push(["aria-label", args.ariaLabel]);
   if (args.minHeight && args.minHeight !== "8rem") attributes.push(["min-height", args.minHeight]);
   if (args.lineNumbers === false) attributes.push(["line-numbers", "false"]);
   if (args.fold === false) attributes.push(["fold", "false"]);
@@ -255,6 +257,13 @@ const meta = {
     placeholder: {
       control: "text",
       description: "Texto exibido com o documento vazio.",
+      table: row(CONTENT, "string")
+    },
+    ariaLabel: {
+      name: "aria-label",
+      control: "text",
+      description:
+        'Nome acessivel do conteudo editavel (o `role="textbox"` do CodeMirror), para um editor sem `<label>` visivel.',
       table: row(CONTENT, "string")
     },
     minHeight: {
@@ -420,6 +429,7 @@ const meta = {
     theme: "auto",
     readonly: false,
     placeholder: "Cole o corpo da requisicao...",
+    ariaLabel: "",
     minHeight: "12rem",
     lineNumbers: true,
     fold: true,
@@ -1397,5 +1407,22 @@ export const Properties = {
     // focus() entrega o foco ao CodeMirror.
     editor.focus();
     await waitFor(() => expect(editor.view!.hasFocus).toBe(true));
+  }
+};
+
+// `aria-label` no host vira o nome do conteudo editavel, que e o `role="textbox"`; sem ele nada muda.
+export const AccessibleName = {
+  args: { language: "json", minHeight: "4rem", ariaLabel: "Corpo da requisicao", value: "{}" },
+  render: (args: StoryArgs) => createEditor(args),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const content = editor.view?.contentDOM as HTMLElement;
+    await expect(canvas.getByRole("textbox", { name: "Corpo da requisicao" })).toBe(content);
+
+    editor.setAttribute("aria-label", "Resposta");
+    await expect(content).toHaveAttribute("aria-label", "Resposta");
+    editor.removeAttribute("aria-label");
+    await expect(content.hasAttribute("aria-label")).toBe(false);
   }
 };

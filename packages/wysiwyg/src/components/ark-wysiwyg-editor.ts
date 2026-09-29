@@ -182,9 +182,11 @@ type Segment = { group: ArkWysiwygToolbarGroup; items: ArkWysiwygToolbarItem[] }
  * `locale-json` (rótulos), `toolbar` (grupos e/ou itens separados por vírgula,
  * `all`, ou "none"/"false" para ocultar; padrão: style, marks, lists, link,
  * blocks, clear, history), `colors` e `highlights` (JSON com a paleta),
- * `max-file-size` (bytes). Propriedade `uploadFile`: sem ela, imagem e vídeo
- * não aparecem na toolbar e arquivos colados ou arrastados são recusados
- * (`ark-wysiwyg-upload-error`), nunca embutidos em base64.
+ * `max-file-size` (bytes), `aria-label` (vai para o conteúdo editável, o
+ * `role="textbox"`) e `testid` (`data-ark="wysiwyg-editor"` na raiz, com as
+ * partes `-toolbar` e `-content`). Propriedade `uploadFile`: sem ela, imagem
+ * e vídeo não aparecem na toolbar e arquivos colados ou arrastados são
+ * recusados (`ark-wysiwyg-upload-error`), nunca embutidos em base64.
  */
 export class ArkWysiwygEditor extends HTMLElementBase {
   static readonly tagName = "ark-wysiwyg-editor";
@@ -213,6 +215,7 @@ export class ArkWysiwygEditor extends HTMLElementBase {
       "colors",
       "highlights",
       "max-file-size",
+      "aria-label",
       "testid"
     ];
   }
@@ -406,6 +409,7 @@ export class ArkWysiwygEditor extends HTMLElementBase {
       content: this.pendingContent,
       theme: this.getTheme(),
       placeholder: this.getAttribute("placeholder") || undefined,
+      label: this.getAttribute("aria-label") || undefined,
       editable: this.isEditable(),
       uploadFile: this.uploader ?? undefined,
       maxFileSize: this.getMaxFileSize(),

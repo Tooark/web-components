@@ -605,3 +605,38 @@ export const KeepsEditsOnRebuild = {
     await expect(JSON.stringify(editor.content)).toContain("Rascunho importante");
   }
 };
+
+// Hooks de E2E e nome acessível: raiz, toolbar e conteúdo editável marcados; `aria-label` vai para o `role="textbox"`.
+export const TestHooksAndLabel = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-4";
+    const editor = makeEditor({ lang: "pt" });
+    editor.setAttribute("testid", "nota");
+    editor.setAttribute("aria-label", "Nota da reunião");
+    const viewer = makeViewer({});
+    viewer.setAttribute("testid", "leitura");
+    wrap.append(editor, viewer);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvasElement.querySelector("ark-wysiwyg-editor") as ArkWysiwygEditor;
+    const viewer = canvasElement.querySelector("ark-wysiwyg-viewer") as ArkWysiwygViewer;
+
+    await expect(canvas.getByTestId("nota")).toHaveAttribute("data-ark", "wysiwyg-editor");
+    await expect(canvas.getByTestId("nota-toolbar")).toHaveAttribute("role", "toolbar");
+    const content = canvas.getByTestId("nota-content");
+    await expect(content).toBe(editor.editor?.view.dom);
+    await expect(canvas.getByRole("textbox", { name: "Nota da reunião" })).toBe(content);
+    await expect(canvas.getByTestId("leitura")).toHaveAttribute("data-ark", "wysiwyg-viewer");
+    await expect(canvas.getByTestId("leitura-content")).toBe(viewer.querySelector(".ProseMirror"));
+
+    // Trocar o testid não reconstrói o editor; o conteúdo digitado continua.
+    editor.setAttribute("testid", "ata");
+    await expect(canvas.getByTestId("ata-content")).toBe(content);
+    editor.removeAttribute("testid");
+    await expect(content.hasAttribute("data-testid")).toBe(false);
+    await expect(content).toHaveAttribute("data-ark", "wysiwyg-editor-content");
+  }
+};
