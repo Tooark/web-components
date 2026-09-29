@@ -164,6 +164,122 @@ export const InlineConsole = {
 
 const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0));
 
+// Ações do app na linha do cabeçalho (slot="actions"), entre o título e o fechar: um console com a contagem e os
+// botões dele, e uma gaveta overlay com um botão de editar.
+export const HeaderActions = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-3";
+
+    const frame = document.createElement("div");
+    frame.className = "flex h-96 flex-col overflow-hidden rounded-lg border";
+    frame.style.borderColor = "var(--ark-color-border)";
+    const main = document.createElement("div");
+    main.className = "flex-1 p-4 text-sm";
+    main.textContent = "Area principal";
+    const consoleDrawer = createDrawer({
+      side: "bottom",
+      mode: "inline",
+      size: "55%",
+      label: "Console",
+      lang: "pt",
+      withFooter: false,
+      open: true,
+      testid: "console"
+    });
+    const log = consoleDrawer.firstElementChild as HTMLElement;
+    log.innerHTML = Array.from({ length: 30 }, (_, index) => `<p>GET /users/${index + 1} 200 OK</p>`).join("");
+    const actions = document.createElement("div");
+    actions.setAttribute("slot", "actions");
+    const count = document.createElement("ark-badge");
+    count.setAttribute("size", "sm");
+    count.textContent = "30";
+    const har = document.createElement("ark-button");
+    har.setAttribute("variant", "ghost");
+    har.setAttribute("size", "sm");
+    har.textContent = "HAR";
+    const clear = document.createElement("ark-button");
+    clear.setAttribute("variant", "ghost");
+    clear.setAttribute("size", "sm");
+    clear.textContent = "Limpar";
+    actions.append(count, har, clear);
+    consoleDrawer.appendChild(actions);
+    frame.append(main, consoleDrawer);
+
+    const details = createDrawer({ label: "Detalhes da requisicao", lang: "pt", testid: "detalhes" });
+    const detailsActions = document.createElement("div");
+    detailsActions.setAttribute("slot", "actions");
+    const edit = document.createElement("ark-button");
+    edit.setAttribute("variant", "outline");
+    edit.setAttribute("size", "sm");
+    edit.textContent = "Editar";
+    detailsActions.appendChild(edit);
+    details.appendChild(detailsActions);
+
+    wrap.append(frame, createOpener(details, "Abrir detalhes (overlay com acoes)"), details);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const part = (testid: string) => canvasElement.querySelector(`[data-testid="${testid}"]`) as HTMLElement;
+    const rect = (el: Element) => el.getBoundingClientRect();
+    const middle = (el: Element) => (rect(el).top + rect(el).bottom) / 2;
+    const near = async (a: number, b: number) => expect(Math.abs(a - b)).toBeLessThanOrEqual(1);
+
+    // Linha do cabeçalho: título | ações | fechar, centradas na linha do título, com o gap-4 entre as três.
+    const drawer = part("console");
+    const actions = part("console-actions");
+    const header = part("console-header");
+    const title = part("console-title");
+    const body = drawer.querySelector(":scope > div:not([data-ark-chrome]):not([slot])") as HTMLElement;
+    await expect(actions).toHaveAttribute("data-ark", "drawer-actions");
+    await settled(drawer);
+    await waitFor(() =>
+      expect(drawer.style.getPropertyValue("--ark-drawer-actions-width")).toBe(`${actions.offsetWidth}px`)
+    );
+    await near(rect(header).top, rect(drawer).top);
+    await near(middle(actions), middle(title));
+    await near(rect(part("console-close")).left - rect(actions).right, 16);
+    await near(rect(actions).left - rect(title).right, 16);
+    // O corpo começa onde o cabeçalho termina: as ações não ocupam espaço próprio.
+    await near(rect(body).top, rect(header).bottom);
+
+    // Rolando, ações e cabeçalho ficam presos juntos.
+    drawer.scrollTop = 200;
+    await expect(drawer.scrollTop).toBeGreaterThan(0);
+    await near(rect(header).top, rect(drawer).top);
+    await near(middle(actions), middle(title));
+    drawer.scrollTop = 0;
+
+    // Sem o fechar, as ações encostam na borda do conteúdo (clientWidth desconta a barra de rolagem).
+    drawer.setAttribute("no-close-button", "");
+    await waitFor(() => expect(part("console-close")).toBeNull());
+    await near(rect(actions).right, rect(drawer).left + drawer.clientLeft + drawer.clientWidth - 24);
+    drawer.removeAttribute("no-close-button");
+
+    // Sem ações, o cabeçalho volta ao que era.
+    actions.remove();
+    await waitFor(() => expect(header.className).not.toContain("ark:-mt-12"));
+    await expect(title.className).not.toContain("--ark-drawer-actions-width");
+    await expect(drawer.style.getPropertyValue("--ark-drawer-actions-width")).toBe("");
+    await near(rect(header).top, rect(drawer).top);
+    drawer.appendChild(actions);
+    await waitFor(() => expect(header.className).toContain("ark:-mt-12"));
+
+    // Overlay: a mesma linha; o foco inicial vai ao corpo, não às ações nem ao chrome.
+    const details = part("detalhes") as DrawerEl;
+    details.show();
+    await waitFor(() => expect(details.matches(":popover-open")).toBe(true));
+    await settled(details);
+    await waitFor(() =>
+      expect(Math.abs(middle(part("detalhes-actions")) - middle(part("detalhes-title")))).toBeLessThanOrEqual(1)
+    );
+    await near(rect(part("detalhes-close")).left - rect(part("detalhes-actions")).right, 16);
+    await expect(details.ownerDocument.activeElement).toHaveAttribute("placeholder", "primeiro focavel");
+    details.close();
+    await waitFor(() => expect(details.matches(":popover-open")).toBe(false));
+  }
+};
+
 // Overlay: popover manual com role=dialog, foco preso, Esc e scrim fecham com o motivo, persistent ignora;
 // a gaveta encosta na borda de `side` com a largura do preset.
 export const OverlayBehavior = {

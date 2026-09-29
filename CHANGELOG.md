@@ -22,6 +22,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `aria-describedby` (the host becomes a grid: the box, then the label and the hint stacked); when free children name
   the control the hint is `aria-hidden`, so it stays out of the name. New hooks `checkbox-helper` and `radio-helper`,
   `helper` prop on the three wrappers. Without it the host keeps its flex layout.
+- `ark-drawer`: a `slot="actions"` container joins the header row between the title and the close button, centered on
+  the title line and sticky with the header; the title reserves the actions' width (measured with a `ResizeObserver`)
+  and the header is rendered even without `label`. New hook `drawer-actions`. A drawer without the slot renders as
+  before.
 
 ### Changed
 
