@@ -56,14 +56,16 @@ import { registerTooarkCode } from "@tooark/code";
 registerTooarkCode();
 ```
 
+Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram como); uma propriedade JS que o framework atribui antes desta chamada, como `value` ligada na tag, é aplicada quando o elemento faz o upgrade, então a ordem não importa.
+
 ---
 
 ## 📦 Componentes
 
 ### `ark-code-editor`
 
-- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, padrão `md`: fonte e recuo lateral, e a altura em `single-line`), `theme`, `testid`.
-- Propriedades: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (o `EditorView`), e uma por atributo exceto `testid`; métodos `format()`, `focus()`.
+- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, padrão `md`: fonte e recuo lateral, e a altura em `single-line`), `theme`, `aria-label` (nomeia o conteúdo editável, o `role="textbox"` do CodeMirror), `testid`.
+- Propriedades: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (o `EditorView`), e uma por atributo exceto `aria-label` e `testid`; métodos `format()`, `focus()`.
 - Eventos: `change` (`detail: { value }`, só edições do usuário), `ark-format-error` (`detail: { error }`), `ark-submit` (`detail: { value }`, Enter em `single-line`).
 - Teclas: Ctrl/Cmd+F busca, Ctrl/Cmd+Z desfazer, Ctrl+Y refazer (Cmd+Shift+Z no macOS), Ctrl+Espaço completions, Shift+Alt+F formatar, Tab/Shift+Tab recuo, Esc+Tab sair, Ctrl+M (Shift+Alt+M no macOS) alterna o modo tab-focus do CodeMirror.
 - Hooks: a raiz do CodeMirror leva `data-ark="code-editor"` e o `testid` como `data-testid`; cada variável pintada, `data-ark="code-editor-variable"` com `data-key`; o tooltip dela, `data-ark="code-editor-variable-tooltip"`.

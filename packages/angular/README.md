@@ -62,7 +62,7 @@ Add the stylesheet to `angular.json` (or import it from your global `styles.css`
 
 One standalone component per element: `ark-button` → `ArkButtonComponent` (`<ark-button-wrapper>`), `ark-kv-editor` → `ArkKvEditorComponent` (`<ark-kv-editor-wrapper>`), and so on.
 
-- Inputs: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`) plus `ariaLabel` on the input, textarea, select, checkbox, radio, switch, toggle, color-swatches, shape-picker, button, copy-button, avatar, dialog, drawer, command palette and menu; object inputs where they matter (`events`, `rows`, `options`).
+- Inputs: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`) plus `ariaLabel` on the input, textarea, select, checkbox, radio, switch, toggle, color-swatches, shape-picker, button, copy-button, avatar, dialog, drawer, command palette and menu; object inputs where they matter (`events`, `rows`, `options`, and `valueField` on the key/value editor).
 - Outputs: the custom events in camelCase (`(arkClose)` on the dialog and drawer, `(arkSelect)` on the menu and palette, `(changed)` on the select and the key/value editor, …) delivering the `CustomEvent`; `(arkChange)` on the calendar, clock and datepicker, `(arkSlideChange)` on the carousel and `(arkEventClick)`/`(arkSlotClick)`/`(arkViewChange)`/`(arkRangeChange)` on the scheduler deliver the `detail` itself; native events bubble from the inner control (`(input)` on the input: read `$any($event.target).value`).
 - State: attributes like `open` are the source of truth (`[open]="bool"` + `(arkClose)`).
 - Raw `ark-*` tags (side packages): add `schemas: [CUSTOM_ELEMENTS_SCHEMA]` to your component and call the `registerTooark*()` function in the browser.

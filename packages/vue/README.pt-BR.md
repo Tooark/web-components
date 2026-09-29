@@ -70,7 +70,7 @@ export default {
 
 Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-editor` → `ArkKvEditor`, `ark-command-palette` → `ArkCommandPalette` + `ArkCommandItem`.
 
-- Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `testid` para os hooks de E2E, mais as propriedades JS onde importam (`events`, `rows`, `options`, `sizes`).
+- Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `testid` para os hooks de E2E, mais as propriedades JS onde importam (`events`, `rows`, `options`, `sizes`, e `valueField` no `ArkKvEditor`).
 - Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, …); `@ark-change` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `@ark-slide-change` em `ArkCarousel` e `@ark-event-click`/`@ark-slot-click`/`@ark-view-change`/`@ark-range-change` em `ArkScheduler` entregam o próprio `detail`; eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`).
 

@@ -93,6 +93,30 @@ const dispose = arkSwipe(linha, {
 });
 ```
 
+### Em React, Vue e Angular
+
+Os helpers são funções comuns, então não precisam de wrapper: chame depois que os elementos existem e chame a função de parar/dispose devolvida quando o componente sai. Passe elementos de uma ref em vez de um seletor, porque um seletor procura no `document` inteiro e animaria também as outras instâncias do componente.
+
+```tsx
+// React
+useEffect(() => arkReveal(listRef.current!.querySelectorAll(":scope > li"), { preset: "fade", once: true }), []);
+```
+
+```ts
+// Vue
+let stop = () => {};
+onMounted(() => (stop = arkSwipe(row.value!, { axis: "x", onSwipe: archive })));
+onBeforeUnmount(() => stop());
+
+// Angular
+ngAfterViewInit(): void {
+  this.stop = arkReveal(this.list.nativeElement.querySelectorAll(":scope > li"), { preset: "fade" });
+}
+ngOnDestroy(): void {
+  this.stop?.();
+}
+```
+
 ---
 
 ## 📋 Dependências

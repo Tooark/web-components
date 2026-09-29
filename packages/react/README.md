@@ -61,7 +61,7 @@ import "@tooark/web-components/styles.css";
 
 One wrapper per element, named after it: `ark-button` → `ArkButton`, `ark-kv-editor` → `ArkKvEditor`, `ark-command-palette` → `ArkCommandPalette` + `ArkCommandItem`. Each exports its props type (`ArkButtonProps`, …).
 
-- Props: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, plus the element's JS properties where they matter (`events`, `rows`, `options`, `sizes`, `colors`).
+- Props: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, plus the element's JS properties where they matter (`events`, `rows`, `options`, `sizes`, `colors`, and `valueField` on `ArkKvEditor`, which must be a stable function: `useCallback`).
 - Events: `on<Event>` for the custom events, receiving the `CustomEvent` (`onChange` on `ArkSelect`/`ArkKvEditor`, `onClose` on `ArkDialog`/`ArkDrawer`, `onSelect` on `ArkMenu`/`ArkCommandPalette`, …); `onChange` on `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `onSlideChange` on `ArkCarousel` and `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` on `ArkScheduler` receive the `detail` itself. Native events bubble from the inner control (`onInput` on `ArkInput`: read `event.target.value`).
 - State: attributes like `open` are the source of truth (`ArkDialog open={bool}` + `onClose`), so controlled rendering works and the exit still animates.
 - Ref: every wrapper forwards `ref` to its `ark-*` element (React 18 and 19), typed as the element class from `@tooark/web-components`, so its methods and properties are typed. Object and callback refs both work (including React 19 callback refs that return a cleanup), and the wrapper's own events and properties keep working.

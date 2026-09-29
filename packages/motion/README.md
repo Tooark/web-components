@@ -93,6 +93,30 @@ const dispose = arkSwipe(row, {
 });
 ```
 
+### In React, Vue and Angular
+
+The helpers are plain functions, so no wrapper is needed: call them after the elements exist and call the returned stop/dispose function when the component goes away. Pass elements from a ref rather than a selector, since a selector searches the whole `document` and would also animate other instances of the component.
+
+```tsx
+// React
+useEffect(() => arkReveal(listRef.current!.querySelectorAll(":scope > li"), { preset: "fade", once: true }), []);
+```
+
+```ts
+// Vue
+let stop = () => {};
+onMounted(() => (stop = arkSwipe(row.value!, { axis: "x", onSwipe: archive })));
+onBeforeUnmount(() => stop());
+
+// Angular
+ngAfterViewInit(): void {
+  this.stop = arkReveal(this.list.nativeElement.querySelectorAll(":scope > li"), { preset: "fade" });
+}
+ngOnDestroy(): void {
+  this.stop?.();
+}
+```
+
 ---
 
 ## 📋 Dependencies
