@@ -13,6 +13,8 @@ export type ArkRadioProps = PropsWithChildren<
     value?: string;
     /** Rotulo proprio (<label for>); sem ele use aria-label ou filhos como rotulo livre. */
     label?: string;
+    /** Dica abaixo do rotulo, ligada ao controle por aria-describedby. */
+    helper?: string;
     className?: string;
     /** Dispara so no radio que ganhou a marca. */
     onChange?: (event: CustomEvent<{ value: string }>) => void;

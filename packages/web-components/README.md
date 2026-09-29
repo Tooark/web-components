@@ -78,7 +78,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-calendar` — Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`).
 - `ark-card` — Card: the host is the box (`surface`, `border`, `rounded`) and a grid: `heading` (h2) or `slot="header"` with `slot="actions"` on the top row, unslotted children as the body, `slot="footer"` last with a divider; `padding` none–lg.
 - `ark-carousel` — Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.
-- `ark-checkbox` — Checkbox drawn by the component (`role="checkbox"` button + hidden native input for forms and `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/free children as the label, sizes, intents. Emits `change`.
+- `ark-checkbox` — Checkbox drawn by the component (`role="checkbox"` button + hidden native input for forms and `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/free children as the label, `helper` hint below it, sizes, intents. Emits `change`.
 - `ark-clock` — Time selection with scrollable digital columns (hours/minutes/seconds), 24h/12h, minute step, localized.
 - `ark-color-swatches` — Color palette as a `radiogroup`: swatches from `colors` (`{ name, value }[]`, JSON attribute or JS property), `value`, arrows navigate, `disabled`, `size`. Emits `change` with the value.
 - `ark-command-item` — Command palette item (the host is the `role="option"`): free children, `slot="trailing"` for a shortcut, `value`, `group`, `label` (filter text), `disabled`. Emits `ark-select`.
@@ -96,7 +96,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-menu` — Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.
 - `ark-menu-item` — Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).
 - `ark-progress` — Progress bar (`role="progressbar"` on the host): `value`/`max` with token-driven width transition, `show-value`, `indeterminate` loop exempt from reduced motion, `label`, sizes, intents.
-- `ark-radio` — Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label. Emits `change` on the one checked.
+- `ark-radio` — Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label, `helper` hint. Emits `change` on the one checked.
 - `ark-scheduler` — Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.
 - `ark-select` — Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.
 - `ark-shape-picker` — Shape picker as a `radiogroup`: the ten `ark-mark` shapes (or the ones `shapes` lists) drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.

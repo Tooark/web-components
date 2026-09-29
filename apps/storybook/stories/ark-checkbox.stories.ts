@@ -5,6 +5,7 @@ const meta = {
   title: "Core/ArkCheckbox",
   argTypes: {
     label: { control: "text" },
+    helper: { control: "text" },
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },
     disabled: { control: "boolean" },
@@ -17,6 +18,7 @@ const meta = {
   },
   args: {
     label: "Aceito os termos",
+    helper: "",
     checked: false,
     indeterminate: false,
     disabled: false,
@@ -33,6 +35,7 @@ export default meta;
 
 type StoryArgs = {
   label: string;
+  helper: string;
   checked: boolean;
   indeterminate: boolean;
   disabled: boolean;
@@ -49,6 +52,7 @@ type CheckboxEl = HTMLElement & { checked: boolean; indeterminate: boolean; togg
 function createCheckbox(args: Partial<StoryArgs> & { ariaLabel?: string; html?: string }): CheckboxEl {
   const el = document.createElement("ark-checkbox") as CheckboxEl;
   if (args.label) el.setAttribute("label", args.label);
+  if (args.helper) el.setAttribute("helper", args.helper);
   if (args.ariaLabel) el.setAttribute("aria-label", args.ariaLabel);
   if (args.html) el.innerHTML = args.html;
   if (args.intent) el.setAttribute("intent", args.intent);
@@ -202,6 +206,74 @@ export const ChildrenAsLabel = {
     await expect(lateBox).not.toHaveAttribute("aria-labelledby");
     late.append("Tardio");
     await waitFor(() => expect(lateBox).toHaveAttribute("aria-labelledby", late.id));
+  }
+};
+
+// `helper` põe a dica abaixo do rótulo (host em grid) e descreve a caixa; com o rótulo nos filhos a dica sai do
+// nome (aria-hidden) e segue como descrição. Sem helper o host fica em flex, como antes; o atributo liga e desliga.
+export const WithHelper = {
+  render: () =>
+    column(
+      createCheckbox({
+        label: "Lembrar de mim",
+        helper: "Mantém a sessão por 30 dias neste navegador.",
+        testid: "lembrar"
+      }),
+      createCheckbox({
+        html: "<span>Desvincular o SSO</span>",
+        helper: "A conta volta a entrar só com senha.",
+        testid: "sso"
+      }),
+      createCheckbox({ label: "Sem dica", size: "sm", testid: "sem-dica" })
+    ),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const part = (testid: string) => canvasElement.querySelector(`[data-testid="${testid}"]`) as HTMLElement;
+    const host = (testid: string) => part(testid).closest("ark-checkbox") as CheckboxEl;
+
+    const remember = canvas.getByRole("checkbox", { name: "Lembrar de mim" });
+    const rememberHelper = part("lembrar-helper");
+    await expect(rememberHelper).toHaveAttribute("data-ark", "checkbox-helper");
+    await expect(remember).toHaveAttribute("aria-describedby", rememberHelper.id);
+    await expect(remember).toHaveAccessibleDescription("Mantém a sessão por 30 dias neste navegador.");
+    await expect(rememberHelper).not.toHaveAttribute("aria-hidden");
+    // Dentro da coluna flex o host é blockificado: grid/flex em vez de inline-grid/inline-flex.
+    await expect(getComputedStyle(host("lembrar")).display).toMatch(/grid$/);
+
+    // Caixa na primeira coluna; rótulo e dica empilhados na segunda, alinhados à esquerda.
+    const box = remember.getBoundingClientRect();
+    const label = part("lembrar-label").getBoundingClientRect();
+    const helper = rememberHelper.getBoundingClientRect();
+    await expect(box.right).toBeLessThan(label.left);
+    await expect(helper.top).toBeGreaterThanOrEqual(label.bottom - 1);
+    await expect(Math.abs(helper.left - label.left)).toBeLessThanOrEqual(1);
+
+    // A dica alterna como o resto do host.
+    await userEvent.click(rememberHelper);
+    await expect(remember).toHaveAttribute("aria-checked", "true");
+
+    // Rótulo nos filhos: o nome não leva a dica, que continua como descrição.
+    const sso = canvas.getByRole("checkbox", { name: "Desvincular o SSO" });
+    await expect(sso).toHaveAccessibleDescription("A conta volta a entrar só com senha.");
+    await expect(part("sso-helper")).toHaveAttribute("aria-hidden", "true");
+    const ssoText = (
+      canvasElement.querySelector("ark-checkbox span:not([data-ark-chrome])") as HTMLElement
+    ).getBoundingClientRect();
+    await expect(part("sso-helper").getBoundingClientRect().top).toBeGreaterThanOrEqual(ssoText.bottom - 1);
+
+    // Sem helper nada muda; o atributo liga e desliga a dica em tempo de execução.
+    const plain = host("sem-dica");
+    const plainBox = canvas.getByRole("checkbox", { name: "Sem dica" });
+    await expect(getComputedStyle(plain).display).toMatch(/flex$/);
+    await expect(plainBox).not.toHaveAttribute("aria-describedby");
+    await expect(plain.querySelector('[data-ark="checkbox-helper"]')).toBeNull();
+    plain.setAttribute("helper", "Dica tardia");
+    await expect(plainBox).toHaveAccessibleDescription("Dica tardia");
+    await expect(getComputedStyle(plain).display).toMatch(/grid$/);
+    plain.removeAttribute("helper");
+    await expect(plain.querySelector('[data-ark="checkbox-helper"]')).toBeNull();
+    await expect(plainBox).not.toHaveAttribute("aria-describedby");
+    await expect(getComputedStyle(plain).display).toMatch(/flex$/);
   }
 };
 

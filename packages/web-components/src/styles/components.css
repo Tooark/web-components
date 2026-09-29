@@ -129,6 +129,14 @@
     grid-area: message;
   }
 
+  /* ---------- ark-checkbox, ark-radio: com helper, rótulo e dica empilhados ao lado da caixa ---------- */
+
+  /* O componente troca o host para grid e põe os próprios nós nas colunas; um rótulo em filhos do usuário vai para
+     a coluna do texto. Um texto solto acha a coluna pelo auto-placement; vários nós viram linhas. */
+  :is(ark-checkbox, ark-radio):where(:has(> [data-ark-chrome="helper"])) > :not([data-ark-chrome]) {
+    grid-column: 2;
+  }
+
   /* ---------- ark-select: mesma grid do ark-input, chevron sobre o campo ---------- */
 
   ark-select {

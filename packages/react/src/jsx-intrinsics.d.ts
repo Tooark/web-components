@@ -92,6 +92,7 @@ interface ArkIntrinsicElements {
     name?: string;
     value?: string;
     label?: string;
+    helper?: string;
   };
   "ark-progress": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
@@ -114,6 +115,7 @@ interface ArkIntrinsicElements {
     name?: string;
     value?: string;
     label?: string;
+    helper?: string;
   };
   "ark-spinner": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
