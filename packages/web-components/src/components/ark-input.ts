@@ -1,6 +1,7 @@
 import { type ArkIntent, type ArkLocale, type ArkRounded, type ArkSize, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 const INPUT_TYPES = ["text", "password", "email", "number", "tel", "url", "search", "date", "time", "datetime-local"];
 
@@ -85,6 +86,7 @@ export class ArkInput extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.inputEl) {
       this.render();
     }

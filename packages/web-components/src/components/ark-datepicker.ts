@@ -6,6 +6,7 @@ import type { ArkInput } from "./ark-input";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Atributos repassados aos componentes internos. */
 const CALENDAR_ATTRS = [
@@ -79,6 +80,7 @@ export class ArkDatepicker extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.hasRendered()) {
       this.syncFromValue();
       this.render();

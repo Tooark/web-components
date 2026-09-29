@@ -1,6 +1,7 @@
 import type { ArkMarkShape } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Um path por forma, no viewBox 0 0 24 24; o ark-shape-picker desenha as mesmas. */
 export const ARK_MARK_PATHS: Record<ArkMarkShape, string> = {
@@ -64,6 +65,7 @@ export class ArkMark extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.svgEl) this.render();
     this.updateAppearance();
   }

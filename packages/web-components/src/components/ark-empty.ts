@@ -1,5 +1,6 @@
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Estado vazio: caixa de borda tracejada com ícone apagado, título, descrição
@@ -23,6 +24,7 @@ export class ArkEmpty extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       // Ícone ou ação que chegam depois (frameworks) recebem o hook.
       this.observer = new MutationObserver(() => this.syncSlots());

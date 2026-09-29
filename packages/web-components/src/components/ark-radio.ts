@@ -1,6 +1,7 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkRadioPalette = {
   ring: string;
@@ -64,6 +65,7 @@ export class ArkRadio extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.boxEl) this.render();
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncName());

@@ -17,6 +17,7 @@ import {
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone do botão de fechar (chrome próprio do componente). */
 const CLOSE_SVG = `
@@ -90,6 +91,7 @@ export class ArkDrawer extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncFooter());
       this.observer.observe(this, { childList: true });

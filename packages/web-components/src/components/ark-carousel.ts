@@ -2,6 +2,7 @@ import type { ArkCarouselSnap, ArkIntent } from "@tooark/core";
 import { prefersReducedMotion } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkCarouselPalette = {
   frame: string;
@@ -92,6 +93,7 @@ export class ArkCarousel extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.build();
 
     if (!this.observer) {

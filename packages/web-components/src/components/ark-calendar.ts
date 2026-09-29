@@ -3,6 +3,7 @@ import { type ArkLocale, announce, arkEnter, resolveLocale } from "@tooark/core"
 import { HTMLElementBase } from "./html-element-base";
 import { intentColors } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkCalendarPalette = {
   container: string;
@@ -62,6 +63,7 @@ export class ArkCalendar extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.locale = this.getLocale();
     const parsed = this.parseDate(this.getAttribute("value"));
     if (parsed) {

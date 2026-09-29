@@ -1,6 +1,7 @@
 import type { ArkSize } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Tecla de atalho: o PRÓPRIO host é a tecla (mono, borda, fundo
@@ -19,6 +20,7 @@ export class ArkKbd extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

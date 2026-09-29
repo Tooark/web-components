@@ -46,7 +46,7 @@ export class ArkWysiwygViewer extends HTMLElementBase {
   }
 
   connectedCallback(): void {
-    upgradeProperties(this, ["content"]);
+    upgradeProperties(this);
     ensureWysiwygStyles();
     this.build();
   }

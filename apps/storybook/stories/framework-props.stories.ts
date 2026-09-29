@@ -195,3 +195,73 @@ export const PropertiesSetBeforeRegistration = {
     }
   }
 };
+
+// Valor distinto do padrão para as propriedades de dados que um framework liga na tag crua; as demais recebem o próprio
+// padrão, o que já basta para provar que passaram pelo setter (a propriedade própria some).
+const PRE_REGISTRATION_SAMPLES: Record<string, unknown> = {
+  "ark-kv-editor.rows": [{ id: "r1", key: "host", value: "{{baseUrl}}", enabled: true }],
+  "ark-select.options": [
+    { value: "a", label: "A" },
+    { value: "b", label: "B" }
+  ],
+  "ark-select.value": "b",
+  "ark-calendar.events": [{ id: "e1", title: "Reunião", start: "2026-09-15" }],
+  "ark-scheduler.events": [{ id: "e1", title: "Reunião", start: "2026-09-15T10:00", end: "2026-09-15T11:00" }],
+  "ark-color-swatches.colors": [{ name: "Azul", value: "#2563eb" }],
+  "ark-color-swatches.value": "#2563eb",
+  "ark-input.value": "abc",
+  "ark-textarea.value": "abc",
+  "ark-checkbox.checked": true,
+  "ark-switch.checked": true,
+  "ark-toggle.pressed": true,
+  "ark-progress.value": 40,
+  "ark-split-pane.sizes": [30, 70],
+  "ark-shape-picker.shapes": ["moon", "cross"],
+  "ark-shape-picker.value": "moon"
+};
+
+// Os setters da classe (e das que ela estende), até o HTMLElement.
+function setterNames(ctor: CustomElementConstructor): string[] {
+  const names: string[] = [];
+  for (let proto = ctor.prototype; proto && proto !== HTMLElement.prototype; proto = Object.getPrototypeOf(proto)) {
+    for (const [name, descriptor] of Object.entries(Object.getOwnPropertyDescriptors(proto))) {
+      if (descriptor.set && !names.includes(name)) names.push(name);
+    }
+  }
+  return names;
+}
+
+// Toda propriedade com setter, gravada na tag ainda sem registro, tem de chegar ao elemento como chegaria gravada num
+// elemento já registrado (o caminho do React 19 e do Vue): o upgrade tira a propriedade própria e passa pelo setter.
+export const EveryPropertySetBeforeRegistration = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const detached = document.implementation.createHTMLDocument("");
+    const problems: string[] = [];
+
+    for (const tag of TAGS) {
+      const ctor = customElements.get(tag) as CustomElementConstructor;
+      const fresh = document.createElement(tag) as HTMLElement & Record<string, unknown>;
+      const values = setterNames(ctor).map((prop) => [prop, PRE_REGISTRATION_SAMPLES[`${tag}.${prop}`] ?? fresh[prop]]);
+
+      const early = detached.createElement(tag) as HTMLElement & Record<string, unknown>;
+      const registered = document.createElement(tag) as HTMLElement & Record<string, unknown>;
+      for (const [prop, value] of values) {
+        early[prop as string] = value;
+        registered[prop as string] = value;
+      }
+      canvasElement.append(document.adoptNode(early), registered);
+
+      for (const [prop] of values) {
+        const name = prop as string;
+        if (Object.getOwnPropertyDescriptor(early, name)) problems.push(`${tag}.${name}: ficou propriedade própria`);
+        else if (JSON.stringify(early[name]) !== JSON.stringify(registered[name])) {
+          problems.push(`${tag}.${name}: ${JSON.stringify(early[name])} != ${JSON.stringify(registered[name])}`);
+        }
+      }
+      early.remove();
+      registered.remove();
+    }
+    await expect(problems).toEqual([]);
+  }
+};

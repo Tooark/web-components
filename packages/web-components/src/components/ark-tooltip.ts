@@ -1,6 +1,7 @@
 import { type ArkTooltipSide, coerceBooleanAttr, isPopoverOpen, openPopover, positionAnchored } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Contador para o id do balão, que o `aria-describedby` do gatilho referencia. */
 let tooltipSeq = 0;
@@ -60,6 +61,7 @@ export class ArkTooltip extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.updateAppearance());
       this.observer.observe(this, { childList: true });

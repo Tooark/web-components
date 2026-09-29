@@ -2,6 +2,7 @@ import { type ArkAnchorRect, coerceBooleanAttr, positionAnchored } from "@tooark
 import type { ArkMenuItem } from "./ark-menu-item";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Atributos do menu propagados a cada item. */
 const PROPAGATED_ATTRS = ["size", "theme"];
@@ -53,6 +54,7 @@ export class ArkMenu extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.id) this.id = `ark-menu-${++menuSeq}`;
     if (!this.childObserver) {
       this.childObserver = new MutationObserver(() => this.syncItems());

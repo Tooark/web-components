@@ -1,6 +1,7 @@
 import type { ArkToggle } from "./ark-toggle";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Segmented control de ark-toggle. O PRÓPRIO host é o container
@@ -25,6 +26,7 @@ export class ArkToggleGroup extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncToggles());
       this.observer.observe(this, { childList: true, subtree: true });

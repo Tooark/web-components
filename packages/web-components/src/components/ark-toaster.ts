@@ -2,6 +2,7 @@ import type { ArkMotionPreset, ArkToastOptions, ArkToastPosition, ArkToastType }
 import { arkEnter, arkExit, isPopoverOpen, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkToastItem = ArkToastOptions & {
   id: string;
@@ -43,6 +44,7 @@ export class ArkToaster extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.build();
     window.addEventListener("ark-toast", this.handleToast as EventListener);
     window.addEventListener("ark-toast-dismiss", this.handleDismiss as EventListener);

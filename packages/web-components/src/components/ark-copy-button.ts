@@ -1,6 +1,7 @@
 import { type ArkLocale, announce, resolveLocale } from "@tooark/core";
 import { ArkButton } from "./ark-button";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone de copiar (duas folhas) e o check do feedback, chrome próprio do componente. */
 const COPY_SVG = `
@@ -45,6 +46,7 @@ export class ArkCopyButton extends ArkButton {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.childObserver) {
       // Rótulo do usuário que chega ou sai depois decide se o rótulo próprio aparece.
       this.childObserver = new MutationObserver(() => this.updateAppearance());

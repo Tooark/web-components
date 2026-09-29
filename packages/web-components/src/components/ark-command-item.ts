@@ -2,6 +2,7 @@ import { coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Item de um ark-command-palette. O PRÓPRIO host é a opção (`role="option"`):
@@ -28,6 +29,7 @@ export class ArkCommandItem extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

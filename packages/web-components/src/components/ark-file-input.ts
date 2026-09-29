@@ -10,6 +10,7 @@ import {
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 let arkFileInputIdCounter = 0;
 
@@ -78,6 +79,7 @@ export class ArkFileInput extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.inputEl) this.render();
     this.updateAppearance();
   }

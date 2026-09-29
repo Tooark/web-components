@@ -1,6 +1,7 @@
 import type { ArkAvatarShape, ArkSize } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Glifo de pessoa para o avatar sem nome e sem imagem (chrome próprio). */
 const PERSON_SVG = `
@@ -38,6 +39,7 @@ export class ArkAvatar extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.initialsEl) this.render();
     this.updateAppearance();
   }

@@ -2,6 +2,7 @@ import type { ArkTabsVariant } from "@tooark/core";
 import type { ArkTab } from "./ark-tab";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Atributos do grupo propagados a cada aba. */
 const PROPAGATED_ATTRS = ["variant", "size", "intent", "rounded", "fill", "theme", "lang", "locale-json"];
@@ -53,6 +54,7 @@ export class ArkTabs extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncTabs());
       this.observer.observe(this, { childList: true, subtree: true });

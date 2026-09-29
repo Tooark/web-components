@@ -2,6 +2,7 @@ import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkProgressSizing = {
   track: string;
@@ -43,6 +44,7 @@ export class ArkProgress extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.trackEl) this.render();
     this.updateAppearance();
   }

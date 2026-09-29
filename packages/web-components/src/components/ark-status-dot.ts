@@ -2,6 +2,7 @@ import type { ArkIntent, ArkSize } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Ponto de status: o PRÓPRIO host é o círculo na cor do intent (padrão
@@ -20,6 +21,7 @@ export class ArkStatusDot extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

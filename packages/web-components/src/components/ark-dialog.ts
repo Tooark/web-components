@@ -12,6 +12,7 @@ import {
 } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone do botão de fechar (chrome próprio do componente). */
 const CLOSE_SVG = `
@@ -91,6 +92,7 @@ export class ArkDialog extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       // Um footer que chega depois (framework) recebe o hook; o resto do DOM é do usuário.
       this.observer = new MutationObserver(() => this.syncFooter());

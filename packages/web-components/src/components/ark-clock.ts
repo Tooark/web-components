@@ -3,6 +3,7 @@ import { resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkClockColumn = "hours" | "minutes" | "seconds" | "meridiem";
 
@@ -31,6 +32,7 @@ export class ArkClock extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.build();
   }
 
