@@ -9,7 +9,7 @@ Wrappers React tipados dos Tooark Web Components: props camelCase, eventos custo
 
 ---
 
-## Conteúdo
+## 📑 Conteúdo
 
 - [Visão Geral](#-visão-geral)
 - [Instalação](#-instalação)

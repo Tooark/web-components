@@ -9,7 +9,7 @@ Wrappers Angular standalone dos Tooark Web Components: `@Input()` para os atribu
 
 ---
 
-## Conteúdo
+## 📑 Conteúdo
 
 - [Visão Geral](#-visão-geral)
 - [Instalação](#-instalação)

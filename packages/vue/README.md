@@ -9,7 +9,7 @@ Vue 3 wrappers for the Tooark Web Components: typed props, native event names de
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)

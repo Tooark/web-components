@@ -9,7 +9,7 @@ Fundação compartilhada dos componentes Tooark: tipos, i18n, os serviços de to
 
 ---
 
-## Conteúdo
+## 📑 Conteúdo
 
 - [Visão Geral](#-visão-geral)
 - [Instalação](#-instalação)

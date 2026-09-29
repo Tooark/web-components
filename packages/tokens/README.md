@@ -9,7 +9,7 @@ Design primitives of the Tooark design system: colors by intent and the size sca
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)

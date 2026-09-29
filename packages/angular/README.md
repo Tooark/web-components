@@ -9,7 +9,7 @@ Standalone Angular wrappers for the Tooark Web Components: `@Input()`s for the a
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)
