@@ -61,7 +61,7 @@ export class ArkChart extends HTMLElementBase {
 
   connectedCallback(): void {
     // Uma `option` gravada antes do registro já monta o gráfico ao passar pelo setter.
-    upgradeProperties(this, ["option"]);
+    upgradeProperties(this);
     if (!this.instance) this.render();
   }
 

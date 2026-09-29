@@ -11,6 +11,7 @@ import { ArkCommandItem } from "./ark-command-item";
 import type { ArkInput } from "./ark-input";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 let paletteSeq = 0;
 
@@ -78,6 +79,7 @@ export class ArkCommandPalette extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.inputEl) this.render();
     if (!this.observer) {
       // Itens que entram ou saem (busca assíncrona, frameworks) reordenam a lista.

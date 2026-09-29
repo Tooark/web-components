@@ -17,6 +17,7 @@ import { HTMLElementBase } from "./html-element-base";
 import { intentColors } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkSchedulerPalette = {
   container: string;
@@ -89,6 +90,7 @@ export class ArkScheduler extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.locale = this.getLocale();
     this.refDate = parseLocalDate(this.getAttribute("date")) || new Date();
     this.build();

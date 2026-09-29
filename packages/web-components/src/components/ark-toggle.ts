@@ -2,6 +2,7 @@ import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkTogglePalette = {
   focusRing: string;
@@ -32,6 +33,7 @@ export class ArkToggle extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

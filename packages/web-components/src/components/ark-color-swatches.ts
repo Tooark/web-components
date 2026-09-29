@@ -1,6 +1,7 @@
 import { type ArkColorSwatch, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Paleta de cores: o PRÓPRIO host é o `role="radiogroup"` e cada amostra é
@@ -30,6 +31,7 @@ export class ArkColorSwatches extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

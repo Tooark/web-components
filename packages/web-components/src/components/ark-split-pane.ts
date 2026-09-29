@@ -1,6 +1,7 @@
 import { type ArkLocale, type ArkSplitPaneDirection, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Passo das setas em pontos percentuais; com Shift, o grande. */
 const STEP = 2;
@@ -40,6 +41,7 @@ export class ArkSplitPane extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       // Painéis que entram ou saem mudam o número de alças e a distribuição.
       this.observer = new MutationObserver(() => this.updateAppearance());

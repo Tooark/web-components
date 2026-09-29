@@ -2,6 +2,7 @@ import type { ArkIntent, ArkRounded, ArkSelectOption, ArkSize } from "@tooark/co
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Chevron do componente (chrome próprio), desenhado sobre a ponta direita do campo. */
 const CHEVRON_SVG = `
@@ -52,6 +53,7 @@ export class ArkSelect extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.selectEl) {
       this.render();
     }

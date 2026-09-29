@@ -1,6 +1,7 @@
 import { type ArkRounded, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Raio por token para o `rounded`: inline, porque `.ark-skeleton` (motion.css, sem layer) fixa o raio padrão e
@@ -42,6 +43,7 @@ export class ArkSkeleton extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

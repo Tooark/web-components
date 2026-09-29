@@ -2,6 +2,7 @@ import type { ArkIntent, ArkRounded, ArkSize } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Atributos do host espelhados no <textarea> nativo sem interpretação. */
 const PASS_THROUGH_ATTRS = ["autocomplete", "autofocus", "maxlength", "minlength", "spellcheck", "wrap", "aria-label"];
@@ -50,6 +51,7 @@ export class ArkTextarea extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.textareaEl) {
       this.render();
     }

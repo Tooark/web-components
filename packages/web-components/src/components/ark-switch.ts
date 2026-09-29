@@ -1,6 +1,7 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkSwitchPalette = {
   focusRing: string;
@@ -61,6 +62,7 @@ export class ArkSwitch extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.trackEl) {
       this.render();
     }

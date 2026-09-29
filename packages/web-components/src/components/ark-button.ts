@@ -11,6 +11,7 @@ import {
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Paleta de cores do botão Ark.
@@ -124,6 +125,7 @@ export class ArkButton extends HTMLElementBase {
    * Chamado pelo navegador quando o elemento é adicionado ao DOM.
    */
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

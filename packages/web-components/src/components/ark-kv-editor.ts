@@ -15,6 +15,7 @@ import type { ArkSelect } from "./ark-select";
 import type { ArkTextarea } from "./ark-textarea";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone do botão de remover linha (chrome próprio). */
 const TRASH_SVG = `
@@ -157,6 +158,7 @@ export class ArkKvEditor extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.listEl) this.render();
     this.updateAppearance();
   }

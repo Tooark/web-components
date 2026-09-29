@@ -2,6 +2,7 @@ import type { ArkBadgeSize, ArkBadgeVariant, ArkIntent, ArkRounded } from "@tooa
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkBadgePalette = Record<ArkBadgeVariant, string>;
 
@@ -21,6 +22,7 @@ export class ArkBadge extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

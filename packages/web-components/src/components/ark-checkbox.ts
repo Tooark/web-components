@@ -1,6 +1,7 @@
 import { type ArkIntent, type ArkSize, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 type ArkCheckboxPalette = {
   ring: string;
@@ -66,6 +67,7 @@ export class ArkCheckbox extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.boxEl) this.render();
     if (!this.observer) {
       // Filhos que chegam depois (frameworks) passam a nomear a caixa.

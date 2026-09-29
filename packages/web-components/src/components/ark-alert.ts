@@ -10,6 +10,7 @@ import {
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone do botão de dispensar (chrome próprio do componente). */
 const CLOSE_SVG = `
@@ -63,6 +64,7 @@ export class ArkAlert extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       // Ícone ou ação que chegam depois (frameworks) recebem o hook.
       this.observer = new MutationObserver(() => this.syncSlots());

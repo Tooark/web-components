@@ -1,6 +1,7 @@
 import { type ArkIntent, type ArkLocale, type ArkSize, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Mesmo SVG do ark-button: gira pelo preset `.ark-animate-spin` do core, isento de movimento reduzido. */
 const SPINNER_SVG = `
@@ -29,6 +30,7 @@ export class ArkSpinner extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.iconEl) this.render();
     this.updateAppearance();
   }

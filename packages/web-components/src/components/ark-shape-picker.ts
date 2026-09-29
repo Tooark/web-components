@@ -2,6 +2,7 @@ import { type ArkLocale, type ArkMarkShape, type ArkSize, coerceBooleanAttr, res
 import { ARK_MARK_SHAPES, type ArkMark, normalizeMarkShape } from "./ark-mark";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Chave do nome localizado de cada forma. */
 const SHAPE_LABEL: Record<ArkMarkShape, keyof ArkLocale> = {
@@ -59,6 +60,7 @@ export class ArkShapePicker extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.rendered = true;
     this.updateAppearance();
   }

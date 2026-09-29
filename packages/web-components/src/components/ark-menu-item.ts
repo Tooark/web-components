@@ -3,6 +3,7 @@ import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /** Ícone do item marcado (chrome próprio do componente). */
 const CHECK_SVG = `
@@ -39,6 +40,7 @@ export class ArkMenuItem extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     this.updateAppearance();
   }
 

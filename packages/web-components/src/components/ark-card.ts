@@ -1,6 +1,7 @@
 import type { ArkCardPadding, ArkRounded } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
+import { upgradeProperties } from "./upgrade-properties";
 
 /**
  * Cartão: o PRÓPRIO host é o container (fundo surface, borda, cantos), uma
@@ -26,6 +27,7 @@ export class ArkCard extends HTMLElementBase {
   }
 
   connectedCallback(): void {
+    upgradeProperties(this);
     if (!this.observer) {
       // Slots que chegam depois (frameworks) recebem o hook.
       this.observer = new MutationObserver(() => this.syncSlots());
