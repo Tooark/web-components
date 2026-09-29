@@ -59,7 +59,7 @@ Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram 
 
 ### `ark-chart`
 
-- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga), `testid`.
+- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga), `testid`, `aria-label`/`aria-labelledby` (o host vira `role="img"` com esse nome, a menos que você tenha dado um `role`; sem eles nada muda, e a descrição gerada pelo ECharts, `option.aria`, continua disponível).
 - Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`.
 - Eventos: `ark-chart-click` com os params do ECharts em `detail`.
 - Hooks: o contêiner do gráfico (`[part="canvas"]`) leva `data-ark="chart"` e o `testid` como `data-testid`.
@@ -109,7 +109,7 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                           | Versão     | Descrição                                                         |
 | ---------------------------------------------------------------- | ---------- | ----------------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.2.2     | Design tokens (cores, tamanhos, motion)   e tipos primitivos |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.2.2     | Design tokens (cores, tamanhos, motion)   e tipos primitivos      |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1     | Helpers de runtime do TypeScript                                  |
 | [`echarts`](https://www.npmjs.com/package/echarts)               | >=5 (peer) | Motor de gráficos                                                 |
 

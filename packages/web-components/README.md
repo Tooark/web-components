@@ -61,6 +61,8 @@ import "@tooark/web-components/styles.css";
 registerTooarkComponents(); // idempotent
 ```
 
+A JS property your framework assigns to a raw tag before this call is picked up when the element upgrades, so the order does not matter.
+
 Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text.
 
 ---
@@ -87,15 +89,15 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-file-input` — File field with the `ark-input` grid (label, helper/error): hidden native `<input type="file">` for forms, drop zone with `dragover` highlight, keyboard-accessible choose button, list of selected names, `accept`/`multiple`. Emits `change` with the files and announces them.
 - `ark-input` — Standardized text field: label, helper/error with aria, prefix/suffix via `slot`, password `reveal`, native attributes passed through, sizes, intents, `rounded`.
 - `ark-kbd` — Keyboard key: the host is the key (mono, border, `surface-muted`, bottom edge) around your text; `size`.
-- `ark-kv-editor` — Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON. Composes other ark-\* controls. Emits `change`, `ark-add`, `ark-delete`.
-- `ark-mark` — Scope mark: one of six shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.
+- `ark-kv-editor` — Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON, opt-in `valueField` for a value cell of your own. Composes other ark-\* controls. Emits `change`, `ark-add`, `ark-delete`.
+- `ark-mark` — Scope mark: one of ten shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.
 - `ark-menu` — Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.
 - `ark-menu-item` — Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).
 - `ark-progress` — Progress bar (`role="progressbar"` on the host): `value`/`max` with token-driven width transition, `show-value`, `indeterminate` loop exempt from reduced motion, `label`, sizes, intents.
 - `ark-radio` — Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label. Emits `change` on the one checked.
 - `ark-scheduler` — Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.
 - `ark-select` — Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.
-- `ark-shape-picker` — Shape picker as a `radiogroup`: the six `ark-mark` shapes drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.
+- `ark-shape-picker` — Shape picker as a `radiogroup`: the ten `ark-mark` shapes (or the ones `shapes` lists) drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.
 - `ark-skeleton` — Loading placeholder: the host is the block (`.ark-skeleton`, `aria-hidden`), sized by your class/style; `rows` renders bars, `animated` opts into the shimmer (a sweeping highlight), `rounded`.
 - `ark-spinner` — Standalone loading indicator (`role="status"`): the button's spinner SVG on `.ark-animate-spin` (keeps spinning under reduced motion), screen-reader label by `lang` or `label`, `size`, optional `intent` (inherits the text color otherwise).
 - `ark-split-pane` — Resizable panels: your children are the panels, the handles are the component's own nodes at the end of the host; `direction`, `sizes` (percentages, rewritten on every change), `data-min`/`data-max` per panel, keyboard and pointer-capture drag. Emits `ark-resize`.
