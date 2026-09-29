@@ -1,7 +1,9 @@
 import type { ArkDrawerCloseReason, ArkDrawerStyleOptions } from "@tooark/core";
+import type { ArkDrawer as ArkDrawerElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, type PropsWithChildren, useEffect, useRef } from "react";
+import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkDrawerProps = PropsWithChildren<
@@ -24,52 +26,54 @@ export type ArkDrawerProps = PropsWithChildren<
   }
 >;
 
-export function ArkDrawer(props: ArkDrawerProps): React.JSX.Element {
-  const {
-    children,
-    className,
-    open,
-    size,
-    noCloseButton,
-    persistent,
-    noScrollLock,
-    localeJson,
-    onOpen,
-    onClose,
-    ...rest
-  } = props;
-  const ref = useRef<HTMLElement>(null);
+export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
+  function ArkDrawer(props, forwardedRef): React.JSX.Element {
+    const {
+      children,
+      className,
+      open,
+      size,
+      noCloseButton,
+      persistent,
+      noScrollLock,
+      localeJson,
+      onOpen,
+      onClose,
+      ...rest
+    } = props;
+    const [ref, setRef] = useForwardedRef<ArkDrawerElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useIsomorphicLayoutEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    useIsomorphicLayoutEffect(() => {
+      const el = ref.current;
+      if (!el) return;
 
-    const handleOpen = (event: Event): void => onOpen?.(event as CustomEvent);
-    const handleClose = (event: Event): void => onClose?.(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
-    el.addEventListener("ark-open", handleOpen);
-    el.addEventListener("ark-close", handleClose);
-    return () => {
-      el.removeEventListener("ark-open", handleOpen);
-      el.removeEventListener("ark-close", handleClose);
+      const handleOpen = (event: Event): void => onOpen?.(event as CustomEvent);
+      const handleClose = (event: Event): void => onClose?.(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
+      el.addEventListener("ark-open", handleOpen);
+      el.addEventListener("ark-close", handleClose);
+      return () => {
+        el.removeEventListener("ark-open", handleOpen);
+        el.removeEventListener("ark-close", handleClose);
+      };
+    }, [onOpen, onClose]);
+
+    const attrs: Record<string, string | undefined | React.Ref<ArkDrawerElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      open: open ? "" : undefined,
+      // Numero vira string aqui; o componente acrescenta px a numeros sem unidade.
+      size: size === undefined ? undefined : String(size),
+      "no-close-button": noCloseButton ? "" : undefined,
+      persistent: persistent ? "" : undefined,
+      "no-scroll-lock": noScrollLock ? "" : undefined,
+      "locale-json": localeJson
     };
-  }, [onOpen, onClose]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    open: open ? "" : undefined,
-    // Numero vira string aqui; o componente acrescenta px a numeros sem unidade.
-    size: size === undefined ? undefined : String(size),
-    "no-close-button": noCloseButton ? "" : undefined,
-    persistent: persistent ? "" : undefined,
-    "no-scroll-lock": noScrollLock ? "" : undefined,
-    "locale-json": localeJson
-  };
-
-  return createElement("ark-drawer", attrs, children);
-}
+    return createElement("ark-drawer", attrs, children);
+  }
+);

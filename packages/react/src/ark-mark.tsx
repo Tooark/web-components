@@ -1,6 +1,7 @@
 import type { ArkMarkStyleOptions } from "@tooark/core";
+import type { ArkMark as ArkMarkElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkMarkProps = ArkMarkStyleOptions & {
@@ -9,18 +10,21 @@ export type ArkMarkProps = ArkMarkStyleOptions & {
   className?: string;
 };
 
-export function ArkMark(props: ArkMarkProps): React.JSX.Element {
-  const { className, size, ...rest } = props;
+export const ArkMark = forwardRef<ArkMarkElement, ArkMarkProps>(
+  function ArkMark(props, forwardedRef): React.JSX.Element {
+    const { className, size, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const attrs: Record<string, string | undefined> = {
-    ...rest,
-    class: className,
-    size: size === undefined ? undefined : String(size)
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkMarkElement>> = {
+      ...rest,
+      ref: forwardedRef,
+      class: className,
+      size: size === undefined ? undefined : String(size)
+    };
 
-  return createElement("ark-mark", attrs);
-}
+    return createElement("ark-mark", attrs);
+  }
+);

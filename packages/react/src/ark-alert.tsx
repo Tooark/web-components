@@ -1,6 +1,8 @@
 import type { ArkAlertStyleOptions } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkAlert as ArkAlertElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkAlertProps = PropsWithChildren<
   ArkAlertStyleOptions & {
@@ -14,30 +16,32 @@ export type ArkAlertProps = PropsWithChildren<
   }
 >;
 
-export function ArkAlert(props: ArkAlertProps): React.JSX.Element {
-  const { children, className, localeJson, dismissible, onDismiss, ...rest } = props;
-  const ref = React.useRef<HTMLElement>(null);
+export const ArkAlert = forwardRef<ArkAlertElement, ArkAlertProps>(
+  function ArkAlert(props, forwardedRef): React.JSX.Element {
+    const { children, className, localeJson, dismissible, onDismiss, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkAlertElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onDismiss) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onDismiss) return;
 
-    const handler = (event: Event) => onDismiss(event as CustomEvent);
-    el.addEventListener("ark-dismiss", handler);
-    return () => el.removeEventListener("ark-dismiss", handler);
-  }, [onDismiss]);
+      const handler = (event: Event) => onDismiss(event as CustomEvent);
+      el.addEventListener("ark-dismiss", handler);
+      return () => el.removeEventListener("ark-dismiss", handler);
+    }, [ref, onDismiss]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    dismissible: dismissible ? "" : undefined,
-    "locale-json": localeJson
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkAlertElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      dismissible: dismissible ? "" : undefined,
+      "locale-json": localeJson
+    };
 
-  return createElement("ark-alert", attrs, children);
-}
+    return createElement("ark-alert", attrs, children);
+  }
+);

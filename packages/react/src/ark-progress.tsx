@@ -1,6 +1,7 @@
 import type { ArkProgressStyleOptions } from "@tooark/core";
+import type { ArkProgress as ArkProgressElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkProgressProps = ArkProgressStyleOptions & {
@@ -17,21 +18,24 @@ export type ArkProgressProps = ArkProgressStyleOptions & {
   className?: string;
 };
 
-export function ArkProgress(props: ArkProgressProps): React.JSX.Element {
-  const { className, value, max, indeterminate, showValue, ...rest } = props;
+export const ArkProgress = forwardRef<ArkProgressElement, ArkProgressProps>(
+  function ArkProgress(props, forwardedRef): React.JSX.Element {
+    const { className, value, max, indeterminate, showValue, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const attrs: Record<string, string | undefined> = {
-    ...rest,
-    class: className,
-    value: value === undefined ? undefined : String(value),
-    max: max === undefined ? undefined : String(max),
-    indeterminate: indeterminate ? "" : undefined,
-    "show-value": showValue ? "" : undefined
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkProgressElement>> = {
+      ...rest,
+      ref: forwardedRef,
+      class: className,
+      value: value === undefined ? undefined : String(value),
+      max: max === undefined ? undefined : String(max),
+      indeterminate: indeterminate ? "" : undefined,
+      "show-value": showValue ? "" : undefined
+    };
 
-  return createElement("ark-progress", attrs);
-}
+    return createElement("ark-progress", attrs);
+  }
+);

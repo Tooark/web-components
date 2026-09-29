@@ -64,6 +64,24 @@ One wrapper per element, named after it: `ark-button` → `ArkButton`, `ark-kv-e
 - Props: the element's attributes in camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, plus the element's JS properties where they matter (`events`, `rows`, `options`, `sizes`, `colors`).
 - Events: `on<Event>` for the custom events, receiving the `CustomEvent` (`onChange` on `ArkSelect`/`ArkKvEditor`, `onClose` on `ArkDialog`/`ArkDrawer`, `onSelect` on `ArkMenu`/`ArkCommandPalette`, …); `onChange` on `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `onSlideChange` on `ArkCarousel` and `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` on `ArkScheduler` receive the `detail` itself. Native events bubble from the inner control (`onInput` on `ArkInput`: read `event.target.value`).
 - State: attributes like `open` are the source of truth (`ArkDialog open={bool}` + `onClose`), so controlled rendering works and the exit still animates.
+- Ref: every wrapper forwards `ref` to its `ark-*` element (React 18 and 19), typed as the element class from `@tooark/web-components`, so its methods and properties are typed. Object and callback refs both work (including React 19 callback refs that return a cleanup), and the wrapper's own events and properties keep working.
+
+```tsx
+import { ArkButton, ArkDialog } from "@tooark/react";
+import React, { useRef } from "react";
+
+export function Shortcuts() {
+  const dialog = useRef<React.ComponentRef<typeof ArkDialog>>(null); // the <ark-dialog> element
+  return (
+    <>
+      <ArkButton onClick={() => dialog.current?.show()}>Keyboard shortcuts</ArkButton>
+      <ArkDialog ref={dialog} label="Keyboard shortcuts">
+        <p>Ctrl+K opens the command palette.</p>
+      </ArkDialog>
+    </>
+  );
+}
+```
 
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 

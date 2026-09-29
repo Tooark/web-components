@@ -1,7 +1,9 @@
 import type { ArkFileInputStyleOptions } from "@tooark/core";
+import type { ArkFileInput as ArkFileInputElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect, useRef } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkFileInputProps = ArkFileInputStyleOptions & {
   /** Tipos aceitos pelo seletor nativo (accept). */
@@ -24,34 +26,36 @@ export type ArkFileInputProps = ArkFileInputStyleOptions & {
   onChange?: (event: CustomEvent<{ files: File[] }>) => void;
 };
 
-export function ArkFileInput(props: ArkFileInputProps): React.JSX.Element {
-  const { className, multiple, errorMessage, error, disabled, required, localeJson, onChange, ...rest } = props;
-  const ref = useRef<HTMLElement>(null);
+export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
+  function ArkFileInput(props, forwardedRef): React.JSX.Element {
+    const { className, multiple, errorMessage, error, disabled, required, localeJson, onChange, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkFileInputElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ files: File[] }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ files: File[] }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    multiple: multiple ? "" : undefined,
-    "error-message": errorMessage,
-    error: error ? "" : undefined,
-    disabled: disabled ? "" : undefined,
-    required: required ? "" : undefined,
-    "locale-json": localeJson
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkFileInputElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      multiple: multiple ? "" : undefined,
+      "error-message": errorMessage,
+      error: error ? "" : undefined,
+      disabled: disabled ? "" : undefined,
+      required: required ? "" : undefined,
+      "locale-json": localeJson
+    };
 
-  return createElement("ark-file-input", attrs);
-}
+    return createElement("ark-file-input", attrs);
+  }
+);

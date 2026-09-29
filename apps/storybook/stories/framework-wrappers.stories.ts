@@ -1,4 +1,4 @@
-import { type ArkSchedulerEvent, toast } from "@tooark/core";
+import { type ArkKvRow, type ArkSchedulerEvent, toast } from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
@@ -6,9 +6,11 @@ import {
   ArkDialog as ReactArkDialog,
   ArkFileInput as ReactArkFileInput,
   ArkInput as ReactArkInput,
+  ArkKvEditor as ReactArkKvEditor,
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
   ArkScheduler as ReactArkScheduler,
+  ArkSwitch as ReactArkSwitch,
   ArkTextarea as ReactArkTextarea,
   ArkToaster as ReactArkToaster
 } from "@tooark/react";
@@ -19,7 +21,13 @@ import {
   ArkScheduler as VueArkScheduler,
   ArkToaster as VueArkToaster
 } from "@tooark/vue";
-import { createElement, type ReactNode } from "react";
+import type {
+  ArkButton as ArkButtonElement,
+  ArkDialog as ArkDialogElement,
+  ArkKvEditor as ArkKvEditorElement,
+  ArkSwitch as ArkSwitchElement
+} from "@tooark/web-components";
+import { createElement, createRef, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
@@ -358,5 +366,71 @@ export const ReactDialogOpenOnMount = {
     root.render(createElement(ReactArkDialog, { label: "Aviso", open: true, onOpen: () => opened++ }, "Oi"));
     await waitFor(() => expect(opened).toBe(1));
     (canvasElement.querySelector("ark-dialog") as HTMLElement & { close: () => void }).close();
+  }
+};
+
+const ROW_HOST: ArkKvRow = { id: "host", key: "HOST", value: "localhost", enabled: true };
+const ROW_PORT: ArkKvRow = { id: "port", key: "PORT", value: "8080", enabled: true };
+
+// A ref do app chega ao ark-*: direto no ArkButton (sem ref própria) e pela useForwardedRef nos wrappers que usam o
+// elemento, cujos efeitos continuam ligando eventos (onOpen do dialog) e gravando propriedades (rows do kv-editor).
+export const ReactForwardedRef = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const buttonRef = createRef<ArkButtonElement>();
+    const dialogRef = createRef<ArkDialogElement>();
+    const kvCalls: Array<ArkKvEditorElement | null> = [];
+    const kvRef = (node: ArkKvEditorElement | null): void => {
+      kvCalls.push(node);
+    };
+    // Callback ref do React 19 que devolve limpeza: ao desmontar roda a limpeza, e não uma chamada com null.
+    const switchCalls: Array<ArkSwitchElement | null> = [];
+    let switchCleanups = 0;
+    const switchRef = (node: ArkSwitchElement | null): (() => void) => {
+      switchCalls.push(node);
+      return () => {
+        switchCleanups++;
+      };
+    };
+    let clicks = 0;
+    let opened = 0;
+    // Refs criadas uma vez, fora do tree: um rerender não troca a callback ref, então ela não é chamada de novo.
+    const tree = (rows: ArkKvRow[]): ReactNode => [
+      createElement(ReactArkButton, { key: "b", ref: buttonRef, onClick: () => clicks++ }, "Salvar"),
+      createElement(ReactArkDialog, { key: "d", ref: dialogRef, label: "Aviso", onOpen: () => opened++ }, "Oi"),
+      createElement(ReactArkKvEditor, { key: "k", ref: kvRef, rows }),
+      createElement(ReactArkSwitch, { key: "s", ref: switchRef, label: "Wi-Fi" })
+    ];
+
+    const root = render(tree([ROW_HOST]));
+    await expect(errors).toEqual([]);
+    await expect(buttonRef.current?.tagName).toBe("ARK-BUTTON");
+    await expect(dialogRef.current?.tagName).toBe("ARK-DIALOG");
+    await expect(kvCalls.map((node) => node?.tagName)).toEqual(["ARK-KV-EDITOR"]);
+    await expect(switchCalls.map((node) => node?.tagName)).toEqual(["ARK-SWITCH"]);
+
+    const kv = kvCalls[0] as ArkKvEditorElement;
+    await expect(kv.rows.map((row) => row.key)).toEqual(["HOST"]);
+    buttonRef.current?.click();
+    await expect(clicks).toBe(1);
+    const dialog = dialogRef.current as ArkDialogElement;
+    dialog.show();
+    await waitFor(() => expect(opened).toBe(1));
+    dialog.close();
+    await waitFor(() => expect(dialog.matches(":popover-open")).toBe(false));
+
+    render(tree([ROW_HOST, ROW_PORT]));
+    await expect(errors).toEqual([]);
+    await expect(kv.rows.map((row) => row.key)).toEqual(["HOST", "PORT"]);
+    await expect(kvCalls).toHaveLength(1);
+
+    root.unmount();
+    await expect(buttonRef.current).toBeNull();
+    await expect(dialogRef.current).toBeNull();
+    await expect(kvCalls.map((node) => node?.tagName ?? null)).toEqual(["ARK-KV-EDITOR", null]);
+    await expect(switchCalls).toHaveLength(1);
+    await expect(switchCleanups).toBe(1);
   }
 };

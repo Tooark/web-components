@@ -1,7 +1,9 @@
 import type { ArkMarkShape, ArkShapePickerStyleOptions } from "@tooark/core";
+import type { ArkShapePicker as ArkShapePickerElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, useEffect, useRef } from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkShapePickerProps = ArkShapePickerStyleOptions & {
   /** Forma selecionada. */
@@ -14,30 +16,32 @@ export type ArkShapePickerProps = ArkShapePickerStyleOptions & {
   onChange?: (event: CustomEvent<{ value: ArkMarkShape }>) => void;
 };
 
-export function ArkShapePicker(props: ArkShapePickerProps): React.JSX.Element {
-  const { className, disabled, localeJson, onChange, ...rest } = props;
-  const ref = useRef<HTMLElement>(null);
+export const ArkShapePicker = forwardRef<ArkShapePickerElement, ArkShapePickerProps>(
+  function ArkShapePicker(props, forwardedRef): React.JSX.Element {
+    const { className, disabled, localeJson, onChange, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkShapePickerElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ value: ArkMarkShape }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ value: ArkMarkShape }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    disabled: disabled ? "" : undefined,
-    "locale-json": localeJson
-  };
+    const attrs: Record<string, string | undefined | React.Ref<ArkShapePickerElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      disabled: disabled ? "" : undefined,
+      "locale-json": localeJson
+    };
 
-  return createElement("ark-shape-picker", attrs);
-}
+    return createElement("ark-shape-picker", attrs);
+  }
+);

@@ -64,6 +64,24 @@ Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-
 - Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `className`, mais as propriedades JS do elemento onde importam (`events`, `rows`, `options`, `sizes`, `colors`).
 - Eventos: `on<Evento>` para os eventos customizados, recebendo o `CustomEvent` (`onChange` em `ArkSelect`/`ArkKvEditor`, `onClose` em `ArkDialog`/`ArkDrawer`, `onSelect` em `ArkMenu`/`ArkCommandPalette`, …); `onChange` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `onSlideChange` em `ArkCarousel` e `onEventClick`/`onSlotClick`/`onViewChange`/`onRangeChange` em `ArkScheduler` recebem o próprio `detail`. Eventos nativos sobem do controle interno (`onInput` em `ArkInput`: leia `event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`ArkDialog open={bool}` + `onClose`), então renderização controlada funciona e a saída continua animando.
+- Ref: todo wrapper encaminha a `ref` ao seu elemento `ark-*` (React 18 e 19), tipada como a classe do elemento de `@tooark/web-components`, então métodos e propriedades dele são tipados. Ref de objeto e callback ref funcionam (inclusive a callback ref do React 19 que devolve uma limpeza), e os eventos e propriedades do próprio wrapper continuam funcionando.
+
+```tsx
+import { ArkButton, ArkDialog } from "@tooark/react";
+import React, { useRef } from "react";
+
+export function Atalhos() {
+  const dialog = useRef<React.ComponentRef<typeof ArkDialog>>(null); // o elemento <ark-dialog>
+  return (
+    <>
+      <ArkButton onClick={() => dialog.current?.show()}>Atalhos de teclado</ArkButton>
+      <ArkDialog ref={dialog} label="Atalhos de teclado">
+        <p>Ctrl+K abre a paleta de comandos.</p>
+      </ArkDialog>
+    </>
+  );
+}
+```
 
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 

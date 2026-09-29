@@ -1,6 +1,9 @@
 import type { ArkSwitchStyleOptions } from "@tooark/core";
-import React, { createElement, useEffect } from "react";
+import type { ArkSwitch as ArkSwitchElement } from "@tooark/web-components";
+import type React from "react";
+import { createElement, forwardRef, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkSwitchProps = ArkSwitchStyleOptions & {
   disabled?: boolean;
@@ -11,35 +14,37 @@ export type ArkSwitchProps = ArkSwitchStyleOptions & {
   onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
 };
 
-export function ArkSwitch(props: ArkSwitchProps): React.JSX.Element {
-  const { className, checked, labels, labelOn, labelOff, icons, disabled, onChange, ...rest } = props;
+export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
+  function ArkSwitch(props, forwardedRef): React.JSX.Element {
+    const { className, checked, labels, labelOn, labelOff, icons, disabled, onChange, ...rest } = props;
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const ref = React.useRef<HTMLElement>(null);
+    const [ref, setRef] = useForwardedRef<ArkSwitchElement>(forwardedRef);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onChange) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onChange) return;
 
-    const handler = (event: Event) => onChange(event as CustomEvent<{ checked: boolean }>);
-    el.addEventListener("change", handler);
-    return () => el.removeEventListener("change", handler);
-  }, [onChange]);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ checked: boolean }>);
+      el.addEventListener("change", handler);
+      return () => el.removeEventListener("change", handler);
+    }, [ref, onChange]);
 
-  const attrs: Record<string, string | boolean | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    checked: checked ? "" : undefined,
-    disabled: disabled ? "" : undefined,
-    labels: labels ? "" : undefined,
-    icons: icons ? "" : undefined,
-    "label-on": labelOn,
-    "label-off": labelOff
-  };
+    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkSwitchElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      checked: checked ? "" : undefined,
+      disabled: disabled ? "" : undefined,
+      labels: labels ? "" : undefined,
+      icons: icons ? "" : undefined,
+      "label-on": labelOn,
+      "label-off": labelOff
+    };
 
-  return createElement("ark-switch", attrs);
-}
+    return createElement("ark-switch", attrs);
+  }
+);

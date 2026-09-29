@@ -1,6 +1,8 @@
 import type { ArkTabStyleOptions, ArkTabsStyleOptions } from "@tooark/core";
-import React, { createElement, type PropsWithChildren, useEffect } from "react";
+import type { ArkTab as ArkTabElement, ArkTabs as ArkTabsElement } from "@tooark/web-components";
+import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkTabsProps = PropsWithChildren<
   ArkTabsStyleOptions & {
@@ -15,37 +17,39 @@ export type ArkTabsProps = PropsWithChildren<
   }
 >;
 
-export function ArkTabs(props: ArkTabsProps): React.JSX.Element {
-  const { children, className, localeJson, onChange, onClose, ...rest } = props;
-  const ref = React.useRef<HTMLElement>(null);
+export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
+  function ArkTabs(props, forwardedRef): React.JSX.Element {
+    const { children, className, localeJson, onChange, onClose, ...rest } = props;
+    const [ref, setRef] = useForwardedRef<ArkTabsElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
 
-    const handleChange = (event: Event): void => onChange?.(event as CustomEvent<{ value: string }>);
-    const handleClose = (event: Event): void => onClose?.(event as CustomEvent<{ value: string }>);
-    el.addEventListener("change", handleChange);
-    el.addEventListener("ark-close", handleClose);
-    return () => {
-      el.removeEventListener("change", handleChange);
-      el.removeEventListener("ark-close", handleClose);
+      const handleChange = (event: Event): void => onChange?.(event as CustomEvent<{ value: string }>);
+      const handleClose = (event: Event): void => onClose?.(event as CustomEvent<{ value: string }>);
+      el.addEventListener("change", handleChange);
+      el.addEventListener("ark-close", handleClose);
+      return () => {
+        el.removeEventListener("change", handleChange);
+        el.removeEventListener("ark-close", handleClose);
+      };
+    }, [ref, onChange, onClose]);
+
+    const attrs: Record<string, string | undefined | React.Ref<ArkTabsElement>> = {
+      ...rest,
+      ref: setRef,
+      class: className,
+      "locale-json": localeJson
     };
-  }, [onChange, onClose]);
 
-  const attrs: Record<string, string | undefined | React.Ref<HTMLElement>> = {
-    ...rest,
-    ref,
-    class: className,
-    "locale-json": localeJson
-  };
-
-  return createElement("ark-tabs", attrs, children);
-}
+    return createElement("ark-tabs", attrs, children);
+  }
+);
 
 export type ArkTabProps = PropsWithChildren<
   ArkTabStyleOptions & {
@@ -61,15 +65,16 @@ export type ArkTabProps = PropsWithChildren<
   }
 >;
 
-export function ArkTab(props: ArkTabProps): React.JSX.Element {
+export const ArkTab = forwardRef<ArkTabElement, ArkTabProps>(function ArkTab(props, forwardedRef): React.JSX.Element {
   const { children, className, disabled, closable, dirty, ...rest } = props;
 
   useEffect(() => {
     ensureTooarkComponentsRegistered();
   }, []);
 
-  const attrs: Record<string, string | undefined> = {
+  const attrs: Record<string, string | undefined | React.Ref<ArkTabElement>> = {
     ...rest,
+    ref: forwardedRef,
     class: className,
     disabled: disabled ? "" : undefined,
     closable: closable ? "" : undefined,
@@ -77,4 +82,4 @@ export function ArkTab(props: ArkTabProps): React.JSX.Element {
   };
 
   return createElement("ark-tab", attrs, children);
-}
+});

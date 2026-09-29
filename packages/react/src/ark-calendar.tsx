@@ -1,6 +1,9 @@
 import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkLocale } from "@tooark/core";
-import React, { createElement, useCallback, useEffect } from "react";
+import type { ArkCalendar as ArkCalendarElement } from "@tooark/web-components";
+import type React from "react";
+import { createElement, forwardRef, useCallback, useEffect } from "react";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkCalendarProps = ArkCalendarStyleOptions & {
   lang?: ArkDatepickerLang;
@@ -12,61 +15,63 @@ export type ArkCalendarProps = ArkCalendarStyleOptions & {
   className?: string;
 };
 
-export function ArkCalendar(props: ArkCalendarProps): React.JSX.Element {
-  const {
-    lang,
-    localeJson,
-    theme,
-    intent,
-    accentColor,
-    value,
-    min,
-    max,
-    onChange,
-    className,
-    testid,
-    events,
-    eventDisplay,
-    ...rest
-  } = props;
-  const ref = React.useRef<HTMLElement>(null);
+export const ArkCalendar = forwardRef<ArkCalendarElement, ArkCalendarProps>(
+  function ArkCalendar(props, forwardedRef): React.JSX.Element {
+    const {
+      lang,
+      localeJson,
+      theme,
+      intent,
+      accentColor,
+      value,
+      min,
+      max,
+      onChange,
+      className,
+      testid,
+      events,
+      eventDisplay,
+      ...rest
+    } = props;
+    const [ref, setRef] = useForwardedRef<ArkCalendarElement>(forwardedRef);
 
-  useEffect(() => {
-    ensureTooarkComponentsRegistered();
-  }, []);
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
 
-  const handleChange = useCallback(
-    (e: Event) => {
-      if (onChange) {
-        onChange((e as CustomEvent).detail);
-      }
-    },
-    [onChange]
-  );
+    const handleChange = useCallback(
+      (e: Event) => {
+        if (onChange) {
+          onChange((e as CustomEvent).detail);
+        }
+      },
+      [onChange]
+    );
 
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    el.addEventListener("ark-change", handleChange);
-    return () => el.removeEventListener("ark-change", handleChange);
-  }, [handleChange]);
+    useEffect(() => {
+      const el = ref.current;
+      if (!el) return;
+      el.addEventListener("ark-change", handleChange);
+      return () => el.removeEventListener("ark-change", handleChange);
+    }, [ref, handleChange]);
 
-  // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
-  const attrs: Record<string, unknown> = {
-    ...rest,
-    lang,
-    theme,
-    intent,
-    value,
-    min,
-    max,
-    testid,
-    class: className,
-    "accent-color": accentColor,
-    "locale-json": localeJson ? JSON.stringify(localeJson) : undefined,
-    events: events ? JSON.stringify(events) : undefined,
-    "event-display": eventDisplay
-  };
+    // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
+    const attrs: Record<string, unknown> = {
+      ...rest,
+      lang,
+      theme,
+      intent,
+      value,
+      min,
+      max,
+      testid,
+      class: className,
+      "accent-color": accentColor,
+      "locale-json": localeJson ? JSON.stringify(localeJson) : undefined,
+      events: events ? JSON.stringify(events) : undefined,
+      "event-display": eventDisplay
+    };
 
-  return createElement("ark-calendar", { ...attrs, ref });
-}
+    return createElement("ark-calendar", { ...attrs, ref: setRef });
+  }
+);
