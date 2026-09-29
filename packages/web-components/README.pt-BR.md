@@ -72,7 +72,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 ## 📦 Componentes
 
 - `ark-alert` — Alerta/banner: o host é a caixa na cor suave do intent, os filhos são a mensagem (texto livre ou elementos), `slot="icon"` à esquerda, `slot="action"` à direita, `heading`, `dismissible` com saída animada, `live` region (`status`/`alert`).
-- `ark-avatar` — Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria.
+- `ark-avatar` — Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria, `variant` soft/solid.
 - `ark-badge` — Rótulo curto de status/categoria: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, `color` própria via `color-mix`. O host é o badge; ícone e texto ficam como filhos.
 - `ark-button` — Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio) e modo link (`href`).
 - `ark-calendar` — Grid de mês inline (no estilo do DateCalendar do MUI): localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).

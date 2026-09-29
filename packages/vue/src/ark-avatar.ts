@@ -1,4 +1,4 @@
-import type { ArkAvatarShape, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkAvatarShape, ArkAvatarVariant, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
@@ -13,6 +13,7 @@ export const ArkAvatar = defineComponent({
     size: { type: String as PropType<ArkSize>, default: "md" },
     shape: { type: String as PropType<ArkAvatarShape>, default: "circle" },
     color: { type: String, default: undefined },
+    variant: { type: String as PropType<ArkAvatarVariant>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" }
   },
   setup(props, { attrs }) {
@@ -26,6 +27,7 @@ export const ArkAvatar = defineComponent({
         size: props.size,
         shape: props.shape,
         color: props.color,
+        variant: props.variant,
         theme: props.theme
       });
   }

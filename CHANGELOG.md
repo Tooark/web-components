@@ -16,6 +16,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   visible option the message becomes the new `searching` string (`ArkLocale.searching`, en/pt/es) and the hidden
   listbox gets `aria-busy`. `hint` and `busy` props on the React, Vue and Angular wrappers. Without them the palette
   shows `noResults` as before.
+- `ark-avatar`: opt-in `variant="solid"` (`ArkAvatarVariant` in core) fills the background with `primary` (initials
+  in `primary-fg`) or with `color` (white initials); `soft` stays the default. `variant` prop on the three wrappers.
 
 ### Changed
 

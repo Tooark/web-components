@@ -45,6 +45,9 @@ export type ArkDatepickerLang = ArkLang;
 /** Forma do ark-avatar. */
 export type ArkAvatarShape = "circle" | "square";
 
+/** Preenchimento do ark-avatar: fundo suave com texto na cor, ou fundo na cor com texto claro. */
+export type ArkAvatarVariant = "soft" | "solid";
+
 /** Props de estilo do ark-avatar. */
 export type ArkAvatarStyleOptions = {
   /** Propagado como data-testid ao host e sufixado nas partes internas. */
@@ -53,8 +56,10 @@ export type ArkAvatarStyleOptions = {
   size?: ArkSize;
   /** Círculo ou quadrado de cantos arredondados. Padrão: "circle". */
   shape?: ArkAvatarShape;
-  /** Cor CSS própria para as iniciais: texto na cor e fundo suave por color-mix. Padrão: o tint primary. */
+  /** Cor CSS própria: em `soft` o texto na cor e fundo suave por color-mix, em `solid` o fundo. Padrão: o primary. */
   color?: string;
+  /** Preenchimento. Padrão: "soft". */
+  variant?: ArkAvatarVariant;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
 };
