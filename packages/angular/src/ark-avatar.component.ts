@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkAvatarShape, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkAvatar as ArkAvatarElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -21,6 +22,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkAvatarComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-avatar` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkAvatarElement | null {
+    return this.host.nativeElement.querySelector<ArkAvatarElement>(":scope > ark-avatar");
   }
 
   @Input() testid: string | undefined;

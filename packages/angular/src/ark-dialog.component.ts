@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkDialogCloseReason, ArkDialogSize, ArkLang, ArkTheme } from "@tooark/core";
+import type { ArkDialog as ArkDialogElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -29,6 +30,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkDialogComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-dialog` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkDialogElement | null {
+    return this.host.nativeElement.querySelector<ArkDialogElement>(":scope > ark-dialog");
   }
 
   @Input() testid: string | undefined;

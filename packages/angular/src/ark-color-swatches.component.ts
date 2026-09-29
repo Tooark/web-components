@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkColorSwatch, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkColorSwatches as ArkColorSwatchesElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -22,6 +23,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkColorSwatchesComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-color-swatches` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkColorSwatchesElement | null {
+    return this.host.nativeElement.querySelector<ArkColorSwatchesElement>(":scope > ark-color-swatches");
   }
 
   @Input() testid: string | undefined;

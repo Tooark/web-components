@@ -1,5 +1,9 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkLang, ArkTheme } from "@tooark/core";
+import type {
+  ArkCommandItem as ArkCommandItemElement,
+  ArkCommandPalette as ArkCommandPaletteElement
+} from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -30,6 +34,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkCommandPaletteComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-command-palette` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkCommandPaletteElement | null {
+    return this.host.nativeElement.querySelector<ArkCommandPaletteElement>(":scope > ark-command-palette");
   }
 
   @Input() testid: string | undefined;
@@ -83,6 +94,13 @@ export class ArkCommandPaletteComponent {
 export class ArkCommandItemComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-command-item` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkCommandItemElement | null {
+    return this.host.nativeElement.querySelector<ArkCommandItemElement>(":scope > ark-command-item");
   }
 
   @Input() testid: string | undefined;

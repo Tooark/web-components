@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkLang, ArkMarkShape, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkShapePicker as ArkShapePickerElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -25,6 +26,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkShapePickerComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-shape-picker` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkShapePickerElement | null {
+    return this.host.nativeElement.querySelector<ArkShapePickerElement>(":scope > ark-shape-picker");
   }
 
   @Input() testid: string | undefined;

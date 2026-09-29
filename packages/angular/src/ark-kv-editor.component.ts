@@ -2,9 +2,10 @@ import {
   type AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
+  ElementRef,
   EventEmitter,
   Input,
+  inject,
   type OnChanges,
   type OnDestroy,
   Output,
@@ -12,6 +13,7 @@ import {
   ViewChild
 } from "@angular/core";
 import type { ArkKvBulkFormat, ArkKvRow, ArkKvValueField, ArkLang, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkKvEditor as ArkKvEditorElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -41,6 +43,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkKvEditorComponent implements AfterViewInit, OnChanges, OnDestroy {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-kv-editor` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkKvEditorElement | null {
+    return this.host.nativeElement.querySelector<ArkKvEditorElement>(":scope > ark-kv-editor");
   }
 
   @Input() testid: string | undefined;

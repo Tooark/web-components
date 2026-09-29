@@ -2,14 +2,16 @@ import {
   type AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
+  ElementRef,
   EventEmitter,
   Input,
+  inject,
   type OnDestroy,
   Output,
   ViewChild
 } from "@angular/core";
 import type { ArkDatepickerLang, ArkIntent, ArkSchedulerEvent, ArkSchedulerView, ArkTheme } from "@tooark/core";
+import type { ArkScheduler as ArkSchedulerElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -37,6 +39,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkSchedulerComponent implements AfterViewInit, OnDestroy {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-scheduler` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkSchedulerElement | null {
+    return this.host.nativeElement.querySelector<ArkSchedulerElement>(":scope > ark-scheduler");
   }
 
   @Input() testid: string | undefined;

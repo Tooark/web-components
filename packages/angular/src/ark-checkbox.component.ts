@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkCheckbox as ArkCheckboxElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -26,6 +27,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkCheckboxComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-checkbox` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkCheckboxElement | null {
+    return this.host.nativeElement.querySelector<ArkCheckboxElement>(":scope > ark-checkbox");
   }
 
   @Input() testid: string | undefined;

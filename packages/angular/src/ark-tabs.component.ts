@@ -2,14 +2,16 @@ import {
   type AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
+  ElementRef,
   EventEmitter,
   Input,
+  inject,
   type OnDestroy,
   Output,
   ViewChild
 } from "@angular/core";
 import type { ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTabsFill, ArkTabsVariant, ArkTheme } from "@tooark/core";
+import type { ArkTab as ArkTabElement, ArkTabs as ArkTabsElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -37,6 +39,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkTabsComponent implements AfterViewInit, OnDestroy {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-tabs` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkTabsElement | null {
+    return this.host.nativeElement.querySelector<ArkTabsElement>(":scope > ark-tabs");
   }
 
   @Input() testid: string | undefined;
@@ -93,6 +102,13 @@ export class ArkTabsComponent implements AfterViewInit, OnDestroy {
 export class ArkTabComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-tab` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkTabElement | null {
+    return this.host.nativeElement.querySelector<ArkTabElement>(":scope > ark-tab");
   }
 
   @Input() testid: string | undefined;
