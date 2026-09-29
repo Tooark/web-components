@@ -234,3 +234,32 @@ export const TestHooks = {
     await expect(container).toHaveAttribute("data-ark", "chart");
   }
 };
+
+// Nome acessível: com `aria-label` o host vira `role="img"` com esse nome (o canvas não tem semântica própria); sem ele
+// nada muda, e um `role` do app fica como está.
+export const AccessibleName = {
+  render: () => {
+    const chart = document.createElement("ark-chart") as ArkChart;
+    chart.setAttribute("height", "200px");
+    chart.setAttribute("aria-label", "Vendas por dia da semana");
+    chart.option = buildOption("bar");
+    return chart;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const chart = canvasElement.querySelector("ark-chart") as ArkChart;
+    await expect(canvas.getByRole("img", { name: "Vendas por dia da semana" })).toBe(chart);
+
+    chart.setAttribute("aria-label", "Receita");
+    await expect(canvas.getByRole("img", { name: "Receita" })).toBe(chart);
+    chart.removeAttribute("aria-label");
+    await expect(chart.hasAttribute("role")).toBe(false);
+
+    // O `role` que o app deu fica, com ou sem nome.
+    chart.setAttribute("role", "figure");
+    chart.setAttribute("aria-label", "Receita");
+    await expect(chart).toHaveAttribute("role", "figure");
+    chart.removeAttribute("aria-label");
+    await expect(chart).toHaveAttribute("role", "figure");
+  }
+};

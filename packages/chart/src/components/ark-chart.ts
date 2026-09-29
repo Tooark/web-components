@@ -20,7 +20,10 @@ import { upgradeProperties } from "./upgrade-properties";
  * `testid`. Em `auto` o tema segue o color-scheme da página e acompanha a
  * troca em tempo de execução (`observeColorScheme` de @tooark/tokens). O
  * contêiner do gráfico leva `data-ark="chart"` e o `testid` como
- * `data-testid`.
+ * `data-testid`. Com `aria-label` (ou `aria-labelledby`) o host vira
+ * `role="img"` com esse nome, a menos que o app já tenha dado outro `role`;
+ * sem eles nada muda, e a descrição gerada pelo ECharts (`option.aria`)
+ * continua disponível.
  *
  * Eventos: dispara `ark-chart-click` (bubbles/composed) ao clicar em uma série,
  * com `detail` = params nativos do ECharts.
@@ -34,9 +37,11 @@ export class ArkChart extends HTMLElementBase {
   private pendingOption: EChartsOption | null = null;
   /** Para de observar o tema da página; só existe com `theme="auto"`. */
   private disposeTheme: (() => void) | null = null;
+  /** O `role="img"` do host foi posto pelo componente (e sai com o nome). */
+  private ownsRole = false;
 
   static get observedAttributes(): string[] {
-    return ["theme", "renderer", "height", "auto-resize", "testid"];
+    return ["theme", "renderer", "height", "auto-resize", "testid", "aria-label", "aria-labelledby"];
   }
 
   /** Opções nativas do ECharts. Atribuir re-renderiza o gráfico. */
@@ -62,6 +67,7 @@ export class ArkChart extends HTMLElementBase {
   connectedCallback(): void {
     // Uma `option` gravada antes do registro já monta o gráfico ao passar pelo setter.
     upgradeProperties(this);
+    this.syncRole();
     if (!this.instance) this.render();
   }
 
@@ -85,6 +91,11 @@ export class ArkChart extends HTMLElementBase {
 
     if (name === "testid") {
       this.applyHooks();
+      return;
+    }
+
+    if (name === "aria-label" || name === "aria-labelledby") {
+      this.syncRole();
       return;
     }
 
@@ -146,6 +157,19 @@ export class ArkChart extends HTMLElementBase {
 
     this.syncAutoResize();
     this.syncThemeObserver();
+  }
+
+  // Com nome, o gráfico inteiro é uma imagem para a tecnologia assistiva (o canvas não tem semântica própria); o
+  // `role` do app, se houver, fica como está.
+  private syncRole(): void {
+    const named = this.hasAttribute("aria-label") || this.hasAttribute("aria-labelledby");
+    if (named && !this.hasAttribute("role")) {
+      this.setAttribute("role", "img");
+      this.ownsRole = true;
+    } else if (!named && this.ownsRole) {
+      this.removeAttribute("role");
+      this.ownsRole = false;
+    }
   }
 
   // O contêiner leva o hook de E2E, como os componentes de @tooark/web-components.
