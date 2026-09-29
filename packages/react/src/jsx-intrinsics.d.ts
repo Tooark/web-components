@@ -2,6 +2,7 @@ import type {
   ArkAlertLive,
   ArkAlertVariant,
   ArkAvatarShape,
+  ArkAvatarVariant,
   ArkBadgeSize,
   ArkBadgeVariant,
   ArkButtonStatus,
@@ -49,6 +50,7 @@ interface ArkIntrinsicElements {
     size?: ArkSize;
     shape?: ArkAvatarShape;
     color?: string;
+    variant?: ArkAvatarVariant;
     theme?: ArkTheme;
   };
   "ark-badge": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {

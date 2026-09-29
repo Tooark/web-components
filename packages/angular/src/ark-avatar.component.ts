@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
-import type { ArkAvatarShape, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkAvatarShape, ArkAvatarVariant, ArkSize, ArkTheme } from "@tooark/core";
 import type { ArkAvatar as ArkAvatarElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -16,6 +16,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.size]="size"
     [attr.shape]="shape"
     [attr.color]="color"
+    [attr.variant]="variant"
     [attr.theme]="theme">
   </ark-avatar>`
 })
@@ -41,7 +42,9 @@ export class ArkAvatarComponent {
   @Input() size: ArkSize = "md";
   /** Círculo ou quadrado de cantos arredondados. Padrão: "circle". */
   @Input() shape: ArkAvatarShape = "circle";
-  /** Cor CSS própria para as iniciais (texto na cor, fundo suave). Padrão: o tint primary. */
+  /** Cor CSS própria: em `soft` o texto na cor e fundo suave, em `solid` o fundo. Padrão: o primary. */
   @Input() color: string | undefined;
+  /** Preenchimento: fundo suave ou fundo na cor com texto claro. Padrão: "soft". */
+  @Input() variant: ArkAvatarVariant | undefined;
   @Input() theme: ArkTheme = "auto";
 }

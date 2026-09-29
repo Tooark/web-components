@@ -1,4 +1,4 @@
-import type { ArkAvatarShape, ArkSize } from "@tooark/core";
+import type { ArkAvatarShape, ArkAvatarVariant, ArkSize } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -20,7 +20,8 @@ type ArkAvatarSizing = {
  * carregar, as iniciais de `name` (primeira letra, ou primeira mais última
  * quando há sobrenome); sem nome e sem imagem, um glifo de pessoa decorativo
  * (`aria-hidden`, a menos que o host tenha aria-label próprio). `color` troca
- * o tint primary por uma cor própria (texto na cor, fundo suave).
+ * o tint primary por uma cor própria (texto na cor, fundo suave) e
+ * `variant="solid"` preenche o fundo com a cor e escreve as iniciais em branco.
  */
 export class ArkAvatar extends HTMLElementBase {
   static readonly tagName = "ark-avatar";
@@ -35,7 +36,7 @@ export class ArkAvatar extends HTMLElementBase {
   private ownLabel: string | null = null;
 
   static get observedAttributes(): string[] {
-    return ["name", "src", "size", "shape", "color", "aria-label", "theme", "class", "testid"];
+    return ["name", "src", "size", "shape", "color", "variant", "aria-label", "theme", "class", "testid"];
   }
 
   connectedCallback(): void {
@@ -78,6 +79,10 @@ export class ArkAvatar extends HTMLElementBase {
     return (this.getAttribute("shape") || "").toLowerCase() === "square" ? "square" : "circle";
   }
 
+  private getVariant(): ArkAvatarVariant {
+    return (this.getAttribute("variant") || "").toLowerCase() === "solid" ? "solid" : "soft";
+  }
+
   private render(): void {
     const initials = document.createElement("span");
     initials.setAttribute("aria-hidden", "true");
@@ -118,7 +123,7 @@ export class ArkAvatar extends HTMLElementBase {
     this.imageEl.className = failed ? "" : "ark:h-full ark:w-full ark:object-cover";
   }
 
-  // Cor própria: texto na cor e fundo suave por color-mix, como o badge.
+  // Cor própria, como o badge: suave é texto na cor e fundo por color-mix; sólido é fundo na cor e texto branco.
   private applyCustomColor(): void {
     const color = this.getAttribute("color")?.trim();
     if (!color) {
@@ -126,8 +131,9 @@ export class ArkAvatar extends HTMLElementBase {
       this.style.removeProperty("--ark-avatar-fg");
       return;
     }
-    this.style.setProperty("--ark-avatar-bg", `color-mix(in oklab, ${color} 18%, transparent)`);
-    this.style.setProperty("--ark-avatar-fg", color);
+    const solid = this.getVariant() === "solid";
+    this.style.setProperty("--ark-avatar-bg", solid ? color : `color-mix(in oklab, ${color} 18%, transparent)`);
+    this.style.setProperty("--ark-avatar-fg", solid ? "#fff" : color);
   }
 
   private applyOwnClasses(next: string[]): void {
@@ -170,7 +176,9 @@ export class ArkAvatar extends HTMLElementBase {
 
     const colors = this.getAttribute("color")?.trim()
       ? "ark:bg-(--ark-avatar-bg) ark:text-(--ark-avatar-fg)"
-      : "ark:bg-primary-soft ark:text-primary-soft-fg";
+      : this.getVariant() === "solid"
+        ? "ark:bg-primary ark:text-primary-fg"
+        : "ark:bg-primary-soft ark:text-primary-soft-fg";
     this.applyOwnClasses(
       [
         "ark:inline-flex ark:shrink-0 ark:items-center ark:justify-center ark:overflow-hidden ark:align-middle ark:font-semibold ark:uppercase ark:leading-none ark:select-none",

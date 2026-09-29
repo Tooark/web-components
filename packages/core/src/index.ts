@@ -33,6 +33,7 @@ export type {
   ArkAlertVariant,
   ArkAvatarShape,
   ArkAvatarStyleOptions,
+  ArkAvatarVariant,
   ArkBadgeSize,
   ArkBadgeStyleOptions,
   ArkBadgeVariant,

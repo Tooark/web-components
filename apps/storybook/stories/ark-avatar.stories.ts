@@ -1,4 +1,4 @@
-import type { ArkAvatarShape, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkAvatarShape, ArkAvatarVariant, ArkSize, ArkTheme } from "@tooark/core";
 import { expect, waitFor } from "storybook/test";
 
 const meta = {
@@ -9,6 +9,7 @@ const meta = {
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     shape: { control: "inline-radio", options: ["circle", "square"] },
     color: { control: "color" },
+    variant: { control: "inline-radio", options: ["soft", "solid"] },
     theme: { control: "select", options: ["auto", "light", "dark"] }
   },
   args: {
@@ -17,6 +18,7 @@ const meta = {
     size: "md",
     shape: "circle",
     color: "",
+    variant: "soft",
     theme: "auto"
   }
 };
@@ -29,6 +31,7 @@ type StoryArgs = {
   size: ArkSize;
   shape: ArkAvatarShape;
   color: string;
+  variant: ArkAvatarVariant;
   theme: ArkTheme;
   testid?: string;
 };
@@ -50,6 +53,7 @@ function createAvatar(args: Partial<StoryArgs>): AvatarEl {
   if (args.size) el.setAttribute("size", args.size);
   if (args.shape) el.setAttribute("shape", args.shape);
   if (args.color) el.setAttribute("color", args.color);
+  if (args.variant) el.setAttribute("variant", args.variant);
   if (args.theme) el.setAttribute("theme", args.theme);
   if (args.testid) el.setAttribute("testid", args.testid);
   return el;
@@ -90,6 +94,60 @@ export const Colors = {
       createAvatar({ name: "Diego Faria", color: "#dc2626" }),
       createAvatar({ name: "Elisa", color: "oklch(55% 0.2 300)" })
     )
+};
+
+/** Cor computada de um valor CSS (token ou literal), para comparar com a do avatar. */
+function resolvedColor(value: string, host: HTMLElement): string {
+  const probe = document.createElement("span");
+  probe.style.color = value;
+  host.appendChild(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+// soft (padrão, igual a antes) é fundo suave e texto na cor; solid preenche o fundo: primary com o texto de contraste
+// do token, ou a `color` do app com texto branco. A imagem cobre o fundo nos dois.
+export const Variants = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col gap-4";
+    wrap.append(
+      row(
+        createAvatar({ name: "Ana Lima", testid: "soft" }),
+        createAvatar({ name: "Bruno Costa", color: "#0ea5e9" }),
+        createAvatar({ name: "Carla Dias", color: "#dc2626" })
+      ),
+      row(
+        createAvatar({ name: "Ana Lima", variant: "solid", testid: "solid" }),
+        createAvatar({ name: "Bruno Costa", color: "#0ea5e9", variant: "solid", testid: "solid-color" }),
+        createAvatar({ name: "Carla Dias", color: "#dc2626", variant: "solid" }),
+        createAvatar({ name: "Ana Lima", src: PHOTO, variant: "solid" })
+      )
+    );
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const byId = (id: string) => canvasElement.querySelector(`[data-testid="${id}"]`) as HTMLElement;
+    const soft = getComputedStyle(byId("soft"));
+    await expect(soft.backgroundColor).toBe(resolvedColor("var(--ark-color-primary-soft)", canvasElement));
+    await expect(soft.color).toBe(resolvedColor("var(--ark-color-primary-soft-fg)", canvasElement));
+
+    const solid = getComputedStyle(byId("solid"));
+    await expect(solid.backgroundColor).toBe(resolvedColor("var(--ark-color-primary)", canvasElement));
+    await expect(solid.color).toBe(resolvedColor("var(--ark-color-primary-fg)", canvasElement));
+
+    const solidColor = byId("solid-color");
+    await expect(getComputedStyle(solidColor).backgroundColor).toBe("rgb(14, 165, 233)");
+    await expect(getComputedStyle(solidColor).color).toBe("rgb(255, 255, 255)");
+
+    // Trocar a variante em tempo de execução refaz a cor própria; sem variant volta ao suave.
+    solidColor.removeAttribute("variant");
+    await expect(getComputedStyle(solidColor).color).toBe("rgb(14, 165, 233)");
+    await expect(getComputedStyle(solidColor).backgroundColor).not.toBe("rgb(14, 165, 233)");
+    solidColor.setAttribute("variant", "solid");
+    await expect(getComputedStyle(solidColor).backgroundColor).toBe("rgb(14, 165, 233)");
+  }
 };
 
 export const WithImage = {
