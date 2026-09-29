@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkIntent, ArkMenuAlign, ArkMenuDirection, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkMenu as ArkMenuElement, ArkMenuItem as ArkMenuItemElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -25,6 +26,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkMenuComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-menu` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkMenuElement | null {
+    return this.host.nativeElement.querySelector<ArkMenuElement>(":scope > ark-menu");
   }
 
   @Input() testid: string | undefined;
@@ -70,6 +78,13 @@ export class ArkMenuComponent {
 export class ArkMenuItemComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-menu-item` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkMenuItemElement | null {
+    return this.host.nativeElement.querySelector<ArkMenuItemElement>(":scope > ark-menu-item");
   }
 
   @Input() testid: string | undefined;

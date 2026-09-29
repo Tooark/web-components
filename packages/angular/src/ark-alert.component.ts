@@ -2,14 +2,16 @@ import {
   type AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
+  ElementRef,
   EventEmitter,
   Input,
+  inject,
   type OnDestroy,
   Output,
   ViewChild
 } from "@angular/core";
 import type { ArkAlertLive, ArkAlertVariant, ArkIntent, ArkLang, ArkTheme } from "@tooark/core";
+import type { ArkAlert as ArkAlertElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -34,6 +36,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkAlertComponent implements AfterViewInit, OnDestroy {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-alert` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkAlertElement | null {
+    return this.host.nativeElement.querySelector<ArkAlertElement>(":scope > ark-alert");
   }
 
   @Input() testid: string | undefined;

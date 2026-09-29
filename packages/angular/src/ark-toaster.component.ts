@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkLang, ArkTheme, ArkToastPosition } from "@tooark/core";
+import type { ArkToaster as ArkToasterElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -22,6 +23,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkToasterComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-toaster` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkToasterElement | null {
+    return this.host.nativeElement.querySelector<ArkToasterElement>(":scope > ark-toaster");
   }
 
   @Input() testid: string | undefined;

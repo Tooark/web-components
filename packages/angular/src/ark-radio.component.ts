@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkRadio as ArkRadioElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -25,6 +26,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkRadioComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-radio` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkRadioElement | null {
+    return this.host.nativeElement.querySelector<ArkRadioElement>(":scope > ark-radio");
   }
 
   @Input() testid: string | undefined;

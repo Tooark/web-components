@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkTheme } from "@tooark/core";
+import type { ArkEmpty as ArkEmptyElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -18,6 +19,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkEmptyComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-empty` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkEmptyElement | null {
+    return this.host.nativeElement.querySelector<ArkEmptyElement>(":scope > ark-empty");
   }
 
   @Input() testid: string | undefined;

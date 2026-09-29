@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, EventEmitter, Input, Output } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkToggle as ArkToggleElement, ArkToggleGroup as ArkToggleGroupElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -23,6 +24,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkToggleComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-toggle` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkToggleElement | null {
+    return this.host.nativeElement.querySelector<ArkToggleElement>(":scope > ark-toggle");
   }
 
   @Input() testid: string | undefined;
@@ -61,6 +69,13 @@ export class ArkToggleComponent {
 export class ArkToggleGroupComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-toggle-group` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkToggleGroupElement | null {
+    return this.host.nativeElement.querySelector<ArkToggleGroupElement>(":scope > ark-toggle-group");
   }
 
   @Input() testid: string | undefined;

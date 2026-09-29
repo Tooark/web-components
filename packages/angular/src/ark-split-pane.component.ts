@@ -2,14 +2,16 @@ import {
   type AfterViewInit,
   Component,
   CUSTOM_ELEMENTS_SCHEMA,
-  type ElementRef,
+  ElementRef,
   EventEmitter,
   Input,
+  inject,
   type OnDestroy,
   Output,
   ViewChild
 } from "@angular/core";
 import type { ArkLang, ArkSplitPaneDirection, ArkTheme } from "@tooark/core";
+import type { ArkSplitPane as ArkSplitPaneElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -31,6 +33,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkSplitPaneComponent implements AfterViewInit, OnDestroy {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-split-pane` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkSplitPaneElement | null {
+    return this.host.nativeElement.querySelector<ArkSplitPaneElement>(":scope > ark-split-pane");
   }
 
   @Input() testid: string | undefined;

@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkCardPadding, ArkRounded, ArkTheme } from "@tooark/core";
+import type { ArkCard as ArkCardElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -19,6 +20,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkCardComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-card` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkCardElement | null {
+    return this.host.nativeElement.querySelector<ArkCardElement>(":scope > ark-card");
   }
 
   @Input() testid: string | undefined;

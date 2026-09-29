@@ -76,9 +76,32 @@ await check("vue (renderToString)", async () => {
 // Angular: o bundle parcial (FESM) avaliado com o compilador JIT, como num servidor sem o linker do CLI.
 await check("angular (import + registro)", async () => {
   await importFrom("angular", "@angular/compiler");
+  const { ElementRef, Injector, runInInjectionContext } = await importFrom("angular", "@angular/core");
   const angular = await import(distUrl("angular", "fesm2022/tooark-angular.mjs"));
-  // O construtor de cada wrapper chama o registro, que no servidor precisa ser no-op.
-  new angular.ArkButtonComponent();
+  // O construtor de cada wrapper chama o registro, que no servidor precisa ser no-op. O wrapper nasce num contexto de
+  // injeção, como o Angular o cria: o host dele (o `element`) vem de inject(ElementRef).
+  const injector = Injector.create({ providers: [{ provide: ElementRef, useValue: new ElementRef(null) }] });
+  const button = runInInjectionContext(injector, () => new angular.ArkButtonComponent());
+  if (!("element" in button)) throw new Error("ArkButtonComponent sem o getter element");
+});
+
+// Todo wrapper Angular expõe o elemento que renderiza: o getter `element` procura, no host do wrapper, o filho direto
+// com a tag do próprio seletor (`ark-x-wrapper` -> `ark-x`).
+await check("angular (element de cada wrapper)", async () => {
+  const { ElementRef, Injector, runInInjectionContext } = await importFrom("angular", "@angular/core");
+  const angular = await import(distUrl("angular", "fesm2022/tooark-angular.mjs"));
+  const wrappers = Object.entries(angular).filter(([name]) => name.endsWith("Component"));
+  if (wrappers.length === 0) throw new Error("nenhum wrapper exportado");
+  for (const [name, Wrapper] of wrappers) {
+    const tag = Wrapper.ɵcmp.selectors[0][0].replace(/-wrapper$/, "");
+    const queried = [];
+    const host = { querySelector: (selector) => queried.push(selector) && null };
+    const injector = Injector.create({ providers: [{ provide: ElementRef, useValue: new ElementRef(host) }] });
+    const wrapper = runInInjectionContext(injector, () => new Wrapper());
+    if (wrapper.element !== null || queried[0] !== `:scope > ${tag}`) {
+      throw new Error(`${name}.element procurou ${JSON.stringify(queried[0])}, esperado ":scope > ${tag}"`);
+    }
+  }
 });
 
 if (failed) process.exit(1);

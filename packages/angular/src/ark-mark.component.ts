@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkMarkShape, ArkTheme } from "@tooark/core";
+import type { ArkMark as ArkMarkElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -19,6 +20,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkMarkComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-mark` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkMarkElement | null {
+    return this.host.nativeElement.querySelector<ArkMarkElement>(":scope > ark-mark");
   }
 
   @Input() testid: string | undefined;

@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkProgress as ArkProgressElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -22,6 +23,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkProgressComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-progress` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkProgressElement | null {
+    return this.host.nativeElement.querySelector<ArkProgressElement>(":scope > ark-progress");
   }
 
   @Input() testid: string | undefined;

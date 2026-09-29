@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkStatusDot as ArkStatusDotElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -18,6 +19,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkStatusDotComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-status-dot` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkStatusDotElement | null {
+    return this.host.nativeElement.querySelector<ArkStatusDotElement>(":scope > ark-status-dot");
   }
 
   @Input() testid: string | undefined;

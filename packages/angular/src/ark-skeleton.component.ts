@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkRounded, ArkTheme } from "@tooark/core";
+import type { ArkSkeleton as ArkSkeletonElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -21,6 +22,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkSkeletonComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-skeleton` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkSkeletonElement | null {
+    return this.host.nativeElement.querySelector<ArkSkeletonElement>(":scope > ark-skeleton");
   }
 
   @Input() testid: string | undefined;

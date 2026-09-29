@@ -1,4 +1,4 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type {
   ArkButtonStatus,
   ArkButtonType,
@@ -8,6 +8,7 @@ import type {
   ArkSize,
   ArkTheme
 } from "@tooark/core";
+import type { ArkButton as ArkButtonElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -40,6 +41,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkButtonComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-button` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkButtonElement | null {
+    return this.host.nativeElement.querySelector<ArkButtonElement>(":scope > ark-button");
   }
 
   @Input() testid: string | undefined;

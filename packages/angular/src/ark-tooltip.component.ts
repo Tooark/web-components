@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, Input } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
 import type { ArkTheme, ArkTooltipSide } from "@tooark/core";
+import type { ArkTooltip as ArkTooltipElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -20,6 +21,13 @@ import { ensureTooarkComponentsRegistered } from "./register";
 export class ArkTooltipComponent {
   constructor() {
     ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-tooltip` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkTooltipElement | null {
+    return this.host.nativeElement.querySelector<ArkTooltipElement>(":scope > ark-tooltip");
   }
 
   @Input() testid: string | undefined;
