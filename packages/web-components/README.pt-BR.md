@@ -61,6 +61,8 @@ import "@tooark/web-components/styles.css";
 registerTooarkComponents(); // idempotente
 ```
 
+Uma propriedade JS que o framework atribui a uma tag crua antes desta chamada é aplicada quando o elemento faz o upgrade, então a ordem não importa.
+
 Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `light dark` para seguir o sistema); `theme="light|dark"` num elemento força um lado, e `lang="en|pt|es"` (ou `lang="custom"` com `locale-json`) nos elementos que mostram texto.
 
 ---
@@ -87,15 +89,15 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-file-input` — Campo de arquivo com a grid do `ark-input` (label, helper/erro): `<input type="file">` nativo oculto para o formulário, zona de soltar com realce em `dragover`, botão de escolher acessível por teclado, lista dos nomes escolhidos, `accept`/`multiple`. Emite `change` com os arquivos e os anuncia.
 - `ark-input` — Campo de texto padronizado: label, helper/erro com aria, prefixo/sufixo via `slot`, `reveal` de senha, atributos nativos repassados, tamanhos, intents, `rounded`.
 - `ark-kbd` — Tecla de atalho: o host é a tecla (mono, borda, `surface-muted`, aresta inferior) em volta do seu texto; `size`.
-- `ark-kv-editor` — Editor chave/valor: linhas `{ id, key, value, enabled }` (propriedade JS) com ativar, editar, remover, adicionar, colunas opcionais `types`/`secret`/`description`, modo em massa em linhas `chave:valor` ou JSON. Compõe outros controles ark-\*. Emite `change`, `ark-add`, `ark-delete`.
-- `ark-mark` — Marca de escopo: uma de seis formas (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`) numa `color`, cor e forma juntas para a identidade nunca depender só da cor; `size`, `label`.
+- `ark-kv-editor` — Editor chave/valor: linhas `{ id, key, value, enabled }` (propriedade JS) com ativar, editar, remover, adicionar, colunas opcionais `types`/`secret`/`description`, modo em massa em linhas `chave:valor` ou JSON, `valueField` opcional para uma célula de valor sua. Compõe outros controles ark-\*. Emite `change`, `ark-add`, `ark-delete`.
+- `ark-mark` — Marca de escopo: uma de dez formas (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) numa `color`, cor e forma juntas para a identidade nunca depender só da cor; `size`, `label`.
 - `ark-menu` — Menu suspenso/de contexto sobre a Popover API (`role="menu"`, `popover="auto"`): ancorado ao gatilho por `for`, `align`/`direction` com flip, teclado, `openAt(x, y)`; itens ficam como filhos. Emite `ark-select`.
 - `ark-menu-item` — Item de menu (o host é o item): filhos livres, `slot="trailing"`, `disabled`, `intent`, `checked` (item checkbox), `divider`, `static` (conteúdo não interativo).
 - `ark-progress` — Barra de progresso (`role="progressbar"` no host): `value`/`max` com transição de largura pelos tokens, `show-value`, `indeterminate` em loop isento de movimento reduzido, `label`, tamanhos, intents.
 - `ark-radio` — Radio desenhado pelo componente (botão `role="radio"` + input nativo oculto): agrupa por `name` no mesmo form, um tab stop por grupo, setas movem e marcam, `label`/filhos como rótulo. Emite `change` na que marcou.
 - `ark-scheduler` — Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.
 - `ark-select` — `<select>` nativo estilizado como o `ark-input`: label, helper/erro com aria, `placeholder`, opções por dados (atributo `options` em JSON ou propriedade JS, `group` → `<optgroup>`), tamanhos, intents, `rounded`.
-- `ark-shape-picker` — Seletor de forma como `radiogroup`: as seis formas do `ark-mark` desenhadas em `color`, `value`, setas navegam, nomes das formas localizados, `disabled`, `size`. Emite `change` com a forma.
+- `ark-shape-picker` — Seletor de forma como `radiogroup`: as dez formas do `ark-mark` (ou as que `shapes` listar) desenhadas em `color`, `value`, setas navegam, nomes das formas localizados, `disabled`, `size`. Emite `change` com a forma.
 - `ark-skeleton` — Placeholder de carregamento: o host é o bloco (`.ark-skeleton`, `aria-hidden`), dimensionado pela sua class/style; `rows` renderiza barras, `animated` liga o shimmer (um brilho que varre), `rounded`.
 - `ark-spinner` — Indicador de carregamento solto (`role="status"`): o SVG do spinner do botão em `.ark-animate-spin` (continua girando sob movimento reduzido), rótulo para leitor de tela por `lang` ou `label`, `size`, `intent` opcional (senão herda a cor do texto).
 - `ark-split-pane` — Painéis redimensionáveis: os seus filhos são os painéis, as alças são nós próprios do componente ao fim do host; `direction`, `sizes` (percentuais, reescritos a cada mudança), `data-min`/`data-max` por painel, teclado e arrasto com pointer capture. Emite `ark-resize`.

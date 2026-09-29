@@ -13,9 +13,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 - `ark-mark`: four more shapes, `cross`, `pentagon`, `moon` and `asterisk` (ten in all), with their localized names
   (`shapeCross`, `shapePentagon`, `shapeMoon`, `shapeAsterisk` in en/pt/es); `ARK_MARK_SHAPES` lists the ten.
-- `ark-shape-picker`: opt-in `shapes` (comma-separated, or `all`) picks which shapes are offered and in what order;
-  without it the picker offers the same six as before (`ARK_SHAPE_PICKER_DEFAULT_SHAPES`). `shapes` prop on the
-  React, Vue and Angular wrappers.
+- `ark-shape-picker` offers the ten shapes, and the opt-in `shapes` (comma-separated, or `all`) picks which ones and
+  in what order. `shapes` prop on the React, Vue and Angular wrappers.
 - `ark-kv-editor`: opt-in `valueField` JS property (`ArkKvValueField`/`ArkKvValueFieldContext` in core), a function
   that creates each row's value cell in place of the `ark-input`, for a field with `{{variable}}` autocomplete such as
   a single-line `ark-code-editor`. Secret rows keep the password field, returning `null` keeps the `ark-input` in
@@ -27,15 +26,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   a React 19 callback ref that returns a cleanup gets the cleanup on unmount.
 - `ark-code-editor` and `ark-wysiwyg-editor`: `aria-label` names the editable content (the `role="textbox"`), also as
   the `label` engine option (plus `setLabel` in `@tooark/code`).
+- `@tooark/angular`: every wrapper exposes the `ark-*` element it renders as `element`, typed as the element class,
+  for its methods and properties; the view children a few wrappers had (`editorRef`, `alertRef`…) stay.
+- `ark-chart`: `aria-label`/`aria-labelledby` make the host a `role="img"` with that name (unless the app gave it
+  a `role`); without them nothing changes.
 - E2E hooks on the side packages that had none: `ark-chart` (`data-ark="chart"` on the chart container) and the
   wysiwyg editor (root, `-toolbar`, `-content`) and viewer (root, `-content`), with `testid` as `data-testid`.
 
 ### Fixed
 
-- `@tooark/chart`, `@tooark/code`, `@tooark/wysiwyg`: a JS property assigned before `registerTooark*()` (a framework
-  binding `option`, `value` or `content` to the raw tag before registration) stayed an own property of the node,
-  shadowed the class setter after the upgrade and never reached the element; the elements now re-apply it through
-  the setter when they connect.
+- Every `ark-*` element: a JS property assigned before `registerTooark*()` (a framework binding `rows`, `options`,
+  `option`, `value` or `content` to the raw tag before registration) stayed an own property of the node, shadowed
+  the class setter after the upgrade and never reached the element; the elements now re-apply every such property
+  through its setter when they connect.
+- `ark-dialog`, `ark-drawer`, `ark-command-palette`, `ark-menu`, `ark-tooltip`: an overlay upgraded already open (an
+  `open` attribute in server-rendered HTML registered later, or `open` assigned before registration) opened
+  before `connectedCallback` and dispatched `ark-open` synchronously, before the listeners attached while mounting;
+  it now opens in `connectedCallback`, with `ark-open` in a microtask.
 - `ark-wysiwyg-editor`: assigning `colors`/`highlights` a JSON string (what React 19 and Vue assign when the template
   writes the attribute) removed the attribute and fell back to the default palette; the setter now takes the string
   like the attribute.
@@ -48,8 +55,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   attributes mirrored on the host (`placeholder`, `aria-label` on `ark-input` and the fields built on it) and the test
   queries that find only the control; the side packages and `@tooark/motion` READMEs show how to use them in React,
   Vue and Angular without a wrapper.
-- Storybook `Integration/Framework Props` also checks `ark-chart`, `ark-code-editor` and the wysiwyg tags, and a new
-  story assigns their properties before the element is registered.
+- Storybook `Integration/Framework Props` also checks `ark-chart`, `ark-code-editor` and the wysiwyg tags, and new
+  stories assign every property of every tag, and `open` on the overlays, before the element is registered.
+  `pnpm check:ssr` checks that each Angular wrapper's `element` queries its own tag.
 
 ## [1.2.2] - 2026-09-28
 
