@@ -9,6 +9,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-command-palette`: opt-in `hint`, the message shown instead of `noResults` while the search field is empty (a
+  palette that starts with no items), and `busy` (attribute and JS property), an async search in progress: with no
+  visible option the message becomes the new `searching` string (`ArkLocale.searching`, en/pt/es) and the hidden
+  listbox gets `aria-busy`. `hint` and `busy` props on the React, Vue and Angular wrappers. Without them the palette
+  shows `noResults` as before.
+
 ### Changed
 
 - Every README (root and packages, English and Portuguese) gains a Help & Security section pointing to `SUPPORT.md`

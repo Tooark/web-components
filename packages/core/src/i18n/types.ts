@@ -58,6 +58,8 @@ export interface ArkLocale {
   noResults: string;
   /** Placeholder e rótulo do campo de busca. */
   search: string;
+  /** Texto exibido enquanto uma busca assíncrona está em andamento. */
+  searching: string;
   /** Rótulo do botão que abre o seletor de arquivos. */
   chooseFile: string;
   /** Dica da área de soltar arquivos. */

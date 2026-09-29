@@ -23,6 +23,10 @@ export type ArkCommandPaletteProps = PropsWithChildren<
     queryDelay?: number;
     /** Nome acessivel do dialogo. */
     label?: string;
+    /** Mensagem sem opcoes enquanto o campo esta vazio (no lugar de `noResults`). */
+    hint?: string;
+    /** Busca assincrona em andamento: sem opcoes a mensagem vira `searching`, e o listbox fica aria-busy. */
+    busy?: boolean;
     /** A pagina continua rolando com a paleta aberta. */
     noScrollLock?: boolean;
     "aria-label"?: string;
@@ -41,6 +45,7 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
       className,
       open,
       filter,
+      busy,
       queryDelay,
       noScrollLock,
       localeJson,
@@ -82,6 +87,7 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
       class: className,
       open: open ? "" : undefined,
       filter: filter ? "" : undefined,
+      busy: busy ? "" : undefined,
       "no-scroll-lock": noScrollLock ? "" : undefined,
       "query-delay": queryDelay === undefined ? undefined : String(queryDelay),
       "locale-json": localeJson

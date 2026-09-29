@@ -16,6 +16,8 @@ export const ArkCommandPalette = defineComponent({
     filter: { type: Boolean, default: false },
     queryDelay: { type: Number, default: undefined },
     label: { type: String, default: undefined },
+    hint: { type: String, default: undefined },
+    busy: { type: Boolean, default: false },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     lang: { type: String as PropType<ArkLang>, default: undefined },
     localeJson: { type: String, default: undefined }
@@ -52,6 +54,8 @@ export const ArkCommandPalette = defineComponent({
           filter: props.filter ? "" : undefined,
           "query-delay": props.queryDelay,
           label: props.label,
+          hint: props.hint,
+          busy: props.busy ? "" : undefined,
           theme: props.theme,
           lang: props.lang,
           "locale-json": props.localeJson

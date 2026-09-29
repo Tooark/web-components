@@ -31,7 +31,9 @@ function normalize(text: string): string {
  * e um listbox oculto que é dono das opções visíveis por `aria-owns`. Itens
  * e cabeçalhos se ordenam por `order` no CSS, então nada é inserido entre os
  * filhos. Com `filter` o texto filtra localmente pelo `label` dos itens; em
- * qualquer caso `ark-query` sai com debounce para busca assíncrona. O foco
+ * qualquer caso `ark-query` sai com debounce para busca assíncrona. Sem opções
+ * visíveis a mensagem é `noResults`; `hint` a troca enquanto o campo está
+ * vazio e `busy` (busca em andamento) a troca por `searching`. O foco
  * fica sempre no campo; setas movem a opção ativa (`aria-activedescendant`),
  * Enter seleciona, Esc fecha; `hotkey` abre de qualquer lugar da página. A
  * página para de rolar enquanto aberta, salvo com `no-scroll-lock`.
@@ -63,6 +65,8 @@ export class ArkCommandPalette extends HTMLElementBase {
       "filter",
       "query-delay",
       "label",
+      "hint",
+      "busy",
       "theme",
       "lang",
       "locale-json",
@@ -154,6 +158,15 @@ export class ArkCommandPalette extends HTMLElementBase {
     this.toggleAttribute("no-scroll-lock", coerceBooleanAttr(value));
   }
 
+  /** Busca assíncrona em andamento (atributo `busy`): o listbox fica `aria-busy` e, sem opções, aparece `searching`. */
+  get busy(): boolean {
+    return this.hasAttribute("busy");
+  }
+
+  set busy(value: boolean | string | null | undefined) {
+    this.toggleAttribute("busy", coerceBooleanAttr(value));
+  }
+
   /** Texto atual do campo de busca. */
   get query(): string {
     return this.inputEl?.value ?? "";
@@ -243,13 +256,28 @@ export class ArkCommandPalette extends HTMLElementBase {
     });
 
     this.listEl.setAttribute("aria-owns", visible.map((item) => item.id).join(" "));
-    this.emptyEl.hidden = visible.length > 0;
-    const noResults = this.getLocale().noResults;
-    if (this.emptyEl.textContent !== noResults) this.emptyEl.textContent = noResults;
+    this.syncEmpty(visible.length);
 
     const enabled = visible.filter((item) => !item.disabled);
     if (!enabled.some((item) => item.id === this.activeId)) this.activeId = enabled[0]?.id ?? null;
     this.applyActive(items);
+  }
+
+  // Mensagem sem opções visíveis: `searching` com `busy`, o `hint` do app com o campo vazio, senão `noResults`.
+  private syncEmpty(visible: number): void {
+    if (!this.listEl || !this.emptyEl) return;
+    const locale = this.getLocale();
+    const busy = this.busy;
+    const hint = this.getAttribute("hint");
+    const text = busy ? locale.searching : hint && this.query.trim() === "" ? hint : locale.noResults;
+    this.emptyEl.hidden = visible > 0;
+    // Só escreve o que mudou: o observer (subtree) veria a troca do nó de texto e sincronizaria em laço.
+    if (this.emptyEl.textContent !== text) this.emptyEl.textContent = text;
+    if (busy) {
+      this.listEl.setAttribute("aria-busy", "true");
+    } else {
+      this.listEl.removeAttribute("aria-busy");
+    }
   }
 
   private applyActive(items: ArkCommandItem[]): void {
@@ -513,7 +541,7 @@ export class ArkCommandPalette extends HTMLElementBase {
         this.inputEl.removeAttribute(attr);
       }
     }
-    if (this.emptyEl.textContent !== locale.noResults) this.emptyEl.textContent = locale.noResults;
+    this.syncEmpty(this.visibleItems().length);
 
     applyTestHooks(this, "command-palette", this);
     applyTestHooks(this, "command-palette", this.inputEl, "input");

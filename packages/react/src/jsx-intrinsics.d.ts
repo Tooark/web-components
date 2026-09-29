@@ -212,6 +212,8 @@ interface ArkIntrinsicElements {
     "no-scroll-lock"?: boolean;
     "query-delay"?: number | string;
     label?: string;
+    hint?: string;
+    busy?: boolean;
     theme?: ArkTheme;
     lang?: ArkLang;
     "locale-json"?: string;

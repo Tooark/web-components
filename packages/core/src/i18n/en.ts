@@ -44,6 +44,7 @@ export const en: ArkLocale = {
   copied: "Copied",
   noResults: "No results",
   search: "Search",
+  searching: "Searching…",
   chooseFile: "Choose file",
   dropHint: "or drag and drop here",
   noFile: "No file selected",
