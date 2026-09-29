@@ -127,6 +127,9 @@ export class ArkDialog extends HTMLElementBase {
     if (name === "open") {
       const reason = this.pendingReason ?? "api";
       this.pendingReason = null;
+      // Sem o observer o connectedCallback ainda não rodou (upgrade de uma tag já no DOM, hidratação de SSR, prop
+      // reaplicada ao conectar): quem abre é ele, com o ark-open no microtask.
+      if (!this.observer) return;
       if (this.hasAttribute("open")) {
         this.openNow();
       } else {

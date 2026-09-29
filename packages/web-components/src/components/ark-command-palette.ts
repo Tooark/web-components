@@ -117,6 +117,9 @@ export class ArkCommandPalette extends HTMLElementBase {
     if (!this.isConnected) return;
 
     if (name === "open") {
+      // Sem o observer o connectedCallback ainda não rodou (upgrade de uma tag já no DOM, hidratação de SSR, prop
+      // reaplicada ao conectar): quem abre é ele, com o ark-open no microtask.
+      if (!this.observer) return;
       if (this.hasAttribute("open")) {
         this.openNow();
       } else {

@@ -265,3 +265,31 @@ export const EveryPropertySetBeforeRegistration = {
     await expect(problems).toEqual([]);
   }
 };
+
+// Overlay aberto antes do registro, por propriedade ou pelo atributo do HTML (hidratação de SSR): quem abre é o
+// connectedCallback, com o ark-open num microtask, que chega a quem se inscreve logo depois de inserir o nó.
+export const OverlayOpenBeforeRegistration = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const detached = document.implementation.createHTMLDocument("");
+    for (const tag of ["ark-dialog", "ark-drawer", "ark-command-palette"]) {
+      for (const via of ["property", "attribute"]) {
+        const el = detached.createElement(tag) as HTMLElement & { open: boolean; close: () => void };
+        el.setAttribute("label", "Painel");
+        if (via === "property") el.open = true;
+        else el.setAttribute("open", "");
+        let opened = 0;
+        canvasElement.appendChild(document.adoptNode(el));
+        el.addEventListener("ark-open", () => opened++);
+        await Promise.resolve();
+        await expect({ tag, via, opened, state: el.getAttribute("data-ark-state") }).toEqual({
+          tag,
+          via,
+          opened: 1,
+          state: "open"
+        });
+        el.remove();
+      }
+    }
+  }
+};
