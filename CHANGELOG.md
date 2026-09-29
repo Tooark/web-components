@@ -9,6 +9,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed
+
+- Every README (root and packages, English and Portuguese) gains a Help & Security section pointing to `SUPPORT.md`
+  and `SECURITY.md`, and a Support section with the GitHub Sponsors and Ko-fi links.
+
 ## [1.3.0] - 2026-09-28
 
 ### Added

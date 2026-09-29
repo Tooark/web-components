@@ -180,8 +180,8 @@ fails with the list of unsigned commits; fix them with
   **key attributes** paragraph and a row in the **E2E test hooks** table.
 - Each package has its own `README.md` (English, the npm page) and `README.pt-BR.md`,
   with the same sections in the same order (contents, overview, installation,
-  configuration, components, usage examples, dependencies, contributing, license); a
-  new attribute, event or export goes into both.
+  configuration, components, usage examples, dependencies, contributing, help &
+  security, support, license); a new attribute, event or export goes into both.
 - Storybook `docs.description` on the component and on non-obvious stories is
   the living documentation; write it in Portuguese without accents, like the
   stories themselves.

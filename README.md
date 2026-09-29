@@ -811,6 +811,24 @@ Bug reports and feature requests go through the [issue templates](https://github
 
 ---
 
+## Help & Security
+
+- ❓ **Questions, bugs, feature ideas** — see [SUPPORT.md](SUPPORT.md) for the right channel
+- 🔒 **Security vulnerabilities** — do **not** open a public issue; follow [SECURITY.md](SECURITY.md)
+
+---
+
+## Support
+
+If this project helps your workflow, consider supporting its development:
+
+- 💙 [GitHub Sponsors](https://github.com/sponsors/paulosfjunior)
+- ☕ [Ko-fi](https://ko-fi.com/paulosfjunior)
+
+Every contribution helps keep the project maintained and improving. Thank you! 🙏
+
+---
+
 ## License
 
 Licensed under the [Apache License 2.0](LICENSE) © 2026 Tooark.
