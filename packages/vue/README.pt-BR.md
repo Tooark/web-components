@@ -153,8 +153,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                           | Versão     | Descrição                                                            |
 | -------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.3.0     | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.3.0     | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.4.0     | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.4.0     | Os Custom Elements `ark-*` e a folha de estilo deles                 |
 | [`vue`](https://www.npmjs.com/package/vue)                                       | >=3 (peer) | Vue 3                                                                |
 
 ---

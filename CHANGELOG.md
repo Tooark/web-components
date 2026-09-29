@@ -9,13 +9,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-09-29
+
 ### Added
 
 - `ark-command-palette`: opt-in `hint`, the message shown instead of `noResults` while the search field is empty (a
   palette that starts with no items), and `busy` (attribute and JS property), an async search in progress: with no
-  visible option the message becomes the new `searching` string (`ArkLocale.searching`, en/pt/es) and the hidden
-  listbox gets `aria-busy`. `hint` and `busy` props on the React, Vue and Angular wrappers. Without them the palette
-  shows `noResults` as before.
+  visible option the message becomes the new `searching` string (`ArkLocale.searching`, en/pt/es; a `locale-json`
+  without it falls back to English) and the hidden listbox gets `aria-busy`. `hint` and `busy` props on the React, Vue
+  and Angular wrappers. Without them the palette shows `noResults` as before.
 - `ark-avatar`: opt-in `variant="solid"` (`ArkAvatarVariant` in core) fills the background with `primary` (initials
   in `primary-fg`) or with `color` (white initials); `soft` stays the default. `variant` prop on the three wrappers.
 - `ark-checkbox` and `ark-radio`: opt-in `helper`, a hint below the label that describes the control through
@@ -23,9 +25,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   the control the hint is `aria-hidden`, so it stays out of the name. New hooks `checkbox-helper` and `radio-helper`,
   `helper` prop on the three wrappers. Without it the host keeps its flex layout.
 - `ark-drawer`: a `slot="actions"` container joins the header row between the title and the close button, centered on
-  the title line and sticky with the header; the title reserves the actions' width (measured with a `ResizeObserver`)
-  and the header is rendered even without `label`. New hook `drawer-actions`. A drawer without the slot renders as
-  before.
+  the title line and sticky with the header; the title reserves the actions' width (measured with a `ResizeObserver`),
+  and with the slot the header is rendered even without `label`. New hook `drawer-actions`. A drawer without the slot
+  renders as before.
 
 ### Changed
 
@@ -256,7 +258,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/Tooark/web-components/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/Tooark/web-components/compare/v1.2.2...v1.3.0
 [1.2.2]: https://github.com/Tooark/web-components/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/Tooark/web-components/compare/v1.2.0...v1.2.1

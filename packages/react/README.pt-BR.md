@@ -167,8 +167,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                           | Versão      | Descrição                                                            |
 | -------------------------------------------------------------------------------- | ----------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.3.0      | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.3.0      | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.4.0      | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.4.0      | Os Custom Elements `ark-*` e a folha de estilo deles                 |
 | [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer) | React 18 ou 19                                                       |
 | [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer) | Renderizador React DOM                                               |
 
