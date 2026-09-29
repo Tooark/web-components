@@ -9,7 +9,7 @@ Primitivas de design do design system Tooark: cores por intent e escala de taman
 
 ---
 
-## Conteúdo
+## 📑 Conteúdo
 
 - [Visão Geral](#-visão-geral)
 - [Instalação](#-instalação)

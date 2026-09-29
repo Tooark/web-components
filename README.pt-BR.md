@@ -18,7 +18,7 @@ Biblioteca de componentes agnóstica de framework construída sobre **Web Compon
 
 ---
 
-## Arquitetura
+## 🧱 Arquitetura
 
 O monorepo é organizado em camadas — cada pacote depende apenas das camadas abaixo dele:
 
@@ -43,7 +43,7 @@ O monorepo é organizado em camadas — cada pacote depende apenas das camadas a
 
 ---
 
-## Pacotes
+## 📦 Pacotes
 
 Todos os pacotes compartilham uma versão e são publicados juntos no npm, no [escopo `@tooark`](https://www.npmjs.com/search?q=%40tooark).
 
@@ -66,7 +66,7 @@ Os wrappers pedem o `@tooark/web-components` junto, e chart, wysiwyg e code pede
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@tooark/tokens`         | Primitivas de design: `tokens.css`, um bloco `@theme` do Tailwind v4 com as cores semânticas (intents) e a escala de tamanhos (`--color-*`, `--size-*`, compiladas como `--ark-color-*`/`--ark-size-*` na folha de estilo dos componentes), mais os motion tokens como custom properties puras (`--ark-duration-*`, `--ark-ease-*`); os tipos primitivos `Ark*` (`ArkRounded` tipa a própria escala de raios do Tailwind) e os helpers de color-scheme. |
 | `@tooark/core`           | Fundação compartilhada: tipos TypeScript (`ArkIntent`, `ArkSize`, …), locales de i18n (`en`, `pt`, `es`), os serviços de toast e announce, a camada de motion sem dependências (presets CSS + helpers WAAPI `arkEnter`/`arkExit`) e os helpers de overlay (`trapFocus`, `openPopover`/`closePopover`).                                                                                                                                                  |
-| `@tooark/web-components` | Os 41 Custom Elements nativos (`ark-alert` … `ark-tooltip`, listados em [Componentes](#componentes)).                                                                                                                                                                                                                                                                                                                                                   |
+| `@tooark/web-components` | Os 41 Custom Elements nativos (`ark-alert` … `ark-tooltip`, listados em [Componentes](#-componentes)).                                                                                                                                                                                                                                                                                                                                                  |
 | `@tooark/react`          | Wrappers React com props tipadas.                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | `@tooark/vue`            | Wrappers Vue 3.                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | `@tooark/angular`        | Componentes wrapper para Angular.                                                                                                                                                                                                                                                                                                                                                                                                                       |
@@ -77,7 +77,7 @@ Os wrappers pedem o `@tooark/web-components` junto, e chart, wysiwyg e code pede
 
 ---
 
-## Componentes
+## 🧩 Componentes
 
 | Elemento              | Pacote         | Destaques                                                                                                                                                                                                                                                                                                                                                                                       |
 | --------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -221,7 +221,7 @@ Os wrappers pedem o `@tooark/web-components` junto, e chart, wysiwyg e code pede
 
 ---
 
-## Sistema de motion
+## 🎬 Sistema de motion
 
 O motion é desenhado em três camadas para que os componentes permaneçam livres de dependências:
 
@@ -269,7 +269,7 @@ Os motion tokens são sobrescritos como os tokens de cor, com uma regra: mantenh
 
 ---
 
-## Começando
+## 🚀 Começando
 
 Exemplos vivos de todos os componentes, com os testes de interação, estão no **[Storybook](https://tooark.com/web-components/)**. As seções abaixo vão da instalação a um formulário funcionando em cada ambiente.
 
@@ -669,7 +669,7 @@ Se o seu app já tem as próprias variáveis de design (um tema gerado, outro de
    }
    ```
 
-Overrides de duração e easing seguem a regra do [sistema de motion](#sistema-de-motion): mantenha-os dentro de `@media (prefers-reduced-motion: no-preference)`.
+Overrides de duração e easing seguem a regra do [sistema de motion](#-sistema-de-motion): mantenha-os dentro de `@media (prefers-reduced-motion: no-preference)`.
 
 `ark-chart`, `ark-wysiwyg-editor`/`ark-wysiwyg-viewer` e `ark-code-editor` não podem ser tematizados só por CSS (ECharts, Tiptap e CodeMirror pintam as próprias cores), então o `theme="auto"` deles resolve o `color-scheme` computado do host quando o elemento é criado: uma página que força `dark` recebe um gráfico escuro, uma página que o deixa em `light dark` (ou sem declarar) segue a preferência do sistema. A resolução acompanha a página enquanto o elemento está conectado: `observeColorScheme(element, onChange)` do `@tooark/tokens` observa os atributos `class`, `style`, `data-theme` e `theme` de `<html>` e `<body>` (onde os apps trocam o tema) mais a preferência do sistema, então um gráfico ou editor deixado em `auto` segue a troca de tema em tempo de execução; `theme="light|dark"` continua forçando um lado.
 
@@ -684,7 +684,7 @@ Isso é independente da folha de estilo dos componentes: eles carregam a própri
 
 ---
 
-## Desenvolvimento
+## 🛠️ Desenvolvimento
 
 Requisitos: **Node.js ≥ 22** (o CI roda no 24) e **pnpm 12** (versão fixada via `packageManager`; o pnpm troca para ela sozinho).
 
@@ -796,7 +796,7 @@ Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) qu
 
 ---
 
-## Convenções
+## 📐 Convenções
 
 - **Nomes**: elementos `ark-*`, tipos/classes TypeScript `Ark*`, helpers de animação `ark*` (`arkEnter`, `arkStaggerEnter`…; os demais helpers, como `trapFocus`, `openPopover` ou `resolveLocale`, não levam prefixo), custom properties CSS `--ark-*`, pacotes `@tooark/*`.
 - **Camadas**: um pacote só pode depender das camadas abaixo dele. Bibliotecas de animação nunca entram em `@tooark/core` ou `@tooark/web-components`.
@@ -805,20 +805,20 @@ Prefira sempre seletores semânticos (`getByRole("switch", { name: "..." })`) qu
 
 ---
 
-## Contribuindo
+## 🪪 Contribuindo
 
 Bugs e pedidos de funcionalidade entram pelos [templates de issue](https://github.com/Tooark/web-components/issues/new/choose); o [CONTRIBUTING.md](CONTRIBUTING.md) cobre o fluxo de desenvolvimento, a convenção de commits (Conventional Commits em português, assinatura DCO) e o checklist de um componente novo. Dúvidas e onde achar ajuda estão no [SUPPORT.md](SUPPORT.md). Questões de segurança seguem o [SECURITY.md](SECURITY.md) (advisories privados, nunca uma issue pública), e todo mundo no espaço do projeto segue o [Código de Conduta](CODE_OF_CONDUCT.md).
 
 ---
 
-## Ajuda & Segurança
+## 🆘 Ajuda & Segurança
 
 - ❓ **Dúvidas, bugs e ideias** — veja o [SUPPORT.md](SUPPORT.md) para escolher o canal certo
 - 🔒 **Vulnerabilidades de segurança** — **não** abra issue pública; siga o [SECURITY.md](SECURITY.md)
 
 ---
 
-## Apoie
+## 💖 Apoie
 
 Se este projeto ajuda no seu dia a dia, considere apoiar o desenvolvimento:
 
@@ -829,7 +829,7 @@ Cada contribuição ajuda a manter o projeto ativo e em evolução. Obrigado! �
 
 ---
 
-## Licença
+## 📄 Licença
 
 Licenciado sob a [Apache License 2.0](LICENSE) © 2026 Tooark.
 

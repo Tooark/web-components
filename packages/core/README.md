@@ -9,7 +9,7 @@ Shared foundation of the Tooark components: types, i18n, the toast and announce 
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)

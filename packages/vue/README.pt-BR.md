@@ -9,7 +9,7 @@ Wrappers Vue 3 dos Tooark Web Components: props tipadas, eventos com o nome nati
 
 ---
 
-## Conteúdo
+## 📑 Conteúdo
 
 - [Visão Geral](#-visão-geral)
 - [Instalação](#-instalação)

@@ -9,7 +9,7 @@ The native Custom Elements (`ark-*`) of the Tooark design system, styled with Ta
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)

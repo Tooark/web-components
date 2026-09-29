@@ -9,7 +9,7 @@ Typed React wrappers for the Tooark Web Components: camelCase props, custom even
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)

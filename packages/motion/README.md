@@ -9,7 +9,7 @@ Opt-in animation helpers on the Motion library, calibrated by the Tooark motion 
 
 ---
 
-## Contents
+## 📑 Contents
 
 - [Overview](#-overview)
 - [Installation](#-installation)
