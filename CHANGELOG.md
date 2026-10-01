@@ -17,6 +17,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-checkbox` and `ark-radio`: the README documents, and an `InsideOuterLabel` story pins, that a `<label>` wrapped
   around the element names the drawn control and toggles it once per click (no behavior change).
 
+### Fixed
+
+- `ark-file-input`: a folder dropped on the zone is no longer taken as a file (the browser hands it over as an empty
+  `File` that cannot be read). It is left out, the files dropped with it are kept, the list shows the new
+  `foldersNotAccepted` string (`ArkLocale`, en/pt/es; hook `file-input-rejected`) and the announcement carries it; a
+  drop of folders alone keeps the selection and emits no `change`.
+
 ## [1.4.0] - 2026-09-29
 
 ### Added

@@ -48,6 +48,7 @@ export const pt: ArkLocale = {
   chooseFile: "Escolher arquivo",
   dropHint: "ou arraste e solte aqui",
   noFile: "Nenhum arquivo selecionado",
+  foldersNotAccepted: "Pastas não são aceitas",
   showPassword: "Mostrar senha",
   hidePassword: "Ocultar senha",
   loading: "Carregando",

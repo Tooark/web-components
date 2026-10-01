@@ -56,6 +56,8 @@ export class ArkFileInput extends HTMLElementBase {
   private messageEl: HTMLParagraphElement | null = null;
   /** Profundidade de dragenter/dragleave, porque eles disparam também nos filhos da zona. */
   private dragDepth = 0;
+  /** O último drop trouxe uma pasta que o campo não aceita: a lista mostra o aviso até a próxima seleção. */
+  private folderRejected = false;
 
   static get observedAttributes(): string[] {
     return [
@@ -119,6 +121,7 @@ export class ArkFileInput extends HTMLElementBase {
   clear(): void {
     if (!this.inputEl) return;
     this.inputEl.value = "";
+    this.folderRejected = false;
     this.syncList();
   }
 
@@ -138,13 +141,41 @@ export class ArkFileInput extends HTMLElementBase {
   // --- Interação ---
 
   // O change nativo do input oculto não sobe ao host: quem escuta no host recebe só o CustomEvent com detail.
-  private readonly handleChange = (event?: Event): void => {
-    event?.stopPropagation();
+  private readonly handleChange = (event: Event): void => {
+    event.stopPropagation();
+    this.folderRejected = false;
+    this.publish();
+  };
+
+  // Lista, anúncio e `change` da seleção atual do input.
+  private publish(): void {
     this.syncList();
     const files = this.files;
-    announce(files.length ? files.map((file) => file.name).join(", ") : this.getLocale().noFile);
+    const locale = this.getLocale();
+    const selection = files.length ? files.map((file) => file.name).join(", ") : locale.noFile;
+    announce(this.folderRejected ? `${selection}. ${locale.foldersNotAccepted}` : selection);
     this.dispatchEvent(new CustomEvent("change", { detail: { files }, bubbles: true, composed: true }));
-  };
+  }
+
+  // Separa arquivos e pastas de um drop. A pasta só se distingue pela entrada (webkitGetAsEntry), que existe só
+  // durante o evento; sem a API, ou num DataTransfer montado por código, tudo é arquivo.
+  private static readDrop(transfer: DataTransfer): { files: File[]; folders: FileSystemDirectoryEntry[] } {
+    const files: File[] = [];
+    const folders: FileSystemDirectoryEntry[] = [];
+    const items = Array.from(transfer.items ?? []);
+    if (items.length === 0) return { files: Array.from(transfer.files ?? []), folders };
+    for (const item of items) {
+      if (item.kind !== "file") continue;
+      const entry = typeof item.webkitGetAsEntry === "function" ? item.webkitGetAsEntry() : null;
+      if (entry?.isDirectory) {
+        folders.push(entry as FileSystemDirectoryEntry);
+        continue;
+      }
+      const file = item.getAsFile();
+      if (file) files.push(file);
+    }
+    return { files, folders };
+  }
 
   private readonly handleDragEnter = (event: DragEvent): void => {
     if (this.isDisabled()) return;
@@ -165,19 +196,29 @@ export class ArkFileInput extends HTMLElementBase {
     if (this.dragDepth === 0) this.setDragover(false);
   };
 
-  // Soltar alimenta o mesmo input (FileList é atribuível): só o primeiro arquivo sem `multiple`.
+  // Soltar alimenta o mesmo input (FileList é atribuível): só o primeiro arquivo sem `multiple`. Uma pasta não é um
+  // arquivo (o navegador a entrega como um File vazio, que não dá para ler): fica de fora, com aviso na lista e
+  // anúncio.
   private readonly handleDrop = (event: DragEvent): void => {
     if (this.isDisabled()) return;
     event.preventDefault();
     this.dragDepth = 0;
     this.setDragover(false);
-    const dropped = event.dataTransfer?.files;
-    if (!dropped || dropped.length === 0 || !this.inputEl) return;
+    if (!event.dataTransfer || !this.inputEl) return;
+    const { files, folders } = ArkFileInput.readDrop(event.dataTransfer);
+    if (files.length === 0 && folders.length === 0) return;
+    this.folderRejected = folders.length > 0;
+    if (files.length === 0) {
+      // Só pastas: a seleção fica como estava e não há `change`.
+      this.syncList();
+      announce(this.getLocale().foldersNotAccepted);
+      return;
+    }
     const transfer = new DataTransfer();
-    const count = this.multiple ? dropped.length : 1;
-    for (let index = 0; index < count; index += 1) transfer.items.add(dropped[index]);
+    const count = this.multiple ? files.length : 1;
+    for (let index = 0; index < count; index += 1) transfer.items.add(files[index]);
     this.inputEl.files = transfer.files;
-    this.handleChange();
+    this.publish();
   };
 
   private setDragover(active: boolean): void {
@@ -321,10 +362,11 @@ export class ArkFileInput extends HTMLElementBase {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  // Lista dos nomes (com o tamanho) ou a string noFile.
+  // Lista dos nomes (com o tamanho) ou a string noFile; por último, o aviso da pasta recusada.
   private syncList(): void {
     if (!this.listEl) return;
     const files = this.files;
+    const locale = this.getLocale();
     const text = this.getSizing().text;
     this.listEl.textContent = "";
     this.listEl.className = [
@@ -334,9 +376,8 @@ export class ArkFileInput extends HTMLElementBase {
     if (files.length === 0) {
       const item = document.createElement("li");
       item.className = "ark:text-fg-muted";
-      item.textContent = this.getLocale().noFile;
+      item.textContent = locale.noFile;
       this.listEl.appendChild(item);
-      return;
     }
     for (const file of files) {
       const item = document.createElement("li");
@@ -350,6 +391,13 @@ export class ArkFileInput extends HTMLElementBase {
       size.textContent = ArkFileInput.formatSize(file.size);
       item.append(name, size);
       applyTestHooks(this, "file-input", item, "item");
+      this.listEl.appendChild(item);
+    }
+    if (this.folderRejected) {
+      const item = document.createElement("li");
+      item.className = "ark:text-danger-soft-fg";
+      item.textContent = locale.foldersNotAccepted;
+      applyTestHooks(this, "file-input", item, "rejected");
       this.listEl.appendChild(item);
     }
   }

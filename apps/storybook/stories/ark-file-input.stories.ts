@@ -87,6 +87,23 @@ function dragEvent(type: string, files?: FileList): DragEvent {
   return new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: transfer });
 }
 
+// Um drop com pasta não se monta com DataTransfer (a entrada de diretório só existe num arrasto real): o evento
+// leva um dataTransfer falso com a forma que o componente lê, items com webkitGetAsEntry e getAsFile.
+function dropEntries(zone: HTMLElement, ...entries: Array<File | { folder: string }>): void {
+  const items = entries.map((entry) => {
+    const folder = !(entry instanceof File);
+    const name = entry instanceof File ? entry.name : entry.folder;
+    return {
+      kind: "file",
+      webkitGetAsEntry: () => ({ name, isFile: !folder, isDirectory: folder }),
+      getAsFile: () => (entry instanceof File ? entry : new File([], name))
+    };
+  });
+  const event = new Event("drop", { bubbles: true, cancelable: true });
+  Object.defineProperty(event, "dataTransfer", { value: { items, files: [] } });
+  zone.dispatchEvent(event);
+}
+
 function column(...items: HTMLElement[]): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "flex flex-col gap-6";
@@ -205,6 +222,55 @@ export const SelectsAndDrops = {
     host.setAttribute("lang", "en");
     await expect(button.textContent?.trim()).toBe("Choose file");
     await expect(list.textContent).toBe("No file selected");
+  }
+};
+
+// Uma pasta solta não entra como arquivo: fica de fora com aviso na lista e anúncio; os arquivos soltos junto
+// seguem; só pastas não mexe na seleção nem emite `change`. O aviso some na próxima seleção e no clear().
+export const RejectsDroppedFolder = {
+  render: () => createFileInput({ label: "Anexos", multiple: true, lang: "pt" }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-file-input") as FileInputEl;
+    const zone = host.querySelector('[data-ark="file-input-zone"]') as HTMLElement;
+    const list = host.querySelector('[data-ark="file-input-list"]') as HTMLElement;
+    const rejected = () => list.querySelector('[data-ark="file-input-rejected"]');
+    const changes: string[][] = [];
+    host.addEventListener("change", (event) =>
+      changes.push((event as CustomEvent<{ files: File[] }>).detail.files.map((file) => file.name))
+    );
+    const announcer = () => document.querySelector('[data-ark="announcer"]')?.textContent ?? "";
+    const [a, b] = Array.from(fileList("a.txt", "b.txt"));
+
+    dropEntries(zone, { folder: "colecao" });
+    await expect(changes).toHaveLength(0);
+    await expect(host.files).toHaveLength(0);
+    await expect(rejected()).toHaveTextContent("Pastas não são aceitas");
+    await expect(list.textContent).toContain("Nenhum arquivo selecionado");
+    await waitFor(() => expect(announcer()).toContain("Pastas não são aceitas"));
+
+    dropEntries(zone, a, { folder: "colecao" }, b);
+    await expect(changes).toEqual([["a.txt", "b.txt"]]);
+    await expect(list.querySelectorAll('[data-ark="file-input-item"]')).toHaveLength(2);
+    await expect(rejected()).not.toBeNull();
+    await waitFor(() => expect(announcer()).toContain("a.txt, b.txt. Pastas não são aceitas"));
+
+    // Só pastas: a seleção anterior fica.
+    dropEntries(zone, { folder: "outra" });
+    await expect(host.files.map((file) => file.name)).toEqual(["a.txt", "b.txt"]);
+    await expect(changes).toHaveLength(1);
+
+    // O aviso some na próxima seleção (seletor ou drop só de arquivos) e no clear().
+    host.inputElement.files = fileList("c.txt");
+    host.inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    await expect(rejected()).toBeNull();
+    dropEntries(zone, { folder: "colecao" });
+    await expect(rejected()).not.toBeNull();
+    zone.dispatchEvent(dragEvent("drop", fileList("d.txt")));
+    await expect(rejected()).toBeNull();
+    await expect(host.files.map((file) => file.name)).toEqual(["d.txt"]);
+    dropEntries(zone, { folder: "colecao" });
+    host.clear();
+    await expect(rejected()).toBeNull();
   }
 };
 

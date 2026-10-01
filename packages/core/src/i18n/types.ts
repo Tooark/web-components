@@ -66,6 +66,8 @@ export interface ArkLocale {
   dropHint: string;
   /** Texto exibido quando nenhum arquivo foi escolhido. */
   noFile: string;
+  /** Aviso exibido quando uma pasta é solta num campo de arquivo que não aceita pastas. */
+  foldersNotAccepted: string;
   /** Rótulo acessível do botão que revela a senha. */
   showPassword: string;
   /** Rótulo acessível do botão que oculta a senha. */
