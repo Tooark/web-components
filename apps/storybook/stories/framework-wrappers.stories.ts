@@ -3,6 +3,7 @@ import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
   ArkCheckbox as ReactArkCheckbox,
+  ArkClock as ReactArkClock,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
   ArkFileInput as ReactArkFileInput,
@@ -18,6 +19,8 @@ import {
 } from "@tooark/react";
 import {
   ArkButton as VueArkButton,
+  ArkCheckbox as VueArkCheckbox,
+  ArkClock as VueArkClock,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
@@ -314,7 +317,8 @@ export const ReactPassThroughProps = {
       createElement(ReactArkFileInput, { key: "f", label: "Anexo", error: true }),
       createElement(ReactArkFileInput, { key: "d", label: "Pasta", directory: true, testid: "pasta" }),
       createElement(ReactArkTextarea, { key: "x", label: "Log", wrap: "off" }),
-      createElement(ReactArkCalendar, { key: "c", "data-secao": "agenda", "aria-describedby": "dica" })
+      createElement(ReactArkCalendar, { key: "c", "data-secao": "agenda", "aria-describedby": "dica" }),
+      createElement(ReactArkClock, { key: "k", lang: "custom", localeJson: '{"hours":"Horas do dia"}' })
     ]);
     await expect(errors).toEqual([]);
 
@@ -323,6 +327,8 @@ export const ReactPassThroughProps = {
     await expect(calendar).toHaveAttribute("aria-describedby", "dica");
     await expect(canvasElement.querySelector("ark-textarea textarea")).toHaveAttribute("wrap", "off");
     await expect(canvasElement.querySelector('[data-ark="file-input-button"]')).toHaveAttribute("aria-invalid", "true");
+    await expect(canvasElement.querySelector("ark-clock")).toHaveAttribute("locale-json", '{"hours":"Horas do dia"}');
+    await expect(canvasElement.querySelector('ark-clock [aria-label="Horas do dia"]')).not.toBeNull();
     await expect(canvasElement.querySelector('[data-testid="pasta"]')).toHaveAttribute("webkitdirectory");
     await expect(canvasElement.querySelector('input[type="file"]:not([data-testid])')).not.toHaveAttribute(
       "webkitdirectory"
@@ -382,6 +388,54 @@ export const ReactDomProps = {
     await expect(boxClicks).toBe(1);
     await expect(rowClicks).toBe(0);
     await expect(changes).toEqual([true]);
+  }
+};
+
+// No Vue os wrappers têm inheritAttrs: false e espalham os attrs no elemento: id, class, style, aria-*, data-* e os
+// listeners nativos (onClick) chegam ao ark-*, sem tipagem a mais. O localeJson do relógio é prop do wrapper.
+export const VueFallthroughAttrs = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    let rowClicks = 0;
+    let boxClicks = 0;
+    const changes: boolean[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", { onClick: () => rowClicks++ }, [
+          h(VueArkCheckbox, {
+            id: "linha-vue",
+            class: "minha-classe",
+            style: { marginLeft: "4px" },
+            title: "Ativar a linha",
+            "aria-label": "Ativar",
+            "data-linha": "1",
+            onClick: (event: MouseEvent) => {
+              boxClicks++;
+              event.stopPropagation();
+            },
+            onChange: (event: CustomEvent<{ checked: boolean }>) => changes.push(event.detail.checked)
+          }),
+          h(VueArkClock, { lang: "custom", localeJson: '{"hours":"Horas do dia"}' })
+        ])
+    });
+    app.mount(mountPoint(canvasElement));
+
+    const host = canvasElement.querySelector("ark-checkbox") as HTMLElement;
+    await expect(host.id).toBe("linha-vue");
+    await expect(host).toHaveClass("minha-classe");
+    await expect(host.style.marginLeft).toBe("4px");
+    await expect(host.title).toBe("Ativar a linha");
+    await expect(host).toHaveAttribute("data-linha", "1");
+
+    const box = host.querySelector('[data-ark="checkbox"]') as HTMLElement;
+    await expect(box).toHaveAccessibleName("Ativar");
+    box.click();
+    await expect(boxClicks).toBe(1);
+    await expect(rowClicks).toBe(0);
+    await expect(changes).toEqual([true]);
+
+    await expect(canvasElement.querySelector('ark-clock [aria-label="Horas do dia"]')).not.toBeNull();
+    app.unmount();
   }
 };
 

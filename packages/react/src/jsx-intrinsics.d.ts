@@ -191,6 +191,7 @@ interface ArkIntrinsicElements {
   "ark-clock": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     lang?: ArkDatepickerLang;
+    "locale-json"?: string;
     theme?: ArkTheme;
     intent?: ArkIntent;
     value?: string;

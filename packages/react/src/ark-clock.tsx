@@ -10,6 +10,8 @@ export type ArkClockProps = ArkDomProps<
   ArkClockStyleOptions & {
     value?: string;
     lang?: ArkDatepickerLang;
+    /** JSON com strings proprias (hours, minutes, seconds), mesclado sobre o ingles, quando lang e "custom". */
+    localeJson?: string;
     className?: string;
     onChange?: (detail: { value: string }) => void;
   }
@@ -17,7 +19,7 @@ export type ArkClockProps = ArkDomProps<
 
 export const ArkClock = forwardRef<ArkClockElement, ArkClockProps>(
   function ArkClock(props, forwardedRef): React.JSX.Element {
-    const { className, seconds, stepMinutes, hoursFormat, onChange, ...rest } = props;
+    const { className, seconds, stepMinutes, hoursFormat, localeJson, onChange, ...rest } = props;
     const [ref, setRef] = useForwardedRef<ArkClockElement>(forwardedRef);
 
     useEffect(() => {
@@ -39,7 +41,8 @@ export const ArkClock = forwardRef<ArkClockElement, ArkClockProps>(
       class: className,
       seconds: seconds ? "" : undefined,
       "step-minutes": stepMinutes !== undefined ? String(stepMinutes) : undefined,
-      "hours-format": hoursFormat
+      "hours-format": hoursFormat,
+      "locale-json": localeJson
     };
 
     return createElement("ark-clock", attrs);

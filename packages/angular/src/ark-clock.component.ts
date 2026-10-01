@@ -24,6 +24,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.testid]="testid"
     [attr.value]="value"
     [attr.lang]="lang"
+    [attr.locale-json]="localeJson"
     [attr.theme]="theme"
     [attr.intent]="intent"
     [attr.seconds]="seconds ? '' : null"
@@ -46,6 +47,8 @@ export class ArkClockComponent implements AfterViewInit, OnDestroy {
   @Input() testid: string | undefined;
   @Input() value: string | undefined;
   @Input() lang: ArkDatepickerLang = "en";
+  /** JSON com strings próprias (hours, minutes, seconds), mesclado sobre o inglês, quando lang é "custom". */
+  @Input() localeJson: string | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() intent: ArkIntent = "primary";
   @Input() seconds = false;

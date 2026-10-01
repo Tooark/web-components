@@ -11,6 +11,8 @@ export const ArkClock = defineComponent({
     testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
     lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
+    /** JSON com strings proprias (hours, minutes, seconds), mesclado sobre o ingles, quando lang e "custom". */
+    localeJson: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
     seconds: { type: Boolean, default: false },
@@ -25,6 +27,7 @@ export const ArkClock = defineComponent({
         testid: props.testid,
         value: props.value,
         lang: props.lang,
+        "locale-json": props.localeJson,
         theme: props.theme,
         intent: props.intent,
         seconds: props.seconds ? "" : undefined,

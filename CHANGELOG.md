@@ -35,6 +35,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- `ark-clock` wrappers (React, Vue, Angular) and the `ark-clock` JSX typing: `localeJson` (a JSON string) was missing,
+  so a standalone clock with `lang="custom"` could not get its `hours`/`minutes`/`seconds` labels through a wrapper.
 - `ark-file-input`: a folder dropped on the zone is no longer taken as a file (the browser hands it over as an empty
   `File` that cannot be read). It is left out, the files dropped with it are kept, the list shows the new
   `foldersNotAccepted` string (`ArkLocale`, en/pt/es; hook `file-input-rejected`) and the announcement carries it; a
