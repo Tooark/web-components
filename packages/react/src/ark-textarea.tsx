@@ -1,41 +1,44 @@
 import type { ArkTextareaResize, ArkTextareaStyleOptions } from "@tooark/core";
 import type { ArkTextarea as ArkTextareaElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkTextareaProps = PropsWithChildren<
-  ArkTextareaStyleOptions & {
-    label?: string;
-    placeholder?: string;
-    value?: string;
-    name?: string;
-    /** Linhas visiveis iniciais. Padrao: 3. */
-    rows?: number;
-    /** Cresce com o conteudo (field-sizing nativo, fallback por JS). */
-    autosize?: boolean;
-    /** Fonte monoespacada, para codigo e dados. */
-    monospace?: boolean;
-    /** Direcoes de redimensionamento pelo usuario. Padrao: "vertical". */
-    resize?: ArkTextareaResize;
-    helper?: string;
-    error?: boolean;
-    errorMessage?: string;
-    disabled?: boolean;
-    required?: boolean;
-    readonly?: boolean;
-    autocomplete?: string;
-    autofocus?: boolean;
-    maxlength?: number;
-    minlength?: number;
-    spellcheck?: boolean;
-    /** Quebra de linha do valor enviado (soft/hard) ou sem quebra visual (off), como no <textarea>. */
-    wrap?: "soft" | "hard" | "off";
-    "aria-label"?: string;
-    className?: string;
-    onInput?: (event: Event) => void;
-    onChange?: (event: Event) => void;
-  }
+  ArkDomProps<
+    ArkTextareaStyleOptions & {
+      label?: string;
+      placeholder?: string;
+      value?: string;
+      name?: string;
+      /** Linhas visiveis iniciais. Padrao: 3. */
+      rows?: number;
+      /** Cresce com o conteudo (field-sizing nativo, fallback por JS). */
+      autosize?: boolean;
+      /** Fonte monoespacada, para codigo e dados. */
+      monospace?: boolean;
+      /** Direcoes de redimensionamento pelo usuario. Padrao: "vertical". */
+      resize?: ArkTextareaResize;
+      helper?: string;
+      error?: boolean;
+      errorMessage?: string;
+      disabled?: boolean;
+      required?: boolean;
+      readonly?: boolean;
+      autocomplete?: string;
+      autofocus?: boolean;
+      maxlength?: number;
+      minlength?: number;
+      spellcheck?: boolean;
+      /** Quebra de linha do valor enviado (soft/hard) ou sem quebra visual (off), como no <textarea>. */
+      wrap?: "soft" | "hard" | "off";
+      "aria-label"?: string;
+      className?: string;
+      onInput?: (event: Event) => void;
+      onChange?: (event: Event) => void;
+    }
+  >
 >;
 
 // Atributo do custom element: string ou ausente.
@@ -84,7 +87,7 @@ export const ArkTextarea = forwardRef<ArkTextareaElement, ArkTextareaProps>(
       };
     }, [ref, onInput, onChange]);
 
-    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkTextareaElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

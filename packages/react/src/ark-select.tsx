@@ -1,25 +1,28 @@
 import type { ArkSelectOption, ArkSelectStyleOptions } from "@tooark/core";
 import type { ArkSelect as ArkSelectElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkSelectProps = PropsWithChildren<
-  ArkSelectStyleOptions & {
-    label?: string;
-    placeholder?: string;
-    options?: ArkSelectOption[];
-    value?: string;
-    name?: string;
-    helper?: string;
-    error?: boolean;
-    errorMessage?: string;
-    disabled?: boolean;
-    required?: boolean;
-    className?: string;
-    onInput?: (event: Event) => void;
-    onChange?: (event: CustomEvent<{ value: string }>) => void;
-  }
+  ArkDomProps<
+    ArkSelectStyleOptions & {
+      label?: string;
+      placeholder?: string;
+      options?: ArkSelectOption[];
+      value?: string;
+      name?: string;
+      helper?: string;
+      error?: boolean;
+      errorMessage?: string;
+      disabled?: boolean;
+      required?: boolean;
+      className?: string;
+      onInput?: (event: Event) => void;
+      onChange?: (event: CustomEvent<{ value: string }>) => void;
+    }
+  >
 >;
 
 export const ArkSelect = forwardRef<ArkSelectElement, ArkSelectProps>(
@@ -45,7 +48,7 @@ export const ArkSelect = forwardRef<ArkSelectElement, ArkSelectProps>(
       };
     }, [ref, onInput, onChange]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkSelectElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

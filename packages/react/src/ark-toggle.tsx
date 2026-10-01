@@ -1,15 +1,18 @@
 import type { ArkToggleGroupStyleOptions, ArkToggleStyleOptions } from "@tooark/core";
 import type { ArkToggle as ArkToggleElement, ArkToggleGroup as ArkToggleGroupElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkToggleProps = PropsWithChildren<
-  ArkToggleStyleOptions & {
-    disabled?: boolean;
-    className?: string;
-    onChange?: (event: CustomEvent<{ pressed: boolean; value: string }>) => void;
-  }
+  ArkDomProps<
+    ArkToggleStyleOptions & {
+      disabled?: boolean;
+      className?: string;
+      onChange?: (event: CustomEvent<{ pressed: boolean; value: string }>) => void;
+    }
+  >
 >;
 
 export const ArkToggle = forwardRef<ArkToggleElement, ArkToggleProps>(
@@ -31,7 +34,7 @@ export const ArkToggle = forwardRef<ArkToggleElement, ArkToggleProps>(
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
 
-    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkToggleElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,
@@ -44,11 +47,13 @@ export const ArkToggle = forwardRef<ArkToggleElement, ArkToggleProps>(
 );
 
 export type ArkToggleGroupProps = PropsWithChildren<
-  ArkToggleGroupStyleOptions & {
-    disabled?: boolean;
-    className?: string;
-    onChange?: (event: CustomEvent<{ value?: string; values?: string[] }>) => void;
-  }
+  ArkDomProps<
+    ArkToggleGroupStyleOptions & {
+      disabled?: boolean;
+      className?: string;
+      onChange?: (event: CustomEvent<{ value?: string; values?: string[] }>) => void;
+    }
+  >
 >;
 
 export const ArkToggleGroup = forwardRef<ArkToggleGroupElement, ArkToggleGroupProps>(
@@ -70,7 +75,7 @@ export const ArkToggleGroup = forwardRef<ArkToggleGroupElement, ArkToggleGroupPr
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
 
-    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkToggleGroupElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

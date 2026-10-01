@@ -2,17 +2,20 @@ import type { ArkSwitchStyleOptions } from "@tooark/core";
 import type { ArkSwitch as ArkSwitchElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkSwitchProps = ArkSwitchStyleOptions & {
-  disabled?: boolean;
-  name?: string;
-  value?: string;
-  label?: string;
-  className?: string;
-  onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
-};
+export type ArkSwitchProps = ArkDomProps<
+  ArkSwitchStyleOptions & {
+    disabled?: boolean;
+    name?: string;
+    value?: string;
+    label?: string;
+    className?: string;
+    onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
+  }
+>;
 
 export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
   function ArkSwitch(props, forwardedRef): React.JSX.Element {
@@ -33,7 +36,7 @@ export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
 
-    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkSwitchElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

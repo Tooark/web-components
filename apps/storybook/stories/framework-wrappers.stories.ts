@@ -2,6 +2,7 @@ import { type ArkKvRow, type ArkKvValueField, type ArkMarkShape, type ArkSchedul
 import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
+  ArkCheckbox as ReactArkCheckbox,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
   ArkFileInput as ReactArkFileInput,
@@ -336,6 +337,51 @@ export const ReactPassThroughProps = {
     } finally {
       toast.dismiss();
     }
+  }
+};
+
+// Atributos e handlers DOM do React nos wrappers (tipados por ArkDomProps): chegam ao elemento como chegariam num
+// <div>. O caso que pediu a tipagem: a caixa dentro de uma linha clicável segura o clique com stopPropagation.
+export const ReactDomProps = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    let rowClicks = 0;
+    let boxClicks = 0;
+    const changes: boolean[] = [];
+    render(
+      createElement(
+        "div",
+        { onClick: () => rowClicks++ },
+        createElement(ReactArkCheckbox, {
+          id: "linha-1",
+          title: "Ativar a linha",
+          style: { marginLeft: "4px" },
+          "aria-label": "Ativar",
+          "data-linha": "1",
+          onClick: (event) => {
+            boxClicks++;
+            event.stopPropagation();
+          },
+          onChange: (event) => changes.push(event.detail.checked)
+        })
+      )
+    );
+    await expect(errors).toEqual([]);
+
+    const host = canvasElement.querySelector("ark-checkbox") as HTMLElement;
+    await expect(host.id).toBe("linha-1");
+    await expect(host.title).toBe("Ativar a linha");
+    await expect(host.style.marginLeft).toBe("4px");
+    await expect(host).toHaveAttribute("data-linha", "1");
+
+    const box = host.querySelector('[data-ark="checkbox"]') as HTMLElement;
+    await expect(box).toHaveAccessibleName("Ativar");
+    box.click();
+    await expect(boxClicks).toBe(1);
+    await expect(rowClicks).toBe(0);
+    await expect(changes).toEqual([true]);
   }
 };
 

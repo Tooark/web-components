@@ -2,28 +2,31 @@ import type { ArkDrawerCloseReason, ArkDrawerStyleOptions } from "@tooark/core";
 import type { ArkDrawer as ArkDrawerElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkDrawerProps = PropsWithChildren<
-  ArkDrawerStyleOptions & {
-    /** Aberta; a saida anima antes de esconder. */
-    open?: boolean;
-    /** Titulo (h2) e nome acessivel. Sem ele, passe aria-label. */
-    label?: string;
-    /** Esconde o botao de fechar do cabecalho. */
-    noCloseButton?: boolean;
-    /** Esc e clique no scrim nao fecham (so no overlay). */
-    persistent?: boolean;
-    /** A pagina continua rolando com a gaveta aberta em overlay. */
-    noScrollLock?: boolean;
-    "aria-label"?: string;
-    className?: string;
-    onOpen?: (event: CustomEvent) => void;
-    /** O fechamento comecou; detail.reason diz por que (escape, backdrop, close-button, api). */
-    onClose?: (event: CustomEvent<{ reason: ArkDrawerCloseReason }>) => void;
-  }
+  ArkDomProps<
+    ArkDrawerStyleOptions & {
+      /** Aberta; a saida anima antes de esconder. */
+      open?: boolean;
+      /** Titulo (h2) e nome acessivel. Sem ele, passe aria-label. */
+      label?: string;
+      /** Esconde o botao de fechar do cabecalho. */
+      noCloseButton?: boolean;
+      /** Esc e clique no scrim nao fecham (so no overlay). */
+      persistent?: boolean;
+      /** A pagina continua rolando com a gaveta aberta em overlay. */
+      noScrollLock?: boolean;
+      "aria-label"?: string;
+      className?: string;
+      onOpen?: (event: CustomEvent) => void;
+      /** O fechamento comecou; detail.reason diz por que (escape, backdrop, close-button, api). */
+      onClose?: (event: CustomEvent<{ reason: ArkDrawerCloseReason }>) => void;
+    }
+  >
 >;
 
 export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
@@ -61,7 +64,7 @@ export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
       };
     }, [onOpen, onClose]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkDrawerElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

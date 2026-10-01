@@ -2,19 +2,22 @@ import type { ArkDatepickerLang, ArkSchedulerEvent, ArkSchedulerStyleOptions } f
 import type { ArkScheduler as ArkSchedulerElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkSchedulerProps = ArkSchedulerStyleOptions & {
-  lang?: ArkDatepickerLang;
-  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
-  localeJson?: string;
-  className?: string;
-  onEventClick?: (detail: { event: ArkSchedulerEvent; id: string | null }) => void;
-  onSlotClick?: (detail: { start: string; end: string; allDay: boolean }) => void;
-  onViewChange?: (detail: { view: string }) => void;
-  onRangeChange?: (detail: { start: string; end: string; view: string }) => void;
-};
+export type ArkSchedulerProps = ArkDomProps<
+  ArkSchedulerStyleOptions & {
+    lang?: ArkDatepickerLang;
+    /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+    localeJson?: string;
+    className?: string;
+    onEventClick?: (detail: { event: ArkSchedulerEvent; id: string | null }) => void;
+    onSlotClick?: (detail: { start: string; end: string; allDay: boolean }) => void;
+    onViewChange?: (detail: { view: string }) => void;
+    onRangeChange?: (detail: { start: string; end: string; view: string }) => void;
+  }
+>;
 
 export const ArkScheduler = forwardRef<ArkSchedulerElement, ArkSchedulerProps>(
   function ArkScheduler(props, forwardedRef): React.JSX.Element {
@@ -62,7 +65,7 @@ export const ArkScheduler = forwardRef<ArkSchedulerElement, ArkSchedulerProps>(
       };
     }, [ref, onEventClick, onSlotClick, onViewChange, onRangeChange]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkSchedulerElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

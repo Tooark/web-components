@@ -1,20 +1,23 @@
 import type { ArkTabStyleOptions, ArkTabsStyleOptions } from "@tooark/core";
 import type { ArkTab as ArkTabElement, ArkTabs as ArkTabsElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkTabsProps = PropsWithChildren<
-  ArkTabsStyleOptions & {
-    /** Value da aba ativa; sem ele a primeira habilitada assume. */
-    value?: string;
-    /** Vira aria-label da faixa. */
-    label?: string;
-    className?: string;
-    onChange?: (event: CustomEvent<{ value: string }>) => void;
-    /** Uma aba fechavel pediu para fechar; remover a aba e do app. */
-    onClose?: (event: CustomEvent<{ value: string }>) => void;
-  }
+  ArkDomProps<
+    ArkTabsStyleOptions & {
+      /** Value da aba ativa; sem ele a primeira habilitada assume. */
+      value?: string;
+      /** Vira aria-label da faixa. */
+      label?: string;
+      className?: string;
+      onChange?: (event: CustomEvent<{ value: string }>) => void;
+      /** Uma aba fechavel pediu para fechar; remover a aba e do app. */
+      onClose?: (event: CustomEvent<{ value: string }>) => void;
+    }
+  >
 >;
 
 export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
@@ -40,7 +43,7 @@ export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
       };
     }, [ref, onChange, onClose]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkTabsElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,
@@ -52,17 +55,19 @@ export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
 );
 
 export type ArkTabProps = PropsWithChildren<
-  ArkTabStyleOptions & {
-    value: string;
-    disabled?: boolean;
-    /** id do painel que a aba controla (aria-controls). */
-    controls?: string;
-    /** Botao de fechar, clique do meio e Delete (so na variante editor). */
-    closable?: boolean;
-    /** Ponto de alteracoes nao salvas. */
-    dirty?: boolean;
-    className?: string;
-  }
+  ArkDomProps<
+    ArkTabStyleOptions & {
+      value: string;
+      disabled?: boolean;
+      /** id do painel que a aba controla (aria-controls). */
+      controls?: string;
+      /** Botao de fechar, clique do meio e Delete (so na variante editor). */
+      closable?: boolean;
+      /** Ponto de alteracoes nao salvas. */
+      dirty?: boolean;
+      className?: string;
+    }
+  >
 >;
 
 export const ArkTab = forwardRef<ArkTabElement, ArkTabProps>(function ArkTab(props, forwardedRef): React.JSX.Element {
@@ -72,7 +77,7 @@ export const ArkTab = forwardRef<ArkTabElement, ArkTabProps>(function ArkTab(pro
     ensureTooarkComponentsRegistered();
   }, []);
 
-  const attrs: Record<string, string | undefined | React.Ref<ArkTabElement>> = {
+  const attrs: Record<string, unknown> = {
     ...rest,
     ref: forwardedRef,
     class: className,

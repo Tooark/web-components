@@ -5,37 +5,40 @@ import type {
 } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkCommandPaletteProps = PropsWithChildren<
-  ArkCommandPaletteStyleOptions & {
-    /** Aberta; a saida anima antes de sair do top layer. */
-    open?: boolean;
-    /** Placeholder e nome do campo de busca. Padrao: a string `search` do idioma. */
-    placeholder?: string;
-    /** Atalho global: "/", "mod+k" (Ctrl ou Cmd), "ctrl+shift+p"... */
-    hotkey?: string;
-    /** Filtra localmente pelo label dos itens. */
-    filter?: boolean;
-    /** Debounce de ark-query em ms. Padrao: 150. */
-    queryDelay?: number;
-    /** Nome acessivel do dialogo. */
-    label?: string;
-    /** Mensagem sem opcoes enquanto o campo esta vazio (no lugar de `noResults`). */
-    hint?: string;
-    /** Busca assincrona em andamento: sem opcoes a mensagem vira `searching`, e o listbox fica aria-busy. */
-    busy?: boolean;
-    /** A pagina continua rolando com a paleta aberta. */
-    noScrollLock?: boolean;
-    "aria-label"?: string;
-    className?: string;
-    onSelect?: (event: CustomEvent<{ value: string }>) => void;
-    onQuery?: (event: CustomEvent<{ query: string }>) => void;
-    onOpen?: (event: CustomEvent) => void;
-    onClose?: (event: CustomEvent) => void;
-  }
+  ArkDomProps<
+    ArkCommandPaletteStyleOptions & {
+      /** Aberta; a saida anima antes de sair do top layer. */
+      open?: boolean;
+      /** Placeholder e nome do campo de busca. Padrao: a string `search` do idioma. */
+      placeholder?: string;
+      /** Atalho global: "/", "mod+k" (Ctrl ou Cmd), "ctrl+shift+p"... */
+      hotkey?: string;
+      /** Filtra localmente pelo label dos itens. */
+      filter?: boolean;
+      /** Debounce de ark-query em ms. Padrao: 150. */
+      queryDelay?: number;
+      /** Nome acessivel do dialogo. */
+      label?: string;
+      /** Mensagem sem opcoes enquanto o campo esta vazio (no lugar de `noResults`). */
+      hint?: string;
+      /** Busca assincrona em andamento: sem opcoes a mensagem vira `searching`, e o listbox fica aria-busy. */
+      busy?: boolean;
+      /** A pagina continua rolando com a paleta aberta. */
+      noScrollLock?: boolean;
+      "aria-label"?: string;
+      className?: string;
+      onSelect?: (event: CustomEvent<{ value: string }>) => void;
+      onQuery?: (event: CustomEvent<{ query: string }>) => void;
+      onOpen?: (event: CustomEvent) => void;
+      onClose?: (event: CustomEvent) => void;
+    }
+  >
 >;
 
 export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommandPaletteProps>(
@@ -81,7 +84,7 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
       };
     }, [onSelect, onQuery, onOpen, onClose]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkCommandPaletteElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,
@@ -98,15 +101,17 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
 );
 
 export type ArkCommandItemProps = PropsWithChildren<
-  ArkCommandItemStyleOptions & {
-    value: string;
-    /** Secao em que a paleta lista o item. */
-    group?: string;
-    /** Texto do filtro e nome da opcao. Padrao: o texto dos filhos sem slot. */
-    label?: string;
-    disabled?: boolean;
-    className?: string;
-  }
+  ArkDomProps<
+    ArkCommandItemStyleOptions & {
+      value: string;
+      /** Secao em que a paleta lista o item. */
+      group?: string;
+      /** Texto do filtro e nome da opcao. Padrao: o texto dos filhos sem slot. */
+      label?: string;
+      disabled?: boolean;
+      className?: string;
+    }
+  >
 >;
 
 export const ArkCommandItem = forwardRef<ArkCommandItemElement, ArkCommandItemProps>(
@@ -117,7 +122,7 @@ export const ArkCommandItem = forwardRef<ArkCommandItemElement, ArkCommandItemPr
       ensureTooarkComponentsRegistered();
     }, []);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkCommandItemElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: forwardedRef,
       class: className,

@@ -2,18 +2,21 @@ import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkL
 import type { ArkCalendar as ArkCalendarElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useCallback, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkCalendarProps = ArkCalendarStyleOptions & {
-  lang?: ArkDatepickerLang;
-  localeJson?: Partial<ArkLocale>;
-  value?: string;
-  min?: string;
-  max?: string;
-  onChange?: (detail: { value: string | null; date: Date | null; events: ArkCalendarEvent[] }) => void;
-  className?: string;
-};
+export type ArkCalendarProps = ArkDomProps<
+  ArkCalendarStyleOptions & {
+    lang?: ArkDatepickerLang;
+    localeJson?: Partial<ArkLocale>;
+    value?: string;
+    min?: string;
+    max?: string;
+    onChange?: (detail: { value: string | null; date: Date | null; events: ArkCalendarEvent[] }) => void;
+    className?: string;
+  }
+>;
 
 export const ArkCalendar = forwardRef<ArkCalendarElement, ArkCalendarProps>(
   function ArkCalendar(props, forwardedRef): React.JSX.Element {

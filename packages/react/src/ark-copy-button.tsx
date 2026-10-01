@@ -2,21 +2,24 @@ import type { ArkCopyButtonStyleOptions } from "@tooark/core";
 import type { ArkCopyButton as ArkCopyButtonElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkCopyButtonProps = PropsWithChildren<
-  ArkCopyButtonStyleOptions & {
-    /** Texto a copiar. */
-    value?: string;
-    /** id de um elemento (vira o atributo for): copia o value de inputs/textareas ou o textContent. */
-    htmlFor?: string;
-    /** Duracao do feedback "copiado" em ms. Padrao: 1500. */
-    feedbackMs?: number;
-    disabled?: boolean;
-    className?: string;
-    onCopy?: (event: CustomEvent<{ value: string }>) => void;
-  }
+  ArkDomProps<
+    ArkCopyButtonStyleOptions & {
+      /** Texto a copiar. */
+      value?: string;
+      /** id de um elemento (vira o atributo for): copia o value de inputs/textareas ou o textContent. */
+      htmlFor?: string;
+      /** Duracao do feedback "copiado" em ms. Padrao: 1500. */
+      feedbackMs?: number;
+      disabled?: boolean;
+      className?: string;
+      onCopy?: (event: CustomEvent<{ value: string }>) => void;
+    }
+  >
 >;
 
 export const ArkCopyButton = forwardRef<ArkCopyButtonElement, ArkCopyButtonProps>(
@@ -50,7 +53,7 @@ export const ArkCopyButton = forwardRef<ArkCopyButtonElement, ArkCopyButtonProps
       return () => el.removeEventListener("ark-copy", handler);
     }, [ref, onCopy]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkCopyButtonElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

@@ -1,18 +1,21 @@
 import type { ArkDatepickerLang, ArkDatepickerStyleOptions, ArkLocale } from "@tooark/core";
 import type { ArkDatepicker as ArkDatepickerElement } from "@tooark/web-components";
 import React, { forwardRef, useCallback, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkDatepickerProps = ArkDatepickerStyleOptions & {
-  lang?: ArkDatepickerLang;
-  localeJson?: Partial<ArkLocale>;
-  value?: string;
-  min?: string;
-  max?: string;
-  onChange?: (detail: { value: string | null; date: Date | null }) => void;
-  className?: string;
-};
+export type ArkDatepickerProps = ArkDomProps<
+  ArkDatepickerStyleOptions & {
+    lang?: ArkDatepickerLang;
+    localeJson?: Partial<ArkLocale>;
+    value?: string;
+    min?: string;
+    max?: string;
+    onChange?: (detail: { value: string | null; date: Date | null }) => void;
+    className?: string;
+  }
+>;
 
 export const ArkDatepicker = forwardRef<ArkDatepickerElement, ArkDatepickerProps>(
   function ArkDatepicker(props, forwardedRef): React.JSX.Element {

@@ -2,12 +2,15 @@ import type { ArkKbdStyleOptions } from "@tooark/core";
 import type { ArkKbd as ArkKbdElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkKbdProps = PropsWithChildren<
-  ArkKbdStyleOptions & {
-    className?: string;
-  }
+  ArkDomProps<
+    ArkKbdStyleOptions & {
+      className?: string;
+    }
+  >
 >;
 
 export const ArkKbd = forwardRef<ArkKbdElement, ArkKbdProps>(function ArkKbd(props, forwardedRef): React.JSX.Element {
@@ -17,7 +20,7 @@ export const ArkKbd = forwardRef<ArkKbdElement, ArkKbdProps>(function ArkKbd(pro
     ensureTooarkComponentsRegistered();
   }, []);
 
-  const attrs: Record<string, string | undefined | React.Ref<ArkKbdElement>> = {
+  const attrs: Record<string, unknown> = {
     ...rest,
     ref: forwardedRef,
     class: className

@@ -1,27 +1,30 @@
 import type { ArkMenuAlign, ArkMenuDirection, ArkMenuItemStyleOptions, ArkMenuStyleOptions } from "@tooark/core";
 import type { ArkMenu as ArkMenuElement, ArkMenuItem as ArkMenuItemElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
 export type ArkMenuProps = PropsWithChildren<
-  ArkMenuStyleOptions & {
-    /** id do gatilho (vira o atributo for): o menu escreve aria-* nele e escuta clique e setas. */
-    htmlFor?: string;
-    /** Aberto; refletido do estado do popover. */
-    open?: boolean;
-    /** Alinhamento em relacao ao gatilho. Padrao: "start". */
-    align?: ArkMenuAlign;
-    /** Lado do gatilho; vira quando nao cabe. Padrao: "down". */
-    direction?: ArkMenuDirection;
-    "aria-label"?: string;
-    className?: string;
-    /** Um item foi escolhido; o menu fecha em seguida. */
-    onSelect?: (event: CustomEvent<{ value: string }>) => void;
-    onOpen?: (event: CustomEvent) => void;
-    onClose?: (event: CustomEvent) => void;
-  }
+  ArkDomProps<
+    ArkMenuStyleOptions & {
+      /** id do gatilho (vira o atributo for): o menu escreve aria-* nele e escuta clique e setas. */
+      htmlFor?: string;
+      /** Aberto; refletido do estado do popover. */
+      open?: boolean;
+      /** Alinhamento em relacao ao gatilho. Padrao: "start". */
+      align?: ArkMenuAlign;
+      /** Lado do gatilho; vira quando nao cabe. Padrao: "down". */
+      direction?: ArkMenuDirection;
+      "aria-label"?: string;
+      className?: string;
+      /** Um item foi escolhido; o menu fecha em seguida. */
+      onSelect?: (event: CustomEvent<{ value: string }>) => void;
+      onOpen?: (event: CustomEvent) => void;
+      onClose?: (event: CustomEvent) => void;
+    }
+  >
 >;
 
 export const ArkMenu = forwardRef<ArkMenuElement, ArkMenuProps>(
@@ -50,7 +53,7 @@ export const ArkMenu = forwardRef<ArkMenuElement, ArkMenuProps>(
       };
     }, [onSelect, onOpen, onClose]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkMenuElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,
@@ -63,17 +66,19 @@ export const ArkMenu = forwardRef<ArkMenuElement, ArkMenuProps>(
 );
 
 export type ArkMenuItemProps = PropsWithChildren<
-  ArkMenuItemStyleOptions & {
-    value?: string;
-    disabled?: boolean;
-    /** Item checkbox: true marcado, false desmarcado; omitido e um item comum. */
-    checked?: boolean;
-    /** Linha separadora (role separator). */
-    divider?: boolean;
-    /** Conteudo nao interativo (nome e e-mail), sem role de item. */
-    static?: boolean;
-    className?: string;
-  }
+  ArkDomProps<
+    ArkMenuItemStyleOptions & {
+      value?: string;
+      disabled?: boolean;
+      /** Item checkbox: true marcado, false desmarcado; omitido e um item comum. */
+      checked?: boolean;
+      /** Linha separadora (role separator). */
+      divider?: boolean;
+      /** Conteudo nao interativo (nome e e-mail), sem role de item. */
+      static?: boolean;
+      className?: string;
+    }
+  >
 >;
 
 export const ArkMenuItem = forwardRef<ArkMenuItemElement, ArkMenuItemProps>(
@@ -84,7 +89,7 @@ export const ArkMenuItem = forwardRef<ArkMenuItemElement, ArkMenuItemProps>(
       ensureTooarkComponentsRegistered();
     }, []);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkMenuItemElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: forwardedRef,
       class: className,

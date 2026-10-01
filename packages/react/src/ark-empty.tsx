@@ -1,16 +1,19 @@
 import type { ArkEmptyStyleOptions } from "@tooark/core";
 import type { ArkEmpty as ArkEmptyElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkEmptyProps = PropsWithChildren<
-  ArkEmptyStyleOptions & {
-    /** Titulo (h3). */
-    heading?: string;
-    /** Texto abaixo do titulo. */
-    description?: string;
-    className?: string;
-  }
+  ArkDomProps<
+    ArkEmptyStyleOptions & {
+      /** Titulo (h3). */
+      heading?: string;
+      /** Texto abaixo do titulo. */
+      description?: string;
+      className?: string;
+    }
+  >
 >;
 
 export const ArkEmpty = forwardRef<ArkEmptyElement, ArkEmptyProps>(
@@ -21,7 +24,7 @@ export const ArkEmpty = forwardRef<ArkEmptyElement, ArkEmptyProps>(
       ensureTooarkComponentsRegistered();
     }, []);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkEmptyElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: forwardedRef,
       class: className

@@ -1,41 +1,44 @@
 import type { ArkInputStyleOptions, ArkLang } from "@tooark/core";
 import type { ArkInput as ArkInputElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkInputProps = PropsWithChildren<
-  ArkInputStyleOptions & {
-    type?: string;
-    label?: string;
-    placeholder?: string;
-    value?: string;
-    name?: string;
-    helper?: string;
-    error?: boolean;
-    errorMessage?: string;
-    disabled?: boolean;
-    required?: boolean;
-    readonly?: boolean;
-    /** Com type="password", botao de mostrar/ocultar na ponta direita. */
-    reveal?: boolean;
-    lang?: ArkLang;
-    localeJson?: string;
-    autocomplete?: string;
-    autofocus?: boolean;
-    inputmode?: string;
-    maxlength?: number;
-    minlength?: number;
-    pattern?: string;
-    min?: string | number;
-    max?: string | number;
-    step?: string | number;
-    spellcheck?: boolean;
-    "aria-label"?: string;
-    className?: string;
-    onInput?: (event: Event) => void;
-    onChange?: (event: Event) => void;
-  }
+  ArkDomProps<
+    ArkInputStyleOptions & {
+      type?: string;
+      label?: string;
+      placeholder?: string;
+      value?: string;
+      name?: string;
+      helper?: string;
+      error?: boolean;
+      errorMessage?: string;
+      disabled?: boolean;
+      required?: boolean;
+      readonly?: boolean;
+      /** Com type="password", botao de mostrar/ocultar na ponta direita. */
+      reveal?: boolean;
+      lang?: ArkLang;
+      localeJson?: string;
+      autocomplete?: string;
+      autofocus?: boolean;
+      inputmode?: string;
+      maxlength?: number;
+      minlength?: number;
+      pattern?: string;
+      min?: string | number;
+      max?: string | number;
+      step?: string | number;
+      spellcheck?: boolean;
+      "aria-label"?: string;
+      className?: string;
+      onInput?: (event: Event) => void;
+      onChange?: (event: Event) => void;
+    }
+  >
 >;
 
 // Atributo do custom element: string ou ausente.
@@ -86,7 +89,7 @@ export const ArkInput = forwardRef<ArkInputElement, ArkInputProps>(
       };
     }, [ref, onInput, onChange]);
 
-    const attrs: Record<string, string | boolean | undefined | React.Ref<ArkInputElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

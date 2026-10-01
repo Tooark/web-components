@@ -1,15 +1,18 @@
 import type { ArkCarouselSnap, ArkCarouselStyleOptions } from "@tooark/core";
 import type { ArkCarousel as ArkCarouselElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useCallback, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkCarouselProps = PropsWithChildren<
-  ArkCarouselStyleOptions & {
-    snap?: ArkCarouselSnap;
-    onSlideChange?: (detail: { index: number }) => void;
-    className?: string;
-  }
+  ArkDomProps<
+    ArkCarouselStyleOptions & {
+      snap?: ArkCarouselSnap;
+      onSlideChange?: (detail: { index: number }) => void;
+      className?: string;
+    }
+  >
 >;
 
 export const ArkCarousel = forwardRef<ArkCarouselElement, ArkCarouselProps>(

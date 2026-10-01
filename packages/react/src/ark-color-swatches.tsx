@@ -2,21 +2,24 @@ import type { ArkColorSwatch, ArkColorSwatchesStyleOptions } from "@tooark/core"
 import type { ArkColorSwatches as ArkColorSwatchesElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkColorSwatchesProps = ArkColorSwatchesStyleOptions & {
-  /** Cor selecionada (o value da amostra). */
-  value?: string;
-  /** Amostras { name, value }[]; vai como JSON no atributo. */
-  colors?: ArkColorSwatch[];
-  /** Nome acessivel do radiogroup. */
-  label?: string;
-  disabled?: boolean;
-  className?: string;
-  /** Selecao mudou pelo usuario: detail.value e a cor. */
-  onChange?: (event: CustomEvent<{ value: string }>) => void;
-};
+export type ArkColorSwatchesProps = ArkDomProps<
+  ArkColorSwatchesStyleOptions & {
+    /** Cor selecionada (o value da amostra). */
+    value?: string;
+    /** Amostras { name, value }[]; vai como JSON no atributo. */
+    colors?: ArkColorSwatch[];
+    /** Nome acessivel do radiogroup. */
+    label?: string;
+    disabled?: boolean;
+    className?: string;
+    /** Selecao mudou pelo usuario: detail.value e a cor. */
+    onChange?: (event: CustomEvent<{ value: string }>) => void;
+  }
+>;
 
 export const ArkColorSwatches = forwardRef<ArkColorSwatchesElement, ArkColorSwatchesProps>(
   function ArkColorSwatches(props, forwardedRef): React.JSX.Element {
@@ -36,7 +39,7 @@ export const ArkColorSwatches = forwardRef<ArkColorSwatchesElement, ArkColorSwat
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkColorSwatchesElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

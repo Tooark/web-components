@@ -57,7 +57,7 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json && node postbuild.mjs",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.typecheck.json && node postbuild.mjs",
     "clean": "rimraf dist"
   },
   "peerDependencies": {

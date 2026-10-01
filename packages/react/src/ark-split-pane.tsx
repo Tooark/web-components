@@ -2,17 +2,20 @@ import type { ArkSplitPaneStyleOptions } from "@tooark/core";
 import type { ArkSplitPane as ArkSplitPaneElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkSplitPaneProps = PropsWithChildren<
-  ArkSplitPaneStyleOptions & {
-    /** Tamanhos dos paineis em percentuais, na ordem dos filhos (ex.: [30, 70]); faltantes sao distribuidos. */
-    sizes?: number[];
-    className?: string;
-    /** Tamanhos mudaram por arrasto ou teclado: detail.sizes e a lista normalizada. Persistir e do app. */
-    onResize?: (event: CustomEvent<{ sizes: number[] }>) => void;
-  }
+  ArkDomProps<
+    ArkSplitPaneStyleOptions & {
+      /** Tamanhos dos paineis em percentuais, na ordem dos filhos (ex.: [30, 70]); faltantes sao distribuidos. */
+      sizes?: number[];
+      className?: string;
+      /** Tamanhos mudaram por arrasto ou teclado: detail.sizes e a lista normalizada. Persistir e do app. */
+      onResize?: (event: CustomEvent<{ sizes: number[] }>) => void;
+    }
+  >
 >;
 
 export const ArkSplitPane = forwardRef<ArkSplitPaneElement, ArkSplitPaneProps>(
@@ -33,7 +36,7 @@ export const ArkSplitPane = forwardRef<ArkSplitPaneElement, ArkSplitPaneProps>(
       return () => el.removeEventListener("ark-resize", handler);
     }, [ref, onResize]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkSplitPaneElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

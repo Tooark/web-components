@@ -18,6 +18,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   property giving the path of each file from the folder name down. New strings `chooseFolder`, `dropFolderHint`,
   `noFolder` and `fileCount` (`ArkLocale`, en/pt/es; a `locale-json` without them falls back to English) and a
   `directory` prop on the React, Vue and Angular wrappers. Without it the field picks files as before.
+- `@tooark/react`: every wrapper's props type takes React's DOM attributes and handlers (`id`, `style`, `title`,
+  `tabIndex`, `aria-*`, `onClick`, `onKeyDown`, ...), as `ArkButtonProps` already did. The wrappers always forwarded
+  them to the element; only the types refused them, so `<ArkCheckbox onClick={...} />` no longer needs the raw tag.
+  Props the wrapper defines win over the React ones of the same name (`onChange` stays the element's `CustomEvent`),
+  and wrappers of elements without content still take no children. Types only, no runtime change; a type-check step
+  in the package build (`typecheck/`) pins it.
 
 ### Changed
 

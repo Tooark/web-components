@@ -1,19 +1,22 @@
 import type { ArkAlertStyleOptions } from "@tooark/core";
 import type { ArkAlert as ArkAlertElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
 export type ArkAlertProps = PropsWithChildren<
-  ArkAlertStyleOptions & {
-    /** Titulo proprio no inicio do alerta. */
-    heading?: string;
-    /** Botao de dispensar (rotulo por lang/localeJson). */
-    dismissible?: boolean;
-    className?: string;
-    /** Depois da saida animada: o host ganha `hidden`; desmontar e do app. */
-    onDismiss?: (event: CustomEvent) => void;
-  }
+  ArkDomProps<
+    ArkAlertStyleOptions & {
+      /** Titulo proprio no inicio do alerta. */
+      heading?: string;
+      /** Botao de dispensar (rotulo por lang/localeJson). */
+      dismissible?: boolean;
+      className?: string;
+      /** Depois da saida animada: o host ganha `hidden`; desmontar e do app. */
+      onDismiss?: (event: CustomEvent) => void;
+    }
+  >
 >;
 
 export const ArkAlert = forwardRef<ArkAlertElement, ArkAlertProps>(
@@ -34,7 +37,7 @@ export const ArkAlert = forwardRef<ArkAlertElement, ArkAlertProps>(
       return () => el.removeEventListener("ark-dismiss", handler);
     }, [ref, onDismiss]);
 
-    const attrs: Record<string, string | undefined | React.Ref<ArkAlertElement>> = {
+    const attrs: Record<string, unknown> = {
       ...rest,
       ref: setRef,
       class: className,

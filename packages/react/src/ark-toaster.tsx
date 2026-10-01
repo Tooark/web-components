@@ -2,14 +2,17 @@ import type { ArkToasterStyleOptions } from "@tooark/core";
 import type { ArkToaster as ArkToasterElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkToasterProps = ArkToasterStyleOptions & {
-  className?: string;
-  /** Botão de ação de um toast: detail traz o id do toast e o actionId das opções. */
-  onAction?: (event: CustomEvent<{ id: string; actionId: string | null }>) => void;
-};
+export type ArkToasterProps = ArkDomProps<
+  ArkToasterStyleOptions & {
+    className?: string;
+    /** Botão de ação de um toast: detail traz o id do toast e o actionId das opções. */
+    onAction?: (event: CustomEvent<{ id: string; actionId: string | null }>) => void;
+  }
+>;
 
 export const ArkToaster = forwardRef<ArkToasterElement, ArkToasterProps>(
   function ArkToaster(props, forwardedRef): React.JSX.Element {

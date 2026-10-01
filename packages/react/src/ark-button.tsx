@@ -2,15 +2,17 @@ import type { ArkButtonStyleOptions, ArkButtonType } from "@tooark/core";
 import type { ArkButton as ArkButtonElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
+import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 /** Props do ArkButton: opções de estilo mais os atributos e handlers DOM do React (onClick, onFocus, id, style...). */
 export type ArkButtonProps = PropsWithChildren<
-  ArkButtonStyleOptions &
-    Omit<React.HTMLAttributes<HTMLElement>, keyof ArkButtonStyleOptions | "children"> & {
+  ArkDomProps<
+    ArkButtonStyleOptions & {
       type?: ArkButtonType;
       disabled?: boolean;
     }
+  >
 >;
 
 export const ArkButton = forwardRef<ArkButtonElement, ArkButtonProps>(
