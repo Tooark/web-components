@@ -1,0 +1,16 @@
+<!-- O manager do Storybook escreve o próprio nome no <title>, sem opção para trocar: "<pacote> - Storybook" no HTML e,
+     a cada navegação, "Storybook" ou "<story> ⋅ Storybook". Este script põe a marca no lugar já no carregamento e
+     de novo a cada reescrita; o <title> estático do build é trocado por scripts/storybook-title.mjs. -->
+<script>
+  (() => {
+    const brand = "Tooark Web Components";
+    const title = document.querySelector("title");
+    const apply = () => {
+      const current = document.title;
+      const next = current.includes("⋅") ? current.replace(/Storybook$/, brand) : brand;
+      if (next !== current) document.title = next;
+    };
+    apply();
+    if (title) new MutationObserver(apply).observe(title, { childList: true, characterData: true, subtree: true });
+  })();
+</script>

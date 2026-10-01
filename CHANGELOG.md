@@ -9,6 +9,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed
+
+- The Storybook site (<https://tooark.com/web-components/>) is titled `Tooark Web Components` instead of `Storybook`:
+  `manager-head.html` swaps the name the manager writes on every navigation and `scripts/storybook-title.mjs` rewrites
+  the static `<title>` after `storybook build`.
+
 ## [1.4.0] - 2026-09-29
 
 ### Added
