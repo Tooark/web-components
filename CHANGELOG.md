@@ -9,6 +9,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-file-input`: opt-in `directory` (attribute and JS property) picks a whole folder. The hidden input gets
+  `webkitdirectory` plus `multiple`, so a browser without folder selection (older mobile ones) falls back to choosing
+  the folder's files; a folder dropped on the zone is read to the end, subfolders included; the list becomes one
+  summary line (new hook `file-input-summary`) and `change` carries `detail: { files, paths }`, with the `paths`
+  property giving the path of each file from the folder name down. New strings `chooseFolder`, `dropFolderHint`,
+  `noFolder` and `fileCount` (`ArkLocale`, en/pt/es; a `locale-json` without them falls back to English) and a
+  `directory` prop on the React, Vue and Angular wrappers. Without it the field picks files as before.
+
 ### Changed
 
 - The Storybook site (<https://tooark.com/web-components/>) is titled `Tooark Web Components` instead of `Storybook`:

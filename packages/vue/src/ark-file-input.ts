@@ -11,6 +11,8 @@ export const ArkFileInput = defineComponent({
     testid: { type: String, default: undefined },
     accept: { type: String, default: undefined },
     multiple: { type: Boolean, default: false },
+    /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona le as pastas soltas. */
+    directory: { type: Boolean, default: false },
     label: { type: String, default: undefined },
     helper: { type: String, default: undefined },
     errorMessage: { type: String, default: undefined },
@@ -33,6 +35,7 @@ export const ArkFileInput = defineComponent({
         testid: props.testid,
         accept: props.accept,
         multiple: props.multiple ? "" : undefined,
+        directory: props.directory ? "" : undefined,
         label: props.label,
         helper: props.helper,
         "error-message": props.errorMessage,
@@ -46,7 +49,7 @@ export const ArkFileInput = defineComponent({
         theme: props.theme,
         lang: props.lang,
         "locale-json": props.localeJson,
-        onChange: (event: CustomEvent<{ files: File[] }>) => emit("change", event)
+        onChange: (event: CustomEvent<{ files: File[]; paths?: string[] }>) => emit("change", event)
       });
   }
 });

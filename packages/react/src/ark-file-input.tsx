@@ -10,6 +10,8 @@ export type ArkFileInputProps = ArkFileInputStyleOptions & {
   accept?: string;
   /** Aceita varios arquivos; sem ele o drop fica com o primeiro. */
   multiple?: boolean;
+  /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona le as pastas soltas. Padrao: desligado. */
+  directory?: boolean;
   /** Rotulo do campo (label for o input oculto; nomeia o botao junto do texto dele). */
   label?: string;
   helper?: string;
@@ -22,13 +24,14 @@ export type ArkFileInputProps = ArkFileInputStyleOptions & {
   /** Nome no formulario (input nativo oculto). */
   name?: string;
   className?: string;
-  /** Arquivos escolhidos ou soltos: detail.files e um array de File. */
-  onChange?: (event: CustomEvent<{ files: File[] }>) => void;
+  /** Arquivos escolhidos ou soltos em detail.files (array de File); com `directory`, detail.paths traz os caminhos. */
+  onChange?: (event: CustomEvent<{ files: File[]; paths?: string[] }>) => void;
 };
 
 export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
   function ArkFileInput(props, forwardedRef): React.JSX.Element {
-    const { className, multiple, errorMessage, error, disabled, required, localeJson, onChange, ...rest } = props;
+    const { className, multiple, directory, errorMessage, error, disabled, required, localeJson, onChange, ...rest } =
+      props;
     const [ref, setRef] = useForwardedRef<ArkFileInputElement>(forwardedRef);
 
     useEffect(() => {
@@ -39,7 +42,7 @@ export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
       const el = ref.current;
       if (!el || !onChange) return;
 
-      const handler = (event: Event) => onChange(event as CustomEvent<{ files: File[] }>);
+      const handler = (event: Event) => onChange(event as CustomEvent<{ files: File[]; paths?: string[] }>);
       el.addEventListener("change", handler);
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
@@ -49,6 +52,7 @@ export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
       ref: setRef,
       class: className,
       multiple: multiple ? "" : undefined,
+      directory: directory ? "" : undefined,
       "error-message": errorMessage,
       error: error ? "" : undefined,
       disabled: disabled ? "" : undefined,

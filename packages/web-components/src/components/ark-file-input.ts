@@ -42,7 +42,10 @@ type ArkFileInputPalette = {
  * seletor nativo e soltar arquivos na zona alimenta o mesmo input. Toda
  * mudança emite `change` com os arquivos e anuncia os nomes ao leitor de
  * tela. O rótulo aponta para o input (associação nativa) e nomeia o botão
- * junto do próprio texto dele.
+ * junto do próprio texto dele. Com `directory` o campo escolhe uma pasta: o
+ * seletor abre em modo pasta, uma pasta solta é lida até o fim, a lista vira
+ * um resumo e `change` leva também o caminho de cada arquivo. Sem ele, uma
+ * pasta solta é recusada com aviso.
  */
 export class ArkFileInput extends HTMLElementBase {
   static readonly tagName = "ark-file-input";
@@ -58,11 +61,16 @@ export class ArkFileInput extends HTMLElementBase {
   private dragDepth = 0;
   /** O último drop trouxe uma pasta que o campo não aceita: a lista mostra o aviso até a próxima seleção. */
   private folderRejected = false;
+  /** Caminho de cada arquivo vindo de um drop em modo pasta, na ordem de `files`; nulo quando veio do seletor. */
+  private droppedPaths: string[] | null = null;
+  /** Conta as seleções: a leitura assíncrona de uma pasta solta só é publicada se nada veio depois dela. */
+  private selectionSeq = 0;
 
   static get observedAttributes(): string[] {
     return [
       "accept",
       "multiple",
+      "directory",
       "label",
       "helper",
       "error",
@@ -101,6 +109,24 @@ export class ArkFileInput extends HTMLElementBase {
     return Array.from(this.inputEl?.files ?? []);
   }
 
+  /**
+   * Caminho de cada arquivo de `files`, na mesma ordem, a partir da pasta escolhida ou solta (`pasta/sub/a.txt`);
+   * o nome do arquivo quando ele não veio de uma pasta.
+   */
+  get paths(): string[] {
+    const dropped = this.droppedPaths;
+    return this.files.map((file, index) => dropped?.[index] ?? (file.webkitRelativePath || file.name));
+  }
+
+  /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona lê as pastas soltas. Padrão: desligado. */
+  get directory(): boolean {
+    return this.hasAttribute("directory");
+  }
+
+  set directory(value: boolean | string | null | undefined) {
+    this.toggleAttribute("directory", coerceBooleanAttr(value));
+  }
+
   get multiple(): boolean {
     return this.hasAttribute("multiple");
   }
@@ -121,7 +147,7 @@ export class ArkFileInput extends HTMLElementBase {
   clear(): void {
     if (!this.inputEl) return;
     this.inputEl.value = "";
-    this.folderRejected = false;
+    this.resetSelection();
     this.syncList();
   }
 
@@ -143,18 +169,45 @@ export class ArkFileInput extends HTMLElementBase {
   // O change nativo do input oculto não sobe ao host: quem escuta no host recebe só o CustomEvent com detail.
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation();
-    this.folderRejected = false;
+    this.resetSelection();
     this.publish();
   };
 
-  // Lista, anúncio e `change` da seleção atual do input.
+  // Uma seleção nova (seletor, drop ou clear) descarta o aviso, os caminhos do drop anterior e a leitura em curso.
+  private resetSelection(): void {
+    this.folderRejected = false;
+    this.droppedPaths = null;
+    this.selectionSeq += 1;
+  }
+
+  // Lista, anúncio e `change` da seleção atual do input. Em modo pasta o anúncio é o resumo e `detail` leva os
+  // caminhos; fora dele o detail é só `{ files }`, como sempre foi.
   private publish(): void {
     this.syncList();
     const files = this.files;
     const locale = this.getLocale();
+    if (this.directory) {
+      const summary = this.summarize(locale);
+      announce(files.length ? [summary.folder, summary.count].filter(Boolean).join(", ") : locale.noFolder);
+      const detail = { files, paths: this.paths };
+      this.dispatchEvent(new CustomEvent("change", { detail, bubbles: true, composed: true }));
+      return;
+    }
     const selection = files.length ? files.map((file) => file.name).join(", ") : locale.noFile;
     announce(this.folderRejected ? `${selection}. ${locale.foldersNotAccepted}` : selection);
     this.dispatchEvent(new CustomEvent("change", { detail: { files }, bubbles: true, composed: true }));
+  }
+
+  // Resumo da seleção em modo pasta: o nome da pasta, quando todos os caminhos saem da mesma, a contagem e o tamanho.
+  private summarize(locale: ArkLocale): { folder: string; count: string; size: number } {
+    const files = this.files;
+    const roots = new Set(this.paths.map((path) => (path.includes("/") ? path.slice(0, path.indexOf("/")) : "")));
+    const [root = ""] = roots;
+    return {
+      folder: roots.size === 1 ? root : "",
+      count: locale.fileCount.replace("{count}", String(files.length)),
+      size: files.reduce((total, file) => total + file.size, 0)
+    };
   }
 
   // Separa arquivos e pastas de um drop. A pasta só se distingue pela entrada (webkitGetAsEntry), que existe só
@@ -177,6 +230,50 @@ export class ArkFileInput extends HTMLElementBase {
     return { files, folders };
   }
 
+  // Lê uma pasta solta até o fim, descendo nas subpastas. readEntries devolve lotes (100 no Chromium), então é
+  // chamado até vir vazio; uma entrada que falha ao ler fica de fora sem derrubar o resto.
+  private static async readFolder(
+    folder: FileSystemDirectoryEntry,
+    prefix: string,
+    found: Array<{ file: File; path: string }>
+  ): Promise<void> {
+    const reader = folder.createReader();
+    for (;;) {
+      const batch = await new Promise<FileSystemEntry[]>((resolve) => {
+        reader.readEntries(resolve, () => resolve([]));
+      });
+      if (batch.length === 0) return;
+      for (const entry of batch) {
+        const path = `${prefix}${entry.name}`;
+        if (entry.isDirectory) {
+          await ArkFileInput.readFolder(entry as FileSystemDirectoryEntry, `${path}/`, found);
+        } else if (entry.isFile) {
+          const file = await new Promise<File | null>((resolve) => {
+            (entry as FileSystemFileEntry).file(resolve, () => resolve(null));
+          });
+          if (file) found.push({ file, path });
+        }
+      }
+    }
+  }
+
+  // Drop em modo pasta: as pastas são lidas até o fim e tudo vai para o input, cada arquivo de pasta com o caminho a
+  // partir do nome dela (como o webkitRelativePath do seletor) e os arquivos soltos junto com o próprio nome.
+  private async selectDropped(files: File[], folders: FileSystemDirectoryEntry[]): Promise<void> {
+    this.resetSelection();
+    const seq = this.selectionSeq;
+    const found = files.map((file) => ({ file, path: file.name }));
+    for (const folder of folders) await ArkFileInput.readFolder(folder, `${folder.name}/`, found);
+    // Outra seleção chegou enquanto a pasta era lida: esta não vale mais.
+    if (seq !== this.selectionSeq || !this.inputEl) return;
+    found.sort((a, b) => (a.path < b.path ? -1 : a.path > b.path ? 1 : 0));
+    const transfer = new DataTransfer();
+    for (const entry of found) transfer.items.add(entry.file);
+    this.inputEl.files = transfer.files;
+    this.droppedPaths = found.map((entry) => entry.path);
+    this.publish();
+  }
+
   private readonly handleDragEnter = (event: DragEvent): void => {
     if (this.isDisabled()) return;
     event.preventDefault();
@@ -197,8 +294,8 @@ export class ArkFileInput extends HTMLElementBase {
   };
 
   // Soltar alimenta o mesmo input (FileList é atribuível): só o primeiro arquivo sem `multiple`. Uma pasta não é um
-  // arquivo (o navegador a entrega como um File vazio, que não dá para ler): fica de fora, com aviso na lista e
-  // anúncio.
+  // arquivo (o navegador a entrega como um File vazio, que não dá para ler): sem `directory` fica de fora, com aviso
+  // na lista e anúncio; com ele é lida até o fim.
   private readonly handleDrop = (event: DragEvent): void => {
     if (this.isDisabled()) return;
     event.preventDefault();
@@ -207,13 +304,19 @@ export class ArkFileInput extends HTMLElementBase {
     if (!event.dataTransfer || !this.inputEl) return;
     const { files, folders } = ArkFileInput.readDrop(event.dataTransfer);
     if (files.length === 0 && folders.length === 0) return;
-    this.folderRejected = folders.length > 0;
+    if (this.directory) {
+      void this.selectDropped(files, folders);
+      return;
+    }
     if (files.length === 0) {
       // Só pastas: a seleção fica como estava e não há `change`.
+      this.folderRejected = true;
       this.syncList();
       announce(this.getLocale().foldersNotAccepted);
       return;
     }
+    this.resetSelection();
+    this.folderRejected = folders.length > 0;
     const transfer = new DataTransfer();
     const count = this.multiple ? files.length : 1;
     for (let index = 0; index < count; index += 1) transfer.items.add(files[index]);
@@ -362,11 +465,13 @@ export class ArkFileInput extends HTMLElementBase {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  // Lista dos nomes (com o tamanho) ou a string noFile; por último, o aviso da pasta recusada.
+  // Lista dos nomes (com o tamanho) ou a string noFile; por último, o aviso da pasta recusada. Em modo pasta a
+  // seleção pode ter centenas de arquivos, então a lista é uma linha só: a pasta, a contagem e o tamanho total.
   private syncList(): void {
     if (!this.listEl) return;
     const files = this.files;
     const locale = this.getLocale();
+    const directory = this.directory;
     const text = this.getSizing().text;
     this.listEl.textContent = "";
     this.listEl.className = [
@@ -376,8 +481,26 @@ export class ArkFileInput extends HTMLElementBase {
     if (files.length === 0) {
       const item = document.createElement("li");
       item.className = "ark:text-fg-muted";
-      item.textContent = locale.noFile;
+      item.textContent = directory ? locale.noFolder : locale.noFile;
       this.listEl.appendChild(item);
+    } else if (directory) {
+      const summary = this.summarize(locale);
+      const item = document.createElement("li");
+      item.setAttribute("data-ark-chrome", "summary");
+      item.className = "ark:inline-flex ark:max-w-full ark:items-baseline ark:gap-1.5 ark:text-fg";
+      if (summary.folder) {
+        const name = document.createElement("span");
+        name.className = "ark:truncate";
+        name.textContent = summary.folder;
+        item.appendChild(name);
+      }
+      const total = document.createElement("span");
+      total.className = summary.folder ? "ark:shrink-0 ark:text-xs ark:text-fg-muted" : "ark:shrink-0";
+      total.textContent = `${summary.count} · ${ArkFileInput.formatSize(summary.size)}`;
+      item.appendChild(total);
+      applyTestHooks(this, "file-input", item, "summary");
+      this.listEl.appendChild(item);
+      return;
     }
     for (const file of files) {
       const item = document.createElement("li");
@@ -420,11 +543,15 @@ export class ArkFileInput extends HTMLElementBase {
     const palette = this.getPalette(intent);
     const sizing = this.getSizing();
     const disabled = this.disabled;
+    const directory = this.directory;
     const error = this.hasAttribute("error") || this.hasAttribute("error-message");
     const dragover = this.hasAttribute("data-ark-dragover");
 
     this.inputEl.name = this.getAttribute("name") || "";
-    this.inputEl.multiple = this.multiple;
+    // Com `directory` o seletor abre em modo pasta. Onde o navegador não tem esse modo (mobile mais antigo) o atributo
+    // não faz nada e sobra o seletor de arquivos: `multiple` deixa escolher os arquivos da pasta de uma vez.
+    this.inputEl.multiple = this.multiple || directory;
+    this.inputEl.toggleAttribute("webkitdirectory", directory);
     this.inputEl.required = this.hasAttribute("required");
     this.inputEl.disabled = disabled;
     const accept = this.getAttribute("accept");
@@ -466,14 +593,15 @@ export class ArkFileInput extends HTMLElementBase {
       palette.ring
     ].join(" ");
     this.buttonEl.disabled = disabled;
-    if (this.buttonEl.getAttribute("data-ark-label") !== locale.chooseFile) {
+    const choose = directory ? locale.chooseFolder : locale.chooseFile;
+    if (this.buttonEl.getAttribute("data-ark-label") !== choose) {
       this.buttonEl.innerHTML = `${UPLOAD_SVG}<span></span>`;
-      (this.buttonEl.lastElementChild as HTMLSpanElement).textContent = locale.chooseFile;
-      this.buttonEl.setAttribute("data-ark-label", locale.chooseFile);
+      (this.buttonEl.lastElementChild as HTMLSpanElement).textContent = choose;
+      this.buttonEl.setAttribute("data-ark-label", choose);
     }
 
     this.hintEl.className = ["ark:text-fg-muted", sizing.text].join(" ");
-    this.hintEl.textContent = locale.dropHint;
+    this.hintEl.textContent = directory ? locale.dropFolderHint : locale.dropHint;
     this.syncList();
 
     // Label: associação nativa com o input; o botão é nomeado pelo rótulo mais o próprio texto.

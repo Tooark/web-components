@@ -12,6 +12,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.testid]="testid"
     [attr.accept]="accept"
     [attr.multiple]="multiple ? '' : null"
+    [attr.directory]="directory ? '' : null"
     [attr.label]="label"
     [attr.helper]="helper"
     [attr.error-message]="errorMessage"
@@ -45,6 +46,8 @@ export class ArkFileInputComponent {
   @Input() accept: string | undefined;
   /** Aceita vários arquivos; sem ele o drop fica com o primeiro. */
   @Input() multiple = false;
+  /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona lê as pastas soltas. */
+  @Input() directory = false;
   /** Rótulo do campo (label for o input oculto; nomeia o botão junto do texto dele). */
   @Input() label: string | undefined;
   @Input() helper: string | undefined;
@@ -63,10 +66,10 @@ export class ArkFileInputComponent {
   @Input() theme: ArkTheme = "auto";
   @Input() lang: ArkLang | undefined;
   @Input() localeJson: string | undefined;
-  /** Arquivos escolhidos ou soltos: detail.files é um array de File. */
-  @Output() changed = new EventEmitter<CustomEvent<{ files: File[] }>>();
+  /** Arquivos escolhidos ou soltos em detail.files (array de File); com `directory`, detail.paths traz os caminhos. */
+  @Output() changed = new EventEmitter<CustomEvent<{ files: File[]; paths?: string[] }>>();
 
   onChange(event: Event): void {
-    this.changed.emit(event as CustomEvent<{ files: File[] }>);
+    this.changed.emit(event as CustomEvent<{ files: File[]; paths?: string[] }>);
   }
 }

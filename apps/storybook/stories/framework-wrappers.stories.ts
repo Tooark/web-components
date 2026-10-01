@@ -295,8 +295,8 @@ export const ReactNativeBooleanProps = {
   }
 };
 
-// Props que os wrappers não repassavam: lang e ação do toaster, error do file-input, wrap do textarea e o resto
-// (data-*, aria-*) nos wrappers que montavam os atributos à mão.
+// Props que os wrappers não repassavam: lang e ação do toaster, error e directory do file-input, wrap do textarea e
+// o resto (data-*, aria-*) nos wrappers que montavam os atributos à mão.
 export const ReactPassThroughProps = {
   render: () => document.createElement("div"),
   play: async ({ canvasElement }: Ctx) => {
@@ -311,6 +311,7 @@ export const ReactPassThroughProps = {
         onAction: (event: CustomEvent<{ id: string; actionId: string | null }>) => actions.push(event.detail.actionId)
       }),
       createElement(ReactArkFileInput, { key: "f", label: "Anexo", error: true }),
+      createElement(ReactArkFileInput, { key: "d", label: "Pasta", directory: true, testid: "pasta" }),
       createElement(ReactArkTextarea, { key: "x", label: "Log", wrap: "off" }),
       createElement(ReactArkCalendar, { key: "c", "data-secao": "agenda", "aria-describedby": "dica" })
     ]);
@@ -321,6 +322,10 @@ export const ReactPassThroughProps = {
     await expect(calendar).toHaveAttribute("aria-describedby", "dica");
     await expect(canvasElement.querySelector("ark-textarea textarea")).toHaveAttribute("wrap", "off");
     await expect(canvasElement.querySelector('[data-ark="file-input-button"]')).toHaveAttribute("aria-invalid", "true");
+    await expect(canvasElement.querySelector('[data-testid="pasta"]')).toHaveAttribute("webkitdirectory");
+    await expect(canvasElement.querySelector('input[type="file"]:not([data-testid])')).not.toHaveAttribute(
+      "webkitdirectory"
+    );
 
     try {
       toast("Arquivo movido", { actionLabel: "Desfazer", actionId: "undo" });

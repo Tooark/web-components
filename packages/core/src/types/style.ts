@@ -747,7 +747,7 @@ export type ArkFileInputStyleOptions = {
   size?: ArkSize;
   /** Arredondamento da zona de soltar. Padrão: "lg". */
   rounded?: ArkRounded;
-  /** Idioma das strings chooseFile/dropHint/noFile/foldersNotAccepted. Padrão: "en". */
+  /** Idioma das strings do campo (chooseFile, dropHint, noFile e as de pasta). Padrão: "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;

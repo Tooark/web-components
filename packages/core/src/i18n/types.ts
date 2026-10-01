@@ -68,6 +68,14 @@ export interface ArkLocale {
   noFile: string;
   /** Aviso exibido quando uma pasta é solta num campo de arquivo que não aceita pastas. */
   foldersNotAccepted: string;
+  /** Rótulo do botão que abre o seletor de pastas. */
+  chooseFolder: string;
+  /** Dica da área de soltar quando o campo escolhe uma pasta. */
+  dropFolderHint: string;
+  /** Texto exibido quando nenhuma pasta foi escolhida. */
+  noFolder: string;
+  /** Contagem dos arquivos de uma pasta escolhida; `{count}` dá lugar ao número. */
+  fileCount: string;
   /** Rótulo acessível do botão que revela a senha. */
   showPassword: string;
   /** Rótulo acessível do botão que oculta a senha. */

@@ -425,6 +425,7 @@ interface ArkIntrinsicElements {
     testid?: string;
     accept?: string;
     multiple?: boolean;
+    directory?: boolean;
     label?: string;
     helper?: string;
     "error-message"?: string;
