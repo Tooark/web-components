@@ -32,6 +32,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   the static `<title>` after `storybook build`.
 - `ark-checkbox` and `ark-radio`: the README documents, and an `InsideOuterLabel` story pins, that a `<label>` wrapped
   around the element names the drawn control and toggles it once per click (no behavior change).
+- READMEs: the Angular notes (root and package) state that only the inputs reach the element, since an `id`, `class`,
+  `style` or `data-*` written on the `<ark-*-wrapper>` tag stays on the wrapper, and the React section of the root
+  README mentions the typed DOM attributes.
 
 ### Fixed
 
