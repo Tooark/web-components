@@ -14,6 +14,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - The Storybook site (<https://tooark.com/web-components/>) is titled `Tooark Web Components` instead of `Storybook`:
   `manager-head.html` swaps the name the manager writes on every navigation and `scripts/storybook-title.mjs` rewrites
   the static `<title>` after `storybook build`.
+- `ark-checkbox` and `ark-radio`: the README documents, and an `InsideOuterLabel` story pins, that a `<label>` wrapped
+  around the element names the drawn control and toggles it once per click (no behavior change).
 
 ## [1.4.0] - 2026-09-29
 

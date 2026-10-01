@@ -209,6 +209,45 @@ export const ArrowKeys = {
   }
 };
 
+// Dentro de um <label> do app (a migração de um <input type="radio"> cru): cada rótulo externo aponta para a opção,
+// o primeiro controle rotulável do host, dá o nome a ela e a marca ao clique, com o grupo exclusivo como sempre.
+export const InsideOuterLabel = {
+  render: () => {
+    const group = document.createElement("div");
+    group.setAttribute("role", "radiogroup");
+    group.setAttribute("aria-label", "Chave ativa");
+    group.className = "flex flex-col items-start gap-2";
+    for (const text of ["Chave de produção", "Chave de testes"]) {
+      const label = document.createElement("label");
+      label.className = "flex cursor-pointer items-center gap-2 text-sm";
+      label.appendChild(createRadio({ name: "active-key", value: text }));
+      label.append(text);
+      group.appendChild(label);
+    }
+    return group;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const values: string[] = [];
+    canvasElement.addEventListener("change", (event) =>
+      values.push((event as CustomEvent<{ value: string }>).detail.value)
+    );
+    const production = canvas.getByRole("radio", { name: "Chave de produção" });
+    const tests = canvas.getByRole("radio", { name: "Chave de testes" });
+    const label = tests.closest("label") as HTMLLabelElement;
+
+    await expect(label.control === tests).toBe(true);
+    await expect(tests).not.toHaveAttribute("aria-labelledby");
+
+    await userEvent.click(canvas.getByText("Chave de testes"));
+    await expect(tests).toHaveAttribute("aria-checked", "true");
+    await userEvent.click(canvas.getByText("Chave de produção"));
+    await expect(production).toHaveAttribute("aria-checked", "true");
+    await expect(tests).toHaveAttribute("aria-checked", "false");
+    await expect(values).toEqual(["Chave de testes", "Chave de produção"]);
+  }
+};
+
 // `helper` descreve a opção e fica abaixo do rótulo (host em grid), com o grupo funcionando igual: clique na dica
 // marca, setas movem e marcam. A opção sem helper continua em flex.
 export const WithHelper = {

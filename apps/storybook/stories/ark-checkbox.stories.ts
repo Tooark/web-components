@@ -209,6 +209,41 @@ export const ChildrenAsLabel = {
   }
 };
 
+// Dentro de um <label> do app (a migração de um <input type="checkbox"> cru): o rótulo externo aponta para a caixa,
+// o primeiro controle rotulável do host, e não para o input oculto; dá o nome e alterna uma vez só por clique.
+export const InsideOuterLabel = {
+  render: () => {
+    const label = document.createElement("label");
+    label.className = "flex cursor-pointer items-center gap-2 text-sm";
+    label.appendChild(createCheckbox({}));
+    label.append("Manter conectado");
+    return label;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const label = canvasElement.querySelector("label:not([data-ark-chrome])") as HTMLLabelElement;
+    const host = canvasElement.querySelector("ark-checkbox") as CheckboxEl;
+    const box = canvas.getByRole("checkbox", { name: "Manter conectado" });
+    const changes: boolean[] = [];
+    host.addEventListener("change", (event) =>
+      changes.push((event as CustomEvent<{ checked: boolean }>).detail.checked)
+    );
+
+    await expect(label.control === box).toBe(true);
+    await expect(box).not.toHaveAttribute("aria-label");
+    await expect(box).not.toHaveAttribute("aria-labelledby");
+
+    await userEvent.click(canvas.getByText("Manter conectado"));
+    await expect(changes).toEqual([true]);
+    await userEvent.click(box);
+    await expect(changes).toEqual([true, false]);
+    // O respiro do host, fora da caixa: o clique fica com o <label> externo, sem alternar duas vezes.
+    host.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    await expect(changes).toEqual([true, false, true]);
+    await expect(box).toHaveAttribute("aria-checked", "true");
+  }
+};
+
 // `helper` põe a dica abaixo do rótulo (host em grid) e descreve a caixa; com o rótulo nos filhos a dica sai do
 // nome (aria-hidden) e segue como descrição. Sem helper o host fica em flex, como antes; o atributo liga e desliga.
 export const WithHelper = {

@@ -265,7 +265,8 @@ export class ArkCheckbox extends HTMLElementBase {
     input.setAttribute("aria-hidden", "true");
     input.setAttribute("data-ark-chrome", "input");
 
-    // No início do host: a caixa antes do rótulo na ordem de leitura; o input oculto não conta.
+    // No início do host: a caixa antes do rótulo na ordem de leitura; o input oculto não conta. A caixa vem antes
+    // do input porque um <label> do app em volta do host rotula o primeiro controle rotulável dentro dele.
     this.prepend(box, input);
 
     this.boxEl = box;

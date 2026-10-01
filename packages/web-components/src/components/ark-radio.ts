@@ -327,6 +327,7 @@ export class ArkRadio extends HTMLElementBase {
     input.setAttribute("aria-hidden", "true");
     input.setAttribute("data-ark-chrome", "input");
 
+    // A opção vem antes do input: um <label> do app em volta do host rotula o primeiro controle rotulável.
     this.prepend(box, input);
 
     this.boxEl = box;
