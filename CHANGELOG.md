@@ -33,6 +33,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `File` that cannot be read). It is left out, the files dropped with it are kept, the list shows the new
   `foldersNotAccepted` string (`ArkLocale`, en/pt/es; hook `file-input-rejected`) and the announcement carries it; a
   drop of folders alone keeps the selection and emits no `change`.
+- `ark-file-input`: a long file name is cut with an ellipsis instead of overflowing the drop zone of a narrow field (a
+  phone screen); the list was as wide as its longest name, so the truncation of its items never applied.
 
 ## [1.4.0] - 2026-09-29
 

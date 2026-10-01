@@ -444,6 +444,39 @@ export const OpensPickerFromButton = {
   }
 };
 
+// Num campo estreito (tela de celular) um nome longo é cortado com reticências em vez de estourar a zona, tanto o
+// do arquivo quanto o da pasta no resumo.
+export const LongNamesFit = {
+  render: () => {
+    const wrap = column(
+      createFileInput({ label: "Arquivo", lang: "pt" }),
+      createFileInput({ label: "Pasta", directory: true, lang: "pt" })
+    );
+    for (const host of Array.from(wrap.children) as HTMLElement[]) host.style.width = "14rem";
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const [fileHost, folderHost] = Array.from(canvasElement.querySelectorAll("ark-file-input")) as FileInputEl[];
+    const long = "um-nome-bem-comprido-para-testar-o-corte-em-tela-estreita";
+
+    fileHost.inputElement.files = fileList(`${long}.json`);
+    fileHost.inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    dropEntries(folderHost.querySelector('[data-ark="file-input-zone"]') as HTMLElement, {
+      folder: long,
+      files: [new File(["a"], "a.bru")]
+    });
+    await waitFor(() => expect(folderHost.files).toHaveLength(1));
+
+    for (const host of [fileHost, folderHost]) {
+      const zone = host.querySelector('[data-ark="file-input-zone"]') as HTMLElement;
+      const name = host.querySelector('[data-ark="file-input-list"] li span') as HTMLElement;
+      await expect(zone.scrollWidth).toBeLessThanOrEqual(zone.clientWidth);
+      await expect(name.textContent).toContain(long);
+      await expect(name.scrollWidth).toBeGreaterThan(name.clientWidth);
+    }
+  }
+};
+
 export const TestHooks = {
   render: () => createFileInput({ label: "Hooks", helper: "Ajuda", lang: "pt", testid: "meu-arquivo" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

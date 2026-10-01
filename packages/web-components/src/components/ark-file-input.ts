@@ -474,8 +474,9 @@ export class ArkFileInput extends HTMLElementBase {
     const directory = this.directory;
     const text = this.getSizing().text;
     this.listEl.textContent = "";
+    // max-w-full: centrada na zona, a lista teria a largura do nome mais longo e o truncate dos itens nunca cortaria.
     this.listEl.className = [
-      "ark:m-0 ark:flex ark:list-none ark:flex-col ark:items-center ark:gap-0.5 ark:p-0",
+      "ark:m-0 ark:flex ark:max-w-full ark:list-none ark:flex-col ark:items-center ark:gap-0.5 ark:p-0",
       text
     ].join(" ");
     if (files.length === 0) {
