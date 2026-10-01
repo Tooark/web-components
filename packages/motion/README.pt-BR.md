@@ -127,8 +127,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                           | Versão  | Descrição                                                            |
 | ---------------------------------------------------------------- | ------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.4.0  | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.4.0  | Design tokens (cores, tamanhos, motion) e tipos primitivos           |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.5.0  | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.5.0  | Design tokens (cores, tamanhos, motion) e tipos primitivos           |
 | [`motion`](https://www.npmjs.com/package/motion)                 | ^13.4.4 | Biblioteca de animação Motion (spring, scroll, gestos)               |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1  | Helpers de runtime do TypeScript                                     |
 
