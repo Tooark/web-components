@@ -31,7 +31,7 @@ The `@tooark/code` package provides:
 - `language` json / javascript / yaml / text, line numbers, folding, search (Ctrl+F), bracket matching, active line, placeholder, `readonly`, `wrap`, `min-height`;
 - Tab indents (Shift+Tab outdents; Esc then Tab leaves the editor), `indent-style` spaces or tabs, `indent-size`, `line-ending` `auto`/`lf`/`crlf` converted at the value boundary;
 - completions: the language's own, `variableKeys` after `{{`, `completions` (words in any language) and `completionSource`; `autocomplete="false"` turns them off;
-- optional, off until you pass them: `variables` paints each `{{key}}` with its variable's intent (free-form scope, hover tooltip with scope and value), `mark-unknown-variables` flags keys that are not defined, and `single-line` turns the editor into a one-line field at control height (`size`), Enter emitting `ark-submit`;
+- optional, off until you pass them: `variables` paints each `{{key}}` with its variable's intent (free-form scope, hover tooltip with scope and value), `mark-unknown-variables` flags keys that are not defined, `single-line` turns the editor into a one-line field at control height (`size`), Enter emitting `ark-submit`, and `extensions` adds your own CodeMirror extensions after the library's (a grammar it does not ship, a blame gutter, decorations);
 - `format()` and Shift+Alt+F: JSON built in with the configured indentation, other languages through the `formatter` hook (Prettier stays in the app);
 - chrome on the `--ark-color-*` tokens with fallbacks, `theme="auto"` following the page at runtime; `createCodeEditor` engine without the element;
 - CodeMirror packages as peer dependencies, so the page keeps one copy of `@codemirror/state`.
@@ -67,7 +67,7 @@ In React, Vue or Angular use the tag directly (the framework READMEs show how); 
 ### `ark-code-editor`
 
 - Attributes: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (default `8rem`), `line-numbers` and `fold` (on; `"false"` turns off), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (default 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` and `autocomplete` (on; `"false"` turns off), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, default `md`: font and side padding, plus the height in `single-line`), `theme`, `aria-label` (names the editable content, CodeMirror's `role="textbox"`), `testid`.
-- Properties: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (the `EditorView`), and one per attribute except `aria-label` and `testid`; methods `format()`, `focus()`.
+- Properties: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `extensions`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (the `EditorView`), and one per attribute except `aria-label` and `testid`; methods `format()`, `focus()`.
 - Events: `change` (`detail: { value }`, user edits only), `ark-format-error` (`detail: { error }`), `ark-submit` (`detail: { value }`, Enter in `single-line`).
 - Keys: Ctrl/Cmd+F search, Ctrl/Cmd+Z undo, Ctrl+Y redo (Cmd+Shift+Z on macOS), Ctrl+Space completions, Shift+Alt+F format, Tab/Shift+Tab indent, Esc+Tab leave, Ctrl+M (Shift+Alt+M on macOS) toggles CodeMirror's tab-focus mode.
 - Hooks: the CodeMirror root carries `data-ark="code-editor"` and the `testid` as `data-testid`; each painted variable `data-ark="code-editor-variable"` with `data-key`; its tooltip `data-ark="code-editor-variable-tooltip"`.
@@ -85,11 +85,21 @@ Nothing changes until the app passes `variables` or sets `mark-unknown-variables
 
 `single-line` makes a field such as a URL bar: the height of the controls of the same `size` (it lines up with `ark-button` and `ark-input`), no gutters and no active line, Enter emits `ark-submit` instead of breaking the line (when the completion list is open, Enter accepts the completion), pasted line breaks are removed as in an `<input>`, Tab leaves the field and Ctrl/Cmd+F is left to the browser. Turning it on over a multi-line text joins the lines without a `change`. Variables and completions work the same.
 
+### App extensions
+
+Nothing changes until the app assigns `extensions`, a JS property taking CodeMirror extensions (`ArkCodeExtension`, CodeMirror's `Extension`: one or a list).
+
+- They come after the library's own: at the same precedence, the library's keymaps, gutters and language go first. Wrap one in `Prec.high` (from `@codemirror/state`) to put it before them, such as a blame gutter to the left of the line numbers.
+- A grammar the library does not ship (`@codemirror/language-data` picks one by file name and loads only that one) needs `language="text"`, the default: with `json`, `javascript` or `yaml` the library's grammar wins. It is highlighted with the library's syntax colors. The editor still sees `text`, so `canFormat` is false unless a `formatter` is set, and the formatter receives `"text"`.
+- Assigning a new value reconfigures the same editor (text, history and selection stay); assigning the same reference does nothing, so keep it stable (module scope, or `useMemo` in React). `null` or `[]` removes them, and they stay when the element moves in the DOM.
+- Build them from the same `@codemirror/*` copies the editor uses (they are peer dependencies): a second `@codemirror/state` throws "Unrecognized extension value", and a grammar from a second `@codemirror/language` is not highlighted.
+- In `single-line` the app's extensions stay on: leave gutters out of a one-line field.
+
 ### Engine
 
-- `createCodeEditor(parent, options)` → `{ view, getValue, setValue, setLanguage, setTheme, setReadonly, setPlaceholder, setLineNumbers, setFold, setWrap, setMinHeight, setIndent, setLineEnding, resolvedLineEnding, setTabIndent, setAutocomplete, setVariableKeys, setVariables, setMarkUnknownVariables, setSingleLine, setSize, setCompletions, setCompletionSource, setFormatter, format, canFormat, resolvedTheme, focus, destroy }`; the options mirror the attributes and properties, plus `onChange`, `onFormatError` and `onSubmit`.
+- `createCodeEditor(parent, options)` → `{ view, getValue, setValue, setLanguage, setTheme, setReadonly, setPlaceholder, setLineNumbers, setFold, setWrap, setMinHeight, setIndent, setLineEnding, resolvedLineEnding, setTabIndent, setAutocomplete, setVariableKeys, setVariables, setMarkUnknownVariables, setSingleLine, setSize, setCompletions, setCompletionSource, setFormatter, setExtensions, format, canFormat, resolvedTheme, focus, destroy }`; the options mirror the attributes and properties, plus `onChange`, `onFormatError` and `onSubmit`.
 - `resolveCodeTheme(theme, element)`.
-- Types: `ArkCodeEditorInstance`, `ArkCodeEditorOptions`, `ArkCodeVariable`, `ArkCodeLanguage`, `ArkCodeTheme`, `ArkCodeIndentStyle`, `ArkCodeLineEnding`, `ArkCodeCompletion`, `ArkCodeCompletionSource`, `ArkCodeFormatter`.
+- Types: `ArkCodeEditorInstance`, `ArkCodeEditorOptions`, `ArkCodeVariable`, `ArkCodeLanguage`, `ArkCodeTheme`, `ArkCodeIndentStyle`, `ArkCodeLineEnding`, `ArkCodeCompletion`, `ArkCodeCompletionSource`, `ArkCodeFormatter`, `ArkCodeExtension`.
 
 ---
 
@@ -150,6 +160,36 @@ editor.completions = [
 ];
 editor.formatter = (value) => dump(load(value), { indent: editor.indentSize });
 editor.addEventListener("ark-format-error", (event) => toast.error(String((event as CustomEvent).detail.error)));
+```
+
+### A code viewer with any language and a blame gutter
+
+```ts
+import { LanguageDescription } from "@codemirror/language";
+import { languages } from "@codemirror/language-data"; // your dependency, not the library's
+import { Prec } from "@codemirror/state";
+import { GutterMarker, gutter } from "@codemirror/view";
+
+class Author extends GutterMarker {
+  constructor(readonly text: string) {
+    super();
+  }
+  toDOM() {
+    return document.createTextNode(this.text);
+  }
+}
+
+const viewer = document.querySelector("ark-code-editor")!; // readonly, language left at "text"
+const grammar = await LanguageDescription.matchFilename(languages, file.path)?.load(); // loads only this one
+const blame = gutter({
+  class: "blame",
+  lineMarker: (view, line) => {
+    const author = file.blame.get(view.state.doc.lineAt(line.from).number);
+    return author ? new Author(author) : null;
+  },
+});
+viewer.extensions = [grammar ?? [], Prec.high(blame)]; // Prec.high: left of the line numbers
+viewer.value = file.content;
 ```
 
 ---

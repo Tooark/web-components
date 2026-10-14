@@ -9,6 +9,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-code-editor`: opt-in `extensions` (a JS property; the `extensions` option and `setExtensions()` of the
+  `createCodeEditor` engine; type `ArkCodeExtension`) adds the app's own CodeMirror extensions after the package's.
+  This covers a grammar the package does not ship, such as one `@codemirror/language-data` loads by file name (with
+  `language` left at `text`; it is highlighted with the package's syntax colors), a gutter such as blame
+  (`Prec.high` puts it before the line numbers), or decorations such as search hits. A new value reconfigures the
+  same editor, keeping text, history and selection, and the same reference does nothing. The extensions also come
+  back when the element is recreated after moving in the DOM, which a one-off `view.dispatch` from the app would
+  lose. Without it the editor is unchanged. An `Extensions` story shows a code viewer: a grammar from outside the
+  package, a blame gutter and highlighted search hits.
+
 ## [1.5.0] - 2026-10-01
 
 ### Added
