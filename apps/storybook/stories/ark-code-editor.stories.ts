@@ -1,7 +1,20 @@
+import { StreamLanguage, type StreamParser } from "@codemirror/language";
+import { Prec } from "@codemirror/state";
+import {
+  Decoration,
+  type DecorationSet,
+  EditorView,
+  GutterMarker,
+  gutter,
+  MatchDecorator,
+  ViewPlugin,
+  type ViewUpdate
+} from "@codemirror/view";
 import type {
   ArkCodeCompletion,
   ArkCodeCompletionSource,
   ArkCodeEditor,
+  ArkCodeExtension,
   ArkCodeFormatter,
   ArkCodeIndentStyle,
   ArkCodeLanguage,
@@ -36,6 +49,7 @@ type StoryArgs = {
   markUnknownVariables: boolean;
   singleLine: boolean;
   formatter: boolean;
+  extensions: boolean;
   testid?: string;
 };
 
@@ -100,6 +114,174 @@ const exampleCompletionSource: ArkCodeCompletionSource = (context) => {
   return { from: match.to - typed.length, options: types.map((label) => ({ label, type: "constant" })) };
 };
 
+// Exemplo de `extensions`: um arquivo de uma linguagem que a lib não traz, com blame e os resultados de uma busca.
+const GO_SAMPLE = `package search
+
+import (
+\t"context"
+\t"strings"
+)
+
+// Handler responde à busca com os trechos encontrados.
+type Handler struct {
+\tindex *Index
+\tlimit int
+}
+
+func (h *Handler) Search(ctx context.Context, query string) ([]Match, error) {
+\tif strings.TrimSpace(query) == "" {
+\t\treturn nil, nil
+\t}
+\treturn h.index.Find(ctx, query, h.limit)
+}`;
+
+// Gramática no formato das do @codemirror/legacy-modes (as que o @codemirror/language-data carrega pelo nome do
+// arquivo): um Go resumido, linha a linha, o bastante para mostrar a gramática do app com as cores do tema da lib.
+const GO_KEYWORDS = new Set(["package", "import", "type", "struct", "func", "if", "else", "for", "range", "return"]);
+const GO_ATOMS = new Set(["nil", "true", "false"]);
+const goParser: StreamParser<unknown> = {
+  name: "go",
+  token(stream) {
+    if (stream.eatSpace()) return null;
+    if (stream.match("//")) {
+      stream.skipToEnd();
+      return "comment";
+    }
+    const quote = stream.peek();
+    if (quote === '"' || quote === "`") {
+      stream.next();
+      while (!stream.eol()) {
+        const ch = stream.next();
+        if (ch === "\\" && quote === '"') stream.next();
+        else if (ch === quote) break;
+      }
+      return "string";
+    }
+    if (stream.match(/^\d[\d_.]*/)) return "number";
+    if (stream.match(/^[A-Za-z_]\w*/)) {
+      const word = stream.current();
+      if (GO_KEYWORDS.has(word)) return "keyword";
+      return GO_ATOMS.has(word) ? "atom" : "variableName";
+    }
+    stream.next();
+    return /[{}()[\],;.]/.test(stream.current()) ? "punctuation" : "operator";
+  }
+};
+
+// Blame de exemplo: autor e data na primeira linha de cada bloco, como nas telas de blame.
+const BLAME = new Map([
+  [1, "ana · 2025-11-03"],
+  [8, "bruno · 2026-02-17"],
+  [14, "carla · 2026-09-30"]
+]);
+
+class BlameMarker extends GutterMarker {
+  readonly text: string;
+
+  constructor(text: string) {
+    super();
+    this.text = text;
+  }
+
+  eq(other: BlameMarker): boolean {
+    return other.text === this.text;
+  }
+
+  toDOM(): Node {
+    return document.createTextNode(this.text);
+  }
+}
+
+const blameGutter = gutter({
+  class: "cm-blame",
+  lineMarker: (view, line) => {
+    const text = BLAME.get(view.state.doc.lineAt(line.from).number);
+    return text ? new BlameMarker(text) : null;
+  }
+});
+
+// Os resultados da busca ("query"), destacados no texto como num visualizador de busca de código.
+const HITS = new MatchDecorator({ regexp: /query/g, decoration: Decoration.mark({ class: "cm-search-hit" }) });
+const searchHits = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet;
+
+    constructor(view: EditorView) {
+      this.decorations = HITS.createDeco(view);
+    }
+
+    update(update: ViewUpdate): void {
+      this.decorations = HITS.updateDeco(update, this.decorations);
+    }
+  },
+  { decorations: (plugin) => plugin.decorations }
+);
+
+const exampleTheme = EditorView.theme({
+  ".cm-blame .cm-gutterElement": { padding: "0 0.75rem 0 0.5rem", color: "var(--ark-color-fg-muted, #64748b)" },
+  ".cm-search-hit": { backgroundColor: "var(--ark-color-warning-soft, #fef3c7)", borderRadius: "2px" }
+});
+
+// Uma referência só: atribuir a mesma lista de novo não reconfigura o editor. Prec.high põe o blame antes da numeração.
+const EXAMPLE_EXTENSIONS: ArkCodeExtension = [
+  StreamLanguage.define(goParser),
+  Prec.high(blameGutter),
+  searchHits,
+  exampleTheme
+];
+
+// O mesmo exemplo para o "Show code", como um app faria: a gramática vem do @codemirror/language-data.
+const EXTENSIONS_IMPORTS = [
+  'import { LanguageDescription } from "@codemirror/language";',
+  'import { languages } from "@codemirror/language-data";',
+  'import { Prec } from "@codemirror/state";',
+  'import { Decoration, EditorView, GutterMarker, gutter, MatchDecorator, ViewPlugin } from "@codemirror/view";'
+];
+const EXTENSIONS_CODE = `// A gramática pelo nome do arquivo: o language-data baixa só a do Go.
+const go = await LanguageDescription.matchFilename(languages, "handler.go").load();
+
+class BlameMarker extends GutterMarker {
+  constructor(text) {
+    super();
+    this.text = text;
+  }
+  eq(other) {
+    return other.text === this.text;
+  }
+  toDOM() {
+    return document.createTextNode(this.text);
+  }
+}
+const blame = new Map([[1, "ana · 2025-11-03"], [8, "bruno · 2026-02-17"], [14, "carla · 2026-09-30"]]);
+const blameGutter = gutter({
+  class: "cm-blame",
+  lineMarker: (view, line) => {
+    const text = blame.get(view.state.doc.lineAt(line.from).number);
+    return text ? new BlameMarker(text) : null;
+  }
+});
+
+const hits = new MatchDecorator({ regexp: /query/g, decoration: Decoration.mark({ class: "cm-search-hit" }) });
+const searchHits = ViewPlugin.fromClass(
+  class {
+    constructor(view) {
+      this.decorations = hits.createDeco(view);
+    }
+    update(update) {
+      this.decorations = hits.updateDeco(update, this.decorations);
+    }
+  },
+  { decorations: (plugin) => plugin.decorations }
+);
+
+const theme = EditorView.theme({
+  ".cm-blame .cm-gutterElement": { padding: "0 0.75rem 0 0.5rem", color: "var(--ark-color-fg-muted)" },
+  ".cm-search-hit": { backgroundColor: "var(--ark-color-warning-soft)", borderRadius: "2px" }
+});
+
+// Uma referência estável (fora do render, ou num useMemo); Prec.high põe o blame antes da numeração.
+editor.extensions = [go, Prec.high(blameGutter), searchHits, theme];`;
+
 // Atributos que os args ligam, fora dos padroes do elemento: a mesma lista monta o elemento e o "Show code".
 function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
   const attributes: Array<[string, string]> = [];
@@ -126,6 +308,8 @@ function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
 
 // Sem `value` nos args, o texto e o exemplo da linguagem.
 function textOf(args: Partial<StoryArgs>): string {
+  // Com o exemplo de `extensions` e sem linguagem da lib, o texto é o arquivo Go que a gramática do exemplo realça.
+  if (args.value === undefined && args.extensions && (args.language ?? "text") === "text") return GO_SAMPLE;
   return args.value ?? SAMPLES[args.language ?? "text"];
 }
 
@@ -137,6 +321,7 @@ function createEditor(args: Partial<StoryArgs>): ArkCodeEditor {
   if (args.completions?.length) el.completions = args.completions;
   if (args.completionSource) el.completionSource = exampleCompletionSource;
   if (args.formatter) el.formatter = exampleFormatter;
+  if (args.extensions) el.extensions = EXAMPLE_EXTENSIONS;
   el.style.maxWidth = "720px";
   el.value = textOf(args);
   return el;
@@ -169,6 +354,7 @@ function snippet(args: Partial<StoryArgs>): string {
       ? `<ark-code-editor\n${attributes.map((attribute) => `  ${attribute}`).join("\n")}\n></ark-code-editor>`
       : `<ark-code-editor${attributes.map((attribute) => ` ${attribute}`).join("")}></ark-code-editor>`;
   const script = [
+    ...(args.extensions ? EXTENSIONS_IMPORTS : []),
     'import { registerTooarkCode } from "@tooark/code";',
     "",
     "registerTooarkCode();",
@@ -180,6 +366,7 @@ function snippet(args: Partial<StoryArgs>): string {
   if (args.completions?.length) script.push(`editor.completions = ${literal(args.completions)};`);
   if (args.completionSource) script.push(`editor.completionSource = ${COMPLETION_SOURCE_CODE};`);
   if (args.formatter) script.push(`editor.formatter = ${FORMATTER_CODE};`);
+  if (args.extensions) script.push("", EXTENSIONS_CODE, "");
   script.push('editor.addEventListener("change", (event) => console.log("change", event.detail.value));');
   if (args.singleLine) {
     script.push('editor.addEventListener("ark-submit", (event) => console.log("ark-submit", event.detail.value));');
@@ -203,6 +390,7 @@ const COMPLETION = "Completions";
 const VARIABLES = "Variaveis (opcional)";
 const SINGLE_LINE = "Campo de uma linha (opcional)";
 const FORMAT = "Formatacao";
+const EXTENSIONS = "Extensões do app (opcional)";
 const EVENTS = "Eventos";
 const READ = "Leitura e metodos";
 
@@ -219,10 +407,10 @@ const meta = {
           "- **Linguagens**: `json`, `javascript`, `yaml` e `text`, com realce, dobra, busca (Ctrl+F), pares e linha ativa.",
           "- **Completions**: as da linguagem, `variableKeys` depois de `{{`, `completions` em qualquer linguagem e `completionSource` com contexto.",
           "- **Formatacao**: `format()` e Shift+Alt+F; JSON de fabrica, outras linguagens pelo `formatter` do app.",
-          "- **Opcionais**, desligados ate o app pedir: `variables` pinta cada `{{chave}}` pelo intent da variavel (escopo livre, com tooltip), `mark-unknown-variables` marca a chave desconhecida e `single-line` vira um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`.",
+          "- **Opcionais**, desligados ate o app pedir: `variables` pinta cada `{{chave}}` pelo intent da variavel (escopo livre, com tooltip), `mark-unknown-variables` marca a chave desconhecida, `single-line` vira um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`, e `extensions` soma extensões do CodeMirror do app (gramáticas que a lib não traz, calhas, decorações).",
           "- **Tema**: `auto` segue o color-scheme da pagina e acompanha a troca em tempo de execucao; o chrome usa os tokens `--ark-color-*` com fallback.",
           "",
-          'O **Playground** tem todos os parametros nos controles, agrupados como na tabela (as propriedades JS `variableKeys`, `variables` e `completions` se editam em JSON; `completionSource` e `formatter` ligam um exemplo). Abaixo do editor ficam os botoes de `format()` e `focus()` e o registro dos eventos; "Show code" de cada story mostra o HTML e o JS equivalentes.'
+          'O **Playground** tem todos os parametros nos controles, agrupados como na tabela (as propriedades JS `variableKeys`, `variables` e `completions` se editam em JSON; `completionSource`, `formatter` e `extensions` ligam um exemplo). Abaixo do editor ficam os botoes de `format()` e `focus()` e o registro dos eventos; "Show code" de cada story mostra o HTML e o JS equivalentes.'
         ].join("\n")
       },
       source: {
@@ -386,6 +574,12 @@ const meta = {
       description: "Leitura: se a linguagem atual tem como ser formatada (JSON ou `formatter`).",
       table: row(FORMAT, "boolean")
     },
+    extensions: {
+      control: "boolean",
+      description:
+        "Propriedade JS com extensões do CodeMirror do app, depois das da lib e sem recriar o editor: gramáticas que a lib não traz (só valem com `language` em `text`), calhas, decorações. O controle liga o exemplo: um arquivo Go com blame e os resultados de uma busca destacados.",
+      table: row(EXTENSIONS, "ArkCodeExtension", "[]")
+    },
     change: {
       control: false,
       description: "A cada edicao do usuario (nao em atribuicoes a `value`), com o fim de linha configurado.",
@@ -447,7 +641,8 @@ const meta = {
     variables: [],
     markUnknownVariables: false,
     singleLine: false,
-    formatter: false
+    formatter: false,
+    extensions: false
   }
 };
 
@@ -1279,6 +1474,7 @@ export const Properties = {
     expect(editor.singleLine).toBe(false);
     expect(editor.size).toBe("md");
     expect(editor.variables).toEqual([]);
+    expect(editor.extensions).toEqual([]);
     expect(root.classList.contains("cm-ark-single-line")).toBe(false);
 
     // Recuo e fim de linha: setter reflete, getter valida.
@@ -1424,5 +1620,79 @@ export const AccessibleName = {
     await expect(content).toHaveAttribute("aria-label", "Resposta");
     editor.removeAttribute("aria-label");
     await expect(content.hasAttribute("aria-label")).toBe(false);
+  }
+};
+
+// Ordem das calhas na tela, pela classe de cada uma.
+function gutterOrder(editor: ArkCodeEditor): string[] {
+  return Array.from(editor.querySelectorAll(".cm-gutters > .cm-gutter")).map((el) =>
+    el.classList.contains("cm-blame") ? "blame" : el.classList.contains("cm-lineNumbers") ? "numbers" : "fold"
+  );
+}
+
+// Span do realce que contém exatamente `text` (a gramática quebra a linha em um span por token).
+function tokenSpan(editor: ArkCodeEditor, text: string): HTMLElement | undefined {
+  return Array.from(editor.querySelectorAll<HTMLElement>(".cm-line span")).find((el) => el.textContent === text);
+}
+
+export const Extensions = {
+  args: { language: "text", theme: "light", readonly: true, minHeight: "8rem", extensions: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          '`extensions` (propriedade JS) soma extensões do CodeMirror do app às da lib, sem recriar o editor. Aqui, um visualizador de busca de código: uma gramática que a lib não traz (um Go resumido no formato das do `@codemirror/legacy-modes`, as que o `@codemirror/language-data` carrega pelo nome do arquivo, como no "Show code"), uma calha de blame posta antes da numeração com `Prec.high` e os resultados da busca destacados. A gramática do app sai com as cores do tema da lib e só vale com `language` em `text`: com outra linguagem, a da lib vence. A mesma referência atribuída de novo não reconfigura nada, então um app React passa uma lista estável (fora do render ou num `useMemo`).'
+      }
+    }
+  },
+  render: (args: StoryArgs) => createEditor(args),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const view = editor.view!;
+    // O instrumentador do Storybook embrulha o que passa pelo expect: a identidade é comparada fora dele.
+    expect(editor.extensions === EXAMPLE_EXTENSIONS).toBe(true);
+
+    // A gramática do app com as cores do tema da lib (palavra-chave do tema claro).
+    await waitFor(() => expect(tokenSpan(editor, "func")).toBeDefined());
+    expect(getComputedStyle(tokenSpan(editor, "func")!).color).toBe("rgb(109, 40, 217)");
+    // A calha do app antes da numeração (Prec.high), com o autor na primeira linha de cada bloco.
+    expect(gutterOrder(editor)).toEqual(["blame", "numbers", "fold"]);
+    const blame = Array.from(editor.querySelectorAll<HTMLElement>(".cm-blame .cm-gutterElement"))
+      .map((el) => el.textContent)
+      .filter(Boolean);
+    expect(blame).toEqual(["ana · 2025-11-03", "bruno · 2026-02-17", "carla · 2026-09-30"]);
+    expect(editor.querySelectorAll(".cm-search-hit").length).toBe(3);
+
+    // Com uma linguagem da lib, a dela vence: a palavra-chave do Go deixa de ser pintada como tal.
+    editor.setAttribute("language", "yaml");
+    await waitFor(() =>
+      expect(getComputedStyle(tokenSpan(editor, "func") ?? editor).color).not.toBe("rgb(109, 40, 217)")
+    );
+    editor.setAttribute("language", "text");
+    await waitFor(() => expect(tokenSpan(editor, "func")).toBeDefined());
+
+    // Tirar as extensões reconfigura o mesmo editor: texto intacto, sem calha, sem realce e sem destaques.
+    editor.extensions = null;
+    expect(editor.extensions).toEqual([]);
+    expect(editor.view === view).toBe(true);
+    await expect(editor.value).toBe(GO_SAMPLE);
+    expect(gutterOrder(editor)).toEqual(["numbers", "fold"]);
+    expect(tokenSpan(editor, "func")).toBeUndefined();
+    expect(editor.querySelectorAll(".cm-search-hit").length).toBe(0);
+
+    // Sem Prec, a calha do app entra depois das da lib.
+    editor.extensions = [blameGutter];
+    expect(gutterOrder(editor)).toEqual(["numbers", "fold", "blame"]);
+
+    // De volta, e o recurso sobrevive a mover o elemento no DOM (o editor é recriado ao reconectar).
+    editor.extensions = EXAMPLE_EXTENSIONS;
+    expect(gutterOrder(editor)).toEqual(["blame", "numbers", "fold"]);
+    const parent = editor.parentElement!;
+    editor.remove();
+    parent.append(editor);
+    expect(editor.view === view).toBe(false);
+    expect(gutterOrder(editor)).toEqual(["blame", "numbers", "fold"]);
+    await waitFor(() => expect(tokenSpan(editor, "func")).toBeDefined());
+    expect(editor.querySelectorAll(".cm-search-hit").length).toBe(3);
   }
 };
