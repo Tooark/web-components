@@ -4,6 +4,7 @@ import { type ArkCodeEditorInstance, createCodeEditor } from "../engine";
 import type {
   ArkCodeCompletion,
   ArkCodeCompletionSource,
+  ArkCodeExtension,
   ArkCodeFormatter,
   ArkCodeIndentStyle,
   ArkCodeLanguage,
@@ -21,6 +22,9 @@ function truthy(value: unknown): boolean {
   if (value === false || value === null || value === undefined || value === "false") return false;
   return Boolean(value);
 }
+
+/** Sem extensões do app; uma referência só, para `null` repetido não reconfigurar o editor. */
+const NO_EXTENSIONS: ArkCodeExtension = [];
 
 /**
  * Custom Element que renderiza um editor de código CodeMirror 6.
@@ -46,7 +50,9 @@ function truthy(value: unknown): boolean {
  * cada `{{chave}}` pelo intent da variável, com tooltip do escopo e do valor;
  * `mark-unknown-variables` pinta em `danger` a chave desconhecida;
  * `single-line` vira um campo de uma linha na altura dos controles (`size`),
- * com Enter emitindo `ark-submit` (`detail: { value }`).
+ * com Enter emitindo `ark-submit` (`detail: { value }`); a propriedade
+ * `extensions` soma extensões do CodeMirror do app (gramáticas que a lib não
+ * traz, calhas, decorações) às da lib, sem recriar o editor.
  */
 export class ArkCodeEditor extends HTMLElementBase {
   static readonly tagName = "ark-code-editor";
@@ -59,6 +65,8 @@ export class ArkCodeEditor extends HTMLElementBase {
   private items: ArkCodeCompletion[] = [];
   private source: ArkCodeCompletionSource | undefined;
   private formatFn: ArkCodeFormatter | undefined;
+  /** Extensões do app como vieram: a mesma referência atribuída de novo não reconfigura o editor. */
+  private exts: ArkCodeExtension = NO_EXTENSIONS;
   /** Para de observar o tema da página; só existe com `theme="auto"`. */
   private disposeTheme: (() => void) | null = null;
 
@@ -174,6 +182,21 @@ export class ArkCodeEditor extends HTMLElementBase {
   set formatter(next: ArkCodeFormatter | null | undefined) {
     this.formatFn = typeof next === "function" ? next : undefined;
     this.instance?.setFormatter(this.formatFn);
+  }
+
+  /**
+   * Extensões do CodeMirror do app (propriedade JS), depois das da lib: gramáticas que ela não traz (com `language`
+   * em "text"), calhas, decorações. Trocar reconfigura sem recriar o editor; `null` remove.
+   */
+  get extensions(): ArkCodeExtension {
+    return this.exts;
+  }
+
+  set extensions(next: ArkCodeExtension | null | undefined) {
+    const value = next !== null && typeof next === "object" ? next : NO_EXTENSIONS;
+    if (value === this.exts) return;
+    this.exts = value;
+    this.instance?.setExtensions(value);
   }
 
   /** Recuo com espaços ou tabulação (atributo `indent-style`). Padrão: "space". */
@@ -398,6 +421,7 @@ export class ArkCodeEditor extends HTMLElementBase {
       completions: this.items,
       completionSource: this.source,
       formatter: this.formatFn,
+      extensions: this.exts,
       onChange: (value) => {
         this.pendingValue = value;
         this.dispatchEvent(new CustomEvent("change", { detail: { value }, bubbles: true, composed: true }));
