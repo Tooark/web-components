@@ -64,6 +64,7 @@ import type {
   ArkCodeCompletion,
   ArkCodeCompletionSource,
   ArkCodeEditorOptions,
+  ArkCodeExtension,
   ArkCodeFormatter,
   ArkCodeIndentStyle,
   ArkCodeLanguage,
@@ -123,6 +124,8 @@ export type ArkCodeEditorInstance = {
   setCompletionSource(source: ArkCodeCompletionSource | undefined): void;
   /** Troca o formatador do app. */
   setFormatter(formatter: ArkCodeFormatter | undefined): void;
+  /** Troca as extensões do app sem recriar o editor (texto, histórico e seleção ficam); `[]` remove todas. */
+  setExtensions(extensions: ArkCodeExtension): void;
   /** Formata o documento (formatador do app, ou JSON nativo); `false` sem formatador ou quando falha. */
   format(): Promise<boolean>;
   /** Indica se há como formatar a linguagem atual. */
@@ -669,7 +672,7 @@ function formatJson(value: string, unit: string): string {
  * `variableKeys`, de `completions` e de `completionSource`), Tab para recuar com saída por Esc+Tab, recuo por
  * espaços ou tabulação, fim de linha LF/CRLF na fronteira do valor, formatação por Shift+Alt+F (JSON nativo ou o
  * `formatter` do app) e tema pelos tokens. Opcionais, ligados só pelas opções: `variables` pintadas por intent com
- * tooltip, `markUnknownVariables` e o campo `singleLine`.
+ * tooltip, `markUnknownVariables`, o campo `singleLine` e as `extensions` do app.
  */
 export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOptions = {}): ArkCodeEditorInstance {
   const language = new Compartment();
@@ -686,6 +689,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
   const variableMarks = new Compartment();
   const lineMode = new Compartment();
   const searchKeys = new Compartment();
+  const custom = new Compartment();
 
   let resolved = resolveCodeTheme(options.theme ?? "auto", parent);
   let applying = false;
@@ -819,7 +823,10 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
       lineMode.of(lineModeExtension()),
       EditorView.updateListener.of((update) => {
         if (update.docChanged && !applying) options.onChange?.(update.state.doc.toString().split("\n").join(eol()));
-      })
+      }),
+      // As do app vêm por último: na mesma precedência, keymaps, calhas e linguagem da lib vêm antes, e quem precisa
+      // passar à frente usa `Prec`.
+      custom.of(options.extensions ?? [])
     ]
   });
 
@@ -936,6 +943,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
     setFormatter: (next) => {
       formatter = next;
     },
+    setExtensions: (next) => view.dispatch({ effects: custom.reconfigure(next) }),
     format,
     canFormat: () => formatter !== undefined || currentLanguage === "json",
     resolvedTheme: () => resolved,

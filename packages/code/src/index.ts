@@ -13,6 +13,7 @@ export type {
   ArkCodeCompletion,
   ArkCodeCompletionSource,
   ArkCodeEditorOptions,
+  ArkCodeExtension,
   ArkCodeFormatter,
   ArkCodeIndentStyle,
   ArkCodeLanguage,

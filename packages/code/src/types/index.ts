@@ -1,4 +1,5 @@
 import type { Completion, CompletionContext, CompletionResult } from "@codemirror/autocomplete";
+import type { Extension } from "@codemirror/state";
 import type { ArkIntent, ArkSize, ArkThemeSelected } from "@tooark/tokens";
 
 /** Tema do editor. "auto" segue o color-scheme do host, ou a preferência do sistema sem lado fixo. */
@@ -26,6 +27,12 @@ export type ArkCodeCompletionSource = (
  * Sem ele, só `json` tem formatação (nativa, com o recuo configurado).
  */
 export type ArkCodeFormatter = (value: string, language: ArkCodeLanguage) => string | Promise<string>;
+
+/**
+ * Extensões do CodeMirror fornecidas pelo app (uma ou uma lista): gramáticas que a lib não traz, calhas próprias,
+ * decorações, keymaps. Entram depois das da lib; `Prec.high`/`Prec.highest` põem uma antes.
+ */
+export type ArkCodeExtension = Extension;
 
 /**
  * Variável `{{chave}}` informada pelo app: oferecida depois de `{{` e pintada no texto. O escopo é livre (a lib não
@@ -97,6 +104,11 @@ export type ArkCodeEditorOptions = {
   completionSource?: ArkCodeCompletionSource;
   /** Formatador do app; `format()` e Shift+Alt+F usam. */
   formatter?: ArkCodeFormatter;
+  /**
+   * Extensões do CodeMirror do app, somadas às da lib sem recriar o editor. Uma gramática própria pede
+   * `language: "text"`, senão a da lib vence. Padrão: nenhuma.
+   */
+  extensions?: ArkCodeExtension;
   /** Chamado a cada edição do usuário com o texto atual (não dispara em `setValue`). */
   onChange?: (value: string) => void;
   /** Chamado com o texto atual quando Enter é pressionado em `singleLine` (fora da lista de completions). */
