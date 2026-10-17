@@ -343,6 +343,63 @@ export const InputModeTyping = {
   }
 };
 
+export const EnterSubmitsForm = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Num formulario, Enter no campo confirma o texto digitado e, com o popup fechado, envia o formulario pelo botao padrao (aqui um `ark-button type="submit"`), como um `<input type="date">`. Texto invalido volta ao ultimo valor e nao envia; com o popup aberto, o Enter so confirma.'
+      }
+    }
+  },
+  render: () => {
+    const form = document.createElement("form");
+    form.className = "flex w-80 flex-col gap-3";
+    form.appendChild(createDatepicker({ input: true, mode: "date", lang: "pt", value: "2026-09-15", name: "entrega" }));
+    const submit = document.createElement("ark-button");
+    submit.setAttribute("type", "submit");
+    submit.textContent = "Filtrar";
+    form.appendChild(submit);
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form")!;
+    const picker = canvasElement.querySelector("ark-datepicker")!;
+    const input = canvasElement.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+    const popup = canvasElement.querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
+    const submits: string[] = [];
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submits.push(new FormData(form).get("entrega") as string);
+    });
+    const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 30));
+
+    // Foco sem clique: o clique no campo abriria o popup.
+    input.focus();
+    input.select();
+    await userEvent.keyboard("20/09/2026{Enter}");
+    await waitFor(() => expect(submits).toEqual(["2026-09-20"]));
+    expect(popup.matches(":popover-open")).toBe(false);
+
+    input.select();
+    await userEvent.keyboard("99/99/9999{Enter}");
+    await settle();
+    await expect(input.value).toBe("20/09/2026");
+    await expect(submits).toHaveLength(1);
+
+    await userEvent.click(input);
+    expect(popup.matches(":popover-open")).toBe(true);
+    input.select();
+    await userEvent.keyboard("21/09/2026{Enter}");
+    await settle();
+    await expect(picker).toHaveAttribute("value", "2026-09-21");
+    await expect(submits).toHaveLength(1);
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(popup.matches(":popover-open")).toBe(false));
+  }
+};
+
 export const CustomFormat = {
   args: { input: true, mode: "date", lang: "pt", format: "DD.MM.YYYY", placeholder: "dd.mm.aaaa" },
   render: Playground.render
