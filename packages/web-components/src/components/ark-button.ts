@@ -46,12 +46,29 @@ const STATUS_SVG: Record<Exclude<ArkButtonStatus, "idle">, string> = {
 
 let arkButtonIdCounter = 0;
 
+/** Tipos de `<input>` em que o Enter submete o formulário (os campos que bloqueiam a submissão implícita no HTML). */
+const IMPLICIT_SUBMIT_TYPES = new Set([
+  "text",
+  "search",
+  "email",
+  "url",
+  "tel",
+  "password",
+  "number",
+  "date",
+  "month",
+  "week",
+  "time",
+  "datetime-local"
+]);
+
 /**
  * Botão da família Ark.
  *
  * O PRÓPRIO host é o controle: recebe as classes, `role="button"`, foco,
  * teclado (Enter/Espaço) e participa de formulários via ElementInternals
- * (`type="submit"`/`"reset"`). Nenhum filho do usuário é movido ou envolvido,
+ * (`type="submit"`/`"reset"`; o primeiro de submit é o botão padrão do Enter
+ * nos campos do formulário). Nenhum filho do usuário é movido ou envolvido,
  * então frameworks que gerenciam os filhos (React, Vue, Angular) continuam
  * donos deles. Com `href`, um `<a>` "esticado" cobre o host, recebe o foco e
  * é nomeado pelo conteúdo do host (`aria-labelledby`).
@@ -69,6 +86,9 @@ export class ArkButton extends HTMLElementBase {
   private ownClasses: string[] = [];
   private syncingClass = false;
   private formDisabled = false;
+
+  /** Listener único de Enter no documento, instalado pelo primeiro botão conectado. */
+  private static implicitSubmitInstalled = false;
 
   /**
    * Atributos observados pelo componente, a que ele reage em attributeChangedCallback.
@@ -126,6 +146,7 @@ export class ArkButton extends HTMLElementBase {
    */
   connectedCallback(): void {
     upgradeProperties(this);
+    ArkButton.installImplicitSubmit();
     this.updateAppearance();
   }
 
@@ -292,6 +313,52 @@ export class ArkButton extends HTMLElementBase {
       }
     }, 0);
   };
+
+  // O navegador só reconhece como botão padrão do formulário um botão de submit nativo; um elemento form-associated
+  // nunca entra na submissão implícita, e um formulário com dois campos (login) não enviava no Enter. Fase de bolha:
+  // o Enter que um componente ou o app já cancelou fica com eles.
+  private static installImplicitSubmit(): void {
+    if (ArkButton.implicitSubmitInstalled) return;
+    ArkButton.implicitSubmitInstalled = true;
+    document.addEventListener("keydown", ArkButton.handleImplicitSubmit);
+  }
+
+  /** Enter num campo de texto do formulário clica o primeiro `ark-button` de submit, como o botão padrão nativo. */
+  private static readonly handleImplicitSubmit = (event: KeyboardEvent): void => {
+    if (event.key !== "Enter" || event.defaultPrevented || event.isComposing) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+
+    const field = event.composedPath()[0];
+    if (!(field instanceof HTMLInputElement) || !IMPLICIT_SUBMIT_TYPES.has(field.type) || !field.form) return;
+
+    const button = ArkButton.defaultButton(field.form);
+    if (!button) return;
+
+    // Sem o preventDefault, um formulário de campo único ainda seria submetido pelo navegador: dois envios.
+    event.preventDefault();
+
+    // Botão padrão desabilitado (ou carregando) bloqueia a submissão implícita, como no nativo.
+    if (!button.isDisabled()) button.click();
+  };
+
+  /** Primeiro `ark-button` de submit do formulário, ou nenhum quando há um submit nativo (o navegador já o clica). */
+  private static defaultButton(form: HTMLFormElement): ArkButton | null {
+    const elements = Array.from(form.elements);
+    // `form.elements` não lista o <input type="image">, que também é botão padrão.
+    const hasNativeSubmit =
+      form.querySelector('input[type="image" i]') !== null ||
+      elements.some(
+        (el) =>
+          (el instanceof HTMLButtonElement && el.type === "submit") ||
+          (el instanceof HTMLInputElement && (el.type === "submit" || el.type === "image"))
+      );
+    if (hasNativeSubmit) return null;
+
+    for (const el of elements) {
+      if (el instanceof ArkButton && el.type === "submit" && !el.hasAttribute("href")) return el;
+    }
+    return null;
+  }
 
   /**
    * Manipula o pressionamento de tecla no botão, tratando Enter e Espaço.
