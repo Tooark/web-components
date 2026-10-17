@@ -9,6 +9,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-10-16
+
 ### Fixed
 
 - `ark-button`: Enter in a text field of a form submits it through the first `type="submit"` `ark-button`, as with a
@@ -27,6 +29,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   the form, as `<input type="date">` does; an invalid entry (which reverts) or an open popup still keeps the Enter.
   `EnterSubmitsForm` story.
 
+### Changed
+
+- `@tooark/motion` depends on `motion` ^14.1.0 (was ^13.5.0). Motion 14.0 only removed internal APIs; the re-exported
+  primitives (`animate`, `hover`, `inView`, `press`, `scroll`, `spring`, `stagger`) are unchanged. The dependency
+  tables of the `@tooark/motion` and `@tooark/wysiwyg` READMEs now match their manifests.
 
 ## [1.6.0] - 2026-10-13
 
@@ -331,7 +338,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/Tooark/web-components/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Tooark/web-components/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/Tooark/web-components/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/Tooark/web-components/compare/v1.3.0...v1.4.0

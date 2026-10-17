@@ -124,15 +124,15 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                                        | Version | Description                                                              |
 | ---------------------------------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------ |
-| [`@tiptap/core`](https://www.npmjs.com/package/@tiptap/core)                                   | ^3.31.3 | Tiptap editor core (ProseMirror)                                         |
-| [`@tiptap/extension-highlight`](https://www.npmjs.com/package/@tiptap/extension-highlight)     | ^3.31.3 | Multicolor highlight mark (`<mark>`)                                     |
-| [`@tiptap/extension-image`](https://www.npmjs.com/package/@tiptap/extension-image)             | ^3.31.3 | Image node (base64 disabled)                                             |
-| [`@tiptap/extension-placeholder`](https://www.npmjs.com/package/@tiptap/extension-placeholder) | ^3.31.3 | Placeholder for the empty document                                       |
-| [`@tiptap/extension-text-align`](https://www.npmjs.com/package/@tiptap/extension-text-align)   | ^3.31.3 | Text alignment on paragraphs and headings                                |
-| [`@tiptap/extension-text-style`](https://www.npmjs.com/package/@tiptap/extension-text-style)   | ^3.31.3 | Text style mark with color                                               |
-| [`@tiptap/pm`](https://www.npmjs.com/package/@tiptap/pm)                                       | ^3.31.3 | ProseMirror packages used by Tiptap                                      |
-| [`@tiptap/starter-kit`](https://www.npmjs.com/package/@tiptap/starter-kit)                     | ^3.31.3 | Base nodes and marks (paragraph, heading, lists, bold, link, underline…) |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.6.0  | Design tokens (colors, sizes, motion) and primitive types                |
+| [`@tiptap/core`](https://www.npmjs.com/package/@tiptap/core)                                   | ^3.31.4 | Tiptap editor core (ProseMirror)                                         |
+| [`@tiptap/extension-highlight`](https://www.npmjs.com/package/@tiptap/extension-highlight)     | ^3.31.4 | Multicolor highlight mark (`<mark>`)                                     |
+| [`@tiptap/extension-image`](https://www.npmjs.com/package/@tiptap/extension-image)             | ^3.31.4 | Image node (base64 disabled)                                             |
+| [`@tiptap/extension-placeholder`](https://www.npmjs.com/package/@tiptap/extension-placeholder) | ^3.31.4 | Placeholder for the empty document                                       |
+| [`@tiptap/extension-text-align`](https://www.npmjs.com/package/@tiptap/extension-text-align)   | ^3.31.4 | Text alignment on paragraphs and headings                                |
+| [`@tiptap/extension-text-style`](https://www.npmjs.com/package/@tiptap/extension-text-style)   | ^3.31.4 | Text style mark with color                                               |
+| [`@tiptap/pm`](https://www.npmjs.com/package/@tiptap/pm)                                       | ^3.31.4 | ProseMirror packages used by Tiptap                                      |
+| [`@tiptap/starter-kit`](https://www.npmjs.com/package/@tiptap/starter-kit)                     | ^3.31.4 | Base nodes and marks (paragraph, heading, lists, bold, link, underline…) |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                               | ^1.6.1  | Design tokens (colors, sizes, motion) and primitive types                |
 | [`tslib`](https://www.npmjs.com/package/tslib)                                                 | ^2.8.1  | TypeScript runtime helpers                                               |
 
 ---
