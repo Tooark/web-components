@@ -414,8 +414,9 @@ export class ArkDatepicker extends HTMLElementBase {
     inputComp.addEventListener("keydown", (event) => {
       if ((event.target as HTMLElement | null)?.tagName !== "INPUT") return;
       if (event.key === "Enter") {
-        event.preventDefault();
-        this.commitTyped();
+        // Enter confirma o texto digitado. Com o popup fechado e o texto aceito, segue para o formulário (submissão
+        // implícita), como num <input type="date">; texto inválido volta ao último valor e não submete.
+        if (!this.commitTyped() || this.popupOpen) event.preventDefault();
       } else if (event.key === "ArrowDown") {
         event.preventDefault();
         this.openPopup();
@@ -598,9 +599,10 @@ export class ArkDatepicker extends HTMLElementBase {
     this.emitChange();
   };
 
-  private commitTyped(): void {
+  /** Aplica o texto digitado no campo; `false` quando ele era inválido e o campo voltou ao último valor válido. */
+  private commitTyped(): boolean {
     const input = this.inputComp?.inputElement;
-    if (!input) return;
+    if (!input) return true;
 
     const text = input.value.trim();
     const currentValue = this.getAttribute("value") || "";
@@ -612,25 +614,26 @@ export class ArkDatepicker extends HTMLElementBase {
         this.pushValueToChildren();
         this.emitChange();
       }
-      return;
+      return true;
     }
 
     const parsed = this.parseDisplay(text);
     if (!parsed) {
       // Entrada inválida: reverte para o último valor válido.
       this.updateInputDisplay();
-      return;
+      return false;
     }
 
     this.dateISO = parsed.dateISO ?? this.dateISO;
     this.timeISO = parsed.timeISO ?? this.timeISO;
     if (this.composeValue() === currentValue) {
       this.updateInputDisplay();
-      return;
+      return true;
     }
 
     this.pushValueToChildren();
     this.emitChange();
+    return true;
   }
 
   // --- Popup ---

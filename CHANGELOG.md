@@ -22,6 +22,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   app that worked around it by calling `requestSubmit()` on Enter should drop that code (or cancel the keydown) so
   the form is not submitted twice. `EnterSubmitsForm` and `EnterSubmitRules` stories, plus `ReactEnterSubmitsForm`
   with the React wrappers.
+- `ark-datepicker`: Enter in the field applied the typed text but always cancelled the key, so a form never
+  submitted from it. With the popup closed and a valid (or empty) entry, Enter now applies the text and goes on to
+  the form, as `<input type="date">` does; an invalid entry (which reverts) or an open popup still keeps the Enter.
+  `EnterSubmitsForm` story.
+
 
 ## [1.6.0] - 2026-10-13
 
