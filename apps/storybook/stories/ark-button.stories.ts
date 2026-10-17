@@ -453,6 +453,210 @@ export const SubmitsForm = {
   }
 };
 
+// Espera o setTimeout do handleClick, que adia o requestSubmit() para depois dos listeners do click.
+const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 30));
+
+export const EnterSubmitsForm = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Formulario de login: dois campos de texto e nenhum submit nativo, onde o navegador sozinho nao envia no Enter (um elemento form-associated nunca e o botao padrao). O primeiro `ark-button` com `type="submit"` faz esse papel: Enter em qualquer campo de texto do formulario o clica, com validacao e o `submit` do formulario.'
+      }
+    }
+  },
+  render: () => {
+    const form = document.createElement("form");
+    form.className = "flex w-80 flex-col gap-3";
+
+    const user = document.createElement("ark-input");
+    user.setAttribute("label", "E-mail");
+    user.setAttribute("name", "user");
+    user.setAttribute("type", "email");
+    form.appendChild(user);
+
+    const pass = document.createElement("ark-input");
+    pass.setAttribute("label", "Senha");
+    pass.setAttribute("name", "pass");
+    pass.setAttribute("type", "password");
+    pass.setAttribute("reveal", "");
+    form.appendChild(pass);
+
+    const el = document.createElement("ark-button");
+    el.setAttribute("type", "submit");
+    el.textContent = "Entrar";
+    form.appendChild(el);
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form")!;
+    const submits: string[][] = [];
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = new FormData(form);
+      submits.push([data.get("user") as string, data.get("pass") as string]);
+    });
+    const canvas = within(canvasElement);
+
+    await userEvent.type(canvas.getByLabelText("E-mail"), "ana@tooark.com");
+    await userEvent.type(canvas.getByLabelText("Senha"), "segredo{Enter}");
+    await waitFor(() => expect(submits).toEqual([["ana@tooark.com", "segredo"]]));
+
+    // Enter no primeiro campo tambem envia, e uma vez so por Enter.
+    await userEvent.type(canvas.getByLabelText("E-mail"), "{Enter}");
+    await settle();
+    await expect(submits).toHaveLength(2);
+  }
+};
+
+export const EnterSubmitRules = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Regras do Enter, as do botao padrao nativo: um submit nativo no formulario fica com o Enter, um `ark-button` padrao desabilitado ou em `loading` bloqueia o envio, o Enter que o app ou um componente ja cancelou fica com eles, `textarea` quebra linha, composicao de IME e Ctrl/Alt/Meta+Enter nao enviam, e `form="id"` num campo fora do `<form>` vale.'
+      }
+    }
+  },
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    // Um formulario isolado por caso: campos nativos, botoes de submit e a contagem de envios.
+    const setup = (fields = 2): { form: HTMLFormElement; inputs: HTMLInputElement[]; count: () => number } => {
+      const form = document.createElement("form");
+      const inputs = Array.from({ length: fields }, (_, index) => {
+        const input = document.createElement("input");
+        input.name = `campo${index}`;
+        input.setAttribute("aria-label", `Campo ${index}`);
+        form.appendChild(input);
+        return input;
+      });
+      let submits = 0;
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        submits++;
+      });
+      canvasElement.appendChild(form);
+      return { form, inputs, count: () => submits };
+    };
+    const submitButton = (form: HTMLFormElement, type = "submit"): ArkButton => {
+      const el = document.createElement("ark-button");
+      el.setAttribute("type", type);
+      el.textContent = "Enviar";
+      form.appendChild(el);
+      return el;
+    };
+    // KeyboardEvent feito a mao: o retorno de dispatchEvent diz se o Enter foi cancelado.
+    const enter = (target: Element, init: KeyboardEventInit = {}): KeyboardEvent => {
+      const event = new KeyboardEvent("keydown", {
+        key: "Enter",
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ...init
+      });
+      target.dispatchEvent(event);
+      return event;
+    };
+
+    // Dois campos: o Enter e cancelado (para o navegador nao agir junto) e vira o click no botao.
+    const login = setup();
+    const loginButton = submitButton(login.form);
+    let clicks = 0;
+    loginButton.addEventListener("click", () => clicks++);
+    await expect(enter(login.inputs[1]).defaultPrevented).toBe(true);
+    await settle();
+    await expect(clicks).toBe(1);
+    await expect(login.count()).toBe(1);
+
+    // Um campo so: o navegador submeteria sozinho; o preventDefault evita o envio duplo.
+    const single = setup(1);
+    submitButton(single.form);
+    await expect(enter(single.inputs[0]).defaultPrevented).toBe(true);
+    await settle();
+    await expect(single.count()).toBe(1);
+
+    // Com dois ark-button de submit, so o primeiro e clicado.
+    const pair = setup();
+    submitButton(pair.form);
+    const second = submitButton(pair.form);
+    let secondClicks = 0;
+    second.addEventListener("click", () => secondClicks++);
+    enter(pair.inputs[0]);
+    await settle();
+    await expect(pair.count()).toBe(1);
+    await expect(secondClicks).toBe(0);
+
+    // Um submit nativo, mesmo depois do ark-button, e o botao padrao do navegador: o Enter fica com ele.
+    const native = setup();
+    const nativeArk = submitButton(native.form);
+    const nativeButton = document.createElement("button");
+    nativeButton.type = "submit";
+    nativeButton.textContent = "Nativo";
+    native.form.appendChild(nativeButton);
+    let nativeArkClicks = 0;
+    nativeArk.addEventListener("click", () => nativeArkClicks++);
+    await expect(enter(native.inputs[0]).defaultPrevented).toBe(false);
+    await settle();
+    await expect(nativeArkClicks).toBe(0);
+
+    // Botao padrao desabilitado ou carregando: o Enter e cancelado e nada e enviado.
+    for (const state of ["disabled", "loading"]) {
+      const blocked = setup();
+      submitButton(blocked.form).setAttribute(state, "");
+      await expect(enter(blocked.inputs[0]).defaultPrevented).toBe(true);
+      await settle();
+      await expect(blocked.count()).toBe(0);
+    }
+
+    // O app cancela o click do botao: o Enter passa pelo mesmo caminho e tambem nao envia.
+    const cancelled = setup();
+    submitButton(cancelled.form).addEventListener("click", (event) => event.preventDefault());
+    enter(cancelled.inputs[0]);
+    await settle();
+    await expect(cancelled.count()).toBe(0);
+
+    // Enter ja cancelado pelo app (ou por um componente, como o ark-kv-editor) fica com quem o cancelou.
+    const consumed = setup();
+    submitButton(consumed.form);
+    consumed.inputs[0].addEventListener("keydown", (event) => event.preventDefault());
+    enter(consumed.inputs[0]);
+    await settle();
+    await expect(consumed.count()).toBe(0);
+
+    // Composicao de IME, modificadores, textarea, checkbox e formulario sem ark-button de submit: nada acontece.
+    const ignored = setup();
+    submitButton(ignored.form);
+    const area = document.createElement("textarea");
+    area.setAttribute("aria-label", "Notas");
+    const check = document.createElement("input");
+    check.type = "checkbox";
+    check.setAttribute("aria-label", "Lembrar");
+    ignored.form.append(area, check);
+    await expect(enter(ignored.inputs[0], { isComposing: true }).defaultPrevented).toBe(false);
+    await expect(enter(ignored.inputs[0], { ctrlKey: true }).defaultPrevented).toBe(false);
+    await expect(enter(area).defaultPrevented).toBe(false);
+    await expect(enter(check).defaultPrevented).toBe(false);
+    const plain = setup();
+    submitButton(plain.form, "button");
+    await expect(enter(plain.inputs[0]).defaultPrevented).toBe(false);
+    await settle();
+    await expect(ignored.count()).toBe(0);
+    await expect(plain.count()).toBe(0);
+
+    // Campo fora do <form>, ligado por form="id": envia o formulario dele.
+    const owner = setup(0);
+    owner.form.id = "ark-button-enter-owner";
+    submitButton(owner.form);
+    const outside = document.createElement("input");
+    outside.setAttribute("form", owner.form.id);
+    outside.setAttribute("aria-label", "Fora");
+    canvasElement.appendChild(outside);
+    await expect(enter(outside).defaultPrevented).toBe(true);
+    await settle();
+    await expect(owner.count()).toBe(1);
+  }
+};
+
 export const LinkIsFocusable = {
   render: AsLink.render,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

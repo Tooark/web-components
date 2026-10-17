@@ -37,7 +37,7 @@ import type {
 import { createElement, createRef, type ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
-import { expect, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
 
 // Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
@@ -110,6 +110,43 @@ export const ReactSubmitButton = {
     // Update depois do mount: o React regrava a prop só quando muda, mas o render não pode lançar.
     render(form("Salvar de novo"));
     await expect(errors).toEqual([]);
+  }
+};
+
+// O cenario do login do Arkcode: React 19, dois ArkInput e um ArkButton de submit; Enter na senha chega ao onSubmit.
+export const ReactEnterSubmitsForm = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const submits: string[][] = [];
+    const render = reactRoot(canvasElement, errors);
+    render(
+      createElement(
+        "form",
+        {
+          onSubmit: (event: SubmitEvent) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget as HTMLFormElement);
+            submits.push([data.get("user") as string, data.get("pass") as string]);
+          }
+        },
+        createElement(ReactArkInput, {
+          key: "user",
+          label: "E-mail",
+          name: "user",
+          type: "email",
+          value: "ana@tooark.com"
+        }),
+        createElement(ReactArkInput, { key: "pass", label: "Senha", name: "pass", type: "password", value: "segredo" }),
+        createElement(ReactArkButton, { key: "submit", type: "submit" }, "Entrar")
+      )
+    );
+    await expect(errors).toEqual([]);
+
+    const pass = canvasElement.querySelectorAll<HTMLInputElement>('[data-ark="input"]')[1];
+    pass.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(submits).toEqual([["ana@tooark.com", "segredo"]]));
   }
 };
 

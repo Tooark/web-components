@@ -9,6 +9,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `ark-button`: Enter in a text field of a form submits it through the first `type="submit"` `ark-button`, as with a
+  native submit button. The browser never makes a custom element the form's default button, so a form whose only
+  submit control was an `ark-button` did not submit on Enter when it had two or more text fields (a login form), and
+  with a single field it submitted without going through the button (its `click` listeners and the `loading` block
+  were skipped). Enter now takes the click path (`click` listeners, `preventDefault()`, then `requestSubmit()` with
+  validation): a native submit button in the form keeps the role, a `disabled` or `loading` default button blocks
+  the submission, and an Enter already cancelled by the app or a component, a `textarea`, IME composition and
+  Ctrl/Alt/Meta+Enter are left alone. Such forms now submit on Enter, as they would with a native submit button; an
+  app that worked around it by calling `requestSubmit()` on Enter should drop that code (or cancel the keydown) so
+  the form is not submitted twice. `EnterSubmitsForm` and `EnterSubmitRules` stories, plus `ReactEnterSubmitsForm`
+  with the React wrappers.
+
 ## [1.6.0] - 2026-10-13
 
 ### Added
