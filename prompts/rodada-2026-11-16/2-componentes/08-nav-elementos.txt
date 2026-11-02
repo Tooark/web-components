@@ -1,0 +1,18 @@
+feat(web-components): ark-nav, ark-nav-item e ark-nav-group
+
+Navegacao do app em tres apresentacoes: sidebar (padrao; cabecalho, rodape
+e botao de recolher presos nas pontas, so os itens rolam entre eles), navbar
+(barra horizontal sem barra de rolagem visivel; collapsed deixa so icones) e
+tabbar (abas de rodape do celular, icone sobre o texto). O item reusa o link
+esticado do ark-button: com href e um <a> real (Ctrl+clique e nova aba
+funcionam, aria-current="page" quando current), sem href e um role=button;
+o clique emite ark-navigate cancelavel para o app rotear. O grupo tem
+cabecalho por label, expansivel com open e ark-toggle. A sidebar recolhe
+(collapsed) para um trilho de icones, com os rotulos sr-only e title no
+item, ou, com collapsible="hidden", para so o logo e o botao de expandir;
+collapsible desenha o botao, que emite ark-collapse. value marca o item
+atual pelo value ou href dele. Larguras em --ark-nav-width e
+--ark-nav-rail-width; slot="header" e slot="footer" ordenados por CSS. As
+regras que escondem filhos ark-* (itens em hidden, badge no trilho, itens de
+grupo fechado) usam display: none !important, porque as utilities de display
+dos hosts venceriam a camada components.

@@ -1,0 +1,11 @@
+diff --git a/biome.json b/biome.json
+index e2bfc98632d1d916fda68585ac23ab04c0aa4438..7945376b8e80173a497d839e32d20a6c65d4f6f5 100644
+--- a/biome.json
++++ b/biome.json
+@@ -1,5 +1,5 @@
+ {
+-  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
++  "$schema": "https://biomejs.dev/schemas/2.6.5/schema.json",
+   "vcs": {
+     "enabled": true,
+     "clientKind": "git",

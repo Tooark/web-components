@@ -1,0 +1,1478 @@
+diff --git a/packages/angular/src/ark-data-view.component.ts b/packages/angular/src/ark-data-view.component.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..453465c7905285437c7d9db8459b3fc9038c7561
+--- /dev/null
++++ b/packages/angular/src/ark-data-view.component.ts
+@@ -0,0 +1,323 @@
++import {
++  type AfterContentChecked,
++  type AfterContentInit,
++  type AfterViewInit,
++  Component,
++  ContentChild,
++  ContentChildren,
++  CUSTOM_ELEMENTS_SCHEMA,
++  Directive,
++  ElementRef,
++  type EmbeddedViewRef,
++  EventEmitter,
++  Input,
++  inject,
++  type OnChanges,
++  type OnDestroy,
++  Output,
++  type QueryList,
++  type SimpleChanges,
++  TemplateRef,
++  ViewChild,
++  ViewContainerRef
++} from "@angular/core";
++import type {
++  ArkDataViewCardContext,
++  ArkDataViewCardRender,
++  ArkDataViewCellContext,
++  ArkDataViewColumn,
++  ArkDataViewKey,
++  ArkDataViewMode,
++  ArkDataViewQueryChangeDetail,
++  ArkDataViewReorderDetail,
++  ArkDataViewRow,
++  ArkDataViewRowClickDetail,
++  ArkDataViewSelectionChangeDetail,
++  ArkDataViewSort,
++  ArkDataViewView,
++  ArkDataViewViewChangeDetail,
++  ArkLang,
++  ArkSize,
++  ArkTheme
++} from "@tooark/core";
++import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
++import { ensureTooarkComponentsRegistered } from "./register";
++
++/** Contexto do template de uma célula: o registro em `let-row` (implícito) e o resto por nome (`let-value="value"`). */
++export type ArkDataViewCellTemplateContext = ArkDataViewCellContext & { $implicit: ArkDataViewRow };
++
++/** Contexto do template do corpo de um card: o registro em `let-row` (implícito) e `index`. */
++export type ArkDataViewCardTemplateContext = ArkDataViewCardContext & { $implicit: ArkDataViewRow };
++
++/**
++ * Conteúdo próprio das células de uma coluna do `ark-data-view-wrapper`, em template do Angular:
++ * `<ng-template arkDataViewCell="name" let-row let-value="value">...</ng-template>`. Vale sobre o `render` da coluna.
++ */
++@Directive({
++  selector: "ng-template[arkDataViewCell]",
++  standalone: true
++})
++export class ArkDataViewCellDirective {
++  /** `key` da coluna que este template desenha. */
++  @Input("arkDataViewCell") key = "";
++
++  readonly template = inject<TemplateRef<ArkDataViewCellTemplateContext>>(TemplateRef);
++
++  static ngTemplateContextGuard(
++    _directive: ArkDataViewCellDirective,
++    _context: unknown
++  ): _context is ArkDataViewCellTemplateContext {
++    return true;
++  }
++}
++
++/**
++ * Corpo de cada card do `ark-data-view-wrapper`, em template do Angular, no lugar da grade de campos:
++ * `<ng-template arkDataViewCard let-row let-index="index">...</ng-template>`. Vale sobre o input `cardRender`.
++ */
++@Directive({
++  selector: "ng-template[arkDataViewCard]",
++  standalone: true
++})
++export class ArkDataViewCardDirective {
++  readonly template = inject<TemplateRef<ArkDataViewCardTemplateContext>>(TemplateRef);
++
++  static ngTemplateContextGuard(
++    _directive: ArkDataViewCardDirective,
++    _context: unknown
++  ): _context is ArkDataViewCardTemplateContext {
++    return true;
++  }
++}
++
++@Component({
++  selector: "ark-data-view-wrapper",
++  standalone: true,
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
++  template: `
++  <ark-data-view
++    #dataView
++    [attr.testid]="testid"
++    [attr.row-key]="rowKey"
++    [attr.view]="view"
++    [attr.no-view-selector]="noViewSelector ? '' : null"
++    [attr.breakpoint]="breakpoint"
++    [attr.mode]="mode"
++    [attr.page]="page"
++    [attr.page-size]="pageSize"
++    [attr.page-sizes]="pageSizesAttr"
++    [attr.total]="total"
++    [attr.sort]="sortAttr"
++    [attr.search]="search || null"
++    [attr.searchable]="searchable ? '' : null"
++    [attr.search-placeholder]="searchPlaceholder"
++    [attr.search-debounce]="searchDebounce"
++    [attr.selectable]="selectable ? '' : null"
++    [attr.reorderable]="reorderable ? '' : null"
++    [attr.clickable]="clickable ? '' : null"
++    [attr.loading]="loading ? '' : null"
++    [attr.card-columns]="cardColumns"
++    [attr.label]="label"
++    [attr.size]="size"
++    [attr.theme]="theme"
++    [attr.lang]="lang"
++    [attr.locale-json]="localeJson">
++    <ng-content></ng-content>
++  </ark-data-view>`
++})
++export class ArkDataViewComponent
++  implements AfterContentChecked, AfterContentInit, AfterViewInit, OnChanges, OnDestroy
++{
++  constructor() {
++    ensureTooarkComponentsRegistered();
++  }
++
++  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
++  private readonly viewContainer = inject(ViewContainerRef);
++
++  /** O `ark-data-view` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
++  get element(): ArkDataViewElement | null {
++    return this.host.nativeElement.querySelector<ArkDataViewElement>(":scope > ark-data-view");
++  }
++
++  @Input() testid: string | undefined;
++  /** Registros (propriedade, não atributo; guardados por referência): uma lista nova renderiza de novo. */
++  @Input() rows: ArkDataViewRow[] | undefined;
++  /** Colunas (propriedade): qual campo aparece, onde e como; o conteúdo próprio vem de `ng-template[arkDataViewCell]`. */
++  @Input() columns: ArkDataViewColumn[] | undefined;
++  /** Campo que identifica cada registro. Padrão: "id". */
++  @Input() rowKey: string | undefined;
++  /** Apresentação ao carregar: "auto" (padrão), "table" ou "cards". */
++  @Input() view: ArkDataViewView | undefined;
++  /** Esconde o seletor de visualização do canto; `view` continua decidindo a apresentação. */
++  @Input() noViewSelector = false;
++  /** Largura do componente, em px, abaixo da qual "auto" mostra cards. Padrão: 640. */
++  @Input() breakpoint: number | undefined;
++  /** Quem busca, ordena e pagina: "client" (padrão) ou "server". */
++  @Input() mode: ArkDataViewMode | undefined;
++  @Input() page: number | undefined;
++  /** Itens por página; sem ele não há paginação. */
++  @Input() pageSize: number | undefined;
++  @Input() pageSizes: number[] | undefined;
++  /** Total de registros no servidor (mode "server"). */
++  @Input() total: number | undefined;
++  /** Ordenação atual: { key, direction } ou "chave:asc". */
++  @Input() sort: ArkDataViewSort | string | null | undefined;
++  @Input() search: string | undefined;
++  @Input() searchable = false;
++  @Input() searchPlaceholder: string | undefined;
++  /** Atraso em ms entre a última tecla e a consulta. Padrão: 300. */
++  @Input() searchDebounce: number | undefined;
++  @Input() selectable = false;
++  /** Chaves selecionadas (propriedade); atribuir não emite evento. */
++  @Input() selected: ArkDataViewKey[] | undefined;
++  @Input() reorderable = false;
++  @Input() clickable = false;
++  @Input() loading = false;
++  /** Colunas da grade de campos de cada card, de 1 a 4. Padrão: 2. */
++  @Input() cardColumns: number | undefined;
++  /** Desenha o corpo de cada card no lugar da grade de campos (propriedade); `ng-template[arkDataViewCard]` vale sobre ela. */
++  @Input() cardRender: ArkDataViewCardRender | undefined;
++  /** Nome acessível da tabela e da lista de cards. */
++  @Input() label: string | undefined;
++  @Input() size: ArkSize = "md";
++  @Input() theme: ArkTheme = "auto";
++  @Input() lang: ArkLang | undefined;
++  @Input() localeJson: string | undefined;
++  /** Página, itens por página, ordenação ou busca mudaram: detail é a consulta inteira mais `reason`. */
++  @Output() arkQueryChange = new EventEmitter<CustomEvent<ArkDataViewQueryChangeDetail>>();
++  /** O usuário trocou a apresentação no seletor. */
++  @Output() arkViewChange = new EventEmitter<CustomEvent<ArkDataViewViewChangeDetail>>();
++  /** Clique, Enter ou Espaço numa linha ou card (com clickable): detail é { row, key, index }. */
++  @Output() arkRowClick = new EventEmitter<CustomEvent<ArkDataViewRowClickDetail>>();
++  /** A seleção mudou por ação do usuário: detail é { selected, rows }. */
++  @Output() arkSelectionChange = new EventEmitter<CustomEvent<ArkDataViewSelectionChangeDetail>>();
++  /** Um registro foi movido: detail é { key, from, to, rows }. Persistir é do app. */
++  @Output() arkReorder = new EventEmitter<CustomEvent<ArkDataViewReorderDetail>>();
++
++  @ViewChild("dataView", { static: false }) viewRef!: ElementRef<ArkDataViewElement>;
++  /** Templates de célula e de card declarados dentro do wrapper. */
++  @ContentChildren(ArkDataViewCellDirective) cellTemplates: QueryList<ArkDataViewCellDirective> | undefined;
++  @ContentChild(ArkDataViewCardDirective) cardTemplate: ArkDataViewCardDirective | undefined;
++
++  /** Views dos templates, pelo nó que o elemento recebeu no lugar do conteúdo da célula (ou do corpo do card). */
++  private readonly embedded = new Map<HTMLElement, EmbeddedViewRef<unknown>>();
++  private templatesSubscription: { unsubscribe: () => void } | undefined;
++  /** Template de card em uso no elemento, para regravar `cardRender` só quando ele entra, sai ou troca. */
++  private appliedCard: TemplateRef<ArkDataViewCardTemplateContext> | undefined;
++
++  get pageSizesAttr(): string | null {
++    return this.pageSizes && this.pageSizes.length > 0 ? this.pageSizes.join(",") : null;
++  }
++
++  get sortAttr(): string | null {
++    const sort = this.sort;
++    return sort && typeof sort === "object" ? `${sort.key}:${sort.direction}` : sort || null;
++  }
++
++  private readonly handlers: Array<[string, EventListener]> = [
++    // A cada redesenho do conteúdo o elemento troca os nós de célula: as views dos que saíram do DOM são destruídas.
++    ["ark-render", () => this.pruneViews()],
++    ["ark-query-change", (event) => this.arkQueryChange.emit(event as CustomEvent<ArkDataViewQueryChangeDetail>)],
++    ["ark-view-change", (event) => this.arkViewChange.emit(event as CustomEvent<ArkDataViewViewChangeDetail>)],
++    ["ark-row-click", (event) => this.arkRowClick.emit(event as CustomEvent<ArkDataViewRowClickDetail>)],
++    [
++      "ark-selection-change",
++      (event) => this.arkSelectionChange.emit(event as CustomEvent<ArkDataViewSelectionChangeDetail>)
++    ],
++    ["ark-reorder", (event) => this.arkReorder.emit(event as CustomEvent<ArkDataViewReorderDetail>)]
++  ];
++
++  ngAfterContentInit(): void {
++    // Um template de célula que entra ou sai depois (um @if em volta dele) muda o que o elemento desenha.
++    this.templatesSubscription = this.cellTemplates?.changes.subscribe(() => this.syncColumns());
++  }
++
++  ngAfterContentChecked(): void {
++    // O template de card é um só (ContentChild, sem `changes`): conferido a cada checagem do conteúdo.
++    if (this.viewRef && this.cardTemplate?.template !== this.appliedCard) this.syncCardRender();
++  }
++
++  ngAfterViewInit(): void {
++    for (const [name, handler] of this.handlers) this.viewRef?.nativeElement?.addEventListener(name, handler);
++    this.syncColumns();
++    this.syncRows();
++    this.syncSelected();
++    this.syncCardRender();
++  }
++
++  ngOnChanges(changes: SimpleChanges): void {
++    // Só o que mudou é regravado: `rows` novo não pode ser efeito colateral de outro input mudando.
++    if (changes.columns) this.syncColumns();
++    if (changes.rows) this.syncRows();
++    if (changes.selected) this.syncSelected();
++    if (changes.cardRender) this.syncCardRender();
++  }
++
++  ngOnDestroy(): void {
++    this.templatesSubscription?.unsubscribe();
++    for (const [name, handler] of this.handlers) this.viewRef?.nativeElement?.removeEventListener(name, handler);
++    for (const view of this.embedded.values()) view.destroy();
++    this.embedded.clear();
++  }
++
++  // Instância um template para uma célula: a view fica no contêiner do wrapper (entra na detecção de mudanças do
++  // componente que declarou o template) e os nós dela vão para o nó que o elemento põe na célula.
++  private createView<Context>(template: TemplateRef<Context>, context: Context): HTMLElement {
++    const view = this.viewContainer.createEmbeddedView(template, context);
++    view.detectChanges();
++    const node = document.createElement("span");
++    node.style.display = "contents";
++    for (const root of view.rootNodes as Node[]) node.appendChild(root);
++    this.embedded.set(node, view);
++    return node;
++  }
++
++  private pruneViews(): void {
++    for (const [node, view] of Array.from(this.embedded)) {
++      if (node.isConnected) continue;
++      view.destroy();
++      this.embedded.delete(node);
++    }
++  }
++
++  // Colunas com um template `arkDataViewCell` de mesma `key` ganham um `render` que instancia o template; as demais
++  // vão como vieram (o `render` delas devolve nó ou texto, como no elemento).
++  private syncColumns(): void {
++    const el = this.viewRef?.nativeElement;
++    if (!el || !this.columns) return;
++    const templates = new Map((this.cellTemplates?.toArray() ?? []).map((cell) => [cell.key, cell.template]));
++    el.columns = this.columns.map((column) => {
++      const template = templates.get(column.key);
++      if (!template) return column;
++      return {
++        ...column,
++        render: (context: ArkDataViewCellContext) => this.createView(template, { $implicit: context.row, ...context })
++      };
++    });
++  }
++
++  private syncRows(): void {
++    const el = this.viewRef?.nativeElement;
++    if (el && this.rows) el.rows = this.rows;
++  }
++
++  private syncSelected(): void {
++    const el = this.viewRef?.nativeElement;
++    if (el && this.selected) el.selected = this.selected;
++  }
++
++  // Função, então propriedade; só é gravada quando o app dá uma (ou o template de card), para a view sem ela não
++  // refazer os cards.
++  private syncCardRender(): void {
++    const el = this.viewRef?.nativeElement;
++    if (!el) return;
++    const template = this.cardTemplate?.template;
++    this.appliedCard = template;
++    if (template) {
++      el.cardRender = (context) => this.createView(template, { $implicit: context.row, ...context });
++    } else if (this.cardRender || el.cardRender) {
++      el.cardRender = this.cardRender ?? null;
++    }
++  }
++}
+diff --git a/packages/angular/src/ark-pagination.component.ts b/packages/angular/src/ark-pagination.component.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..d049cd5af499dfd06cbd4dd2aa04f0f068a2b204
+--- /dev/null
++++ b/packages/angular/src/ark-pagination.component.ts
+@@ -0,0 +1,88 @@
++import {
++  type AfterViewInit,
++  Component,
++  CUSTOM_ELEMENTS_SCHEMA,
++  ElementRef,
++  EventEmitter,
++  Input,
++  inject,
++  type OnDestroy,
++  Output,
++  ViewChild
++} from "@angular/core";
++import type { ArkIntent, ArkLang, ArkPageChangeDetail, ArkSize, ArkTheme } from "@tooark/core";
++import type { ArkPagination as ArkPaginationElement } from "@tooark/web-components";
++import { ensureTooarkComponentsRegistered } from "./register";
++
++@Component({
++  selector: "ark-pagination-wrapper",
++  standalone: true,
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
++  template: `
++  <ark-pagination
++    #pagination
++    [attr.testid]="testid"
++    [attr.aria-label]="ariaLabel"
++    [attr.page]="page"
++    [attr.page-size]="pageSize"
++    [attr.total]="total"
++    [attr.page-sizes]="pageSizesAttr"
++    [attr.siblings]="siblings"
++    [attr.disabled]="disabled ? '' : null"
++    [attr.size]="size"
++    [attr.intent]="intent"
++    [attr.theme]="theme"
++    [attr.lang]="lang"
++    [attr.locale-json]="localeJson">
++  </ark-pagination>`
++})
++export class ArkPaginationComponent implements AfterViewInit, OnDestroy {
++  constructor() {
++    ensureTooarkComponentsRegistered();
++  }
++
++  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
++
++  /** O `ark-pagination` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
++  get element(): ArkPaginationElement | null {
++    return this.host.nativeElement.querySelector<ArkPaginationElement>(":scope > ark-pagination");
++  }
++
++  @Input() testid: string | undefined;
++  /** Nome acessível da navegação; sem ele vale a string `pagination` do idioma. */
++  @Input() ariaLabel: string | undefined;
++  /** Página atual, a partir de 1; um clique a reescreve no elemento e emite arkPageChange. */
++  @Input() page: number | undefined;
++  /** Itens por página. Padrão: 10. */
++  @Input() pageSize: number | undefined;
++  /** Total de itens. */
++  @Input() total: number | undefined;
++  /** Opções do seletor de itens por página; sem elas o seletor não aparece. */
++  @Input() pageSizes: number[] | undefined;
++  /** Páginas vizinhas da atual, de cada lado. Padrão: 1. */
++  @Input() siblings: number | undefined;
++  @Input() disabled = false;
++  @Input() size: ArkSize = "md";
++  @Input() intent: ArkIntent = "primary";
++  @Input() theme: ArkTheme = "auto";
++  @Input() lang: ArkLang | undefined;
++  @Input() localeJson: string | undefined;
++  /** Página ou itens por página mudaram: detail é { page, pageSize, pageCount }. */
++  @Output() arkPageChange = new EventEmitter<CustomEvent<ArkPageChangeDetail>>();
++
++  @ViewChild("pagination", { static: false }) paginationRef!: ElementRef<HTMLElement>;
++
++  get pageSizesAttr(): string | null {
++    return this.pageSizes && this.pageSizes.length > 0 ? this.pageSizes.join(",") : null;
++  }
++
++  private pageHandler = (event: Event) => this.arkPageChange.emit(event as CustomEvent<ArkPageChangeDetail>);
++
++  ngAfterViewInit(): void {
++    this.paginationRef?.nativeElement?.addEventListener("ark-page-change", this.pageHandler);
++  }
++
++  ngOnDestroy(): void {
++    this.paginationRef?.nativeElement?.removeEventListener("ark-page-change", this.pageHandler);
++  }
++}
+diff --git a/packages/angular/src/index.ts b/packages/angular/src/index.ts
+index b8cce2908f984909610fd0443468eb5e347164e2..492003ad3b50d42b6853bb5869a4f7bdf2cca81f 100644
+--- a/packages/angular/src/index.ts
++++ b/packages/angular/src/index.ts
+@@ -11,6 +11,12 @@ export { ArkClockComponent } from "./ark-clock.component";
+ export { ArkColorSwatchesComponent } from "./ark-color-swatches.component";
+ export { ArkCommandItemComponent, ArkCommandPaletteComponent } from "./ark-command-palette.component";
+ export { ArkCopyButtonComponent } from "./ark-copy-button.component";
++export type { ArkDataViewCardTemplateContext, ArkDataViewCellTemplateContext } from "./ark-data-view.component";
++export {
++  ArkDataViewCardDirective,
++  ArkDataViewCellDirective,
++  ArkDataViewComponent
++} from "./ark-data-view.component";
+ export { ArkDatepickerComponent } from "./ark-datepicker.component";
+ export { ArkDialogComponent } from "./ark-dialog.component";
+ export { ArkDrawerComponent } from "./ark-drawer.component";
+@@ -21,6 +27,7 @@ export { ArkKbdComponent } from "./ark-kbd.component";
+ export { ArkKvEditorComponent } from "./ark-kv-editor.component";
+ export { ArkMarkComponent } from "./ark-mark.component";
+ export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
++export { ArkPaginationComponent } from "./ark-pagination.component";
+ export { ArkProgressComponent } from "./ark-progress.component";
+ export { ArkRadioComponent } from "./ark-radio.component";
+ export { ArkSchedulerComponent } from "./ark-scheduler.component";
+diff --git a/packages/react/src/ark-data-view.tsx b/packages/react/src/ark-data-view.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..88d99a235cdaa5ba5d802c966a1e9255f5cadba5
+--- /dev/null
++++ b/packages/react/src/ark-data-view.tsx
+@@ -0,0 +1,340 @@
++import type {
++  ArkDataViewCardContext,
++  ArkDataViewCardRender,
++  ArkDataViewCellContext,
++  ArkDataViewColumn,
++  ArkDataViewKey,
++  ArkDataViewQueryChangeDetail,
++  ArkDataViewReorderDetail,
++  ArkDataViewRow,
++  ArkDataViewRowClickDetail,
++  ArkDataViewSelectionChangeDetail,
++  ArkDataViewSort,
++  ArkDataViewStyleOptions,
++  ArkDataViewViewChangeDetail
++} from "@tooark/core";
++import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
++import type React from "react";
++import { createElement, Fragment, forwardRef, type PropsWithChildren, useEffect, useReducer, useRef } from "react";
++import { createPortal, flushSync } from "react-dom";
++import type { ArkDomProps } from "./dom-props.js";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++import { useForwardedRef } from "./use-forwarded-ref.js";
++import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
++
++/**
++ * Coluna do ArkDataView: a do elemento, com um `render` que devolve o que um componente React devolveria (JSX, texto,
++ * `null` para nada) e que roda de novo a cada render do wrapper, como qualquer filho. Um nó DOM também é aceito.
++ */
++export type ArkDataViewReactColumn<Row extends object = ArkDataViewRow> = Omit<ArkDataViewColumn<Row>, "render"> & {
++  render?(context: ArkDataViewCellContext<Row>): React.ReactNode | Node;
++};
++
++/**
++ * Desenha o corpo de cada card em JSX no lugar da grade de campos; `null` ou `undefined` mantém a grade naquele card.
++ * Tirado de um método (parâmetros bivariantes), como o tipo do elemento.
++ */
++export type ArkDataViewReactCardRender<Row extends object = ArkDataViewRow> = {
++  render(context: ArkDataViewCardContext<Row>): React.ReactNode | Node;
++}["render"];
++
++export type ArkDataViewProps<Row extends object = ArkDataViewRow> = PropsWithChildren<
++  ArkDomProps<
++    ArkDataViewStyleOptions & {
++      /** Registros (propriedade JS, guardados por referência); uma lista nova renderiza de novo. */
++      rows?: Row[];
++      /**
++       * Colunas (propriedade JS): qual campo aparece, onde e como, com `render` em JSX para o conteúdo da célula. Não
++       * precisa ser estável: o elemento só refaz as células quando os dados das colunas mudam, e o `render` é lido de
++       * novo a cada render do wrapper.
++       */
++      columns?: ArkDataViewReactColumn<Row>[];
++      /** Campo que identifica cada registro. Padrão: "id". */
++      rowKey?: string;
++      /** Página atual, a partir de 1. */
++      page?: number;
++      /** Itens por página; sem ele não há paginação. */
++      pageSize?: number;
++      /** Opções do seletor de itens por página. */
++      pageSizes?: number[];
++      /** Total de registros no servidor (mode "server"). */
++      total?: number;
++      /** Ordenação atual: { key, direction } ou "chave:asc". */
++      sort?: ArkDataViewSort | string | null;
++      /** Texto da busca. */
++      search?: string;
++      /** Mostra o campo de busca. */
++      searchable?: boolean;
++      /** Placeholder e rótulo acessível da busca. Padrão: a string `search` do idioma. */
++      searchPlaceholder?: string;
++      /** Atraso em ms entre a última tecla e a consulta. Padrão: 300. */
++      searchDebounce?: number;
++      /** Caixa de seleção por registro e a de selecionar tudo. */
++      selectable?: boolean;
++      /** Chaves selecionadas (propriedade JS); atribuir não emite evento. */
++      selected?: ArkDataViewKey[];
++      /** Alça de reordenar por registro (arrasto, setas e menu de mover). */
++      reorderable?: boolean;
++      /** Linha e card focáveis, que emitem onRowClick. */
++      clickable?: boolean;
++      /** Consulta em andamento: placeholders ou registros esmaecidos, com aria-busy. */
++      loading?: boolean;
++      /** Nome acessível da tabela e da lista de cards. */
++      label?: string;
++      /** Desenha o corpo de cada card em JSX no lugar da grade de campos. */
++      cardRender?: ArkDataViewReactCardRender<Row>;
++      className?: string;
++      /** Página, itens por página, ordenação ou busca mudaram: detail é a consulta inteira mais `reason`. */
++      onQueryChange?: (event: CustomEvent<ArkDataViewQueryChangeDetail>) => void;
++      /** O usuário trocou a apresentação no seletor. */
++      onViewChange?: (event: CustomEvent<ArkDataViewViewChangeDetail>) => void;
++      /** Clique, Enter ou Espaço numa linha ou card (com clickable): detail é { row, key, index }. */
++      onRowClick?: (event: CustomEvent<ArkDataViewRowClickDetail<Row>>) => void;
++      /** A seleção mudou por ação do usuário: detail é { selected, rows }. */
++      onSelectionChange?: (event: CustomEvent<ArkDataViewSelectionChangeDetail<Row>>) => void;
++      /** Um registro foi movido: detail é { key, from, to, rows }. Persistir é do app. */
++      onReorder?: (event: CustomEvent<ArkDataViewReorderDetail<Row>>) => void;
++    }
++  >
++>;
++
++/** Um nó que o elemento recebeu no lugar do conteúdo de uma célula (ou do corpo de um card), onde o React desenha. */
++type Bridged =
++  | { id: number; kind: "cell"; key: string; context: ArkDataViewCellContext }
++  | { id: number; kind: "card"; context: ArkDataViewCardContext };
++
++let hostSeq = 0;
++
++// Assinatura das colunas sem as funções (só se existem): enquanto ela não muda o elemento fica com as colunas que
++// tem, e um `render` novo a cada render do app (colunas declaradas inline) não refaz a tabela.
++function signatureOf(columns: ArkDataViewReactColumn[] | undefined): string {
++  if (!columns) return "";
++  return JSON.stringify(
++    columns.map(({ render, compare, ...data }) => [data, typeof render === "function", typeof compare === "function"])
++  );
++}
++
++function isDomNode(value: unknown): value is Node {
++  return typeof Node !== "undefined" && value instanceof Node;
++}
++
++const ArkDataViewBase = forwardRef<ArkDataViewElement, ArkDataViewProps>(
++  function ArkDataView(props, forwardedRef): React.JSX.Element {
++    const {
++      children,
++      className,
++      rows,
++      columns,
++      rowKey,
++      noViewSelector,
++      page,
++      pageSize,
++      pageSizes,
++      total,
++      sort,
++      search,
++      searchable,
++      searchPlaceholder,
++      searchDebounce,
++      selectable,
++      selected,
++      reorderable,
++      clickable,
++      loading,
++      breakpoint,
++      cardColumns,
++      cardRender,
++      localeJson,
++      onQueryChange,
++      onViewChange,
++      onRowClick,
++      onSelectionChange,
++      onReorder,
++      ...rest
++    } = props;
++    const [ref, setRef] = useForwardedRef<ArkDataViewElement>(forwardedRef);
++    const [, repaint] = useReducer((count: number) => count + 1, 0);
++    // Nós de célula entregues ao elemento, onde os portais desenham; quem cria e quem descarta é o elemento.
++    const hosts = useRef(new Map<HTMLElement, Bridged>());
++    // O que o app passou no último render confirmado: as funções entregues ao elemento leem daqui, então continuam
++    // as mesmas enquanto o `render` do app muda.
++    const latest = useRef<{ columns?: ArkDataViewReactColumn[]; cardRender?: ArkDataViewReactCardRender }>({});
++    const bridge = useRef<{
++      signature: string | null;
++      cell: (key: string, context: ArkDataViewCellContext) => Node;
++      card: ArkDataViewCardRender;
++      compare: (key: string, a: ArkDataViewRow, b: ArkDataViewRow) => number;
++    } | null>(null);
++    if (!bridge.current) {
++      const host = (entry: Bridged): HTMLElement => {
++        const node = document.createElement("span");
++        node.style.display = "contents";
++        hosts.current.set(node, entry);
++        return node;
++      };
++      bridge.current = {
++        signature: null,
++        cell: (key, context) => {
++          const out = latest.current.columns?.find((column) => column.key === key)?.render?.(context);
++          return isDomNode(out) ? out : host({ id: ++hostSeq, kind: "cell", key, context });
++        },
++        card: (context) => {
++          const out = latest.current.cardRender?.(context);
++          // Sem JSX para este card, a grade de campos do elemento fica.
++          if (out === null || out === undefined || isDomNode(out)) return out;
++          return host({ id: ++hostSeq, kind: "card", context });
++        },
++        compare: (key, a, b) => latest.current.columns?.find((column) => column.key === key)?.compare?.(a, b) ?? 0
++      };
++    }
++
++    useEffect(() => {
++      ensureTooarkComponentsRegistered();
++    }, []);
++
++    useIsomorphicLayoutEffect(() => {
++      latest.current = { columns, cardRender };
++    });
++
++    // A cada redesenho do conteúdo o elemento troca os nós de célula: os que saíram do DOM são descartados e os
++    // portais dos novos são desenhados antes da pintura. Num microtask, porque o redesenho pode vir de dentro de um
++    // efeito do React, onde o flushSync não pode rodar.
++    useIsomorphicLayoutEffect(() => {
++      const el = ref.current;
++      if (!el) return;
++      let alive = true;
++      let queued = false;
++      const flush = (): void => {
++        queued = false;
++        if (!alive) return;
++        let dropped = false;
++        for (const node of Array.from(hosts.current.keys())) {
++          if (node.isConnected) continue;
++          hosts.current.delete(node);
++          dropped = true;
++        }
++        if (hosts.current.size > 0 || dropped) flushSync(repaint);
++      };
++      const handleRender = (): void => {
++        if (queued) return;
++        queued = true;
++        queueMicrotask(flush);
++      };
++      el.addEventListener("ark-render", handleRender);
++      return () => {
++        alive = false;
++        el.removeEventListener("ark-render", handleRender);
++      };
++    }, [ref]);
++
++    // `columns`, `rows` e `selected` são propriedades (objetos e funções), não atributos; as colunas vão antes das
++    // linhas para a primeira renderização com dados já ter as células certas. As colunas só são regravadas quando a
++    // assinatura delas muda.
++    const signature = signatureOf(columns);
++    useEffect(() => {
++      const el = ref.current;
++      const api = bridge.current;
++      const list = latest.current.columns;
++      if (!el || !api || !list || api.signature === signature) return;
++      api.signature = signature;
++      el.columns = list.map(({ render, compare, ...data }) => ({
++        ...data,
++        ...(render ? { render: (context: ArkDataViewCellContext) => api.cell(data.key, context) } : {}),
++        ...(compare ? { compare: (a: ArkDataViewRow, b: ArkDataViewRow) => api.compare(data.key, a, b) } : {})
++      }));
++    }, [ref, signature]);
++
++    useEffect(() => {
++      if (ref.current && rows) ref.current.rows = rows;
++    }, [ref, rows]);
++
++    useEffect(() => {
++      if (ref.current && selected) ref.current.selected = selected;
++    }, [ref, selected]);
++
++    // Função, então propriedade; só é gravada quando o app dá uma (e uma vez só: quem muda é a função lida por ela),
++    // para a view sem ela não refazer os cards.
++    const hasCardRender = typeof cardRender === "function";
++    useEffect(() => {
++      const el = ref.current;
++      const api = bridge.current;
++      if (!el || !api) return;
++      if (hasCardRender) {
++        if (el.cardRender !== api.card) el.cardRender = api.card;
++      } else if (el.cardRender) {
++        el.cardRender = null;
++      }
++    }, [ref, hasCardRender]);
++
++    useEffect(() => {
++      const el = ref.current;
++      if (!el) return;
++
++      const handlers: Array<[string, EventListener]> = [];
++      function bind<T>(name: string, handler?: (event: CustomEvent<T>) => void): void {
++        if (!handler) return;
++        const listener: EventListener = (event) => handler(event as CustomEvent<T>);
++        el!.addEventListener(name, listener);
++        handlers.push([name, listener]);
++      }
++
++      bind("ark-query-change", onQueryChange);
++      bind("ark-view-change", onViewChange);
++      bind("ark-row-click", onRowClick);
++      bind("ark-selection-change", onSelectionChange);
++      bind("ark-reorder", onReorder);
++
++      return () => {
++        for (const [name, listener] of handlers) {
++          el.removeEventListener(name, listener);
++        }
++      };
++    }, [ref, onQueryChange, onViewChange, onRowClick, onSelectionChange, onReorder]);
++
++    const attrs: Record<string, unknown> = {
++      ...rest,
++      ref: setRef,
++      class: className,
++      "row-key": rowKey,
++      "no-view-selector": noViewSelector ? "" : undefined,
++      breakpoint: breakpoint !== undefined ? String(breakpoint) : undefined,
++      page: page !== undefined ? String(page) : undefined,
++      "page-size": pageSize !== undefined ? String(pageSize) : undefined,
++      "page-sizes": pageSizes && pageSizes.length > 0 ? pageSizes.join(",") : undefined,
++      total: total !== undefined ? String(total) : undefined,
++      sort: sort && typeof sort === "object" ? `${sort.key}:${sort.direction}` : sort || undefined,
++      search: search || undefined,
++      searchable: searchable ? "" : undefined,
++      "search-placeholder": searchPlaceholder,
++      "search-debounce": searchDebounce !== undefined ? String(searchDebounce) : undefined,
++      selectable: selectable ? "" : undefined,
++      reorderable: reorderable ? "" : undefined,
++      clickable: clickable ? "" : undefined,
++      loading: loading ? "" : undefined,
++      "card-columns": cardColumns !== undefined ? String(cardColumns) : undefined,
++      "locale-json": localeJson
++    };
++
++    // Um portal por nó de célula, com o `render` deste render do app: o conteúdo se atualiza como qualquer filho,
++    // sem o elemento refazer a tabela.
++    const portals: React.ReactPortal[] = [];
++    for (const [node, entry] of hosts.current) {
++      const content =
++        entry.kind === "cell"
++          ? columns?.find((column) => column.key === entry.key)?.render?.(entry.context)
++          : cardRender?.(entry.context);
++      if (isDomNode(content)) continue;
++      portals.push(createPortal(content, node, String(entry.id)));
++    }
++
++    return createElement(Fragment, null, createElement("ark-data-view", attrs, children), portals);
++  }
++);
++
++/**
++ * Wrapper do ark-data-view. Genérico no registro: `<ArkDataView<User> rows={users} ... />` tipa `columns`, `render`
++ * e o `detail.row` dos eventos com o tipo do app (inferido de `rows` quando o parâmetro é omitido).
++ */
++export const ArkDataView = ArkDataViewBase as <Row extends object = ArkDataViewRow>(
++  props: ArkDataViewProps<Row> & React.RefAttributes<ArkDataViewElement>
++) => React.JSX.Element;
+diff --git a/packages/react/src/ark-pagination.tsx b/packages/react/src/ark-pagination.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..ce60679730840770aee27c4dc5778e999e1216b1
+--- /dev/null
++++ b/packages/react/src/ark-pagination.tsx
+@@ -0,0 +1,62 @@
++import type { ArkPageChangeDetail, ArkPaginationStyleOptions } from "@tooark/core";
++import type { ArkPagination as ArkPaginationElement } from "@tooark/web-components";
++import type React from "react";
++import { createElement, forwardRef, useEffect } from "react";
++import type { ArkDomProps } from "./dom-props.js";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++import { useForwardedRef } from "./use-forwarded-ref.js";
++
++export type ArkPaginationProps = ArkDomProps<
++  ArkPaginationStyleOptions & {
++    /** Página atual, a partir de 1; um clique a reescreve no elemento e emite onPageChange. */
++    page?: number;
++    /** Itens por página. Padrão: 10. */
++    pageSize?: number;
++    /** Total de itens. */
++    total?: number;
++    /** Opções do seletor de itens por página; sem elas o seletor não aparece. */
++    pageSizes?: number[];
++    /** Páginas vizinhas da atual, de cada lado. Padrão: 1. */
++    siblings?: number;
++    disabled?: boolean;
++    className?: string;
++    /** Página ou itens por página mudaram: detail é { page, pageSize, pageCount }. */
++    onPageChange?: (event: CustomEvent<ArkPageChangeDetail>) => void;
++  }
++>;
++
++export const ArkPagination = forwardRef<ArkPaginationElement, ArkPaginationProps>(
++  function ArkPagination(props, forwardedRef): React.JSX.Element {
++    const { className, page, pageSize, total, pageSizes, siblings, disabled, localeJson, onPageChange, ...rest } =
++      props;
++    const [ref, setRef] = useForwardedRef<ArkPaginationElement>(forwardedRef);
++
++    useEffect(() => {
++      ensureTooarkComponentsRegistered();
++    }, []);
++
++    useEffect(() => {
++      const el = ref.current;
++      if (!el || !onPageChange) return;
++
++      const handler = (event: Event) => onPageChange(event as CustomEvent<ArkPageChangeDetail>);
++      el.addEventListener("ark-page-change", handler);
++      return () => el.removeEventListener("ark-page-change", handler);
++    }, [ref, onPageChange]);
++
++    const attrs: Record<string, unknown> = {
++      ...rest,
++      ref: setRef,
++      class: className,
++      page: page !== undefined ? String(page) : undefined,
++      "page-size": pageSize !== undefined ? String(pageSize) : undefined,
++      total: total !== undefined ? String(total) : undefined,
++      "page-sizes": pageSizes && pageSizes.length > 0 ? pageSizes.join(",") : undefined,
++      siblings: siblings !== undefined ? String(siblings) : undefined,
++      disabled: disabled ? "" : undefined,
++      "locale-json": localeJson
++    };
++
++    return createElement("ark-pagination", attrs);
++  }
++);
+diff --git a/packages/react/src/index.tsx b/packages/react/src/index.tsx
+index f907e381a0d2bd3b1c4b9590ccd2ef14ff6d925b..de862ecf9d830b4231e7a6b8690a4a6bde885e65 100644
+--- a/packages/react/src/index.tsx
++++ b/packages/react/src/index.tsx
+@@ -23,6 +23,8 @@ export type { ArkCommandItemProps, ArkCommandPaletteProps } from "./ark-command-
+ export { ArkCommandItem, ArkCommandPalette } from "./ark-command-palette.js";
+ export type { ArkCopyButtonProps } from "./ark-copy-button.js";
+ export { ArkCopyButton } from "./ark-copy-button.js";
++export type { ArkDataViewProps, ArkDataViewReactCardRender, ArkDataViewReactColumn } from "./ark-data-view.js";
++export { ArkDataView } from "./ark-data-view.js";
+ export type { ArkDatepickerProps } from "./ark-datepicker.js";
+ export { ArkDatepicker } from "./ark-datepicker.js";
+ export type { ArkDialogProps } from "./ark-dialog.js";
+@@ -43,6 +45,8 @@ export type { ArkMarkProps } from "./ark-mark.js";
+ export { ArkMark } from "./ark-mark.js";
+ export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu.js";
+ export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
++export type { ArkPaginationProps } from "./ark-pagination.js";
++export { ArkPagination } from "./ark-pagination.js";
+ export type { ArkProgressProps } from "./ark-progress.js";
+ export { ArkProgress } from "./ark-progress.js";
+ export type { ArkRadioProps } from "./ark-radio.js";
+diff --git a/packages/react/src/jsx-intrinsics.d.ts b/packages/react/src/jsx-intrinsics.d.ts
+index b7f2c9113d4e4342fe108f30a3ef9cb7d0e497ac..b26e8e84735afa67d773ad853bb3d8b86a4c6022 100644
+--- a/packages/react/src/jsx-intrinsics.d.ts
++++ b/packages/react/src/jsx-intrinsics.d.ts
+@@ -10,6 +10,8 @@ import type {
+   ArkButtonVariant,
+   ArkCardPadding,
+   ArkCarouselSnap,
++  ArkDataViewMode,
++  ArkDataViewView,
+   ArkDatepickerLang,
+   ArkDialogSize,
+   ArkDrawerMode,
+@@ -307,6 +309,53 @@ interface ArkIntrinsicElements {
+     lang?: ArkLang;
+     "locale-json"?: string;
+   };
++  "ark-pagination": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
++    testid?: string;
++    page?: number | string;
++    "page-size"?: number | string;
++    total?: number | string;
++    /** Opções do seletor de itens por página, separadas por vírgula; sem ele o seletor não aparece. */
++    "page-sizes"?: string;
++    siblings?: number | string;
++    disabled?: boolean;
++    size?: ArkSize;
++    intent?: ArkIntent;
++    theme?: ArkTheme;
++    lang?: ArkLang;
++    "locale-json"?: string;
++  };
++  "ark-data-view": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
++    testid?: string;
++    /** JSON das colunas (sem `render`/`compare`, que só existem na propriedade JS). */
++    columns?: string;
++    rows?: string;
++    "row-key"?: string;
++    view?: ArkDataViewView;
++    /** Esconde o seletor de visualização; `view` continua valendo. */
++    "no-view-selector"?: boolean;
++    breakpoint?: number | string;
++    mode?: ArkDataViewMode;
++    page?: number | string;
++    "page-size"?: number | string;
++    "page-sizes"?: string;
++    total?: number | string;
++    /** "chave:asc" ou "chave:desc". */
++    sort?: string;
++    search?: string;
++    searchable?: boolean;
++    "search-placeholder"?: string;
++    "search-debounce"?: number | string;
++    selectable?: boolean;
++    reorderable?: boolean;
++    clickable?: boolean;
++    loading?: boolean;
++    "card-columns"?: number | string;
++    label?: string;
++    size?: ArkSize;
++    theme?: ArkTheme;
++    lang?: ArkLang;
++    "locale-json"?: string;
++  };
+   "ark-mark": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+     testid?: string;
+     shape?: ArkMarkShape;
+diff --git a/packages/react/typecheck/data-view.tsx b/packages/react/typecheck/data-view.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..ff145327d2dae44211e6860ad9937bf2985fa495
+--- /dev/null
++++ b/packages/react/typecheck/data-view.tsx
+@@ -0,0 +1,85 @@
++// Verificação só de tipos (ver dom-props.tsx): o ArkDataView é genérico no registro, e um registro declarado como
++// `interface` no app precisa ser aceito sem cast, no wrapper e no elemento.
++import type { ArkDataViewCardRender, ArkDataViewColumn } from "@tooark/core";
++import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
++import type { ReactNode } from "react";
++import { ArkDataView, type ArkDataViewReactColumn, ArkPagination } from "../src/index.js";
++
++interface User {
++  id: number;
++  name: string;
++  active: boolean;
++}
++
++const users: User[] = [{ id: 1, name: "Ana", active: true }];
++const columns: ArkDataViewColumn<User>[] = [
++  { key: "name", label: "Nome", sortable: true, render: ({ row }) => row.name.toUpperCase() },
++  { key: "active", label: "Ativo", compare: (a, b) => Number(a.active) - Number(b.active) }
++];
++
++/** No wrapper o `render` da coluna devolve JSX (ou texto, ou nada), com o registro tipado. */
++const jsxColumns: ArkDataViewReactColumn<User>[] = [
++  { key: "name", label: "Nome", render: ({ row }) => <strong title={row.name}>{row.name}</strong> },
++  { key: "active", label: "Ativo", render: ({ row }) => (row.active ? "sim" : null) }
++];
++
++/** O registro é inferido de `rows`, ou dado no parâmetro; sem nenhum dos dois vale o registro genérico. */
++export const accepted: ReactNode[] = [
++  <ArkDataView key="jsx" rows={users} columns={jsxColumns} cardRender={({ row }) => <p>{row.name}</p>} />,
++  <ArkDataView
++    key="inferido"
++    id="usuarios"
++    rows={users}
++    columns={columns}
++    selected={[1]}
++    sort={{ key: "name", direction: "asc" }}
++    onClick={(event) => event.currentTarget}
++    onRowClick={(event) => event.detail.row.name.length}
++    onSelectionChange={(event) => event.detail.rows[0]?.active}
++    onReorder={(event) => event.detail.rows.map((user) => user.id)}
++    onQueryChange={(event) => event.detail.sort?.direction}
++    cardRender={({ row }) => row.name}
++  >
++    <div slot="selection" />
++  </ArkDataView>,
++  <ArkDataView<User> key="explicito" rows={users} columns={[{ key: "id", label: "#", render: ({ row }) => row.id }]} />,
++  <ArkDataView key="generico" view="cards" noViewSelector mode="server" total={0} sort="name:desc" />,
++  <ArkPagination
++    key="paginacao"
++    page={2}
++    total={50}
++    pageSizes={[10, 25]}
++    aria-label="Páginas"
++    onPageChange={(event) => event.detail.pageCount}
++  />
++];
++
++/** O elemento aceita os mesmos registros e colunas tipados, pela propriedade. */
++export function assign(el: ArkDataViewElement): void {
++  el.rows = users;
++  el.columns = columns;
++  el.selected = [1, "a"];
++  el.sort = { key: "name", direction: "desc" };
++  const card: ArkDataViewCardRender<User> = ({ row }) => row.name;
++  el.cardRender = card;
++}
++
++/** O que continua sendo erro. */
++export const rejected: ReactNode[] = [
++  // Campo que não existe no registro.
++  // @ts-expect-error
++  <ArkDataView key="campo" rows={users} onRowClick={(event) => event.detail.row.nome} />,
++  // Apresentação que não existe.
++  // @ts-expect-error
++  <ArkDataView key="view" view="grid" />,
++  <ArkDataView
++    key="render"
++    rows={users}
++    // O render devolve o que o React desenha (ou um nó DOM), não um objeto qualquer.
++    // @ts-expect-error
++    columns={[{ key: "active", label: "Ativo", render: ({ row }) => ({ ativo: row.active }) }]}
++  />,
++  // Paginação não tem conteúdo.
++  // @ts-expect-error
++  <ArkPagination key="filhos">1</ArkPagination>
++];
+diff --git a/packages/vue/src/ark-data-view.ts b/packages/vue/src/ark-data-view.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..113297b6c25cd5ad0270037762dbe7ef3337fd31
+--- /dev/null
++++ b/packages/vue/src/ark-data-view.ts
+@@ -0,0 +1,280 @@
++import type {
++  ArkDataViewCardContext,
++  ArkDataViewCardRender,
++  ArkDataViewCellContext,
++  ArkDataViewColumn,
++  ArkDataViewKey,
++  ArkDataViewMode,
++  ArkDataViewRow,
++  ArkDataViewSort,
++  ArkDataViewView,
++  ArkLang,
++  ArkSize,
++  ArkTheme
++} from "@tooark/core";
++import {
++  defineComponent,
++  h,
++  isVNode,
++  onBeforeUnmount,
++  onMounted,
++  onUpdated,
++  type PropType,
++  ref,
++  Teleport,
++  type VNode,
++  type VNodeChild,
++  watch
++} from "vue";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++
++const EVENTS = ["ark-query-change", "ark-view-change", "ark-row-click", "ark-selection-change", "ark-reorder"] as const;
++
++/**
++ * Coluna do ArkDataView: a do elemento, com um `render` que também devolve VNodes (`h(...)`). O jeito do template é
++ * o slot `#cell-<key>="{ row, value, index, view }"`, que vale sobre o `render` da coluna.
++ */
++export type ArkDataViewVueColumn<Row extends object = ArkDataViewRow> = Omit<ArkDataViewColumn<Row>, "render"> & {
++  render?(context: ArkDataViewCellContext<Row>): VNode | VNode[] | Node | string | number | null | undefined;
++};
++
++/** Desenha o corpo de cada card; pode devolver VNodes. O jeito do template é o slot `#card="{ row, index }"`. */
++export type ArkDataViewVueCardRender<Row extends object = ArkDataViewRow> = {
++  render(context: ArkDataViewCardContext<Row>): VNode | VNode[] | Node | string | number | null | undefined;
++}["render"];
++
++type DataViewElement = HTMLElement & {
++  rows: ArkDataViewRow[];
++  columns: ArkDataViewColumn[];
++  selected: ArkDataViewKey[];
++  cardRender: ArkDataViewCardRender | null;
++};
++
++/** Um nó que o elemento recebeu no lugar do conteúdo de uma célula (ou do corpo de um card), onde o Vue desenha. */
++type Bridged =
++  | { id: number; kind: "cell"; key: string; context: ArkDataViewCellContext }
++  | { id: number; kind: "card"; context: ArkDataViewCardContext };
++
++let hostSeq = 0;
++
++function isDomNode(value: unknown): value is Node {
++  return typeof Node !== "undefined" && value instanceof Node;
++}
++
++function isVNodes(value: unknown): value is VNode | VNode[] {
++  return isVNode(value) || Array.isArray(value);
++}
++
++export const ArkDataView = defineComponent({
++  name: "ArkDataView",
++  inheritAttrs: false,
++  emits: [...EVENTS],
++  props: {
++    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
++    testid: { type: String, default: undefined },
++    /** Registros (propriedade JS, guardados por referência). */
++    rows: { type: Array as PropType<ArkDataViewRow[]>, default: undefined },
++    /** Colunas (propriedade JS): qual campo aparece, onde e como; o conteúdo próprio vem do slot `cell-<key>`. */
++    columns: { type: Array as PropType<ArkDataViewVueColumn[]>, default: undefined },
++    rowKey: { type: String, default: undefined },
++    view: { type: String as PropType<ArkDataViewView>, default: undefined },
++    /** Esconde o seletor de visualização do canto; `view` continua decidindo a apresentação. */
++    noViewSelector: { type: Boolean, default: false },
++    breakpoint: { type: Number, default: undefined },
++    mode: { type: String as PropType<ArkDataViewMode>, default: undefined },
++    page: { type: Number, default: undefined },
++    pageSize: { type: Number, default: undefined },
++    pageSizes: { type: Array as PropType<number[]>, default: undefined },
++    total: { type: Number, default: undefined },
++    /** Ordenação atual: { key, direction } ou "chave:asc". */
++    sort: { type: [Object, String] as PropType<ArkDataViewSort | string | null>, default: undefined },
++    search: { type: String, default: undefined },
++    searchable: { type: Boolean, default: false },
++    searchPlaceholder: { type: String, default: undefined },
++    searchDebounce: { type: Number, default: undefined },
++    selectable: { type: Boolean, default: false },
++    /** Chaves selecionadas (propriedade JS); atribuir não emite evento. */
++    selected: { type: Array as PropType<ArkDataViewKey[]>, default: undefined },
++    reorderable: { type: Boolean, default: false },
++    clickable: { type: Boolean, default: false },
++    loading: { type: Boolean, default: false },
++    cardColumns: { type: Number, default: undefined },
++    /** Desenha o corpo de cada card no lugar da grade de campos; o slot `card` vale sobre ela. */
++    cardRender: { type: Function as PropType<ArkDataViewVueCardRender>, default: undefined },
++    label: { type: String, default: undefined },
++    size: { type: String as PropType<ArkSize>, default: "md" },
++    theme: { type: String as PropType<ArkTheme>, default: "auto" },
++    lang: { type: String as PropType<ArkLang>, default: undefined },
++    localeJson: { type: String, default: undefined }
++  },
++  setup(props, { attrs, slots, emit }) {
++    ensureTooarkComponentsRegistered();
++    const elRef = ref<DataViewElement | null>(null);
++    // Nós de célula entregues ao elemento, onde os Teleports desenham; quem cria e quem descarta é o elemento, fora
++    // da reatividade, então `version` avisa o render deste componente.
++    const hosts = new Map<HTMLElement, Bridged>();
++    const version = ref(0);
++    let appliedColumns: string | null = null;
++
++    const host = (entry: Bridged): HTMLElement => {
++      const node = document.createElement("span");
++      node.style.display = "contents";
++      hosts.set(node, entry);
++      return node;
++    };
++    const columnOf = (key: string) => props.columns?.find((column) => column.key === key);
++
++    // Funções entregues ao elemento: estáveis, leem o slot e as props do momento. Com slot a célula é do Vue; sem
++    // ele vale o `render` da coluna, que só vira Teleport quando devolve VNodes (nó, texto e null seguem a regra do
++    // elemento).
++    const renderCell = (key: string, context: ArkDataViewCellContext): Node | string | number | null | undefined => {
++      if (!slots[`cell-${key}`]) {
++        const out = columnOf(key)?.render?.(context);
++        if (!isVNodes(out)) return out;
++      }
++      return host({ id: ++hostSeq, kind: "cell", key, context });
++    };
++    const renderCard: ArkDataViewCardRender = (context) => {
++      if (!slots.card) {
++        const out = props.cardRender?.(context);
++        if (!isVNodes(out)) return out;
++      }
++      return host({ id: ++hostSeq, kind: "card", context });
++    };
++
++    // As colunas só são regravadas quando os dados delas mudam (ou os slots de célula): uma lista declarada inline
++    // no template, nova a cada render, não refaz a tabela.
++    const syncColumns = () => {
++      const el = elRef.value;
++      const columns = props.columns;
++      if (!el || !columns) return;
++      const signature = JSON.stringify(
++        columns.map(({ render, compare, ...data }) => [
++          data,
++          typeof render === "function" || Boolean(slots[`cell-${data.key}`]),
++          typeof compare === "function"
++        ])
++      );
++      if (signature === appliedColumns) return;
++      appliedColumns = signature;
++      el.columns = columns.map(({ render, compare, ...data }) => ({
++        ...data,
++        ...(render || slots[`cell-${data.key}`]
++          ? { render: (context: ArkDataViewCellContext) => renderCell(data.key, context) }
++          : {}),
++        ...(compare
++          ? { compare: (a: ArkDataViewRow, b: ArkDataViewRow) => columnOf(data.key)?.compare?.(a, b) ?? 0 }
++          : {})
++      }));
++    };
++    // `rows` e `selected` são propriedades (objetos), não atributos. Sem `deep`: os registros ficam por referência
++    // no elemento, e só uma lista nova renderiza de novo.
++    const syncRows = () => {
++      if (elRef.value && props.rows) elRef.value.rows = props.rows;
++    };
++    const syncSelected = () => {
++      if (elRef.value && props.selected) elRef.value.selected = props.selected;
++    };
++    // Função, então propriedade; só é gravada quando o app dá uma (ou o slot `card`), para a view sem ela não
++    // refazer os cards.
++    const syncCardRender = () => {
++      const el = elRef.value;
++      if (!el) return;
++      if (props.cardRender || slots.card) {
++        if (el.cardRender !== renderCard) el.cardRender = renderCard;
++      } else if (el.cardRender) {
++        el.cardRender = null;
++      }
++    };
++    watch(() => props.columns, syncColumns);
++    watch(() => props.rows, syncRows);
++    watch(() => props.selected, syncSelected);
++    watch(() => props.cardRender, syncCardRender);
++
++    // A cada redesenho do conteúdo o elemento troca os nós de célula: os que saíram do DOM são descartados e o
++    // render deste componente teleporta o conteúdo para os novos.
++    const renderHandler = () => {
++      const before = hosts.size;
++      for (const node of Array.from(hosts.keys())) {
++        if (!node.isConnected) hosts.delete(node);
++      }
++      if (before > 0 || hosts.size > 0) version.value++;
++    };
++
++    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
++    const handlers = EVENTS.map((name) => [name, (event: Event) => emit(name, event as CustomEvent)] as const);
++    onMounted(() => {
++      elRef.value?.addEventListener("ark-render", renderHandler);
++      syncColumns();
++      syncRows();
++      syncSelected();
++      syncCardRender();
++      for (const [name, handler] of handlers) elRef.value?.addEventListener(name, handler);
++    });
++    // Um slot de célula ou de card que aparece ou some depois (v-if no template) muda o que o elemento desenha.
++    onUpdated(() => {
++      syncColumns();
++      syncCardRender();
++    });
++    onBeforeUnmount(() => {
++      elRef.value?.removeEventListener("ark-render", renderHandler);
++      for (const [name, handler] of handlers) elRef.value?.removeEventListener(name, handler);
++    });
++
++    return () => {
++      const sort = props.sort;
++      // Lido para o render depender dele: os nós de célula mudam fora da reatividade.
++      void version.value;
++      const teleports: VNode[] = [];
++      for (const [node, entry] of hosts) {
++        let content: unknown;
++        if (entry.kind === "cell") {
++          const slot = slots[`cell-${entry.key}`];
++          content = slot ? slot(entry.context) : columnOf(entry.key)?.render?.(entry.context);
++        } else {
++          content = slots.card ? slots.card(entry.context) : props.cardRender?.(entry.context);
++        }
++        if (isDomNode(content)) continue;
++        const children = Array.isArray(content) ? content : content === null || content === undefined ? [] : [content];
++        teleports.push(h(Teleport, { to: node, key: entry.id }, children as VNodeChild[]));
++      }
++
++      return [
++        h(
++          "ark-data-view",
++          {
++            ...attrs,
++            testid: props.testid,
++            ref: elRef,
++            "row-key": props.rowKey,
++            view: props.view,
++            "no-view-selector": props.noViewSelector ? "" : undefined,
++            breakpoint: props.breakpoint !== undefined ? String(props.breakpoint) : undefined,
++            mode: props.mode,
++            page: props.page !== undefined ? String(props.page) : undefined,
++            "page-size": props.pageSize !== undefined ? String(props.pageSize) : undefined,
++            "page-sizes": props.pageSizes && props.pageSizes.length > 0 ? props.pageSizes.join(",") : undefined,
++            total: props.total !== undefined ? String(props.total) : undefined,
++            sort: sort && typeof sort === "object" ? `${sort.key}:${sort.direction}` : sort || undefined,
++            search: props.search || undefined,
++            searchable: props.searchable ? "" : undefined,
++            "search-placeholder": props.searchPlaceholder,
++            "search-debounce": props.searchDebounce !== undefined ? String(props.searchDebounce) : undefined,
++            selectable: props.selectable ? "" : undefined,
++            reorderable: props.reorderable ? "" : undefined,
++            clickable: props.clickable ? "" : undefined,
++            loading: props.loading ? "" : undefined,
++            "card-columns": props.cardColumns !== undefined ? String(props.cardColumns) : undefined,
++            label: props.label,
++            size: props.size,
++            theme: props.theme,
++            lang: props.lang,
++            "locale-json": props.localeJson
++          },
++          slots.default ? slots.default() : []
++        ),
++        ...teleports
++      ];
++    };
++  }
++});
+diff --git a/packages/vue/src/ark-pagination.ts b/packages/vue/src/ark-pagination.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..38786458561605688caa6a5f0643afad1711dc4a
+--- /dev/null
++++ b/packages/vue/src/ark-pagination.ts
+@@ -0,0 +1,53 @@
++import type { ArkIntent, ArkLang, ArkPageChangeDetail, ArkSize, ArkTheme } from "@tooark/core";
++import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++
++export const ArkPagination = defineComponent({
++  name: "ArkPagination",
++  inheritAttrs: false,
++  emits: ["ark-page-change"],
++  props: {
++    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
++    testid: { type: String, default: undefined },
++    /** Página atual, a partir de 1; um clique a reescreve no elemento e emite ark-page-change. */
++    page: { type: Number, default: undefined },
++    pageSize: { type: Number, default: undefined },
++    total: { type: Number, default: undefined },
++    /** Opções do seletor de itens por página; sem elas o seletor não aparece. */
++    pageSizes: { type: Array as PropType<number[]>, default: undefined },
++    siblings: { type: Number, default: undefined },
++    disabled: { type: Boolean, default: false },
++    size: { type: String as PropType<ArkSize>, default: "md" },
++    intent: { type: String as PropType<ArkIntent>, default: "primary" },
++    theme: { type: String as PropType<ArkTheme>, default: "auto" },
++    lang: { type: String as PropType<ArkLang>, default: undefined },
++    localeJson: { type: String, default: undefined }
++  },
++  setup(props, { attrs, emit }) {
++    ensureTooarkComponentsRegistered();
++    const elRef = ref<HTMLElement | null>(null);
++
++    // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
++    const pageHandler = (event: Event) => emit("ark-page-change", event as CustomEvent<ArkPageChangeDetail>);
++    onMounted(() => elRef.value?.addEventListener("ark-page-change", pageHandler));
++    onBeforeUnmount(() => elRef.value?.removeEventListener("ark-page-change", pageHandler));
++
++    return () =>
++      h("ark-pagination", {
++        ...attrs,
++        testid: props.testid,
++        ref: elRef,
++        page: props.page !== undefined ? String(props.page) : undefined,
++        "page-size": props.pageSize !== undefined ? String(props.pageSize) : undefined,
++        total: props.total !== undefined ? String(props.total) : undefined,
++        "page-sizes": props.pageSizes && props.pageSizes.length > 0 ? props.pageSizes.join(",") : undefined,
++        siblings: props.siblings !== undefined ? String(props.siblings) : undefined,
++        disabled: props.disabled ? "" : undefined,
++        size: props.size,
++        intent: props.intent,
++        theme: props.theme,
++        lang: props.lang,
++        "locale-json": props.localeJson
++      });
++  }
++});
+diff --git a/packages/vue/src/index.ts b/packages/vue/src/index.ts
+index f87b7cf30a3cf2c4c269d7b4b52f954552183581..827aec790ef7028bcc7dc9f90daa15d5323ac838 100644
+--- a/packages/vue/src/index.ts
++++ b/packages/vue/src/index.ts
+@@ -11,6 +11,8 @@ export { ArkClock } from "./ark-clock.js";
+ export { ArkColorSwatches } from "./ark-color-swatches.js";
+ export { ArkCommandItem, ArkCommandPalette } from "./ark-command-palette.js";
+ export { ArkCopyButton } from "./ark-copy-button.js";
++export type { ArkDataViewVueCardRender, ArkDataViewVueColumn } from "./ark-data-view.js";
++export { ArkDataView } from "./ark-data-view.js";
+ export { ArkDatepicker } from "./ark-datepicker.js";
+ export { ArkDialog } from "./ark-dialog.js";
+ export { ArkDrawer } from "./ark-drawer.js";
+@@ -21,6 +23,7 @@ export { ArkKbd } from "./ark-kbd.js";
+ export { ArkKvEditor } from "./ark-kv-editor.js";
+ export { ArkMark } from "./ark-mark.js";
+ export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
++export { ArkPagination } from "./ark-pagination.js";
+ export { ArkProgress } from "./ark-progress.js";
+ export { ArkRadio } from "./ark-radio.js";
+ export { ArkScheduler } from "./ark-scheduler.js";
+diff --git a/scripts/check-ssr.mjs b/scripts/check-ssr.mjs
+index f3ef8c3136b59313adc5d18bf731d71c18afa7f5..fbf4052999124dc36798eef90047972b8624988b 100644
+--- a/scripts/check-ssr.mjs
++++ b/scripts/check-ssr.mjs
+@@ -62,15 +62,37 @@ await check("react (renderToString)", async () => {
+   if (!html.includes("<ark-dialog") || !html.includes('<ark-button type="submit"')) {
+     throw new Error(`HTML inesperado: ${html.slice(0, 160)}`);
+   }
++  // O data-view desenha as células em JSX por portal, que só existe no navegador: no servidor sai só a tag.
++  const { ArkDataView } = await import(distUrl("react"));
++  const table = renderToString(
++    createElement(ArkDataView, {
++      rows: [{ id: 1, name: "Ana" }],
++      columns: [{ key: "name", label: "Nome", render: ({ row }) => createElement("strong", null, row.name) }],
++      pageSize: 10
++    })
++  );
++  if (!table.includes('<ark-data-view page-size="10"')) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
+ });
+ 
+ // Vue: o setup roda no servidor e chama o registro, que precisa ser no-op.
+ await check("vue (renderToString)", async () => {
+   const { createSSRApp, h } = await importFrom("vue", "vue");
+   const { renderToString } = await importFrom("vue", "vue/server-renderer");
+-  const { ArkButton } = await import(distUrl("vue"));
++  const { ArkButton, ArkDataView } = await import(distUrl("vue"));
+   const html = await renderToString(createSSRApp({ render: () => h(ArkButton, { type: "submit" }, () => "Salvar") }));
+   if (!html.includes("<ark-button")) throw new Error(`HTML inesperado: ${html.slice(0, 160)}`);
++  // O data-view teleporta os slots de célula, o que só acontece no navegador: no servidor sai só a tag.
++  const table = await renderToString(
++    createSSRApp({
++      render: () =>
++        h(
++          ArkDataView,
++          { rows: [{ id: 1, name: "Ana" }], columns: [{ key: "name", label: "Nome" }], pageSize: 10 },
++          { "cell-name": ({ row }) => h("strong", row.name) }
++        )
++    })
++  );
++  if (!table.includes("<ark-data-view")) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
+ });
+ 
+ // Angular: o bundle parcial (FESM) avaliado com o compilador JIT, como num servidor sem o linker do CLI.
+@@ -88,7 +110,10 @@ await check("angular (import + registro)", async () => {
+ // Todo wrapper Angular expõe o elemento que renderiza: o getter `element` procura, no host do wrapper, o filho direto
+ // com a tag do próprio seletor (`ark-x-wrapper` -> `ark-x`).
+ await check("angular (element de cada wrapper)", async () => {
+-  const { ElementRef, Injector, runInInjectionContext } = await importFrom("angular", "@angular/core");
++  const { ElementRef, Injector, runInInjectionContext, ViewContainerRef } = await importFrom(
++    "angular",
++    "@angular/core"
++  );
+   const angular = await import(distUrl("angular", "fesm2022/tooark-angular.mjs"));
+   const wrappers = Object.entries(angular).filter(([name]) => name.endsWith("Component"));
+   if (wrappers.length === 0) throw new Error("nenhum wrapper exportado");
+@@ -96,7 +121,13 @@ await check("angular (element de cada wrapper)", async () => {
+     const tag = Wrapper.ɵcmp.selectors[0][0].replace(/-wrapper$/, "");
+     const queried = [];
+     const host = { querySelector: (selector) => queried.push(selector) && null };
+-    const injector = Injector.create({ providers: [{ provide: ElementRef, useValue: new ElementRef(host) }] });
++    // O ViewContainerRef é do wrapper do data-view, que instancia nele os templates de célula.
++    const injector = Injector.create({
++      providers: [
++        { provide: ElementRef, useValue: new ElementRef(host) },
++        { provide: ViewContainerRef, useValue: {} }
++      ]
++    });
+     const wrapper = runInInjectionContext(injector, () => new Wrapper());
+     if (wrapper.element !== null || queried[0] !== `:scope > ${tag}`) {
+       throw new Error(`${name}.element procurou ${JSON.stringify(queried[0])}, esperado ":scope > ${tag}"`);

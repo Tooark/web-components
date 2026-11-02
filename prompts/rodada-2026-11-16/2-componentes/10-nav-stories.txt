@@ -1,0 +1,9 @@
+test(storybook): stories do ark-nav e cobertura nas stories de integracao
+
+Playground, trilho, recolhimento oculto, lado direito, navbar, tabbar,
+tamanhos, tema escuro e os testes de interacao: ark-navigate cancelavel
+(Ctrl+clique fica com o navegador, item sem href e botao), value marca o
+atual, recolher para trilho e para oculto, grupos expansiveis, variantes
+horizontais e hooks de teste. Toda play que clica num item cancela o
+ark-navigate, senao o href navegaria o iframe. As tres tags entram em
+Framework Props e os wrappers React e Vue da navegacao em Framework Wrappers.

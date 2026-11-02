@@ -1,0 +1,6 @@
+build(deps): storybook 10.6.6, na versao dos addons
+
+O grupo dev do Dependabot subiu os addons @storybook/* para 10.6.6, mas nao o proprio storybook, que ficou em 10.6.0:
+o app em apps/storybook tambem se chama "storybook" e o Dependabot nunca sobe essa dependencia (as ultimas trocas dela
+foram todas a mao). Os addons 10.6.6 pedem storybook ^10.6.6 no peer e o pnpm peers check acusava. O core vai para a
+mesma 10.6.6 dos addons, nao para a 10.6.7 ja publicada, para todos os pacotes do Storybook ficarem na mesma versao.

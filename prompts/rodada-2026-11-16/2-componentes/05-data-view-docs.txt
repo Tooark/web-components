@@ -1,0 +1,9 @@
+docs: ark-pagination e ark-data-view nos READMEs, CHANGELOG e CLAUDE.md
+
+- README raiz (en + pt-BR): as duas tags na tabela de componentes, atributos principais, exemplos em HTML, React, Vue
+  e Angular (celulas com avatar e duas linhas, acoes em massa no slot selection) e a tabela de hooks de E2E.
+- READMEs de web-components, react, vue e angular (en + pt-BR): contagem e lista de elementos do pacote.
+- CHANGELOG (Unreleased): os dois elementos, os wrappers, os tipos e textos do core, a suite com os wrappers Angular e
+  a revisao de acentos.
+- CLAUDE.md: componentes de dados (consulta em atributos, simples por padrao e opt-in, arrangeChrome, ark-render, as
+  tres entradas do reorder), a ponte de celulas dos wrappers e o JIT dos wrappers Angular no Storybook.

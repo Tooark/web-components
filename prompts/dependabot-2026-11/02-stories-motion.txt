@@ -1,0 +1,10 @@
+test(storybook): stories do @tooark/motion leem o transform computado
+
+Desde a 14.2 a lib Motion anima x, y e scale pela WAAPI, no compositor, em vez de gravar style.transform a cada
+quadro: o estilo inline fica em "none" do primeiro ao ultimo quadro e as esperas por "translateX(...)" inline das
+stories Flip Reorder, Swipe e Targets And Options nunca passavam. Os helpers do pacote nao mudam: estado final,
+posicoes e o retorno do swipe sao os mesmos da 14.1.
+
+As verificacoes de meio de animacao passam a ler o deslocamento do transform computado (helper offset, por
+DOMMatrixReadOnly), agora com a direcao esperada de cada caso, e o settled espera o transform computado "none" junto
+com a opacidade computada 1. As stories passam com a 14.1 e com a 14.3.

@@ -1,0 +1,7 @@
+feat(react,vue,angular): wrappers do ark-nav
+
+ArkNav, ArkNavItem e ArkNavGroup nos tres frameworks, com collapsed e
+collapsible (boolean ou rail/hidden), value e os eventos ark-collapse,
+ark-navigate (ainda cancelavel no handler, o listener e sincrono) e
+ark-toggle; tipagem JSX dos tres elementos no React. Os wrappers Angular de
+item e grupo sao display: contents, para o item entrar no flex do nav.

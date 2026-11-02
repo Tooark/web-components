@@ -1,0 +1,26 @@
+diff --git a/packages/web-components/src/components/ark-color-swatches.ts b/packages/web-components/src/components/ark-color-swatches.ts
+index 40c79990d2ec4923e62f2184fabebfa7530feb09..9488d2bf63ffdef1e83436ea607a46ad08fc9223 100644
+--- a/packages/web-components/src/components/ark-color-swatches.ts
++++ b/packages/web-components/src/components/ark-color-swatches.ts
+@@ -193,7 +193,7 @@ export class ArkColorSwatches extends HTMLElementBase {
+ 
+     // Um tab stop: a amostra selecionada, senão a primeira.
+     const selectedIndex = colors.findIndex((color) => color.value === value);
+-    const stop = selectedIndex >= 0 ? selectedIndex : 0;
++    const stop = Math.max(selectedIndex, 0);
+     this.swatches.forEach((swatch, index) => {
+       const color = colors[index];
+       const selected = index === selectedIndex;
+diff --git a/packages/web-components/src/components/ark-shape-picker.ts b/packages/web-components/src/components/ark-shape-picker.ts
+index e2737eb9edbc8e0f64caa05b4ae826c253026c5e..b6e4a5952df00f2b0719d542d3321cc9b4609188 100644
+--- a/packages/web-components/src/components/ark-shape-picker.ts
++++ b/packages/web-components/src/components/ark-shape-picker.ts
+@@ -227,7 +227,7 @@ export class ArkShapePicker extends HTMLElementBase {
+     );
+ 
+     const selectedIndex = value ? this.offered.indexOf(value) : -1;
+-    const stop = selectedIndex >= 0 ? selectedIndex : 0;
++    const stop = Math.max(selectedIndex, 0);
+     this.options.forEach((option, index) => {
+       const shape = this.offered[index];
+       const selected = index === selectedIndex;

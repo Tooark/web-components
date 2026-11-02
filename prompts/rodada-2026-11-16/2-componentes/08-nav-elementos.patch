@@ -1,0 +1,1331 @@
+diff --git a/packages/web-components/src/components/ark-nav-group.ts b/packages/web-components/src/components/ark-nav-group.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..8265eafbfa1f74dc8252d42fd596767ee39c1b31
+--- /dev/null
++++ b/packages/web-components/src/components/ark-nav-group.ts
+@@ -0,0 +1,205 @@
++import { type ArkNavVariant, type ArkSize, coerceBooleanAttr } from "@tooark/core";
++import { HTMLElementBase } from "./html-element-base";
++import { reflectAttr } from "./reflect-attr";
++import { applyTestHooks } from "./test-hooks";
++import { upgradeProperties } from "./upgrade-properties";
++
++/** Chevron do cabeçalho expansível (chrome próprio do componente); gira 180° quando o grupo está aberto. */
++const CHEVRON_SVG = `
++  <svg class="ark:h-3.5 ark:w-3.5 ark:shrink-0 ark:transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
++    <path d="M5 7.5l5 5 5-5"></path>
++  </svg>`;
++
++/** Contador para o id do cabeçalho, que o `aria-labelledby` do grupo referencia. */
++let navGroupSeq = 0;
++
++/**
++ * Seção de um ark-nav. O PRÓPRIO host é o grupo (`role="group"`, nomeado pelo
++ * cabeçalho); os `ark-nav-item` do usuário ficam onde estão. `label` cria o
++ * cabeçalho num nó próprio: um título de seção ou, com `expandable`, um botão
++ * (`aria-expanded`) que abre e fecha os itens (`open`, refletido) e emite
++ * `ark-toggle`. No trilho (sidebar recolhida) o cabeçalho some e o grupo vira
++ * uma faixa separada por uma linha, com todos os itens à mostra; no navbar e
++ * no tabbar o grupo não tem caixa (`display: contents`) e os itens entram na
++ * barra. Tamanho e apresentação chegam propagados do ark-nav.
++ */
++export class ArkNavGroup extends HTMLElementBase {
++  static readonly tagName = "ark-nav-group";
++
++  private ownClasses: string[] = [];
++  private syncingClass = false;
++  /** Cabeçalho próprio: `div` (título) ou `button` (expansível). */
++  private headingEl: HTMLElement | null = null;
++  private readonly headingId = `ark-nav-group-${++navGroupSeq}-heading`;
++  /** `aria-labelledby` que o próprio componente escreveu, para não apagar um do usuário. */
++  private appliedLabelledBy: string | null = null;
++
++  static get observedAttributes(): string[] {
++    return ["label", "expandable", "open", "variant", "size", "theme", "data-ark-rail", "class", "testid"];
++  }
++
++  connectedCallback(): void {
++    upgradeProperties(this);
++    this.updateAppearance();
++  }
++
++  attributeChangedCallback(name: string): void {
++    if (name === "class") {
++      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
++      return;
++    }
++    if (!this.isConnected) return;
++    this.updateAppearance();
++  }
++
++  /** Texto do cabeçalho; sem ele o grupo não tem cabeçalho nem nome. */
++  get label(): string | null {
++    return this.getAttribute("label");
++  }
++
++  set label(value: string | null | undefined) {
++    reflectAttr(this, "label", value);
++  }
++
++  /** O cabeçalho é um botão que abre e fecha os itens. */
++  get expandable(): boolean {
++    return this.hasAttribute("expandable");
++  }
++
++  set expandable(value: boolean | string | null | undefined) {
++    this.toggleAttribute("expandable", coerceBooleanAttr(value));
++  }
++
++  /** Itens à mostra (só importa com `expandable`). */
++  get open(): boolean {
++    return this.hasAttribute("open");
++  }
++
++  set open(value: boolean | string | null | undefined) {
++    this.toggleAttribute("open", coerceBooleanAttr(value));
++  }
++
++  /** Abre ou fecha um grupo expansível e emite `ark-toggle` com `detail: { open }`. */
++  toggle(): void {
++    if (!this.expandable) return;
++    const open = !this.open;
++    this.toggleAttribute("open", open);
++    this.dispatchEvent(new CustomEvent("ark-toggle", { detail: { open }, bubbles: true, composed: true }));
++  }
++
++  private getVariant(): ArkNavVariant {
++    const variant = (this.getAttribute("variant") || "").toLowerCase();
++    return variant === "navbar" || variant === "tabbar" ? variant : "sidebar";
++  }
++
++  /** Trilho: a sidebar recolhida só com ícones (o ark-nav propaga `data-ark-rail`). */
++  private isRail(): boolean {
++    return this.hasAttribute("data-ark-rail") && this.getVariant() === "sidebar";
++  }
++
++  // Cabeçalho próprio no início do host: div de título ou botão expansível; recriado quando troca de tipo.
++  private syncHeading(label: string | null, expandable: boolean, visible: boolean): void {
++    if (label === null) {
++      this.headingEl?.remove();
++      this.headingEl = null;
++      return;
++    }
++
++    const tag = expandable ? "button" : "div";
++    if (this.headingEl && this.headingEl.tagName.toLowerCase() !== tag) {
++      this.headingEl.remove();
++      this.headingEl = null;
++    }
++    if (!this.headingEl) {
++      const heading = document.createElement(tag);
++      heading.id = this.headingId;
++      heading.setAttribute("data-ark-chrome", "heading");
++      if (heading instanceof HTMLButtonElement) {
++        heading.type = "button";
++        heading.addEventListener("click", () => this.toggle());
++      }
++      this.prepend(heading);
++      this.headingEl = heading;
++    }
++
++    const heading = this.headingEl;
++    // Texto num span próprio para o chevron do botão ficar ao lado sem reescrever o nó inteiro a cada mudança.
++    if (!heading.firstElementChild) {
++      heading.replaceChildren(document.createElement("span"));
++      if (expandable) heading.insertAdjacentHTML("beforeend", CHEVRON_SVG);
++    }
++    (heading.firstElementChild as HTMLElement).textContent = label;
++
++    const sizes: Record<ArkSize, string> = {
++      xs: "ark:text-2xs",
++      sm: "ark:text-2xs",
++      md: "ark:text-2xs",
++      lg: "ark:text-xs",
++      xl: "ark:text-xs"
++    };
++    const size = sizes[(this.getAttribute("size") || "md").toLowerCase() as ArkSize] ?? sizes.md;
++    const text = `ark:font-semibold ark:tracking-wide ark:text-fg-muted ark:uppercase ark:select-none ${size}`;
++
++    if (!visible) {
++      heading.className = "ark:hidden";
++    } else if (expandable) {
++      heading.className = `ark:flex ark:w-full ark:cursor-pointer ark:items-center ark:justify-between ark:gap-2 ark:rounded-md ark:px-3 ark:py-1.5 ark:transition-colors ark:outline-none ark:ring-inset ark:hover:bg-surface-muted ark:hover:text-fg ark:focus-visible:ring-2 ark:focus-visible:ring-primary-ring ${text}`;
++    } else {
++      heading.className = `ark:px-3 ark:pt-3 ark:pb-1 ${text}`;
++    }
++
++    if (expandable) {
++      const open = this.open;
++      heading.setAttribute("aria-expanded", open ? "true" : "false");
++      heading.querySelector("svg")?.classList.toggle("ark:rotate-180", open);
++    } else {
++      heading.removeAttribute("aria-expanded");
++    }
++  }
++
++  private applyOwnClasses(next: string[]): void {
++    this.syncingClass = true;
++    for (const cls of this.ownClasses) {
++      if (!next.includes(cls)) this.classList.remove(cls);
++    }
++    for (const cls of next) {
++      if (!this.classList.contains(cls)) this.classList.add(cls);
++    }
++    this.ownClasses = next;
++    this.syncingClass = false;
++  }
++
++  private updateAppearance(): void {
++    const variant = this.getVariant();
++    const rail = this.isRail();
++    const label = this.getAttribute("label");
++
++    this.setAttribute("role", "group");
++    // O cabeçalho só aparece na sidebar expandida; nas barras e no trilho os itens entram soltos.
++    this.syncHeading(label, this.expandable, variant === "sidebar" && !rail);
++
++    // Nome acessível: o cabeçalho (mesmo oculto no trilho, o aria-labelledby o lê); sem ele um aria-label do usuário fica.
++    if (label !== null && this.headingEl) {
++      if (this.getAttribute("aria-labelledby") !== this.headingId) this.setAttribute("aria-labelledby", this.headingId);
++      this.appliedLabelledBy = this.headingId;
++    } else if (this.appliedLabelledBy && this.getAttribute("aria-labelledby") === this.appliedLabelledBy) {
++      this.removeAttribute("aria-labelledby");
++      this.appliedLabelledBy = null;
++    }
++
++    let host: string;
++    if (variant !== "sidebar") {
++      host = "ark:contents";
++    } else if (rail) {
++      host = "ark:mt-1 ark:flex ark:shrink-0 ark:flex-col ark:gap-0.5 ark:border-t ark:border-border ark:pt-1";
++    } else {
++      host = "ark:flex ark:shrink-0 ark:flex-col ark:gap-0.5";
++    }
++    this.applyOwnClasses(host.split(" "));
++
++    applyTestHooks(this, "nav-group", this);
++    if (this.headingEl) applyTestHooks(this, "nav-group", this.headingEl, "heading");
++  }
++}
++
++export default ArkNavGroup;
+diff --git a/packages/web-components/src/components/ark-nav-item.ts b/packages/web-components/src/components/ark-nav-item.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..57d0626168aaa4ce148603f366d9d6f01fc2bed9
+--- /dev/null
++++ b/packages/web-components/src/components/ark-nav-item.ts
+@@ -0,0 +1,444 @@
++import { type ArkIntent, type ArkNavVariant, type ArkSize, coerceBooleanAttr } from "@tooark/core";
++import { HTMLElementBase } from "./html-element-base";
++import { normalizeIntent } from "./intent-colors";
++import { reflectAttr } from "./reflect-attr";
++import { applyTestHooks } from "./test-hooks";
++import { upgradeProperties } from "./upgrade-properties";
++
++/** Contador para o id do host, que o `aria-labelledby` do link referencia. */
++let navItemSeq = 0;
++
++type ArkNavItemPalette = { ring: string; soft: string; text: string };
++
++/**
++ * Item de um ark-nav. O PRÓPRIO host é a linha (classes, cores do item atual);
++ * o texto vem de `label` num nó próprio, o ícone do usuário fica em
++ * `slot="icon"` e um badge ou atalho em `slot="trailing"`, todos onde estão.
++ * Com `href`, um `<a>` "esticado" cobre o host, recebe o foco e é nomeado pelo
++ * conteúdo do host (`aria-labelledby`), como no ark-button: Ctrl/Cmd+clique,
++ * clique do meio e "abrir em nova aba" funcionam como num link. Sem `href` o
++ * host é um `role="button"`. O clique emite `ark-navigate` cancelável antes de
++ * o navegador seguir o link: um app SPA chama `preventDefault()` e roteia por
++ * conta própria. `current` marca a página atual (`aria-current="page"`).
++ * `divider` vira `role="separator"`. Tamanho, intent, apresentação e o estado
++ * de trilho (sidebar ou navbar recolhidas: só o ícone, rótulo sr-only e
++ * `title` no host) chegam propagados do ark-nav.
++ */
++export class ArkNavItem extends HTMLElementBase {
++  static readonly tagName = "ark-nav-item";
++
++  private ownClasses: string[] = [];
++  private syncingClass = false;
++  private anchorEl: HTMLAnchorElement | null = null;
++  private labelEl: HTMLSpanElement | null = null;
++  /** `title` que o próprio componente escreveu no trilho, para não apagar um do usuário. */
++  private appliedTitle: string | null = null;
++
++  static get observedAttributes(): string[] {
++    return [
++      "href",
++      "target",
++      "label",
++      "value",
++      "current",
++      "disabled",
++      "divider",
++      "variant",
++      "size",
++      "intent",
++      "theme",
++      "data-ark-rail",
++      "class",
++      "testid"
++    ];
++  }
++
++  constructor() {
++    super();
++    this.addEventListener("click", this.handleClick);
++    this.addEventListener("keydown", this.handleKeydown);
++  }
++
++  connectedCallback(): void {
++    upgradeProperties(this);
++    this.updateAppearance();
++  }
++
++  attributeChangedCallback(name: string): void {
++    if (name === "class") {
++      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
++      return;
++    }
++    if (!this.isConnected) return;
++    this.updateAppearance();
++  }
++
++  /** Destino do link; sem ele o item é um botão. */
++  get href(): string | null {
++    return this.getAttribute("href");
++  }
++
++  set href(value: string | null | undefined) {
++    reflectAttr(this, "href", value);
++  }
++
++  /** `target` do link (`_blank` ganha `rel="noopener noreferrer"`). */
++  get target(): string | null {
++    return this.getAttribute("target");
++  }
++
++  set target(value: string | null | undefined) {
++    reflectAttr(this, "target", value);
++  }
++
++  /** Texto do item, desenhado num nó próprio (oculto no trilho, pequeno sob o ícone no tabbar). */
++  get label(): string | null {
++    return this.getAttribute("label");
++  }
++
++  set label(value: string | null | undefined) {
++    reflectAttr(this, "label", value);
++  }
++
++  /** Identificador publicado em `ark-navigate` e comparado com o `value` do ark-nav. Padrão: o `href`. */
++  get value(): string {
++    return this.getAttribute("value") ?? this.getAttribute("href") ?? "";
++  }
++
++  set value(value: string | null | undefined) {
++    reflectAttr(this, "value", value);
++  }
++
++  /** Página atual (`aria-current="page"`); o ark-nav o escreve a partir do próprio `value` quando tem um. */
++  get current(): boolean {
++    return this.hasAttribute("current");
++  }
++
++  set current(value: boolean | string | null | undefined) {
++    this.toggleAttribute("current", coerceBooleanAttr(value));
++  }
++
++  get disabled(): boolean {
++    return this.hasAttribute("disabled");
++  }
++
++  set disabled(value: boolean | string | null | undefined) {
++    this.toggleAttribute("disabled", coerceBooleanAttr(value));
++  }
++
++  /** Linha separadora (`role="separator"`), sem link nem texto. */
++  get divider(): boolean {
++    return this.hasAttribute("divider");
++  }
++
++  set divider(value: boolean | string | null | undefined) {
++    this.toggleAttribute("divider", coerceBooleanAttr(value));
++  }
++
++  // --- Interação ---
++
++  /** Emite `ark-navigate` (cancelável) com `href` e `value`; devolve false quando o app cancelou. */
++  private emitNavigate(): boolean {
++    return this.dispatchEvent(
++      new CustomEvent("ark-navigate", {
++        detail: { href: this.href, value: this.value },
++        bubbles: true,
++        composed: true,
++        cancelable: true
++      })
++    );
++  }
++
++  private readonly handleClick = (event: MouseEvent): void => {
++    if (this.disabled || this.divider) {
++      event.preventDefault();
++      event.stopImmediatePropagation();
++      return;
++    }
++    if (!this.anchorEl) {
++      this.emitNavigate();
++      return;
++    }
++    // Modificadores e target de nova aba são do navegador (nova aba, janela, download): sem ark-navigate, como os
++    // routers de SPA fazem, senão o app cancelaria uma abertura em nova aba.
++    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
++    const target = this.anchorEl.getAttribute("target");
++    if (target && target !== "_self") return;
++    if (!this.emitNavigate()) event.preventDefault();
++  };
++
++  // Só no item sem link, em que o host é o botão; o <a> já responde a Enter sozinho.
++  private readonly handleKeydown = (event: KeyboardEvent): void => {
++    if (event.target !== this || this.anchorEl || this.disabled || this.divider) return;
++    if (event.key === "Enter" || event.key === " ") {
++      event.preventDefault();
++      this.emitNavigate();
++    }
++  };
++
++  // --- Aparência ---
++
++  private getVariant(): ArkNavVariant {
++    const variant = (this.getAttribute("variant") || "").toLowerCase();
++    return variant === "navbar" || variant === "tabbar" ? variant : "sidebar";
++  }
++
++  /** Trilho: só o ícone (o ark-nav propaga `data-ark-rail` na sidebar e na navbar recolhidas). */
++  private isRail(): boolean {
++    return this.hasAttribute("data-ark-rail") && this.getVariant() !== "tabbar";
++  }
++
++  private ensureId(): string {
++    if (!this.id) this.id = `ark-nav-item-${++navItemSeq}`;
++    return this.id;
++  }
++
++  private getPalette(intent: ArkIntent): ArkNavItemPalette {
++    const palettes: Record<ArkIntent, ArkNavItemPalette> = {
++      primary: {
++        ring: "ark:ring-primary-ring",
++        soft: "ark:bg-primary-soft ark:text-primary-soft-fg",
++        text: "ark:text-primary"
++      },
++      secondary: {
++        ring: "ark:ring-secondary-ring",
++        soft: "ark:bg-secondary-soft ark:text-secondary-soft-fg",
++        text: "ark:text-secondary"
++      },
++      success: {
++        ring: "ark:ring-success-ring",
++        soft: "ark:bg-success-soft ark:text-success-soft-fg",
++        text: "ark:text-success"
++      },
++      warning: {
++        ring: "ark:ring-warning-ring",
++        soft: "ark:bg-warning-soft ark:text-warning-soft-fg",
++        text: "ark:text-warning"
++      },
++      danger: {
++        ring: "ark:ring-danger-ring",
++        soft: "ark:bg-danger-soft ark:text-danger-soft-fg",
++        text: "ark:text-danger"
++      },
++      info: { ring: "ark:ring-info-ring", soft: "ark:bg-info-soft ark:text-info-soft-fg", text: "ark:text-info" },
++      neutral: {
++        ring: "ark:ring-neutral-ring",
++        soft: "ark:bg-neutral-soft ark:text-neutral-soft-fg",
++        text: "ark:text-fg"
++      }
++    };
++    return palettes[intent];
++  }
++
++  private computeClasses(): { host: string[]; label: string } {
++    const variant = this.getVariant();
++    const horizontal = variant !== "sidebar";
++
++    if (this.divider) {
++      return {
++        host: (horizontal
++          ? "ark:mx-1 ark:h-5 ark:w-px ark:shrink-0 ark:self-center ark:bg-border"
++          : "ark:my-1 ark:h-px ark:w-full ark:shrink-0 ark:bg-border"
++        ).split(" "),
++        label: ""
++      };
++    }
++
++    const palette = this.getPalette(normalizeIntent(this.getAttribute("intent"), "primary"));
++    const current = this.current;
++    // O anel vale para o host focado (item botão) e para o <a> esticado focado dentro dele (item link).
++    const focus = `ark:outline-none ark:ring-inset ark:focus-visible:ring-2 ark:has-focus-visible:ring-2 ${palette.ring}`;
++    const disabled = this.disabled ? "ark:cursor-not-allowed ark:opacity-50 ark:pointer-events-none" : "";
++
++    if (variant === "tabbar") {
++      // Aba de rodapé: ícone sobre o rótulo, largura igual entre os itens, só a cor marca a atual.
++      return {
++        host: [
++          "ark:relative ark:flex ark:min-w-0 ark:flex-1 ark:cursor-pointer ark:select-none ark:flex-col ark:items-center ark:justify-center ark:gap-0.5 ark:px-1 ark:py-1.5 ark:text-2xs ark:font-medium ark:transition-colors",
++          focus,
++          current ? palette.text : "ark:text-fg-muted ark:hover:text-fg",
++          disabled
++        ]
++          .join(" ")
++          .split(/\s+/)
++          .filter(Boolean),
++        label: "ark:max-w-full ark:truncate"
++      };
++    }
++
++    // Altura pelo token --ark-size-* (min-height), como os demais controles do mesmo size.
++    // No trilho o item vira um quadrado do tamanho do token (a navbar recolhida precisa da largura mínima).
++    const sizes: Record<ArkSize, { host: string; rail: string }> = {
++      xs: { host: "ark:min-h-(--ark-size-xs) ark:gap-2 ark:px-2 ark:text-xs", rail: "ark:min-w-(--ark-size-xs)" },
++      sm: { host: "ark:min-h-(--ark-size-sm) ark:gap-2 ark:px-2.5 ark:text-xs", rail: "ark:min-w-(--ark-size-sm)" },
++      md: { host: "ark:min-h-(--ark-size-md) ark:gap-3 ark:px-3 ark:text-sm", rail: "ark:min-w-(--ark-size-md)" },
++      lg: { host: "ark:min-h-(--ark-size-lg) ark:gap-3 ark:px-3.5 ark:text-base", rail: "ark:min-w-(--ark-size-lg)" },
++      xl: { host: "ark:min-h-(--ark-size-xl) ark:gap-3 ark:px-4 ark:text-lg", rail: "ark:min-w-(--ark-size-xl)" }
++    };
++    const size = sizes[(this.getAttribute("size") || "md").toLowerCase() as ArkSize] ?? sizes.md;
++    const rail = this.isRail();
++
++    return {
++      host: [
++        "ark:relative ark:flex ark:shrink-0 ark:cursor-pointer ark:select-none ark:items-center ark:rounded-md ark:font-medium ark:whitespace-nowrap ark:transition-colors",
++        size.host,
++        // No trilho o ícone fica centrado e o rótulo some (sr-only, para o nome do link continuar).
++        rail ? `ark:justify-center ark:gap-0 ark:px-0 ${size.rail}` : "",
++        focus,
++        current ? palette.soft : "ark:text-fg-muted ark:hover:bg-surface-muted ark:hover:text-fg",
++        disabled
++      ]
++        .join(" ")
++        .split(/\s+/)
++        .filter(Boolean),
++      label: rail ? "ark:sr-only" : "ark:min-w-0 ark:flex-1 ark:truncate"
++    };
++  }
++
++  // Rótulo: nó próprio no início do host (o ícone do usuário vem antes por `order`), só enquanto `label` existir.
++  private syncLabel(label: string | null, classes: string): void {
++    if (label === null || this.divider) {
++      this.labelEl?.remove();
++      this.labelEl = null;
++      return;
++    }
++    if (!this.labelEl) {
++      const span = document.createElement("span");
++      span.setAttribute("data-ark-chrome", "label");
++      this.prepend(span);
++      this.labelEl = span;
++    }
++    this.labelEl.textContent = label;
++    this.labelEl.className = classes;
++  }
++
++  /** Modo link: cria/remove o <a> esticado conforme `href` entra/sai. */
++  private syncAnchor(): void {
++    const wantsAnchor = this.getAttribute("href") !== null && !this.divider;
++
++    if (wantsAnchor && !this.anchorEl) {
++      const anchor = document.createElement("a");
++      // Marcado como chrome: as regras do trilho escondem os filhos do usuário fora do ícone, e o link tem de ficar.
++      anchor.setAttribute("data-ark-chrome", "link");
++      anchor.className = "ark:absolute ark:inset-0 ark:rounded-[inherit] ark:outline-none";
++      this.appendChild(anchor);
++      this.anchorEl = anchor;
++    } else if (!wantsAnchor && this.anchorEl) {
++      this.anchorEl.remove();
++      this.anchorEl = null;
++    }
++    if (!this.anchorEl) return;
++
++    const anchor = this.anchorEl;
++    anchor.setAttribute("aria-labelledby", this.ensureId());
++
++    const target = this.getAttribute("target");
++    if (target) {
++      anchor.target = target;
++      if (target === "_blank") {
++        anchor.rel = "noopener noreferrer";
++      } else {
++        anchor.removeAttribute("rel");
++      }
++    } else {
++      anchor.removeAttribute("target");
++      anchor.removeAttribute("rel");
++    }
++
++    if (this.current) {
++      anchor.setAttribute("aria-current", "page");
++    } else {
++      anchor.removeAttribute("aria-current");
++    }
++
++    // Âncora não tem "disabled": remove o href e sinaliza via aria.
++    if (this.disabled) {
++      anchor.removeAttribute("href");
++      anchor.setAttribute("aria-disabled", "true");
++      anchor.setAttribute("tabindex", "-1");
++    } else {
++      anchor.setAttribute("href", this.getAttribute("href") || "");
++      anchor.removeAttribute("aria-disabled");
++      anchor.removeAttribute("tabindex");
++    }
++  }
++
++  // No trilho o rótulo está oculto: um title no host mostra o nome ao passar o ponteiro. Fica no host, e não no <a>,
++  // porque o nome do link vem do conteúdo do host e o Chromium somaria o title do <a> a ele ("Requisições Requisições").
++  private syncTitle(): void {
++    const label = this.getAttribute("label");
++    if (this.isRail() && label && !this.divider) {
++      if (this.getAttribute("title") !== label) this.setAttribute("title", label);
++      this.appliedTitle = label;
++    } else if (this.appliedTitle !== null && this.getAttribute("title") === this.appliedTitle) {
++      this.removeAttribute("title");
++      this.appliedTitle = null;
++    }
++  }
++
++  private syncHostSemantics(): void {
++    if (this.divider) {
++      this.setAttribute("role", "separator");
++      this.setAttribute("aria-orientation", this.getVariant() === "sidebar" ? "horizontal" : "vertical");
++      this.removeAttribute("tabindex");
++      this.removeAttribute("aria-disabled");
++      this.removeAttribute("aria-current");
++      return;
++    }
++    this.removeAttribute("aria-orientation");
++
++    if (this.anchorEl) {
++      // O <a> é o controle acessível; o host vira só o "corpo" visual.
++      this.removeAttribute("role");
++      this.removeAttribute("tabindex");
++      this.removeAttribute("aria-disabled");
++      this.removeAttribute("aria-current");
++      return;
++    }
++
++    this.setAttribute("role", "button");
++    this.setAttribute("tabindex", this.disabled ? "-1" : "0");
++    if (this.disabled) {
++      this.setAttribute("aria-disabled", "true");
++    } else {
++      this.removeAttribute("aria-disabled");
++    }
++    if (this.current) {
++      this.setAttribute("aria-current", "page");
++    } else {
++      this.removeAttribute("aria-current");
++    }
++  }
++
++  private applyOwnClasses(next: string[]): void {
++    this.syncingClass = true;
++    for (const cls of this.ownClasses) {
++      if (!next.includes(cls)) this.classList.remove(cls);
++    }
++    for (const cls of next) {
++      if (!this.classList.contains(cls)) this.classList.add(cls);
++    }
++    this.ownClasses = next;
++    this.syncingClass = false;
++  }
++
++  private updateAppearance(): void {
++    const classes = this.computeClasses();
++    this.syncLabel(this.getAttribute("label"), classes.label);
++    this.syncAnchor();
++    this.syncTitle();
++    this.syncHostSemantics();
++    this.applyOwnClasses(classes.host);
++
++    // Hook principal no host (testid sem sufixo): nav-item ou nav-divider.
++    applyTestHooks(this, this.divider ? "nav-divider" : "nav-item", this);
++    if (this.anchorEl) applyTestHooks(this, "nav-item", this.anchorEl, "link");
++    if (this.labelEl) applyTestHooks(this, "nav-item", this.labelEl, "label");
++    const icon = this.querySelector<HTMLElement>(':scope > [slot="icon"]');
++    if (icon) applyTestHooks(this, "nav-item", icon, "icon");
++    const trailing = this.querySelector<HTMLElement>(':scope > [slot="trailing"]');
++    if (trailing) applyTestHooks(this, "nav-item", trailing, "trailing");
++  }
++}
++
++export default ArkNavItem;
+diff --git a/packages/web-components/src/components/ark-nav.ts b/packages/web-components/src/components/ark-nav.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..703b7b9ecf4246a909644ec4c0172a0b97792e9b
+--- /dev/null
++++ b/packages/web-components/src/components/ark-nav.ts
+@@ -0,0 +1,364 @@
++import {
++  type ArkIntent,
++  type ArkLocale,
++  type ArkNavCollapsible,
++  type ArkNavSide,
++  type ArkNavVariant,
++  type ArkSize,
++  coerceBooleanAttr,
++  resolveLocale
++} from "@tooark/core";
++import { HTMLElementBase } from "./html-element-base";
++import { normalizeIntent } from "./intent-colors";
++import { reflectAttr } from "./reflect-attr";
++import { applyTestHooks } from "./test-hooks";
++import { upgradeProperties } from "./upgrade-properties";
++
++/** Atributos do nav propagados a cada item e grupo. */
++const PROPAGATED_ATTRS = ["variant", "size", "intent", "theme"];
++
++/** Chevron do botão de recolher (chrome próprio do componente), apontando para a borda em que a sidebar encosta. */
++const CHEVRON_SVG = `
++  <svg class="ark:h-4 ark:w-4 ark:shrink-0 ark:transition-transform" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
++    <path d="M12.5 5l-5 5 5 5"></path>
++  </svg>`;
++
++/**
++ * Navegação do app. O PRÓPRIO host é o `role="navigation"` (classes, largura,
++ * borda): os `ark-nav-item` e `ark-nav-group` do usuário ficam onde estão, um
++ * filho `slot="header"` (logo) vai ao início e um `slot="footer"` (avatar,
++ * seletor) ao fim, por CSS. Três apresentações: `sidebar` (coluna, padrão),
++ * `navbar` (barra horizontal) e `tabbar` (abas de rodapé, ícone sobre o
++ * texto). Na sidebar o cabeçalho, o rodapé e o botão de recolher ficam presos
++ * nas pontas e só os itens rolam entre eles. Recolhida (`collapsed`) ela vira
++ * um trilho de ícones ou, com `collapsible="hidden"`, só o logo e o botão de
++ * expandir; `collapsible` também desenha o botão de recolher e o clique nele
++ * emite `ark-collapse`. A navbar recolhida fica só com ícones (sem botão).
++ * `value` marca o item atual pelo `value` (ou `href`) dele; o `ark-navigate`
++ * cancelável de cada item sobe pelo host sem ser consolidado. O app posiciona
++ * o componente (grid, `position: fixed` no tabbar): ele não faz layout de
++ * página.
++ */
++export class ArkNav extends HTMLElementBase {
++  static readonly tagName = "ark-nav";
++
++  private observer: MutationObserver | null = null;
++  private toggleEl: HTMLButtonElement | null = null;
++  private toggleLabelEl: HTMLSpanElement | null = null;
++  private ownClasses: string[] = [];
++  private syncingClass = false;
++  /** `aria-label` que o próprio componente escreveu a partir de `label`, para não apagar um do usuário. */
++  private appliedLabel: string | null = null;
++
++  static get observedAttributes(): string[] {
++    return [
++      "variant",
++      "side",
++      "value",
++      "collapsed",
++      "collapsible",
++      "label",
++      "size",
++      "intent",
++      "theme",
++      "lang",
++      "locale-json",
++      "class",
++      "testid"
++    ];
++  }
++
++  connectedCallback(): void {
++    upgradeProperties(this);
++    if (!this.observer) {
++      // Itens, grupos e slots que chegam depois (frameworks) ganham os atributos propagados e os hooks.
++      this.observer = new MutationObserver(() => this.syncChildren());
++      this.observer.observe(this, { childList: true, subtree: true });
++    }
++    this.updateAppearance();
++    this.syncChildren();
++  }
++
++  disconnectedCallback(): void {
++    this.observer?.disconnect();
++    this.observer = null;
++  }
++
++  attributeChangedCallback(name: string): void {
++    if (name === "class") {
++      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
++      return;
++    }
++    if (!this.isConnected) return;
++    this.updateAppearance();
++    this.syncChildren();
++  }
++
++  /** sidebar (coluna), navbar (barra) ou tabbar (abas de rodapé). Padrão: "sidebar". */
++  get variant(): ArkNavVariant {
++    const variant = (this.getAttribute("variant") || "").toLowerCase();
++    return variant === "navbar" || variant === "tabbar" ? variant : "sidebar";
++  }
++
++  set variant(value: ArkNavVariant | null | undefined) {
++    reflectAttr(this, "variant", value);
++  }
++
++  /** Borda em que a sidebar encosta (borda desenhada e direção do chevron). Padrão: "left". */
++  get side(): ArkNavSide {
++    return (this.getAttribute("side") || "").toLowerCase() === "right" ? "right" : "left";
++  }
++
++  set side(value: ArkNavSide | null | undefined) {
++    reflectAttr(this, "side", value);
++  }
++
++  /** `value` (ou `href`) do item atual; sem o atributo cada item mantém o próprio `current`. */
++  get value(): string {
++    return this.getAttribute("value") || "";
++  }
++
++  set value(value: string | null | undefined) {
++    reflectAttr(this, "value", value);
++  }
++
++  /** Sidebar recolhida (atributo `collapsed`). */
++  get collapsed(): boolean {
++    return this.hasAttribute("collapsed");
++  }
++
++  set collapsed(value: boolean | string | null | undefined) {
++    this.toggleAttribute("collapsed", coerceBooleanAttr(value));
++  }
++
++  /** Botão de recolher e o que resta recolhida: "rail" (ícones) ou "hidden" (só o logo). `null` sem o atributo. */
++  get collapsible(): ArkNavCollapsible | null {
++    if (!this.hasAttribute("collapsible")) return null;
++    return (this.getAttribute("collapsible") || "").toLowerCase() === "hidden" ? "hidden" : "rail";
++  }
++
++  set collapsible(value: ArkNavCollapsible | boolean | string | null | undefined) {
++    // true/"" ligam o trilho (como o atributo vazio); false e null tiram o botão.
++    if (value === null || value === undefined || value === false) {
++      this.removeAttribute("collapsible");
++    } else {
++      this.setAttribute("collapsible", value === true ? "" : String(value));
++    }
++  }
++
++  /** Nome acessível da navegação (`aria-label`), para distinguir vários `role="navigation"` na página. */
++  get label(): string | null {
++    return this.getAttribute("label");
++  }
++
++  set label(value: string | null | undefined) {
++    reflectAttr(this, "label", value);
++  }
++
++  /** Recolhe ou expande a sidebar e emite `ark-collapse` com `detail: { collapsed }`, como o botão faz. */
++  toggle(): void {
++    const collapsed = !this.collapsed;
++    this.toggleAttribute("collapsed", collapsed);
++    this.dispatchEvent(new CustomEvent("ark-collapse", { detail: { collapsed }, bubbles: true, composed: true }));
++  }
++
++  // --- Estado ---
++
++  /** Trilho (só ícones): a sidebar recolhida sem `collapsible="hidden"`, ou a navbar recolhida; o tabbar não recolhe. */
++  private isRail(): boolean {
++    if (!this.collapsed) return false;
++    const variant = this.variant;
++    if (variant === "tabbar") return false;
++    return variant === "navbar" || this.collapsible !== "hidden";
++  }
++
++  /** Só o cabeçalho e o botão: sidebar recolhida com `collapsible="hidden"`. */
++  private isHidden(): boolean {
++    return this.variant === "sidebar" && this.collapsed && this.collapsible === "hidden";
++  }
++
++  private getLocale(): ArkLocale {
++    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
++  }
++
++  private getItems(): HTMLElement[] {
++    return Array.from(this.querySelectorAll<HTMLElement>("ark-nav-item")).filter(
++      (item) => item.closest("ark-nav") === this
++    );
++  }
++
++  private getGroups(): HTMLElement[] {
++    return Array.from(this.querySelectorAll<HTMLElement>("ark-nav-group")).filter(
++      (group) => group.closest("ark-nav") === this
++    );
++  }
++
++  /** Propaga variant/size/intent/theme e o estado de trilho a itens e grupos, marca o atual e os slots. */
++  private syncChildren(): void {
++    const rail = this.isRail();
++    const value = this.getAttribute("value");
++    const items = this.getItems();
++
++    for (const el of [...items, ...this.getGroups()]) {
++      for (const name of PROPAGATED_ATTRS) {
++        const next = this.getAttribute(name);
++        if (next === null) {
++          el.removeAttribute(name);
++        } else if (el.getAttribute(name) !== next) {
++          el.setAttribute(name, next);
++        }
++      }
++      if (el.hasAttribute("data-ark-rail") !== rail) el.toggleAttribute("data-ark-rail", rail);
++    }
++
++    // Com `value`, o nav é a fonte do item atual: o item cujo value (ou href) coincide ganha `current`.
++    if (value !== null) {
++      for (const item of items) {
++        const own = item.getAttribute("value") ?? item.getAttribute("href") ?? "";
++        const current = value !== "" && own === value;
++        if (item.hasAttribute("current") !== current) item.toggleAttribute("current", current);
++      }
++    }
++
++    const header = this.querySelector<HTMLElement>(':scope > [slot="header"]');
++    if (header) applyTestHooks(this, "nav", header, "header");
++    const footer = this.querySelector<HTMLElement>(':scope > [slot="footer"]');
++    if (footer) applyTestHooks(this, "nav", footer, "footer");
++  }
++
++  // --- Aparência ---
++
++  // Botão de recolher: nó próprio ao fim do host (o CSS o põe depois do rodapé), só na sidebar com `collapsible`.
++  private syncToggle(active: boolean, collapsed: boolean, ring: string): void {
++    if (!active) {
++      this.toggleEl?.remove();
++      this.toggleEl = null;
++      this.toggleLabelEl = null;
++      return;
++    }
++
++    if (!this.toggleEl) {
++      const button = document.createElement("button");
++      button.type = "button";
++      button.setAttribute("data-ark-chrome", "toggle");
++      button.innerHTML = CHEVRON_SVG;
++      const label = document.createElement("span");
++      button.appendChild(label);
++      button.addEventListener("click", () => this.toggle());
++      this.appendChild(button);
++      this.toggleEl = button;
++      this.toggleLabelEl = label;
++    }
++
++    const locale = this.getLocale();
++    const text = collapsed ? locale.expand : locale.collapse;
++    const sizes: Record<ArkSize, string> = {
++      xs: "ark:min-h-(--ark-size-xs) ark:gap-2 ark:px-2 ark:text-xs",
++      sm: "ark:min-h-(--ark-size-sm) ark:gap-2 ark:px-2.5 ark:text-xs",
++      md: "ark:min-h-(--ark-size-md) ark:gap-3 ark:px-3 ark:text-sm",
++      lg: "ark:min-h-(--ark-size-lg) ark:gap-3 ark:px-3.5 ark:text-base",
++      xl: "ark:min-h-(--ark-size-xl) ark:gap-3 ark:px-4 ark:text-lg"
++    };
++    const size = sizes[(this.getAttribute("size") || "md").toLowerCase() as ArkSize] ?? sizes.md;
++
++    this.toggleEl.className = [
++      "ark:flex ark:w-full ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-md ark:font-medium ark:text-fg-muted ark:transition-colors ark:outline-none ark:ring-inset ark:hover:bg-surface-muted ark:hover:text-fg ark:focus-visible:ring-2",
++      ring,
++      size,
++      collapsed ? "ark:justify-center ark:gap-0 ark:px-0" : ""
++    ]
++      .join(" ")
++      .trim();
++    this.toggleEl.setAttribute("aria-label", text);
++    this.toggleEl.title = text;
++    this.toggleEl.setAttribute("aria-expanded", collapsed ? "false" : "true");
++    // O chevron aponta para onde a sidebar vai: para a própria borda ao recolher, para o conteúdo ao expandir.
++    const towardsEdge = this.side === "left" ? !collapsed : collapsed;
++    this.toggleEl.querySelector("svg")?.classList.toggle("ark:rotate-180", !towardsEdge);
++
++    if (this.toggleLabelEl) {
++      this.toggleLabelEl.textContent = text;
++      this.toggleLabelEl.className = collapsed ? "ark:hidden" : "ark:truncate";
++    }
++  }
++
++  private computeClasses(): string[] {
++    const variant = this.variant;
++    const base = "ark:relative ark:flex ark:border-border ark:bg-surface ark:text-fg";
++
++    if (variant === "navbar") {
++      return `${base} ark:flex-row ark:items-center ark:gap-1 ark:overflow-x-auto ark:border-b ark:px-3 ark:py-1.5`.split(
++        " "
++      );
++    }
++    if (variant === "tabbar") {
++      return `${base} ark:flex-row ark:items-stretch ark:border-t`.split(" ");
++    }
++
++    // Sidebar: coluna rolável; a largura vem das custom properties (components.css), com transição pelos tokens.
++    return [
++      base,
++      "ark:shrink-0 ark:flex-col ark:gap-0.5 ark:overflow-x-hidden ark:overflow-y-auto ark:overscroll-contain ark:p-2",
++      this.side === "right" ? "ark:border-l" : "ark:border-r",
++      this.collapsed ? "ark:w-(--ark-nav-rail-width)" : "ark:w-(--ark-nav-width)"
++    ]
++      .join(" ")
++      .split(" ");
++  }
++
++  private applyOwnClasses(next: string[]): void {
++    this.syncingClass = true;
++    for (const cls of this.ownClasses) {
++      if (!next.includes(cls)) this.classList.remove(cls);
++    }
++    for (const cls of next) {
++      if (!this.classList.contains(cls)) this.classList.add(cls);
++    }
++    this.ownClasses = next;
++    this.syncingClass = false;
++  }
++
++  private updateAppearance(): void {
++    const variant = this.variant;
++    const collapsed = this.collapsed;
++
++    this.setAttribute("role", "navigation");
++    const label = this.getAttribute("label");
++    if (label) {
++      if (this.getAttribute("aria-label") !== label) this.setAttribute("aria-label", label);
++      this.appliedLabel = label;
++    } else if (this.appliedLabel !== null && this.getAttribute("aria-label") === this.appliedLabel) {
++      this.removeAttribute("aria-label");
++      this.appliedLabel = null;
++    }
++
++    // Estado para o components.css (ordem dos slots, largura, o que some em `hidden`).
++    this.setAttribute("data-ark-variant", variant);
++    this.setAttribute("data-ark-side", this.side);
++    this.toggleAttribute("data-ark-rail", this.isRail());
++    this.toggleAttribute("data-ark-hidden", this.isHidden());
++
++    this.syncToggle(variant === "sidebar" && this.collapsible !== null, collapsed, this.ringClass());
++
++    this.applyOwnClasses(this.computeClasses());
++
++    applyTestHooks(this, "nav", this);
++    if (this.toggleEl) applyTestHooks(this, "nav", this.toggleEl, "toggle");
++  }
++
++  // Anel de foco do botão de recolher no intent do nav (strings completas, para o Tailwind gerá-las).
++  private ringClass(): string {
++    const rings: Record<ArkIntent, string> = {
++      primary: "ark:ring-primary-ring",
++      secondary: "ark:ring-secondary-ring",
++      success: "ark:ring-success-ring",
++      warning: "ark:ring-warning-ring",
++      danger: "ark:ring-danger-ring",
++      info: "ark:ring-info-ring",
++      neutral: "ark:ring-neutral-ring"
++    };
++    return rings[normalizeIntent(this.getAttribute("intent"), "primary")];
++  }
++}
++
++export default ArkNav;
+diff --git a/packages/web-components/src/components/index.ts b/packages/web-components/src/components/index.ts
+index 194818aaff7ba61ce5a869760a6e6af702206bb6..c49159bcfe64422ab6608ce29fbaaeaa8666c19b 100644
+--- a/packages/web-components/src/components/index.ts
++++ b/packages/web-components/src/components/index.ts
+@@ -23,6 +23,9 @@ export * from "./ark-kv-editor";
+ export * from "./ark-mark";
+ export * from "./ark-menu";
+ export * from "./ark-menu-item";
++export * from "./ark-nav";
++export * from "./ark-nav-group";
++export * from "./ark-nav-item";
+ export * from "./ark-pagination";
+ export * from "./ark-progress";
+ export * from "./ark-radio";
+diff --git a/packages/web-components/src/register.ts b/packages/web-components/src/register.ts
+index fa35082720989106cc543cd5f76b83ece976909e..05d2dd06f044fd73e4fc34278969b8cd419d6fc0 100644
+--- a/packages/web-components/src/register.ts
++++ b/packages/web-components/src/register.ts
+@@ -24,6 +24,9 @@ import {
+   ArkMark,
+   ArkMenu,
+   ArkMenuItem,
++  ArkNav,
++  ArkNavGroup,
++  ArkNavItem,
+   ArkPagination,
+   ArkProgress,
+   ArkRadio,
+@@ -178,6 +181,19 @@ export function registerTooarkComponents(): void {
+     customElements.define(ArkMenu.tagName, ArkMenu);
+   }
+ 
++  // Item e grupo antes do nav: o ark-nav coordena filhos já upgraded.
++  if (!customElements.get(ArkNavItem.tagName)) {
++    customElements.define(ArkNavItem.tagName, ArkNavItem);
++  }
++
++  if (!customElements.get(ArkNavGroup.tagName)) {
++    customElements.define(ArkNavGroup.tagName, ArkNavGroup);
++  }
++
++  if (!customElements.get(ArkNav.tagName)) {
++    customElements.define(ArkNav.tagName, ArkNav);
++  }
++
+   if (!customElements.get(ArkCard.tagName)) {
+     customElements.define(ArkCard.tagName, ArkCard);
+   }
+diff --git a/packages/web-components/src/styles/base.css b/packages/web-components/src/styles/base.css
+index 4933f567caeb8866f7bacec74948766c00167910..0295a92333f279b7683336d814c1394e7ce76282 100644
+--- a/packages/web-components/src/styles/base.css
++++ b/packages/web-components/src/styles/base.css
+@@ -39,6 +39,9 @@
+     ark-mark,
+     ark-menu,
+     ark-menu-item,
++    ark-nav,
++    ark-nav-group,
++    ark-nav-item,
+     ark-pagination,
+     ark-progress,
+     ark-radio,
+diff --git a/packages/web-components/src/styles/components.css b/packages/web-components/src/styles/components.css
+index 47b393931c8f8819e9cdb9bc76e3261bbaab1893..d3b6ccc970d3e2bbea01b5f101a4381c1528bc2c 100644
+--- a/packages/web-components/src/styles/components.css
++++ b/packages/web-components/src/styles/components.css
+@@ -933,4 +933,209 @@
+   ark-data-view[data-ark-drop-stacked] li[data-ark-drop="after"]::after {
+     bottom: calc(-0.375rem - 2.5px);
+   }
++
++  /* ---------- ark-nav: coluna (sidebar), barra (navbar) ou abas (tabbar); cabeçalho e rodapé do usuário ordenados ---------- */
++
++  /*
++   * Larguras da sidebar em custom properties (redefina-as no host ou em :root)
++   * e a transição de largura pelos tokens de movimento. O cabeçalho (logo), o
++   * rodapé (avatar) e o botão de recolher ficam presos nas pontas (sticky) e
++   * só os itens rolam entre eles; a altura do botão, por size, é o quanto o
++   * rodapé sobe para parar acima dele.
++   */
++  ark-nav {
++    --ark-nav-width: 16rem;
++    --ark-nav-rail-width: 3.5rem;
++    --ark-nav-toggle-height: var(--ark-size-md);
++  }
++
++  ark-nav[size="xs"] {
++    --ark-nav-toggle-height: var(--ark-size-xs);
++  }
++
++  ark-nav[size="sm"] {
++    --ark-nav-toggle-height: var(--ark-size-sm);
++  }
++
++  ark-nav[size="lg"] {
++    --ark-nav-toggle-height: var(--ark-size-lg);
++  }
++
++  ark-nav[size="xl"] {
++    --ark-nav-toggle-height: var(--ark-size-xl);
++  }
++
++  ark-nav[data-ark-variant="sidebar"] {
++    transition: width var(--ark-duration-default, 250ms) var(--ark-ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
++  }
++
++  /* Navbar: logo no início, rodapé (avatar, ações) no fim; rola por trackpad, toque e foco, sem barra visível. */
++  ark-nav[data-ark-variant="navbar"] {
++    scrollbar-width: none;
++  }
++
++  ark-nav[data-ark-variant="navbar"]::-webkit-scrollbar {
++    display: none;
++  }
++
++  /* Presos nas pontas, com fundo surface, acima dos itens (que são position: relative) que rolam por baixo. */
++  ark-nav[data-ark-variant="sidebar"] > [slot="header"] {
++    order: -1;
++    position: sticky;
++    top: 0;
++    z-index: 1;
++    flex-shrink: 0;
++    margin-bottom: 0.25rem;
++    @apply ark:bg-surface;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [slot="footer"] {
++    order: 1;
++    position: sticky;
++    bottom: 0;
++    z-index: 1;
++    flex-shrink: 0;
++    margin-top: auto;
++    padding-top: 0.25rem;
++    @apply ark:bg-surface;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"] {
++    order: 2;
++    position: sticky;
++    bottom: 0;
++    z-index: 1;
++    margin-top: auto;
++    @apply ark:bg-surface;
++  }
++
++  ark-nav[data-ark-variant="navbar"] > [slot="header"] {
++    order: -1;
++    display: inline-flex;
++    flex-shrink: 0;
++    align-items: center;
++    margin-inline-end: 0.5rem;
++  }
++
++  ark-nav[data-ark-variant="navbar"] > [slot="footer"] {
++    order: 1;
++    display: inline-flex;
++    flex-shrink: 0;
++    align-items: center;
++    margin-inline-start: auto;
++  }
++
++  /* Recolhida (trilho ou hidden): logo e rodapé centrados na coluna estreita, seja qual for o display deles. */
++  ark-nav:is([data-ark-rail], [data-ark-hidden])[data-ark-variant="sidebar"] > :is([slot="header"], [slot="footer"]) {
++    justify-content: center;
++    text-align: center;
++  }
++
++  /* Recolhida em hidden o botão fica logo abaixo do logo, com ou sem rodapé (o rodapé some e não empurra mais). */
++  ark-nav[data-ark-hidden] > [data-ark-chrome="toggle"] {
++    margin-top: 0;
++  }
++
++  /* O sticky para no padding do host (p-2) e deixa transparentes a margem e o gap (0.25rem + 0.125rem) entre as
++     pontas e os itens: faixas pintadas fora de cada ponta cobrem os itens que passariam por ali. Pseudoelementos, e
++     não box-shadow, porque o anel de foco do botão trocaria a sombra. */
++  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::before,
++  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::after,
++  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::before,
++  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::after,
++  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::before,
++  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::after {
++    content: "";
++    position: absolute;
++    inset-inline: 0;
++    @apply ark:bg-surface;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::before {
++    top: -0.5rem;
++    height: 0.5rem;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::after {
++    bottom: -0.375rem;
++    height: 0.375rem;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::before,
++  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::before {
++    top: -0.125rem;
++    height: 0.125rem;
++  }
++
++  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::after,
++  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::after {
++    bottom: -0.5rem;
++    height: 0.5rem;
++  }
++
++  /* Com rodapé, o botão é quem fica no fundo e o rodapé para logo acima dele. */
++  ark-nav[data-ark-variant="sidebar"]:has(> [slot="footer"]) > [data-ark-chrome="toggle"] {
++    margin-top: 0;
++  }
++
++  ark-nav[data-ark-variant="sidebar"]:has(> [data-ark-chrome="toggle"]) > [slot="footer"] {
++    bottom: calc(var(--ark-nav-toggle-height) + 0.125rem);
++  }
++
++  /* Recolhida com collapsible="hidden": só o cabeçalho e o botão ficam; o resto sai também da árvore de acessibilidade.
++     Com !important porque os filhos são hosts ark-* (item, grupo) cujas utilities de display venceriam esta camada. */
++  ark-nav[data-ark-hidden] > :not([slot="header"]):not([data-ark-chrome="toggle"]) {
++    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:flex dos hosts filhos */
++    display: none !important;
++  }
++
++  /* Item: o ícone do usuário vem antes do rótulo, no tamanho do size; o trailing (badge, atalho) vai à direita. */
++  ark-nav-item > [slot="icon"] {
++    order: -1;
++    display: inline-flex;
++    flex-shrink: 0;
++    align-items: center;
++    justify-content: center;
++    width: 1.25rem;
++    height: 1.25rem;
++  }
++
++  ark-nav-item > [slot="icon"] > :where(svg) {
++    width: 100%;
++    height: 100%;
++  }
++
++  ark-nav-item:is([size="xs"], [size="sm"]) > [slot="icon"] {
++    width: 1rem;
++    height: 1rem;
++  }
++
++  ark-nav-item:is([size="xl"], [variant="tabbar"]) > [slot="icon"] {
++    width: 1.5rem;
++    height: 1.5rem;
++  }
++
++  ark-nav-item > [slot="trailing"] {
++    order: 1;
++    display: inline-flex;
++    align-items: center;
++    gap: 0.25rem;
++    margin-inline-start: auto;
++    @apply ark:text-xs ark:text-fg-muted;
++  }
++
++  /* Trilho: só o ícone (o rótulo próprio fica sr-only, para o nome do link); tabbar: ícone e rótulo, sem trailing. Com
++     !important porque o trailing costuma ser um host ark-* (badge) cuja utility de display venceria esta camada. */
++  ark-nav-item[data-ark-rail] > :not([slot="icon"]):not([data-ark-chrome]),
++  ark-nav-item[variant="tabbar"] > [slot="trailing"] {
++    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:inline-flex de um ark-badge no slot */
++    display: none !important;
++  }
++
++  /* Grupo expansível fechado: os itens somem; no trilho ficam, porque o cabeçalho que os abriria está oculto. Com
++     !important porque os itens são hosts ark-nav-item, cujo ark:flex venceria esta camada. */
++  ark-nav-group[expandable]:not([open]):not([data-ark-rail]) > :not([data-ark-chrome]) {
++    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:flex dos itens */
++    display: none !important;
++  }
+ }
+diff --git a/packages/web-components/src/tag-map.ts b/packages/web-components/src/tag-map.ts
+index 45d3ae70d6f0ffd52e8a0ff30104530f4b2d3067..30f754b4da97bd67ab3abd8ae63871687352e3ce 100644
+--- a/packages/web-components/src/tag-map.ts
++++ b/packages/web-components/src/tag-map.ts
+@@ -25,6 +25,9 @@ import type {
+   ArkMark,
+   ArkMenu,
+   ArkMenuItem,
++  ArkNav,
++  ArkNavGroup,
++  ArkNavItem,
+   ArkPagination,
+   ArkProgress,
+   ArkRadio,
+@@ -72,6 +75,9 @@ declare global {
+     "ark-mark": ArkMark;
+     "ark-menu": ArkMenu;
+     "ark-menu-item": ArkMenuItem;
++    "ark-nav": ArkNav;
++    "ark-nav-group": ArkNavGroup;
++    "ark-nav-item": ArkNavItem;
+     "ark-pagination": ArkPagination;
+     "ark-progress": ArkProgress;
+     "ark-radio": ArkRadio;

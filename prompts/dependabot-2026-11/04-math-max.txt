@@ -1,0 +1,4 @@
+refactor(web-components): Math.max no tab stop do ark-color-swatches e do ark-shape-picker
+
+O Biome 2.6 traz a regra useMathMinMax, que avisa no ternario "selectedIndex >= 0 ? selectedIndex : 0". O resultado
+de Math.max(selectedIndex, 0) e o mesmo: o indice vem de findIndex/indexOf, entao e -1 ou a posicao.

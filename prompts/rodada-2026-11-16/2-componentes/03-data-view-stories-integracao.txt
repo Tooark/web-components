@@ -1,0 +1,15 @@
+test(storybook): ark-data-view e ark-pagination nas stories de integracao, com os wrappers Angular
+
+- framework-props: as duas tags na conferencia de setters, com rows, columns, selected, sort, pageSizes, total e page
+  gravados antes do registro.
+- framework-wrappers: ArkDataView e ArkPagination de React e Vue contra react-dom e vue reais, com celulas em JSX e
+  slots de celula.
+- framework-angular (novo, Integration/Angular Wrappers): os wrappers Angular de verdade, compilados em JIT a partir
+  do src e montados numa aplicacao sem zone.js; inputs, outputs, slot projetado e ng-template de celula e de card.
+- .storybook/main.ts: oxc.decorator.legacy (sem ele o Vite deixa os decorators do TypeScript na saida e o modulo nao
+  carrega) e o alias @tooark/angular; de quebra, acentos no comentario do staticDirs.
+- package.json do app e lockfile: @tooark/angular e as devDependencies Angular, com @angular/platform-browser fixo no
+  patch 21.2.26 que o lockfile tem para o core (cada patch pede o mesmo patch de core e common), as mesmas versoes
+  do packages/angular.
+- As stories Integration/* sao so testes (renderizam um no vazio): tags ["!dev", "!autodocs"] as tiram da barra
+  lateral e do Docs, e a suite continua rodando todas.

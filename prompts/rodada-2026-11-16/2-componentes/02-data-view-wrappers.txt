@@ -1,0 +1,17 @@
+feat(react,vue,angular): wrappers do ark-pagination e do ark-data-view
+
+Conteudo de celula nos termos de cada framework, com o mesmo resultado nos tres e um so mecanismo: o wrapper entrega
+ao elemento funcoes render estaveis que devolvem um span display: contents por celula, desenha nesses spans e solta
+os que o elemento desconectou quando ark-render dispara.
+
+- React: ArkPagination e ArkDataView, generico no tipo do registro (<ArkDataView<User> />); render e cardRender da
+  coluna desenham JSX por portal (flushSync num microtask depois do ark-render, para a celula nunca pintar vazia),
+  rodam de novo a cada render e el.columns so e reescrito quando a assinatura das colunas muda, entao columns inline
+  dispensam useMemo. Tipagens JSX das duas tags e typecheck/data-view.tsx compilado no build.
+- Vue: ArkPagination e ArkDataView com os slots com escopo #cell-<key> e #card (ou um render de coluna que devolve
+  VNodes), teleportados para as celulas e reativos.
+- Angular: ArkPaginationComponent e ArkDataViewComponent; <ng-template arkDataViewCell="<key>" let-row> e
+  <ng-template arkDataViewCard let-row> (ArkDataViewCellDirective, ArkDataViewCardDirective) instanciados no
+  ViewContainerRef do wrapper, com a deteccao de mudancas do componente que os declara.
+- check-ssr: renderToString do ArkDataView em React e Vue (no servidor sai so a tag) e ViewContainerRef no injetor
+  que constroi cada wrapper Angular.

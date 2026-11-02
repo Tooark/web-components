@@ -1,0 +1,121 @@
+chore(deps): bump the runtime-minor-patch group with 10 updates
+
+Bumps the runtime-minor-patch group with 10 updates:
+
+| Package | From | To |
+| --- | --- | --- |
+| [tslib](https://github.com/Microsoft/tslib) | `2.8.1` | `2.9.1` |
+| [motion](https://github.com/motiondivision/motion) | `14.1.0` | `14.10.0` |
+| [@tiptap/core](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/core) | `3.31.4` | `3.33.0` |
+| [@tiptap/extension-highlight](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/extension-highlight) | `3.31.4` | `3.33.0` |
+| [@tiptap/extension-image](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/extension-image) | `3.31.4` | `3.33.0` |
+| [@tiptap/extension-placeholder](https://github.com/ueberdosis/tiptap/tree/HEAD/packages-deprecated/extension-placeholder) | `3.31.4` | `3.33.0` |
+| [@tiptap/extension-text-align](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/extension-text-align) | `3.31.4` | `3.33.0` |
+| [@tiptap/extension-text-style](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/extension-text-style) | `3.31.4` | `3.33.0` |
+| [@tiptap/pm](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/pm) | `3.31.4` | `3.33.0` |
+| [@tiptap/starter-kit](https://github.com/ueberdosis/tiptap/tree/HEAD/packages/starter-kit) | `3.31.4` | `3.33.0` |
+
+
+Updates `tslib` from 2.8.1 to 2.9.1
+- [Release notes](https://github.com/Microsoft/tslib/releases)
+- [Commits](https://github.com/Microsoft/tslib/compare/v2.8.1...v2.9.1)
+
+Updates `motion` from 14.1.0 to 14.10.0
+- [Changelog](https://github.com/motiondivision/motion/blob/main/CHANGELOG.md)
+- [Commits](https://github.com/motiondivision/motion/compare/v14.1.0...v14.10.0)
+
+Updates `@tiptap/core` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/core/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/core)
+
+Updates `@tiptap/extension-highlight` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/extension-highlight/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/extension-highlight)
+
+Updates `@tiptap/extension-image` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/extension-image/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/extension-image)
+
+Updates `@tiptap/extension-placeholder` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages-deprecated/extension-placeholder/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages-deprecated/extension-placeholder)
+
+Updates `@tiptap/extension-text-align` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/extension-text-align/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/extension-text-align)
+
+Updates `@tiptap/extension-text-style` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/extension-text-style/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/extension-text-style)
+
+Updates `@tiptap/pm` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/pm/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/pm)
+
+Updates `@tiptap/starter-kit` from 3.31.4 to 3.33.0
+- [Release notes](https://github.com/ueberdosis/tiptap/releases)
+- [Changelog](https://github.com/ueberdosis/tiptap/blob/v3.33.0/packages/starter-kit/CHANGELOG.md)
+- [Commits](https://github.com/ueberdosis/tiptap/commits/v3.33.0/packages/starter-kit)
+
+---
+updated-dependencies:
+- dependency-name: tslib
+  dependency-version: 2.9.1
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: motion
+  dependency-version: 14.10.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/core"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/extension-highlight"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/extension-image"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/extension-placeholder"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/extension-text-align"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/extension-text-style"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/pm"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+- dependency-name: "@tiptap/starter-kit"
+  dependency-version: 3.33.0
+  dependency-type: direct:production
+  update-type: version-update:semver-minor
+  dependency-group: runtime-minor-patch
+...
+
+Signed-off-by: dependabot[bot] <support@github.com>

@@ -1,0 +1,27 @@
+feat(web-components): ark-pagination e ark-data-view
+
+Colecao de registros como tabela ou cards, com paginacao propria: simples por padrao e com cada recurso ligado por
+atributo.
+
+- ark-pagination: o host e o role="navigation"; resumo do intervalo, select opcional de itens por pagina (page-sizes,
+  um ark-select) e a faixa de paginas com anterior, proxima, reticencias e numero constante de itens (siblings).
+  page, page-size e total sao a fonte da verdade: o clique reescreve page, emite ark-page-change
+  ({ page, pageSize, pageCount }) e anuncia a pagina; trocar o tamanho mantem na tela o primeiro item visivel.
+- ark-data-view: rows (os objetos do app, guardados por referencia) e columns sao propriedades JS; a coluna escolhe o
+  campo (key, com caminho pontuado), onde aparece (show), como ordena (sortable, compare), o lugar no card (cardRole,
+  cardSpan, cardLabel) e o conteudo por render, que devolve um no do DOM ou texto, nunca HTML; cardRender desenha o
+  corpo inteiro do card. view="auto" (padrao) mostra cards enquanto o proprio componente e mais estreito que
+  breakpoint, table e cards fixam um; o seletor reescreve view (ark-view-change) e no-view-selector o esconde sem
+  tirar a decisao do view. mode="client" busca, ordena e pagina rows; mode="server" so publica a consulta em
+  ark-query-change ({ page, pageSize, sort, search, reason }) e mostra o que o app devolve, com total e loading.
+- Sem atributo nenhum e uma tabela simples com o seletor de visao; o resto e opt-in: searchable, page-size (compoe o
+  ark-pagination), selectable (checkboxes, selecionar tudo com estado misto, selected, ark-selection-change e o slot
+  selection para acoes em massa), reorderable (alca por registro: arraste com marca de destino e auto-scroll, setas
+  e menu de mover no clique; ark-reorder) e clickable (linhas e cards focaveis, ark-row-click). Slots toolbar,
+  selection e empty, com os nos do componente encaixados em volta para a ordem de Tab seguir a visual. ark-render
+  (nao borbulha) segue cada redesenho do conteudo e e o gancho dos wrappers.
+- core: tipos ArkDataView*, ArkPageChangeDetail, ArkPaginationStyleOptions e 25 textos no ArkLocale (en/pt/es).
+- CSS: as duas tags na lista de hosts do base.css; grid do host, slots e marcas de destino do arraste (sombra na
+  linha, linha ::after ao lado do card) no components.css. Registro e HTMLElementTagNameMap.
+- Stories Core/ArkPagination e Core/ArkDataView: Docs com argTypes por categoria, Playground com log de eventos e
+  servidor simulado, exemplos de cada recurso e testes de interacao, TestHooks incluido.

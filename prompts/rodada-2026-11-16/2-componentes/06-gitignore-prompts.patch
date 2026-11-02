@@ -1,0 +1,11 @@
+diff --git a/.gitignore b/.gitignore
+index 6858d2cdf71a1738b6a8389bcf69b87201e65a46..f9a32e0b46d95dbefae8390ca991c002d4b2a444 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -51,3 +51,6 @@ pnpm-debug.log*
+ .rpt2_cache/
+ .rollup.cache
+ .sass-cache
++
++# prompts
++prompts/

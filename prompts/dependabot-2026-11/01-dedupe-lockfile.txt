@@ -1,0 +1,10 @@
+build(deps): pnpm dedupe unifica o prosemirror depois do bump do tiptap
+
+O bump do @tiptap/pm para 3.32.0 resolveu prosemirror-model 1.25.12, prosemirror-transform 1.12.2 e prosemirror-view
+1.42.6 so para o proprio @tiptap/pm; os outros pacotes prosemirror-* ficaram presos no lockfile as versoes antigas
+(1.25.11, 1.12.0 e 1.42.3). Com duas copias do prosemirror-model carregadas, criar lista ou quebrar bloco lanca
+"Can not convert <> to a Fragment (looks like multiple versions of prosemirror-model were loaded)" e a story
+Formatting do ark-wysiwyg falha.
+
+pnpm dedupe deixa uma versao de cada. De passagem unifica duplicatas que ja estavam na main: postcss 8.5.26 e 8.5.28
+em 8.5.29, nanoid 3.3.18 em 3.3.20 e source-map-js 1.2.1 em 1.2.2.

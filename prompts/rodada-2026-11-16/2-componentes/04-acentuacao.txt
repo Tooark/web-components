@@ -1,0 +1,11 @@
+docs: acentuacao dos textos em portugues nas stories e nos comentarios
+
+Revisao de acentos em 97 arquivos, so texto: descricoes do Docs e textos de demonstracao das stories, JSDoc dos
+wrappers React e Vue (que vai para o tooltip do editor e para o .d.ts publicado) e comentarios de ark-carousel,
+ark-dialog, ark-tooltip, do wysiwyg, dos rollup.config.mjs, do postbuild do React e dos scripts. Inclui as stories
+que entraram depois da revisao original: o Extensions do ark-code-editor (1.6.0) e o Enter em formularios do
+ark-button e do ark-datepicker (1.6.1).
+
+- Nenhum atributo, evento, test id ou texto de locale mudou. Ficam sem acento os valores que sao dado ou codigo (test
+  ids, valores de atributo, dados de teste) e os dicionarios en e es.
+- Onde o play confere um texto da propria story, a assercao acompanha a troca (ark-toaster, ark-motion-plus).

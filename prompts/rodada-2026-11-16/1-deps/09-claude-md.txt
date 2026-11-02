@@ -1,0 +1,10 @@
+docs: Biome com Markdown, Motion pela WAAPI e bumps do Dependabot no CLAUDE.md
+
+- Requisitos: desde a 2.6 o Biome tambem formata Markdown e o biome ci reprova; pnpm check:fix preenche as tabelas e
+  formata os blocos de codigo com o estilo do codigo.
+- Armadilhas de play: a lib Motion 14.2 anima x/y/scale pela WAAPI, entao o style.transform inline fica em "none"
+  durante a animacao; o meio da animacao se le pelo transform computado (offset) e o fim por transform e opacidade
+  computados (settled).
+- Politica de dependencias: o Dependabot nao sobe o storybook (o app tem o mesmo nome), so os addons, entao o core
+  acompanha a mao no mesmo PR; e os bumps em grupo deixam copias velhas no lockfile (dois prosemirror-model apos
+  um bump do @tiptap/pm), por isso pnpm dedupe depois de mesclar o lockfile de um PR dele.

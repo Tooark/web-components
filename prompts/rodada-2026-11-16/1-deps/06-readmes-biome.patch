@@ -1,0 +1,552 @@
+diff --git a/README.md b/README.md
+index 1efa10318a842de063c57d6ccae222d245c0af2e..a3e1bf3c7c1cd3dd067131c4d708333af2e4f1bb 100644
+--- a/README.md
++++ b/README.md
+@@ -79,53 +79,53 @@ The wrappers need `@tooark/web-components` next to them, and chart, wysiwyg and
+ 
+ ## 🧩 Components
+ 
+-| Element               | Package        | Highlights                                                                                                                                                                                                                                                                                                                                                                                 |
+-| --------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+-| `ark-alert`           | web-components | Alert/banner: the host is the box in the intent's soft color, your children are the message (free text or elements), `slot="icon"` left, `slot="action"` right, `heading`, `dismissible` with animated exit, `live` region (`status`/`alert`).                                                                                                                                             |
+-| `ark-avatar`          | web-components | Avatar (`role="img"` named by `name`): initials from `name`, `src` image that falls back to the initials on load error, `size`, `shape` circle/square, custom `color`, `variant` soft/solid.                                                                                                                                                                                               |
+-| `ark-badge`           | web-components | Short status/category label: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, custom `color` via `color-mix`. The host is the badge; icon and text stay as its children.                                                                                                                                                                                                           |
+-| `ark-button`          | web-components | Intents, sizes, style variants (solid/outline/ghost), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, `status` feedback (success/error glyph + announcement), link mode (`href`).                                                                                                                                                                                     |
+-| `ark-calendar`        | web-components | Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`).                                                                                                                                                                                                                   |
+-| `ark-card`            | web-components | Card: the host is the box (`surface`, `border`, `rounded`) and a grid: `heading` (h2) or `slot="header"` with `slot="actions"` on the top row, unslotted children as the body, `slot="footer"` last with a divider; `padding` none–lg.                                                                                                                                                     |
+-| `ark-carousel`        | web-components | Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.                                                                                                                                                                                                                                        |
+-| `ark-checkbox`        | web-components | Checkbox drawn by the component (`role="checkbox"` button + hidden native input for forms and `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/free children as the label, `helper` hint below it, sizes, intents. Emits `change`.                                                                                                                                 |
+-| `ark-clock`           | web-components | Time selection with scrollable digital columns (hours/minutes/seconds), 24h/12h, minute step, localized.                                                                                                                                                                                                                                                                                   |
+-| `ark-color-swatches`  | web-components | Color palette as a `radiogroup`: swatches from `colors` (`{ name, value }[]`, JSON attribute or JS property), `value`, arrows navigate, `disabled`, `size`. Emits `change` with the value.                                                                                                                                                                                                 |
+-| `ark-command-item`    | web-components | Command palette item (the host is the `role="option"`): free children, `slot="trailing"` for a shortcut, `value`, `group`, `label` (filter text), `disabled`. Emits `ark-select`.                                                                                                                                                                                                          |
+-| `ark-command-palette` | web-components | Command palette on the Popover API: search field (an `ark-input` of its own), `ark-command-item` children grouped and filtered (`filter`) or searched by the app (`ark-query`), arrows + Enter, `hotkey` (`/`, `mod+k`), `hint` and `busy` for the empty message. Emits `ark-select`, `ark-query`, `ark-open`, `ark-close`.                                                                |
+-| `ark-copy-button`     | web-components | Copy button: extends `ark-button` (same variants, sizes, `icon-only`, forms, hooks); copies `value` or the `for` element, swaps the icon for a check and the text/`title` for "copied" for `feedback-ms`, announces it. Emits `ark-copy`.                                                                                                                                                  |
+-| `ark-datepicker`      | web-components | Date/time picker composing `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (default)/date/time, inline or `input` mode with field + popup, localized formatting, typed input parsing, forms.                                                                                                                                                                                   |
+-| `ark-dialog`          | web-components | Modal dialog on the Popover API (top layer, `::backdrop` scrim, no portal): the host is the panel, your children are the body, `slot="footer"` is the footer; header from `label`, focus trap, Esc/scrim, `sm`–`xl` or `full`.                                                                                                                                                             |
+-| `ark-drawer`          | web-components | Drawer anchored to an edge: `overlay` (Popover API, scrim, focus trap, Esc) or `inline` (in the page flow, e.g. a bottom console); `side`, `size` preset or CSS length, header from `label` with a `slot="actions"` row, `slot="footer"`, slide with the `sheet` easing. Emits `ark-open`/`ark-close`.                                                                                     |
+-| `ark-empty`           | web-components | Empty state: dashed box with a dimmed `slot="icon"`, `heading` (h3), `description` and an optional `slot="action"` button; children stay in place, ordered by CSS.                                                                                                                                                                                                                         |
+-| `ark-file-input`      | web-components | File field with the `ark-input` grid (label, helper/error): hidden native `<input type="file">` for forms, drop zone with `dragover` highlight, keyboard-accessible choose button, list of selected names, `accept`/`multiple`, `directory` for a whole folder. Emits `change` with the files and announces them.                                                                          |
+-| `ark-input`           | web-components | Standardized text field: label, helper/error with aria, prefix/suffix via `slot`, password `reveal`, native attributes passed through, sizes, intents, `rounded`.                                                                                                                                                                                                                          |
+-| `ark-kbd`             | web-components | Keyboard key: the host is the key (mono, border, `surface-muted`, bottom edge) around your text; `size`.                                                                                                                                                                                                                                                                                   |
+-| `ark-kv-editor`       | web-components | Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON, opt-in `valueField` for a value cell of your own (variable autocomplete, for instance). Composes other ark-\* controls. Emits `change`, `ark-add`, `ark-delete`.                              |
+-| `ark-mark`            | web-components | Scope mark: one of ten shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.                                                                                                                                                     |
+-| `ark-menu`            | web-components | Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.                                                                                                                                                                           |
+-| `ark-menu-item`       | web-components | Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).                                                                                                                                                                                                                        |
+-| `ark-progress`        | web-components | Progress bar (`role="progressbar"` on the host): `value`/`max` with token-driven width transition, `show-value`, `indeterminate` loop exempt from reduced motion, `label`, sizes, intents.                                                                                                                                                                                                 |
+-| `ark-radio`           | web-components | Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label, `helper` hint. Emits `change` on the one checked.                                                                                                                                             |
+-| `ark-scheduler`       | web-components | Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.                                                                                                                                                                                                                                                    |
+-| `ark-select`          | web-components | Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.                                                                                                                                                                                   |
+-| `ark-shape-picker`    | web-components | Shape picker as a `radiogroup`: the ten `ark-mark` shapes, or the ones `shapes` lists, drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.                                                                                                                                                                               |
+-| `ark-skeleton`        | web-components | Loading placeholder: the host is the block (`.ark-skeleton`, `aria-hidden`), sized by your class/style; `rows` renders bars, `animated` opts into the shimmer, `rounded`.                                                                                                                                                                                                                  |
+-| `ark-spinner`         | web-components | Standalone loading indicator (`role="status"`): the button's spinner SVG on `.ark-animate-spin` (keeps spinning under reduced motion), screen-reader label by `lang` or `label`, `size`, optional `intent` (inherits the text color otherwise).                                                                                                                                            |
+-| `ark-split-pane`      | web-components | Resizable panels: your children are the panels, the handles are the component's own nodes at the end of the host; `direction`, `sizes` (percentages, rewritten on every change), `data-min`/`data-max` per panel, keyboard and pointer-capture drag. Emits `ark-resize`.                                                                                                                   |
+-| `ark-status-dot`      | web-components | Status dot: the host is the circle in the intent color (default `neutral`); `label` makes it a named `role="img"`, without it it is decorative; `size`. Static, never pulses.                                                                                                                                                                                                              |
+-| `ark-switch`          | web-components | Accessible on/off switch (`role="switch"`): optional ON/OFF text and ✓/✕ icons, intents, form participation via hidden checkbox.                                                                                                                                                                                                                                                           |
+-| `ark-tab`             | web-components | Tab item (`role="tab"`, the host is the control): free children, `disabled`, `controls`, `closable` and `dirty` in the editor variant. Emits `ark-close`.                                                                                                                                                                                                                                  |
+-| `ark-tabs`            | web-components | Tab strip (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex with arrows/Home/End, `slot="actions"` at the end, `change` with the active value. Panels stay with the app.                                                                                                                                                                                                   |
+-| `ark-textarea`        | web-components | Multi-line field with the `ark-input` grid: `rows`, `autosize` (native `field-sizing`, JS fallback), `monospace`, `resize`, helper/error with aria, sizes, intents, `rounded`.                                                                                                                                                                                                             |
+-| `ark-toaster`         | web-components | Sonner-style toasts: programmatic API, positions, rich colors, actions, animated enter/exit, localized close button.                                                                                                                                                                                                                                                                       |
+-| `ark-toggle`          | web-components | Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.                                                                                                                                                                                                                                                                                          |
+-| `ark-toggle-group`    | web-components | Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.                                                                                                                                                                                                                                                      |
+-| `ark-tooltip`         | web-components | Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.                                                                                                                                                                                              |
+-| `ark-chart`           | chart          | ECharts-powered chart types with theme support; `aria-label` names the chart as one image.                                                                                                                                                                                                                                                                                                 |
+-| `ark-wysiwyg-editor`  | wysiwyg        | Tiptap-based rich-text editor: JSON content sanitized on the way in, opt-in toolbar groups (style, marks, color, align, lists, link, media, blocks, clear, history), external images/videos through an `uploadFile` hook (never base64).                                                                                                                                                   |
+-| `ark-wysiwyg-viewer`  | wysiwyg        | Read-only viewer sharing the editor's schema: the same sanitized JSON content, links opened in a new tab.                                                                                                                                                                                                                                                                                  |
+-| `ark-code-editor`     | code           | CodeMirror 6 editor: `language` json/javascript/yaml/text, line numbers, folding, search, Tab indentation, LF/CRLF, `readonly`, `wrap`, `placeholder`, completions (`variableKeys` after `{{`, `completions`, `completionSource`), `format()`, token theme (`auto` follows the page), opt-in `variables`, `single-line`, `extensions`. Emits `change`, `ark-submit`, `ark-format-error`.   |
++| Element               | Package        | Highlights                                                                                                                                                                                                                                                                                                                                                                               |
++| --------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
++| `ark-alert`           | web-components | Alert/banner: the host is the box in the intent's soft color, your children are the message (free text or elements), `slot="icon"` left, `slot="action"` right, `heading`, `dismissible` with animated exit, `live` region (`status`/`alert`).                                                                                                                                           |
++| `ark-avatar`          | web-components | Avatar (`role="img"` named by `name`): initials from `name`, `src` image that falls back to the initials on load error, `size`, `shape` circle/square, custom `color`, `variant` soft/solid.                                                                                                                                                                                             |
++| `ark-badge`           | web-components | Short status/category label: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, custom `color` via `color-mix`. The host is the badge; icon and text stay as its children.                                                                                                                                                                                                         |
++| `ark-button`          | web-components | Intents, sizes, style variants (solid/outline/ghost), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, `status` feedback (success/error glyph + announcement), link mode (`href`).                                                                                                                                                                                   |
++| `ark-calendar`        | web-components | Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`).                                                                                                                                                                                                                 |
++| `ark-card`            | web-components | Card: the host is the box (`surface`, `border`, `rounded`) and a grid: `heading` (h2) or `slot="header"` with `slot="actions"` on the top row, unslotted children as the body, `slot="footer"` last with a divider; `padding` none–lg.                                                                                                                                                   |
++| `ark-carousel`        | web-components | Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.                                                                                                                                                                                                                                      |
++| `ark-checkbox`        | web-components | Checkbox drawn by the component (`role="checkbox"` button + hidden native input for forms and `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/free children as the label, `helper` hint below it, sizes, intents. Emits `change`.                                                                                                                               |
++| `ark-clock`           | web-components | Time selection with scrollable digital columns (hours/minutes/seconds), 24h/12h, minute step, localized.                                                                                                                                                                                                                                                                                 |
++| `ark-color-swatches`  | web-components | Color palette as a `radiogroup`: swatches from `colors` (`{ name, value }[]`, JSON attribute or JS property), `value`, arrows navigate, `disabled`, `size`. Emits `change` with the value.                                                                                                                                                                                               |
++| `ark-command-item`    | web-components | Command palette item (the host is the `role="option"`): free children, `slot="trailing"` for a shortcut, `value`, `group`, `label` (filter text), `disabled`. Emits `ark-select`.                                                                                                                                                                                                        |
++| `ark-command-palette` | web-components | Command palette on the Popover API: search field (an `ark-input` of its own), `ark-command-item` children grouped and filtered (`filter`) or searched by the app (`ark-query`), arrows + Enter, `hotkey` (`/`, `mod+k`), `hint` and `busy` for the empty message. Emits `ark-select`, `ark-query`, `ark-open`, `ark-close`.                                                              |
++| `ark-copy-button`     | web-components | Copy button: extends `ark-button` (same variants, sizes, `icon-only`, forms, hooks); copies `value` or the `for` element, swaps the icon for a check and the text/`title` for "copied" for `feedback-ms`, announces it. Emits `ark-copy`.                                                                                                                                                |
++| `ark-datepicker`      | web-components | Date/time picker composing `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (default)/date/time, inline or `input` mode with field + popup, localized formatting, typed input parsing, forms.                                                                                                                                                                                 |
++| `ark-dialog`          | web-components | Modal dialog on the Popover API (top layer, `::backdrop` scrim, no portal): the host is the panel, your children are the body, `slot="footer"` is the footer; header from `label`, focus trap, Esc/scrim, `sm`–`xl` or `full`.                                                                                                                                                           |
++| `ark-drawer`          | web-components | Drawer anchored to an edge: `overlay` (Popover API, scrim, focus trap, Esc) or `inline` (in the page flow, e.g. a bottom console); `side`, `size` preset or CSS length, header from `label` with a `slot="actions"` row, `slot="footer"`, slide with the `sheet` easing. Emits `ark-open`/`ark-close`.                                                                                   |
++| `ark-empty`           | web-components | Empty state: dashed box with a dimmed `slot="icon"`, `heading` (h3), `description` and an optional `slot="action"` button; children stay in place, ordered by CSS.                                                                                                                                                                                                                       |
++| `ark-file-input`      | web-components | File field with the `ark-input` grid (label, helper/error): hidden native `<input type="file">` for forms, drop zone with `dragover` highlight, keyboard-accessible choose button, list of selected names, `accept`/`multiple`, `directory` for a whole folder. Emits `change` with the files and announces them.                                                                        |
++| `ark-input`           | web-components | Standardized text field: label, helper/error with aria, prefix/suffix via `slot`, password `reveal`, native attributes passed through, sizes, intents, `rounded`.                                                                                                                                                                                                                        |
++| `ark-kbd`             | web-components | Keyboard key: the host is the key (mono, border, `surface-muted`, bottom edge) around your text; `size`.                                                                                                                                                                                                                                                                                 |
++| `ark-kv-editor`       | web-components | Key/value editor: rows `{ id, key, value, enabled }` (JS property) to enable, edit, delete and add, optional `types`/`secret`/`description` columns, bulk mode as `key:value` lines or JSON, opt-in `valueField` for a value cell of your own (variable autocomplete, for instance). Composes other ark-\* controls. Emits `change`, `ark-add`, `ark-delete`.                            |
++| `ark-mark`            | web-components | Scope mark: one of ten shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.                                                                                                                                                   |
++| `ark-menu`            | web-components | Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.                                                                                                                                                                         |
++| `ark-menu-item`       | web-components | Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).                                                                                                                                                                                                                      |
++| `ark-progress`        | web-components | Progress bar (`role="progressbar"` on the host): `value`/`max` with token-driven width transition, `show-value`, `indeterminate` loop exempt from reduced motion, `label`, sizes, intents.                                                                                                                                                                                               |
++| `ark-radio`           | web-components | Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label, `helper` hint. Emits `change` on the one checked.                                                                                                                                           |
++| `ark-scheduler`       | web-components | Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.                                                                                                                                                                                                                                                  |
++| `ark-select`          | web-components | Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.                                                                                                                                                                                 |
++| `ark-shape-picker`    | web-components | Shape picker as a `radiogroup`: the ten `ark-mark` shapes, or the ones `shapes` lists, drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.                                                                                                                                                                             |
++| `ark-skeleton`        | web-components | Loading placeholder: the host is the block (`.ark-skeleton`, `aria-hidden`), sized by your class/style; `rows` renders bars, `animated` opts into the shimmer, `rounded`.                                                                                                                                                                                                                |
++| `ark-spinner`         | web-components | Standalone loading indicator (`role="status"`): the button's spinner SVG on `.ark-animate-spin` (keeps spinning under reduced motion), screen-reader label by `lang` or `label`, `size`, optional `intent` (inherits the text color otherwise).                                                                                                                                          |
++| `ark-split-pane`      | web-components | Resizable panels: your children are the panels, the handles are the component's own nodes at the end of the host; `direction`, `sizes` (percentages, rewritten on every change), `data-min`/`data-max` per panel, keyboard and pointer-capture drag. Emits `ark-resize`.                                                                                                                 |
++| `ark-status-dot`      | web-components | Status dot: the host is the circle in the intent color (default `neutral`); `label` makes it a named `role="img"`, without it it is decorative; `size`. Static, never pulses.                                                                                                                                                                                                            |
++| `ark-switch`          | web-components | Accessible on/off switch (`role="switch"`): optional ON/OFF text and ✓/✕ icons, intents, form participation via hidden checkbox.                                                                                                                                                                                                                                                         |
++| `ark-tab`             | web-components | Tab item (`role="tab"`, the host is the control): free children, `disabled`, `controls`, `closable` and `dirty` in the editor variant. Emits `ark-close`.                                                                                                                                                                                                                                |
++| `ark-tabs`            | web-components | Tab strip (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex with arrows/Home/End, `slot="actions"` at the end, `change` with the active value. Panels stay with the app.                                                                                                                                                                                                 |
++| `ark-textarea`        | web-components | Multi-line field with the `ark-input` grid: `rows`, `autosize` (native `field-sizing`, JS fallback), `monospace`, `resize`, helper/error with aria, sizes, intents, `rounded`.                                                                                                                                                                                                           |
++| `ark-toaster`         | web-components | Sonner-style toasts: programmatic API, positions, rich colors, actions, animated enter/exit, localized close button.                                                                                                                                                                                                                                                                     |
++| `ark-toggle`          | web-components | Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.                                                                                                                                                                                                                                                                                        |
++| `ark-toggle-group`    | web-components | Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.                                                                                                                                                                                                                                                    |
++| `ark-tooltip`         | web-components | Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.                                                                                                                                                                                            |
++| `ark-chart`           | chart          | ECharts-powered chart types with theme support; `aria-label` names the chart as one image.                                                                                                                                                                                                                                                                                               |
++| `ark-wysiwyg-editor`  | wysiwyg        | Tiptap-based rich-text editor: JSON content sanitized on the way in, opt-in toolbar groups (style, marks, color, align, lists, link, media, blocks, clear, history), external images/videos through an `uploadFile` hook (never base64).                                                                                                                                                 |
++| `ark-wysiwyg-viewer`  | wysiwyg        | Read-only viewer sharing the editor's schema: the same sanitized JSON content, links opened in a new tab.                                                                                                                                                                                                                                                                                |
++| `ark-code-editor`     | code           | CodeMirror 6 editor: `language` json/javascript/yaml/text, line numbers, folding, search, Tab indentation, LF/CRLF, `readonly`, `wrap`, `placeholder`, completions (`variableKeys` after `{{`, `completions`, `completionSource`), `format()`, token theme (`auto` follows the page), opt-in `variables`, `single-line`, `extensions`. Emits `change`, `ark-submit`, `ark-format-error`. |
+ 
+ ### Key attributes
+ 
+@@ -359,7 +359,7 @@ document.querySelector("ark-select")!.addEventListener("change", (event) => {
+ 
+ ```ts
+ document.querySelector("ark-scheduler")!.events = [
+-  { id: "1", title: "Daily", start: "2026-09-01T09:00", end: "2026-09-01T09:15", intent: "info" },
++  { id: "1", title: "Daily", start: "2026-09-01T09:00", end: "2026-09-01T09:15", intent: "info" }
+ ];
+ ```
+ 
+@@ -378,7 +378,7 @@ import { type FormEvent, useState } from "react";
+ 
+ const ROLES = [
+   { value: "dev", label: "Developer" },
+-  { value: "ops", label: "Operations" },
++  { value: "ops", label: "Operations" }
+ ];
+ 
+ export function ProfileForm() {
+@@ -495,7 +495,7 @@ import {
+   ArkInputComponent,
+   ArkSelectComponent,
+   ArkToasterComponent,
+-  toast,
++  toast
+ } from "@tooark/angular";
+ 
+ @Component({
+@@ -530,12 +530,12 @@ import {
+ 
+       <ark-toaster-wrapper position="bottom-right"></ark-toaster-wrapper>
+     </form>
+-  `,
++  `
+ })
+ export class ProfileFormComponent {
+   roles = [
+     { value: "dev", label: "Developer" },
+-    { value: "ops", label: "Operations" },
++    { value: "ops", label: "Operations" }
+   ];
+   name = "";
+   role = "dev";
+@@ -562,7 +562,7 @@ const chart = document.querySelector("ark-chart")!;
+ chart.option = {
+   xAxis: { type: "category", data: ["Mon", "Tue", "Wed"] },
+   yAxis: {},
+-  series: [{ type: "bar", data: [120, 200, 150] }],
++  series: [{ type: "bar", data: [120, 200, 150] }]
+ };
+ ```
+ 
+diff --git a/README.pt-BR.md b/README.pt-BR.md
+index fbb63ddd2b1a78f79afe79e5eda48ce509ed96a2..eda5e922de7e1554877bed5bb034a99106450435 100644
+--- a/README.pt-BR.md
++++ b/README.pt-BR.md
+@@ -79,53 +79,53 @@ Os wrappers pedem o `@tooark/web-components` junto, e chart, wysiwyg e code pede
+ 
+ ## 🧩 Componentes
+ 
+-| Elemento              | Pacote         | Destaques                                                                                                                                                                                                                                                                                                                                                                                       |
+-| --------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+-| `ark-alert`           | web-components | Alerta/banner: o host é a caixa na cor suave do intent, os filhos são a mensagem (texto livre ou elementos), `slot="icon"` à esquerda, `slot="action"` à direita, `heading`, `dismissible` com saída animada, live region por `live` (`status`/`alert`).                                                                                                                                        |
+-| `ark-avatar`          | web-components | Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria, `variant` soft/solid.                                                                                                                                                                                                     |
+-| `ark-badge`           | web-components | Rótulo curto de status/categoria: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, `color` própria via `color-mix`. O host é o badge; ícone e texto ficam como filhos.                                                                                                                                                                                                                  |
+-| `ark-button`          | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio) e modo link (`href`).                                                                                                                                                                                               |
+-| `ark-calendar`        | web-components | Grid de mês inline (no estilo do DateCalendar do MUI): localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).                                                                                                                                                                                                                              |
+-| `ark-card`            | web-components | Cartão: o host é a caixa (`surface`, `border`, `rounded`) e uma grid: `heading` (h2) ou `slot="header"` com `slot="actions"` na linha de cima, filhos sem slot como corpo, `slot="footer"` por último com divisor; `padding` none–lg.                                                                                                                                                           |
+-| `ark-carousel`        | web-components | CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.                                                                                                                                                                                                                              |
+-| `ark-checkbox`        | web-components | Checkbox desenhado pelo componente (botão `role="checkbox"` + input nativo oculto para formulário e `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/filhos livres como rótulo, dica `helper` abaixo dele, tamanhos, intents. Emite `change`.                                                                                                                           |
+-| `ark-clock`           | web-components | Seleção de hora em colunas digitais (hora/minuto/segundo), 24h/12h, step de minutos, localizado.                                                                                                                                                                                                                                                                                                |
+-| `ark-color-swatches`  | web-components | Paleta de cores como `radiogroup`: amostras de `colors` (`{ name, value }[]`, atributo JSON ou propriedade JS), `value`, setas navegam, `disabled`, `size`. Emite `change` com o valor.                                                                                                                                                                                                         |
+-| `ark-command-item`    | web-components | Item da paleta de comandos (o host é o `role="option"`): filhos livres, `slot="trailing"` para o atalho, `value`, `group`, `label` (texto do filtro), `disabled`. Emite `ark-select`.                                                                                                                                                                                                           |
+-| `ark-command-palette` | web-components | Paleta de comandos sobre a Popover API: campo de busca (um `ark-input` próprio), filhos `ark-command-item` agrupados e filtrados (`filter`) ou buscados pelo app (`ark-query`), setas + Enter, `hotkey` (`/`, `mod+k`), `hint` e `busy` para a mensagem de vazio. Emite `ark-select`, `ark-query`, `ark-open`, `ark-close`.                                                                     |
+-| `ark-copy-button`     | web-components | Botão de copiar: estende o `ark-button` (mesmas variantes, tamanhos, `icon-only`, formulário, hooks); copia `value` ou o elemento de `for`, troca o ícone por um check e o texto/`title` por "copiado" durante `feedback-ms`, anuncia. Emite `ark-copy`.                                                                                                                                        |
+-| `ark-datepicker`      | web-components | Seletor de data/hora que compõe `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (padrão)/date/time, inline ou modo `input` com campo + popup, formatação localizada, parse do que se digita, formulário.                                                                                                                                                                            |
+-| `ark-dialog`          | web-components | Diálogo modal sobre a Popover API (top layer, scrim por `::backdrop`, sem portal): o host é o painel, seus filhos são o corpo, `slot="footer"` é o rodapé; cabeçalho de `label`, focus trap, Esc/scrim, `sm`–`xl` ou `full`.                                                                                                                                                                    |
+-| `ark-drawer`          | web-components | Gaveta ancorada numa borda: `overlay` (Popover API, scrim, focus trap, Esc) ou `inline` (no fluxo da página, ex.: console inferior); `side`, `size` preset ou comprimento CSS, cabeçalho de `label` com a linha `slot="actions"`, `slot="footer"`, slide com o easing `sheet`. Emite `ark-open`/`ark-close`.                                                                                    |
+-| `ark-empty`           | web-components | Estado vazio: caixa tracejada com `slot="icon"` apagado, `heading` (h3), `description` e um botão opcional em `slot="action"`; os filhos ficam no lugar, ordenados por CSS.                                                                                                                                                                                                                     |
+-| `ark-file-input`      | web-components | Campo de arquivo com a grid do `ark-input` (label, helper/erro): `<input type="file">` nativo oculto para o formulário, zona de soltar com realce em `dragover`, botão de escolher acessível por teclado, lista dos nomes escolhidos, `accept`/`multiple`, `directory` para uma pasta inteira. Emite `change` com os arquivos e os anuncia.                                                     |
+-| `ark-input`           | web-components | Campo de texto padronizado: label, helper/erro com aria, prefixo/sufixo via `slot`, `reveal` de senha, atributos nativos repassados, tamanhos, intents, `rounded`.                                                                                                                                                                                                                              |
+-| `ark-kbd`             | web-components | Tecla de atalho: o host é a tecla (mono, borda, `surface-muted`, aresta inferior) em volta do seu texto; `size`.                                                                                                                                                                                                                                                                                |
+-| `ark-kv-editor`       | web-components | Editor chave/valor: linhas `{ id, key, value, enabled }` (propriedade JS) com ativar, editar, remover, adicionar, colunas opcionais `types`/`secret`/`description`, modo em massa em linhas `chave:valor` ou JSON, `valueField` opcional para uma célula de valor sua (autocomplete de variáveis, por exemplo). Compõe outros controles ark-\*. Emite `change`, `ark-add`, `ark-delete`.        |
+-| `ark-mark`            | web-components | Marca de escopo: uma de dez formas (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) numa `color`, cor e forma juntas para a identidade nunca depender só da cor; `size`, `label`.                                                                                                                                                        |
+-| `ark-menu`            | web-components | Menu suspenso/de contexto sobre a Popover API (`role="menu"`, `popover="auto"`): ancorado ao gatilho por `for`, `align`/`direction` com flip, teclado, `openAt(x, y)`; itens ficam como filhos. Emite `ark-select`.                                                                                                                                                                             |
+-| `ark-menu-item`       | web-components | Item de menu (o host é o item): filhos livres, `slot="trailing"`, `disabled`, `intent`, `checked` (item checkbox), `divider`, `static` (conteúdo não interativo).                                                                                                                                                                                                                               |
+-| `ark-progress`        | web-components | Barra de progresso (`role="progressbar"` no host): `value`/`max` com transição de largura pelos tokens, `show-value`, `indeterminate` em loop isento de movimento reduzido, `label`, tamanhos, intents.                                                                                                                                                                                         |
+-| `ark-radio`           | web-components | Radio desenhado pelo componente (botão `role="radio"` + input nativo oculto): agrupa por `name` no mesmo form, um tab stop por grupo, setas movem e marcam, `label`/filhos como rótulo, dica `helper`. Emite `change` na que marcou.                                                                                                                                                            |
+-| `ark-scheduler`       | web-components | Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.                                                                                                                                                                                                                                                              |
+-| `ark-select`          | web-components | `<select>` nativo estilizado como o `ark-input`: label, helper/erro com aria, `placeholder`, opções por dados (atributo `options` em JSON ou propriedade JS, `group` → `<optgroup>`), tamanhos, intents, `rounded`.                                                                                                                                                                             |
+-| `ark-shape-picker`    | web-components | Seletor de forma como `radiogroup`: as dez formas do `ark-mark`, ou as que `shapes` listar, desenhadas em `color`, `value`, setas navegam, nomes das formas localizados, `disabled`, `size`. Emite `change` com a forma.                                                                                                                                                                        |
+-| `ark-skeleton`        | web-components | Placeholder de carregamento: o host é o bloco (`.ark-skeleton`, `aria-hidden`), dimensionado pela sua class/style; `rows` renderiza barras, `animated` liga o brilho que varre, `rounded`.                                                                                                                                                                                                      |
+-| `ark-spinner`         | web-components | Indicador de carregamento solto (`role="status"`): o SVG do spinner do botão em `.ark-animate-spin` (continua girando sob movimento reduzido), rótulo para leitor de tela por `lang` ou `label`, `size`, `intent` opcional (senão herda a cor do texto).                                                                                                                                        |
+-| `ark-split-pane`      | web-components | Painéis redimensionáveis: os seus filhos são os painéis, as alças são nós próprios do componente ao fim do host; `direction`, `sizes` (percentuais, reescritos a cada mudança), `data-min`/`data-max` por painel, teclado e arrasto com pointer capture. Emite `ark-resize`.                                                                                                                    |
+-| `ark-status-dot`      | web-components | Ponto de status: o host é o círculo na cor do intent (padrão `neutral`); `label` o torna um `role="img"` nomeado, sem ele é decorativo; `size`. Estático, nunca pulsa.                                                                                                                                                                                                                          |
+-| `ark-switch`          | web-components | Switch on/off acessível (`role="switch"`): texto ON/OFF e ícones ✓/✕ opcionais, intents, participação em formulário via checkbox oculto.                                                                                                                                                                                                                                                        |
+-| `ark-tab`             | web-components | Aba (`role="tab"`, o host é o controle): filhos livres, `disabled`, `controls`, `closable` e `dirty` na variante editor. Emite `ark-close`.                                                                                                                                                                                                                                                     |
+-| `ark-tabs`            | web-components | Faixa de abas (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex com setas/Home/End, `slot="actions"` no fim, `change` com o value ativo. Painéis ficam com o app.                                                                                                                                                                                                               |
+-| `ark-textarea`        | web-components | Campo multilinha com a grid do `ark-input`: `rows`, `autosize` (`field-sizing` nativo, fallback JS), `monospace`, `resize`, helper/erro com aria, tamanhos, intents, `rounded`.                                                                                                                                                                                                                 |
+-| `ark-toaster`         | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.                                                                                                                                                                                                                                                                    |
+-| `ark-toggle`          | web-components | Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.                                                                                                                                                                                                                                                                                     |
+-| `ark-toggle-group`    | web-components | Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.                                                                                                                                                                                                                                                          |
+-| `ark-tooltip`         | web-components | Tooltip sobre a Popover API: envolve o gatilho sem movê-lo, texto por `content` ou `slot="content"` rico, `side` com flip, `delay`, hover/foco/Esc, `aria-describedby` no gatilho.                                                                                                                                                                                                              |
+-| `ark-chart`           | chart          | Tipos de gráfico do ECharts com suporte a temas; `aria-label` nomeia o gráfico como uma imagem.                                                                                                                                                                                                                                                                                                 |
+-| `ark-wysiwyg-editor`  | wysiwyg        | Editor de texto rico baseado em Tiptap: JSON sanitizado ao entrar, grupos de toolbar opt-in (estilo, marcas, cor, alinhamento, listas, link, mídia, blocos, limpar, histórico), imagens/vídeos externos por um gancho `uploadFile` (nunca base64).                                                                                                                                              |
+-| `ark-wysiwyg-viewer`  | wysiwyg        | Viewer somente leitura com o mesmo schema do editor: o mesmo JSON sanitizado, links abertos em nova aba.                                                                                                                                                                                                                                                                                        |
+-| `ark-code-editor`     | code           | Editor CodeMirror 6: `language` json/javascript/yaml/text, numeração, dobra, busca, recuo por Tab, LF/CRLF, `readonly`, `wrap`, `placeholder`, completions (`variableKeys` depois de `{{`, `completions`, `completionSource`), `format()`, tema pelos tokens (`auto` segue a página), `variables`, `single-line` e `extensions` opcionais. Emite `change`, `ark-submit`, `ark-format-error`.    |
++| Elemento              | Pacote         | Destaques                                                                                                                                                                                                                                                                                                                                                                                    |
++| --------------------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
++| `ark-alert`           | web-components | Alerta/banner: o host é a caixa na cor suave do intent, os filhos são a mensagem (texto livre ou elementos), `slot="icon"` à esquerda, `slot="action"` à direita, `heading`, `dismissible` com saída animada, live region por `live` (`status`/`alert`).                                                                                                                                     |
++| `ark-avatar`          | web-components | Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria, `variant` soft/solid.                                                                                                                                                                                                  |
++| `ark-badge`           | web-components | Rótulo curto de status/categoria: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, `color` própria via `color-mix`. O host é o badge; ícone e texto ficam como filhos.                                                                                                                                                                                                               |
++| `ark-button`          | web-components | Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio) e modo link (`href`).                                                                                                                                                                                            |
++| `ark-calendar`        | web-components | Grid de mês inline (no estilo do DateCalendar do MUI): localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).                                                                                                                                                                                                                           |
++| `ark-card`            | web-components | Cartão: o host é a caixa (`surface`, `border`, `rounded`) e uma grid: `heading` (h2) ou `slot="header"` com `slot="actions"` na linha de cima, filhos sem slot como corpo, `slot="footer"` por último com divisor; `padding` none–lg.                                                                                                                                                        |
++| `ark-carousel`        | web-components | CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.                                                                                                                                                                                                                           |
++| `ark-checkbox`        | web-components | Checkbox desenhado pelo componente (botão `role="checkbox"` + input nativo oculto para formulário e `<fieldset disabled>`): `checked`, `indeterminate`, `label`/`aria-label`/filhos livres como rótulo, dica `helper` abaixo dele, tamanhos, intents. Emite `change`.                                                                                                                        |
++| `ark-clock`           | web-components | Seleção de hora em colunas digitais (hora/minuto/segundo), 24h/12h, step de minutos, localizado.                                                                                                                                                                                                                                                                                             |
++| `ark-color-swatches`  | web-components | Paleta de cores como `radiogroup`: amostras de `colors` (`{ name, value }[]`, atributo JSON ou propriedade JS), `value`, setas navegam, `disabled`, `size`. Emite `change` com o valor.                                                                                                                                                                                                      |
++| `ark-command-item`    | web-components | Item da paleta de comandos (o host é o `role="option"`): filhos livres, `slot="trailing"` para o atalho, `value`, `group`, `label` (texto do filtro), `disabled`. Emite `ark-select`.                                                                                                                                                                                                        |
++| `ark-command-palette` | web-components | Paleta de comandos sobre a Popover API: campo de busca (um `ark-input` próprio), filhos `ark-command-item` agrupados e filtrados (`filter`) ou buscados pelo app (`ark-query`), setas + Enter, `hotkey` (`/`, `mod+k`), `hint` e `busy` para a mensagem de vazio. Emite `ark-select`, `ark-query`, `ark-open`, `ark-close`.                                                                  |
++| `ark-copy-button`     | web-components | Botão de copiar: estende o `ark-button` (mesmas variantes, tamanhos, `icon-only`, formulário, hooks); copia `value` ou o elemento de `for`, troca o ícone por um check e o texto/`title` por "copiado" durante `feedback-ms`, anuncia. Emite `ark-copy`.                                                                                                                                     |
++| `ark-datepicker`      | web-components | Seletor de data/hora que compõe `ark-input` + `ark-calendar` + `ark-clock`: `mode` datetime (padrão)/date/time, inline ou modo `input` com campo + popup, formatação localizada, parse do que se digita, formulário.                                                                                                                                                                         |
++| `ark-dialog`          | web-components | Diálogo modal sobre a Popover API (top layer, scrim por `::backdrop`, sem portal): o host é o painel, seus filhos são o corpo, `slot="footer"` é o rodapé; cabeçalho de `label`, focus trap, Esc/scrim, `sm`–`xl` ou `full`.                                                                                                                                                                 |
++| `ark-drawer`          | web-components | Gaveta ancorada numa borda: `overlay` (Popover API, scrim, focus trap, Esc) ou `inline` (no fluxo da página, ex.: console inferior); `side`, `size` preset ou comprimento CSS, cabeçalho de `label` com a linha `slot="actions"`, `slot="footer"`, slide com o easing `sheet`. Emite `ark-open`/`ark-close`.                                                                                 |
++| `ark-empty`           | web-components | Estado vazio: caixa tracejada com `slot="icon"` apagado, `heading` (h3), `description` e um botão opcional em `slot="action"`; os filhos ficam no lugar, ordenados por CSS.                                                                                                                                                                                                                  |
++| `ark-file-input`      | web-components | Campo de arquivo com a grid do `ark-input` (label, helper/erro): `<input type="file">` nativo oculto para o formulário, zona de soltar com realce em `dragover`, botão de escolher acessível por teclado, lista dos nomes escolhidos, `accept`/`multiple`, `directory` para uma pasta inteira. Emite `change` com os arquivos e os anuncia.                                                  |
++| `ark-input`           | web-components | Campo de texto padronizado: label, helper/erro com aria, prefixo/sufixo via `slot`, `reveal` de senha, atributos nativos repassados, tamanhos, intents, `rounded`.                                                                                                                                                                                                                           |
++| `ark-kbd`             | web-components | Tecla de atalho: o host é a tecla (mono, borda, `surface-muted`, aresta inferior) em volta do seu texto; `size`.                                                                                                                                                                                                                                                                             |
++| `ark-kv-editor`       | web-components | Editor chave/valor: linhas `{ id, key, value, enabled }` (propriedade JS) com ativar, editar, remover, adicionar, colunas opcionais `types`/`secret`/`description`, modo em massa em linhas `chave:valor` ou JSON, `valueField` opcional para uma célula de valor sua (autocomplete de variáveis, por exemplo). Compõe outros controles ark-\*. Emite `change`, `ark-add`, `ark-delete`.     |
++| `ark-mark`            | web-components | Marca de escopo: uma de dez formas (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) numa `color`, cor e forma juntas para a identidade nunca depender só da cor; `size`, `label`.                                                                                                                                                     |
++| `ark-menu`            | web-components | Menu suspenso/de contexto sobre a Popover API (`role="menu"`, `popover="auto"`): ancorado ao gatilho por `for`, `align`/`direction` com flip, teclado, `openAt(x, y)`; itens ficam como filhos. Emite `ark-select`.                                                                                                                                                                          |
++| `ark-menu-item`       | web-components | Item de menu (o host é o item): filhos livres, `slot="trailing"`, `disabled`, `intent`, `checked` (item checkbox), `divider`, `static` (conteúdo não interativo).                                                                                                                                                                                                                            |
++| `ark-progress`        | web-components | Barra de progresso (`role="progressbar"` no host): `value`/`max` com transição de largura pelos tokens, `show-value`, `indeterminate` em loop isento de movimento reduzido, `label`, tamanhos, intents.                                                                                                                                                                                      |
++| `ark-radio`           | web-components | Radio desenhado pelo componente (botão `role="radio"` + input nativo oculto): agrupa por `name` no mesmo form, um tab stop por grupo, setas movem e marcam, `label`/filhos como rótulo, dica `helper`. Emite `change` na que marcou.                                                                                                                                                         |
++| `ark-scheduler`       | web-components | Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.                                                                                                                                                                                                                                                           |
++| `ark-select`          | web-components | `<select>` nativo estilizado como o `ark-input`: label, helper/erro com aria, `placeholder`, opções por dados (atributo `options` em JSON ou propriedade JS, `group` → `<optgroup>`), tamanhos, intents, `rounded`.                                                                                                                                                                          |
++| `ark-shape-picker`    | web-components | Seletor de forma como `radiogroup`: as dez formas do `ark-mark`, ou as que `shapes` listar, desenhadas em `color`, `value`, setas navegam, nomes das formas localizados, `disabled`, `size`. Emite `change` com a forma.                                                                                                                                                                     |
++| `ark-skeleton`        | web-components | Placeholder de carregamento: o host é o bloco (`.ark-skeleton`, `aria-hidden`), dimensionado pela sua class/style; `rows` renderiza barras, `animated` liga o brilho que varre, `rounded`.                                                                                                                                                                                                   |
++| `ark-spinner`         | web-components | Indicador de carregamento solto (`role="status"`): o SVG do spinner do botão em `.ark-animate-spin` (continua girando sob movimento reduzido), rótulo para leitor de tela por `lang` ou `label`, `size`, `intent` opcional (senão herda a cor do texto).                                                                                                                                     |
++| `ark-split-pane`      | web-components | Painéis redimensionáveis: os seus filhos são os painéis, as alças são nós próprios do componente ao fim do host; `direction`, `sizes` (percentuais, reescritos a cada mudança), `data-min`/`data-max` por painel, teclado e arrasto com pointer capture. Emite `ark-resize`.                                                                                                                 |
++| `ark-status-dot`      | web-components | Ponto de status: o host é o círculo na cor do intent (padrão `neutral`); `label` o torna um `role="img"` nomeado, sem ele é decorativo; `size`. Estático, nunca pulsa.                                                                                                                                                                                                                       |
++| `ark-switch`          | web-components | Switch on/off acessível (`role="switch"`): texto ON/OFF e ícones ✓/✕ opcionais, intents, participação em formulário via checkbox oculto.                                                                                                                                                                                                                                                     |
++| `ark-tab`             | web-components | Aba (`role="tab"`, o host é o controle): filhos livres, `disabled`, `controls`, `closable` e `dirty` na variante editor. Emite `ark-close`.                                                                                                                                                                                                                                                  |
++| `ark-tabs`            | web-components | Faixa de abas (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex com setas/Home/End, `slot="actions"` no fim, `change` com o value ativo. Painéis ficam com o app.                                                                                                                                                                                                            |
++| `ark-textarea`        | web-components | Campo multilinha com a grid do `ark-input`: `rows`, `autosize` (`field-sizing` nativo, fallback JS), `monospace`, `resize`, helper/erro com aria, tamanhos, intents, `rounded`.                                                                                                                                                                                                              |
++| `ark-toaster`         | web-components | Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.                                                                                                                                                                                                                                                                 |
++| `ark-toggle`          | web-components | Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.                                                                                                                                                                                                                                                                                  |
++| `ark-toggle-group`    | web-components | Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.                                                                                                                                                                                                                                                       |
++| `ark-tooltip`         | web-components | Tooltip sobre a Popover API: envolve o gatilho sem movê-lo, texto por `content` ou `slot="content"` rico, `side` com flip, `delay`, hover/foco/Esc, `aria-describedby` no gatilho.                                                                                                                                                                                                           |
++| `ark-chart`           | chart          | Tipos de gráfico do ECharts com suporte a temas; `aria-label` nomeia o gráfico como uma imagem.                                                                                                                                                                                                                                                                                              |
++| `ark-wysiwyg-editor`  | wysiwyg        | Editor de texto rico baseado em Tiptap: JSON sanitizado ao entrar, grupos de toolbar opt-in (estilo, marcas, cor, alinhamento, listas, link, mídia, blocos, limpar, histórico), imagens/vídeos externos por um gancho `uploadFile` (nunca base64).                                                                                                                                           |
++| `ark-wysiwyg-viewer`  | wysiwyg        | Viewer somente leitura com o mesmo schema do editor: o mesmo JSON sanitizado, links abertos em nova aba.                                                                                                                                                                                                                                                                                     |
++| `ark-code-editor`     | code           | Editor CodeMirror 6: `language` json/javascript/yaml/text, numeração, dobra, busca, recuo por Tab, LF/CRLF, `readonly`, `wrap`, `placeholder`, completions (`variableKeys` depois de `{{`, `completions`, `completionSource`), `format()`, tema pelos tokens (`auto` segue a página), `variables`, `single-line` e `extensions` opcionais. Emite `change`, `ark-submit`, `ark-format-error`. |
+ 
+ ### Atributos principais
+ 
+@@ -359,7 +359,7 @@ document.querySelector("ark-select")!.addEventListener("change", (event) => {
+ 
+ ```ts
+ document.querySelector("ark-scheduler")!.events = [
+-  { id: "1", title: "Daily", start: "2026-09-01T09:00", end: "2026-09-01T09:15", intent: "info" },
++  { id: "1", title: "Daily", start: "2026-09-01T09:00", end: "2026-09-01T09:15", intent: "info" }
+ ];
+ ```
+ 
+@@ -378,7 +378,7 @@ import { type FormEvent, useState } from "react";
+ 
+ const PAPEIS = [
+   { value: "dev", label: "Desenvolvimento" },
+-  { value: "ops", label: "Operações" },
++  { value: "ops", label: "Operações" }
+ ];
+ 
+ export function FormularioPerfil() {
+@@ -495,7 +495,7 @@ import {
+   ArkInputComponent,
+   ArkSelectComponent,
+   ArkToasterComponent,
+-  toast,
++  toast
+ } from "@tooark/angular";
+ 
+ @Component({
+@@ -530,12 +530,12 @@ import {
+ 
+       <ark-toaster-wrapper position="bottom-right" lang="pt"></ark-toaster-wrapper>
+     </form>
+-  `,
++  `
+ })
+ export class FormularioPerfilComponent {
+   papeis = [
+     { value: "dev", label: "Desenvolvimento" },
+-    { value: "ops", label: "Operações" },
++    { value: "ops", label: "Operações" }
+   ];
+   nome = "";
+   papel = "dev";
+@@ -562,7 +562,7 @@ const chart = document.querySelector("ark-chart")!;
+ chart.option = {
+   xAxis: { type: "category", data: ["Seg", "Ter", "Qua"] },
+   yAxis: {},
+-  series: [{ type: "bar", data: [120, 200, 150] }],
++  series: [{ type: "bar", data: [120, 200, 150] }]
+ };
+ ```
+ 
+diff --git a/packages/angular/README.md b/packages/angular/README.md
+index e35370a767ccc2ffdcc1ae01adc3ad2b737b2ecc..613b360a15e1745890f207c25ef13a0d5bac18b2 100644
+--- a/packages/angular/README.md
++++ b/packages/angular/README.md
+@@ -87,7 +87,7 @@ import {
+   ArkInputComponent,
+   ArkSelectComponent,
+   ArkToasterComponent,
+-  toast,
++  toast
+ } from "@tooark/angular";
+ 
+ @Component({
+@@ -120,12 +120,12 @@ import {
+ 
+       <ark-toaster-wrapper position="bottom-right"></ark-toaster-wrapper>
+     </form>
+-  `,
++  `
+ })
+ export class ProfileFormComponent {
+   roles = [
+     { value: "dev", label: "Developer" },
+-    { value: "ops", label: "Operations" },
++    { value: "ops", label: "Operations" }
+   ];
+   name = "";
+   role = "dev";
+@@ -148,7 +148,7 @@ import { registerTooarkChart } from "@tooark/chart";
+   selector: "app-sales",
+   standalone: true,
+   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+-  template: `<ark-chart #chart height="320px"></ark-chart>`,
++  template: `<ark-chart #chart height="320px"></ark-chart>`
+ })
+ export class SalesComponent implements AfterViewInit {
+   @ViewChild("chart") chart!: ElementRef<HTMLElement & { option: object }>;
+diff --git a/packages/angular/README.pt-BR.md b/packages/angular/README.pt-BR.md
+index 248b0ffdafbd600d4c12a3bc81335b63c68671ae..4c0a129588bdb3f644c4d4614875a0f0057dcce9 100644
+--- a/packages/angular/README.pt-BR.md
++++ b/packages/angular/README.pt-BR.md
+@@ -87,7 +87,7 @@ import {
+   ArkInputComponent,
+   ArkSelectComponent,
+   ArkToasterComponent,
+-  toast,
++  toast
+ } from "@tooark/angular";
+ 
+ @Component({
+@@ -120,12 +120,12 @@ import {
+ 
+       <ark-toaster-wrapper position="bottom-right" lang="pt"></ark-toaster-wrapper>
+     </form>
+-  `,
++  `
+ })
+ export class FormularioPerfilComponent {
+   papeis = [
+     { value: "dev", label: "Desenvolvimento" },
+-    { value: "ops", label: "Operações" },
++    { value: "ops", label: "Operações" }
+   ];
+   nome = "";
+   papel = "dev";
+@@ -148,7 +148,7 @@ import { registerTooarkChart } from "@tooark/chart";
+   selector: "app-vendas",
+   standalone: true,
+   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+-  template: `<ark-chart #chart height="320px"></ark-chart>`,
++  template: `<ark-chart #chart height="320px"></ark-chart>`
+ })
+ export class VendasComponent implements AfterViewInit {
+   @ViewChild("chart") chart!: ElementRef<HTMLElement & { option: object }>;
+diff --git a/packages/chart/README.md b/packages/chart/README.md
+index 8918c6ef01e1b1fed0721a93f3840d9416336495..5331243d756e44092d11bd8284c7807e67e841a5 100644
+--- a/packages/chart/README.md
++++ b/packages/chart/README.md
+@@ -84,7 +84,7 @@ chart.setAttribute("height", "320px");
+ chart.option = {
+   xAxis: { type: "category", data: ["Mon", "Tue", "Wed"] },
+   yAxis: { type: "value" },
+-  series: [{ type: "bar", data: [120, 200, 150] }],
++  series: [{ type: "bar", data: [120, 200, 150] }]
+ };
+ chart.addEventListener("ark-chart-click", (event) => {
+   console.log((event as CustomEvent).detail.name, (event as CustomEvent).detail.value);
+diff --git a/packages/chart/README.pt-BR.md b/packages/chart/README.pt-BR.md
+index 867e04efda699e98074db4ae9fd43f6e620d056a..9b84b8f529579d3f44386e2e4eb3f7f05ed0b1cd 100644
+--- a/packages/chart/README.pt-BR.md
++++ b/packages/chart/README.pt-BR.md
+@@ -84,7 +84,7 @@ chart.setAttribute("height", "320px");
+ chart.option = {
+   xAxis: { type: "category", data: ["Seg", "Ter", "Qua"] },
+   yAxis: { type: "value" },
+-  series: [{ type: "bar", data: [120, 200, 150] }],
++  series: [{ type: "bar", data: [120, 200, 150] }]
+ };
+ chart.addEventListener("ark-chart-click", (event) => {
+   console.log((event as CustomEvent).detail.name, (event as CustomEvent).detail.value);
+diff --git a/packages/code/README.md b/packages/code/README.md
+index 8248906d5c93ca8dabc0ba107686062d39296ec3..eb603218ec0aba537b52ae1752fee27e6bdfccba 100644
+--- a/packages/code/README.md
++++ b/packages/code/README.md
+@@ -131,7 +131,7 @@ const url = document.querySelector("ark-code-editor")!;
+ url.variables = [
+   { key: "baseUrl", scope: "global", intent: "info", value: "https://api.example.com" },
+   { key: "token", scope: "environment", intent: "success" }, // no value: kept out of the tooltip
+-  { key: "userId", scope: "local", intent: "primary", value: "42" },
++  { key: "userId", scope: "local", intent: "primary", value: "42" }
+ ];
+ url.value = "{{baseUrl}}/users/{{userId}}";
+ url.addEventListener("ark-submit", (event) => send((event as CustomEvent<{ value: string }>).detail.value));
+@@ -156,7 +156,7 @@ editor.setAttribute("line-ending", "lf");
+ editor.completions = [
+   { label: "apiVersion", type: "keyword" },
+   { label: "kind", type: "keyword" },
+-  { label: "metadata" },
++  { label: "metadata" }
+ ];
+ editor.formatter = (value) => dump(load(value), { indent: editor.indentSize });
+ editor.addEventListener("ark-format-error", (event) => toast.error(String((event as CustomEvent).detail.error)));
+@@ -186,7 +186,7 @@ const blame = gutter({
+   lineMarker: (view, line) => {
+     const author = file.blame.get(view.state.doc.lineAt(line.from).number);
+     return author ? new Author(author) : null;
+-  },
++  }
+ });
+ viewer.extensions = [grammar ?? [], Prec.high(blame)]; // Prec.high: left of the line numbers
+ viewer.value = file.content;
+diff --git a/packages/code/README.pt-BR.md b/packages/code/README.pt-BR.md
+index b8375142cec7c43378db593fdb13b36db3947984..b41540b80ec368e610650157357309d9dd98f77a 100644
+--- a/packages/code/README.pt-BR.md
++++ b/packages/code/README.pt-BR.md
+@@ -131,7 +131,7 @@ const url = document.querySelector("ark-code-editor")!;
+ url.variables = [
+   { key: "baseUrl", scope: "global", intent: "info", value: "https://api.exemplo.com" },
+   { key: "token", scope: "environment", intent: "success" }, // sem value: fica fora do tooltip
+-  { key: "userId", scope: "local", intent: "primary", value: "42" },
++  { key: "userId", scope: "local", intent: "primary", value: "42" }
+ ];
+ url.value = "{{baseUrl}}/users/{{userId}}";
+ url.addEventListener("ark-submit", (event) => enviar((event as CustomEvent<{ value: string }>).detail.value));
+@@ -156,7 +156,7 @@ editor.setAttribute("line-ending", "lf");
+ editor.completions = [
+   { label: "apiVersion", type: "keyword" },
+   { label: "kind", type: "keyword" },
+-  { label: "metadata" },
++  { label: "metadata" }
+ ];
+ editor.formatter = (value) => dump(load(value), { indent: editor.indentSize });
+ editor.addEventListener("ark-format-error", (event) => toast.error(String((event as CustomEvent).detail.error)));
+@@ -186,7 +186,7 @@ const blame = gutter({
+   lineMarker: (view, line) => {
+     const autor = arquivo.blame.get(view.state.doc.lineAt(line.from).number);
+     return autor ? new Autor(autor) : null;
+-  },
++  }
+ });
+ viewer.extensions = [gramatica ?? [], Prec.high(blame)]; // Prec.high: à esquerda da numeração
+ viewer.value = arquivo.conteudo;
+diff --git a/packages/motion/README.md b/packages/motion/README.md
+index 72d02a61a8ca2c4d13480d290b31da5d24d18e23..ea15c39aa5a5a85e8fa8d6aa4b468bbf476c0c2d 100644
+--- a/packages/motion/README.md
++++ b/packages/motion/README.md
+@@ -91,7 +91,7 @@ const dispose = arkSwipe(row, {
+   threshold: 64,
+   onSwipe: (direction) => {
+     if (direction === "left") archive(row);
+-  },
++  }
+ });
+ ```
+ 
+diff --git a/packages/motion/README.pt-BR.md b/packages/motion/README.pt-BR.md
+index 88f2f3b8576a2aa907029f46ebe33deca4ff9d09..5abffac84c6079c47026a988e963a4a8a14d53e7 100644
+--- a/packages/motion/README.pt-BR.md
++++ b/packages/motion/README.pt-BR.md
+@@ -91,7 +91,7 @@ const dispose = arkSwipe(linha, {
+   threshold: 64,
+   onSwipe: (direcao) => {
+     if (direcao === "left") arquivar(linha);
+-  },
++  }
+ });
+ ```
+ 
+diff --git a/packages/react/README.md b/packages/react/README.md
+index f9870c566546977f25ea3b05a40cc40c4f1994b5..c2d36e468ab53231a40cd795ddcc23beb6665e3e 100644
+--- a/packages/react/README.md
++++ b/packages/react/README.md
+@@ -99,7 +99,7 @@ import { type FormEvent, useState } from "react";
+ 
+ const ROLES = [
+   { value: "dev", label: "Developer" },
+-  { value: "ops", label: "Operations" },
++  { value: "ops", label: "Operations" }
+ ];
+ 
+ export function ProfileForm() {
+diff --git a/packages/react/README.pt-BR.md b/packages/react/README.pt-BR.md
+index c2ce71c0bd98b2a8102f83ce8d73566fcb02d553..6241eec5725f57c3e4bc65da9936467624b5d46a 100644
+--- a/packages/react/README.pt-BR.md
++++ b/packages/react/README.pt-BR.md
+@@ -99,7 +99,7 @@ import { type FormEvent, useState } from "react";
+ 
+ const PAPEIS = [
+   { value: "dev", label: "Desenvolvimento" },
+-  { value: "ops", label: "Operações" },
++  { value: "ops", label: "Operações" }
+ ];
+ 
+ export function FormularioPerfil() {
+diff --git a/packages/vue/README.md b/packages/vue/README.md
+index 35527523f84767ceef0fd85e4acd9cbbaae79c33..063fde264225a4ae0587923f2447a72757b01041 100644
+--- a/packages/vue/README.md
++++ b/packages/vue/README.md
+@@ -62,7 +62,7 @@ import "@tooark/web-components/styles.css";
+ import vue from "@vitejs/plugin-vue";
+ 
+ export default {
+-  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })],
++  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })]
+ };
+ ```
+ 
+diff --git a/packages/vue/README.pt-BR.md b/packages/vue/README.pt-BR.md
+index 8ebc69ea4827b00bbddf5a81f7dab46623d9ee7f..d44f05ed79aece8c21c60101e0f1581400b7a789 100644
+--- a/packages/vue/README.pt-BR.md
++++ b/packages/vue/README.pt-BR.md
+@@ -62,7 +62,7 @@ import "@tooark/web-components/styles.css";
+ import vue from "@vitejs/plugin-vue";
+ 
+ export default {
+-  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })],
++  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })]
+ };
+ ```
+ 

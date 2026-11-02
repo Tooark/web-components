@@ -1,0 +1,4 @@
+build: schema do biome.json na 2.6.4
+
+Saida do biome migrate com a 2.6.4: so o $schema muda. Ate o bump do Biome entrar, a CLI 2.5.15 segue emitindo o
+aviso informativo de versao do schema, como ja fazia com o 2.5.14.

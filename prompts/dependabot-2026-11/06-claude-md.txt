@@ -1,0 +1,8 @@
+docs: Markdown formatado pelo Biome e transform da lib Motion pela WAAPI no CLAUDE.md
+
+Requisitos: desde a 2.6 o Biome tambem formata Markdown e o biome ci reprova; pnpm check:fix preenche as tabelas e
+formata os blocos de codigo com o estilo do codigo.
+
+Armadilhas de play: a lib Motion 14.2 anima x/y/scale pela WAAPI, entao o style.transform inline fica em "none"
+durante a animacao; o meio da animacao se le pelo transform computado (offset) e o fim por transform e opacidade
+computados (settled).

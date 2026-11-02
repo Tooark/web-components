@@ -1,0 +1,5 @@
+feat(core): tipos e strings do ark-nav
+
+Tipos ArkNavVariant, ArkNavSide e ArkNavCollapsible e as opcoes de estilo de
+ark-nav, ark-nav-item e ark-nav-group; strings collapse e expand em ArkLocale
+(en, pt, es) para o botao de recolher da sidebar.

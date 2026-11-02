@@ -1,0 +1,599 @@
+diff --git a/packages/angular/src/ark-nav.component.ts b/packages/angular/src/ark-nav.component.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..23050b4f5ff6cd13011f2e36a61410246635512a
+--- /dev/null
++++ b/packages/angular/src/ark-nav.component.ts
+@@ -0,0 +1,166 @@
++import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
++import type { ArkIntent, ArkLang, ArkNavCollapsible, ArkNavSide, ArkNavVariant, ArkSize, ArkTheme } from "@tooark/core";
++import type {
++  ArkNav as ArkNavElement,
++  ArkNavGroup as ArkNavGroupElement,
++  ArkNavItem as ArkNavItemElement
++} from "@tooark/web-components";
++import { ensureTooarkComponentsRegistered } from "./register";
++
++/** `detail` de `ark-navigate`: o destino do item e o seu identificador (`value`, ou o `href`). */
++export type ArkNavNavigateDetail = { href: string | null; value: string };
++
++@Component({
++  selector: "ark-nav-wrapper",
++  standalone: true,
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
++  template: `
++  <ark-nav
++    [attr.testid]="testid"
++    [attr.variant]="variant"
++    [attr.side]="side"
++    [attr.value]="value"
++    [attr.collapsed]="collapsed ? '' : null"
++    [attr.collapsible]="collapsible === true ? '' : (collapsible || null)"
++    [attr.label]="label"
++    [attr.size]="size"
++    [attr.intent]="intent"
++    [attr.theme]="theme"
++    [attr.lang]="lang"
++    [attr.locale-json]="localeJson"
++    (ark-collapse)="collapseHandler($event)"
++    (ark-navigate)="navigateHandler($event)">
++    <ng-content></ng-content>
++  </ark-nav>`
++})
++export class ArkNavComponent {
++  constructor() {
++    ensureTooarkComponentsRegistered();
++  }
++
++  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
++
++  /** O `ark-nav` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
++  get element(): ArkNavElement | null {
++    return this.host.nativeElement.querySelector<ArkNavElement>(":scope > ark-nav");
++  }
++
++  @Input() testid: string | undefined;
++  /** sidebar (coluna), navbar (barra) ou tabbar (abas de rodapé). Padrão: "sidebar". */
++  @Input() variant: ArkNavVariant = "sidebar";
++  /** Borda em que a sidebar encosta. Padrão: "left". */
++  @Input() side: ArkNavSide = "left";
++  /** `value` (ou `href`) do item atual; sem ele cada item mantém o próprio `current`. */
++  @Input() value: string | undefined;
++  /** Sidebar recolhida. */
++  @Input() collapsed = false;
++  /** Botão de recolher e o que resta recolhida: true/"rail" (só ícones) ou "hidden" (só o logo e o botão). */
++  @Input() collapsible: boolean | ArkNavCollapsible = false;
++  /** Vira aria-label da navegação. */
++  @Input() label: string | undefined;
++  @Input() size: ArkSize = "md";
++  @Input() intent: ArkIntent = "primary";
++  @Input() theme: ArkTheme = "auto";
++  @Input() lang: ArkLang | undefined;
++  @Input() localeJson: string | undefined;
++  /** O botão de recolher foi acionado; detail.collapsed é o novo estado, para o app guardar. */
++  @Output() arkCollapse = new EventEmitter<CustomEvent<{ collapsed: boolean }>>();
++  /** Um item foi acionado (sobe dos itens); preventDefault() cancela a navegação do navegador para o app rotear. */
++  @Output() arkNavigate = new EventEmitter<CustomEvent<ArkNavNavigateDetail>>();
++
++  protected collapseHandler = (event: Event) => this.arkCollapse.emit(event as CustomEvent<{ collapsed: boolean }>);
++  protected navigateHandler = (event: Event) => this.arkNavigate.emit(event as CustomEvent<ArkNavNavigateDetail>);
++}
++
++@Component({
++  selector: "ark-nav-item-wrapper",
++  standalone: true,
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
++  // Sem caixa própria: o item entra no flex do nav (e do grupo), que o ordena e dimensiona.
++  host: { style: "display: contents" },
++  template: `
++  <ark-nav-item
++    [attr.testid]="testid"
++    [attr.href]="href"
++    [attr.target]="target"
++    [attr.label]="label"
++    [attr.value]="value"
++    [attr.current]="current ? '' : null"
++    [attr.disabled]="disabled ? '' : null"
++    [attr.divider]="divider ? '' : null"
++    (ark-navigate)="navigateHandler($event)">
++    <ng-content></ng-content>
++  </ark-nav-item>`
++})
++export class ArkNavItemComponent {
++  constructor() {
++    ensureTooarkComponentsRegistered();
++  }
++
++  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
++
++  /** O `ark-nav-item` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
++  get element(): ArkNavItemElement | null {
++    return this.host.nativeElement.querySelector<ArkNavItemElement>(":scope > ark-nav-item");
++  }
++
++  @Input() testid: string | undefined;
++  /** Destino do link; sem ele o item é um botão. */
++  @Input() href: string | undefined;
++  /** `target` do link (`_blank` ganha rel noopener). */
++  @Input() target: string | undefined;
++  /** Texto do item, desenhado pelo componente (oculto no trilho). */
++  @Input() label: string | undefined;
++  /** Identificador em `ark-navigate` e no `value` do nav. Padrão: o `href`. */
++  @Input() value: string | undefined;
++  /** Página atual (`aria-current="page"`). */
++  @Input() current = false;
++  @Input() disabled = false;
++  /** Linha separadora (role separator). */
++  @Input() divider = false;
++  /** Este item foi acionado; preventDefault() cancela a navegação do navegador. */
++  @Output() arkNavigate = new EventEmitter<CustomEvent<ArkNavNavigateDetail>>();
++
++  protected navigateHandler = (event: Event) => this.arkNavigate.emit(event as CustomEvent<ArkNavNavigateDetail>);
++}
++
++@Component({
++  selector: "ark-nav-group-wrapper",
++  standalone: true,
++  schemas: [CUSTOM_ELEMENTS_SCHEMA],
++  // Sem caixa própria: o grupo entra no flex do nav.
++  host: { style: "display: contents" },
++  template: `
++  <ark-nav-group
++    [attr.testid]="testid"
++    [attr.label]="label"
++    [attr.expandable]="expandable ? '' : null"
++    [attr.open]="open ? '' : null"
++    (ark-toggle)="toggleHandler($event)">
++    <ng-content></ng-content>
++  </ark-nav-group>`
++})
++export class ArkNavGroupComponent {
++  constructor() {
++    ensureTooarkComponentsRegistered();
++  }
++
++  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
++
++  /** O `ark-nav-group` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
++  get element(): ArkNavGroupElement | null {
++    return this.host.nativeElement.querySelector<ArkNavGroupElement>(":scope > ark-nav-group");
++  }
++
++  @Input() testid: string | undefined;
++  /** Texto do cabeçalho e nome do grupo. */
++  @Input() label: string | undefined;
++  /** O cabeçalho é um botão que abre e fecha os itens. */
++  @Input() expandable = false;
++  /** Itens à mostra (com `expandable`). */
++  @Input() open = false;
++  /** O cabeçalho expansível foi acionado; detail.open é o novo estado. */
++  @Output() arkToggle = new EventEmitter<CustomEvent<{ open: boolean }>>();
++
++  protected toggleHandler = (event: Event) => this.arkToggle.emit(event as CustomEvent<{ open: boolean }>);
++}
+diff --git a/packages/angular/src/index.ts b/packages/angular/src/index.ts
+index 492003ad3b50d42b6853bb5869a4f7bdf2cca81f..242b8e283b01e4bf16097f980f0d19c3d8d65f89 100644
+--- a/packages/angular/src/index.ts
++++ b/packages/angular/src/index.ts
+@@ -27,6 +27,8 @@ export { ArkKbdComponent } from "./ark-kbd.component";
+ export { ArkKvEditorComponent } from "./ark-kv-editor.component";
+ export { ArkMarkComponent } from "./ark-mark.component";
+ export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
++export type { ArkNavNavigateDetail } from "./ark-nav.component";
++export { ArkNavComponent, ArkNavGroupComponent, ArkNavItemComponent } from "./ark-nav.component";
+ export { ArkPaginationComponent } from "./ark-pagination.component";
+ export { ArkProgressComponent } from "./ark-progress.component";
+ export { ArkRadioComponent } from "./ark-radio.component";
+diff --git a/packages/react/src/ark-nav.tsx b/packages/react/src/ark-nav.tsx
+new file mode 100644
+index 0000000000000000000000000000000000000000..e064f8d38eb934380517dfc78ebbc327cc035ab8
+--- /dev/null
++++ b/packages/react/src/ark-nav.tsx
+@@ -0,0 +1,172 @@
++import type {
++  ArkNavCollapsible,
++  ArkNavGroupStyleOptions,
++  ArkNavItemStyleOptions,
++  ArkNavStyleOptions
++} from "@tooark/core";
++import type {
++  ArkNav as ArkNavElement,
++  ArkNavGroup as ArkNavGroupElement,
++  ArkNavItem as ArkNavItemElement
++} from "@tooark/web-components";
++import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
++import type { ArkDomProps } from "./dom-props.js";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++import { useForwardedRef } from "./use-forwarded-ref.js";
++
++/** `detail` de `ark-navigate`: o destino do item e o seu identificador (`value`, ou o `href`). */
++export type ArkNavNavigateDetail = { href: string | null; value: string };
++
++export type ArkNavProps = PropsWithChildren<
++  ArkDomProps<
++    ArkNavStyleOptions & {
++      /** `value` (ou `href`) do item atual; sem ele cada item mantém o próprio `current`. */
++      value?: string;
++      /** Sidebar recolhida. */
++      collapsed?: boolean;
++      /** Botão de recolher e o que resta recolhida: true/"rail" (só ícones) ou "hidden" (só o logo e o botão). */
++      collapsible?: boolean | ArkNavCollapsible;
++      /** Vira aria-label da navegação. */
++      label?: string;
++      className?: string;
++      /** O botão de recolher foi acionado; detail.collapsed é o novo estado, para o app guardar. */
++      onCollapse?: (event: CustomEvent<{ collapsed: boolean }>) => void;
++      /** Um item foi acionado (sobe dos itens); preventDefault() cancela a navegação do navegador para o app rotear. */
++      onNavigate?: (event: CustomEvent<ArkNavNavigateDetail>) => void;
++    }
++  >
++>;
++
++export const ArkNav = forwardRef<ArkNavElement, ArkNavProps>(function ArkNav(props, forwardedRef): React.JSX.Element {
++  const { children, className, collapsed, collapsible, localeJson, onCollapse, onNavigate, ...rest } = props;
++  const [ref, setRef] = useForwardedRef<ArkNavElement>(forwardedRef);
++
++  useEffect(() => {
++    ensureTooarkComponentsRegistered();
++  }, []);
++
++  useEffect(() => {
++    const el = ref.current;
++    if (!el) return;
++
++    const handleCollapse = (event: Event): void => onCollapse?.(event as CustomEvent<{ collapsed: boolean }>);
++    const handleNavigate = (event: Event): void => onNavigate?.(event as CustomEvent<ArkNavNavigateDetail>);
++    el.addEventListener("ark-collapse", handleCollapse);
++    el.addEventListener("ark-navigate", handleNavigate);
++    return () => {
++      el.removeEventListener("ark-collapse", handleCollapse);
++      el.removeEventListener("ark-navigate", handleNavigate);
++    };
++  }, [ref, onCollapse, onNavigate]);
++
++  const attrs: Record<string, unknown> = {
++    ...rest,
++    ref: setRef,
++    class: className,
++    collapsed: collapsed ? "" : undefined,
++    collapsible: collapsible === true ? "" : collapsible || undefined,
++    "locale-json": localeJson
++  };
++
++  return createElement("ark-nav", attrs, children);
++});
++
++export type ArkNavItemProps = PropsWithChildren<
++  ArkDomProps<
++    ArkNavItemStyleOptions & {
++      /** Destino do link; sem ele o item é um botão. */
++      href?: string;
++      /** `target` do link (`_blank` ganha rel noopener). */
++      target?: string;
++      /** Texto do item, desenhado pelo componente (oculto no trilho). */
++      label?: string;
++      /** Identificador em `ark-navigate` e no `value` do ArkNav. Padrão: o `href`. */
++      value?: string;
++      /** Página atual (`aria-current="page"`). */
++      current?: boolean;
++      disabled?: boolean;
++      /** Linha separadora (role separator). */
++      divider?: boolean;
++      className?: string;
++      /** Este item foi acionado; preventDefault() cancela a navegação do navegador. */
++      onNavigate?: (event: CustomEvent<ArkNavNavigateDetail>) => void;
++    }
++  >
++>;
++
++export const ArkNavItem = forwardRef<ArkNavItemElement, ArkNavItemProps>(
++  function ArkNavItem(props, forwardedRef): React.JSX.Element {
++    const { children, className, current, disabled, divider, onNavigate, ...rest } = props;
++    const [ref, setRef] = useForwardedRef<ArkNavItemElement>(forwardedRef);
++
++    useEffect(() => {
++      ensureTooarkComponentsRegistered();
++    }, []);
++
++    useEffect(() => {
++      const el = ref.current;
++      if (!el) return;
++
++      const handleNavigate = (event: Event): void => onNavigate?.(event as CustomEvent<ArkNavNavigateDetail>);
++      el.addEventListener("ark-navigate", handleNavigate);
++      return () => el.removeEventListener("ark-navigate", handleNavigate);
++    }, [ref, onNavigate]);
++
++    const attrs: Record<string, unknown> = {
++      ...rest,
++      ref: setRef,
++      class: className,
++      current: current ? "" : undefined,
++      disabled: disabled ? "" : undefined,
++      divider: divider ? "" : undefined
++    };
++
++    return createElement("ark-nav-item", attrs, children);
++  }
++);
++
++export type ArkNavGroupProps = PropsWithChildren<
++  ArkDomProps<
++    ArkNavGroupStyleOptions & {
++      /** Texto do cabeçalho e nome do grupo. */
++      label?: string;
++      /** O cabeçalho é um botão que abre e fecha os itens. */
++      expandable?: boolean;
++      /** Itens à mostra (com `expandable`). */
++      open?: boolean;
++      className?: string;
++      /** O cabeçalho expansível foi acionado; detail.open é o novo estado. */
++      onToggle?: (event: CustomEvent<{ open: boolean }>) => void;
++    }
++  >
++>;
++
++export const ArkNavGroup = forwardRef<ArkNavGroupElement, ArkNavGroupProps>(
++  function ArkNavGroup(props, forwardedRef): React.JSX.Element {
++    const { children, className, expandable, open, onToggle, ...rest } = props;
++    const [ref, setRef] = useForwardedRef<ArkNavGroupElement>(forwardedRef);
++
++    useEffect(() => {
++      ensureTooarkComponentsRegistered();
++    }, []);
++
++    useEffect(() => {
++      const el = ref.current;
++      if (!el) return;
++
++      const handleToggle = (event: Event): void => onToggle?.(event as CustomEvent<{ open: boolean }>);
++      el.addEventListener("ark-toggle", handleToggle);
++      return () => el.removeEventListener("ark-toggle", handleToggle);
++    }, [ref, onToggle]);
++
++    const attrs: Record<string, unknown> = {
++      ...rest,
++      ref: setRef,
++      class: className,
++      expandable: expandable ? "" : undefined,
++      open: open ? "" : undefined
++    };
++
++    return createElement("ark-nav-group", attrs, children);
++  }
++);
+diff --git a/packages/react/src/index.tsx b/packages/react/src/index.tsx
+index de862ecf9d830b4231e7a6b8690a4a6bde885e65..397db32e753c7ec4bd2991b1c315bda5612813cc 100644
+--- a/packages/react/src/index.tsx
++++ b/packages/react/src/index.tsx
+@@ -45,6 +45,8 @@ export type { ArkMarkProps } from "./ark-mark.js";
+ export { ArkMark } from "./ark-mark.js";
+ export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu.js";
+ export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
++export type { ArkNavGroupProps, ArkNavItemProps, ArkNavNavigateDetail, ArkNavProps } from "./ark-nav.js";
++export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
+ export type { ArkPaginationProps } from "./ark-pagination.js";
+ export { ArkPagination } from "./ark-pagination.js";
+ export type { ArkProgressProps } from "./ark-progress.js";
+diff --git a/packages/react/src/jsx-intrinsics.d.ts b/packages/react/src/jsx-intrinsics.d.ts
+index b26e8e84735afa67d773ad853bb3d8b86a4c6022..1ea8f417900349ef1a17ea522f164f9a6087a8fe 100644
+--- a/packages/react/src/jsx-intrinsics.d.ts
++++ b/packages/react/src/jsx-intrinsics.d.ts
+@@ -21,6 +21,9 @@ import type {
+   ArkMarkShape,
+   ArkMenuAlign,
+   ArkMenuDirection,
++  ArkNavCollapsible,
++  ArkNavSide,
++  ArkNavVariant,
+   ArkRounded,
+   ArkSize,
+   ArkTabsFill,
+@@ -382,6 +385,36 @@ interface ArkIntrinsicElements {
+     divider?: boolean;
+     static?: boolean;
+   };
++  "ark-nav": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
++    testid?: string;
++    variant?: ArkNavVariant;
++    side?: ArkNavSide;
++    value?: string;
++    collapsed?: boolean;
++    collapsible?: boolean | ArkNavCollapsible;
++    label?: string;
++    size?: ArkSize;
++    intent?: ArkIntent;
++    theme?: ArkTheme;
++    lang?: ArkLang;
++    "locale-json"?: string;
++  };
++  "ark-nav-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
++    testid?: string;
++    href?: string;
++    target?: string;
++    label?: string;
++    value?: string;
++    current?: boolean;
++    disabled?: boolean;
++    divider?: boolean;
++  };
++  "ark-nav-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
++    testid?: string;
++    label?: string;
++    expandable?: boolean;
++    open?: boolean;
++  };
+   "ark-tooltip": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+     testid?: string;
+     content?: string;
+diff --git a/packages/vue/src/ark-nav.ts b/packages/vue/src/ark-nav.ts
+new file mode 100644
+index 0000000000000000000000000000000000000000..81176bd41b54cb4bbb46da00baa286a1509278db
+--- /dev/null
++++ b/packages/vue/src/ark-nav.ts
+@@ -0,0 +1,153 @@
++import type { ArkIntent, ArkLang, ArkNavCollapsible, ArkNavSide, ArkNavVariant, ArkSize, ArkTheme } from "@tooark/core";
++import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
++import { ensureTooarkComponentsRegistered } from "./register.js";
++
++/** `detail` de `ark-navigate`: o destino do item e o seu identificador (`value`, ou o `href`). */
++export type ArkNavNavigateDetail = { href: string | null; value: string };
++
++export const ArkNav = defineComponent({
++  name: "ArkNav",
++  inheritAttrs: false,
++  emits: ["ark-collapse", "ark-navigate"],
++  props: {
++    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
++    testid: { type: String, default: undefined },
++    variant: { type: String as PropType<ArkNavVariant>, default: "sidebar" },
++    side: { type: String as PropType<ArkNavSide>, default: "left" },
++    /** `value` (ou `href`) do item atual; sem ele cada item mantém o próprio `current`. */
++    value: { type: String, default: undefined },
++    collapsed: { type: Boolean, default: false },
++    /** Botão de recolher e o que resta recolhida: true/"rail" (só ícones) ou "hidden" (só o logo e o botão). */
++    collapsible: { type: [Boolean, String] as PropType<boolean | ArkNavCollapsible>, default: false },
++    /** Vira aria-label da navegação. */
++    label: { type: String, default: undefined },
++    size: { type: String as PropType<ArkSize>, default: "md" },
++    intent: { type: String as PropType<ArkIntent>, default: "primary" },
++    theme: { type: String as PropType<ArkTheme>, default: "auto" },
++    lang: { type: String as PropType<ArkLang>, default: undefined },
++    localeJson: { type: String, default: undefined }
++  },
++  setup(props, { attrs, slots, emit }) {
++    ensureTooarkComponentsRegistered();
++    const elRef = ref<HTMLElement | null>(null);
++
++    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen. O emit é
++    // síncrono, então um preventDefault() no handler do app ainda cancela a navegação.
++    const collapseHandler = (event: Event) => emit("ark-collapse", event as CustomEvent<{ collapsed: boolean }>);
++    const navigateHandler = (event: Event) => emit("ark-navigate", event as CustomEvent<ArkNavNavigateDetail>);
++    onMounted(() => {
++      elRef.value?.addEventListener("ark-collapse", collapseHandler);
++      elRef.value?.addEventListener("ark-navigate", navigateHandler);
++    });
++    onBeforeUnmount(() => {
++      elRef.value?.removeEventListener("ark-collapse", collapseHandler);
++      elRef.value?.removeEventListener("ark-navigate", navigateHandler);
++    });
++
++    return () =>
++      h(
++        "ark-nav",
++        {
++          ...attrs,
++          testid: props.testid,
++          ref: elRef,
++          variant: props.variant,
++          side: props.side,
++          value: props.value,
++          collapsed: props.collapsed ? "" : undefined,
++          collapsible: props.collapsible === true ? "" : props.collapsible || undefined,
++          label: props.label,
++          size: props.size,
++          intent: props.intent,
++          theme: props.theme,
++          lang: props.lang,
++          "locale-json": props.localeJson
++        },
++        slots.default ? slots.default() : []
++      );
++  }
++});
++
++export const ArkNavItem = defineComponent({
++  name: "ArkNavItem",
++  inheritAttrs: false,
++  emits: ["ark-navigate"],
++  props: {
++    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
++    testid: { type: String, default: undefined },
++    /** Destino do link; sem ele o item é um botão. */
++    href: { type: String, default: undefined },
++    target: { type: String, default: undefined },
++    /** Texto do item, desenhado pelo componente (oculto no trilho). */
++    label: { type: String, default: undefined },
++    /** Identificador em `ark-navigate` e no `value` do ArkNav. Padrão: o `href`. */
++    value: { type: String, default: undefined },
++    current: { type: Boolean, default: false },
++    disabled: { type: Boolean, default: false },
++    divider: { type: Boolean, default: false }
++  },
++  setup(props, { attrs, slots, emit }) {
++    ensureTooarkComponentsRegistered();
++    const elRef = ref<HTMLElement | null>(null);
++
++    const navigateHandler = (event: Event) => emit("ark-navigate", event as CustomEvent<ArkNavNavigateDetail>);
++    onMounted(() => elRef.value?.addEventListener("ark-navigate", navigateHandler));
++    onBeforeUnmount(() => elRef.value?.removeEventListener("ark-navigate", navigateHandler));
++
++    return () =>
++      h(
++        "ark-nav-item",
++        {
++          ...attrs,
++          testid: props.testid,
++          ref: elRef,
++          href: props.href,
++          target: props.target,
++          label: props.label,
++          value: props.value,
++          current: props.current ? "" : undefined,
++          disabled: props.disabled ? "" : undefined,
++          divider: props.divider ? "" : undefined
++        },
++        slots.default ? slots.default() : []
++      );
++  }
++});
++
++export const ArkNavGroup = defineComponent({
++  name: "ArkNavGroup",
++  inheritAttrs: false,
++  emits: ["ark-toggle"],
++  props: {
++    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
++    testid: { type: String, default: undefined },
++    /** Texto do cabeçalho e nome do grupo. */
++    label: { type: String, default: undefined },
++    /** O cabeçalho é um botão que abre e fecha os itens. */
++    expandable: { type: Boolean, default: false },
++    /** Itens à mostra (com `expandable`). */
++    open: { type: Boolean, default: false }
++  },
++  setup(props, { attrs, slots, emit }) {
++    ensureTooarkComponentsRegistered();
++    const elRef = ref<HTMLElement | null>(null);
++
++    const toggleHandler = (event: Event) => emit("ark-toggle", event as CustomEvent<{ open: boolean }>);
++    onMounted(() => elRef.value?.addEventListener("ark-toggle", toggleHandler));
++    onBeforeUnmount(() => elRef.value?.removeEventListener("ark-toggle", toggleHandler));
++
++    return () =>
++      h(
++        "ark-nav-group",
++        {
++          ...attrs,
++          testid: props.testid,
++          ref: elRef,
++          label: props.label,
++          expandable: props.expandable ? "" : undefined,
++          open: props.open ? "" : undefined
++        },
++        slots.default ? slots.default() : []
++      );
++  }
++});
+diff --git a/packages/vue/src/index.ts b/packages/vue/src/index.ts
+index 827aec790ef7028bcc7dc9f90daa15d5323ac838..d7a0c5d1fcea1b160580615770be53155e4eb9bf 100644
+--- a/packages/vue/src/index.ts
++++ b/packages/vue/src/index.ts
+@@ -23,6 +23,8 @@ export { ArkKbd } from "./ark-kbd.js";
+ export { ArkKvEditor } from "./ark-kv-editor.js";
+ export { ArkMark } from "./ark-mark.js";
+ export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
++export type { ArkNavNavigateDetail } from "./ark-nav.js";
++export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
+ export { ArkPagination } from "./ark-pagination.js";
+ export { ArkProgress } from "./ark-progress.js";
+ export { ArkRadio } from "./ark-radio.js";

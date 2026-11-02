@@ -1,0 +1,8 @@
+docs: ark-nav nos READMEs, CHANGELOG e CLAUDE.md
+
+Tabela de componentes, atributos principais e hooks de teste nos READMEs
+raiz (en e pt-BR) e lista do README do pacote; contagem de elementos e de
+wrappers para 46, ja com o ark-data-view e o ark-pagination (READMEs raiz,
+do web-components e do react); entrada no Added do Unreleased do CHANGELOG;
+nota do padrao do componente (link esticado, propagacao do estado de
+trilho, !important nas regras que escondem hosts ark-*) no CLAUDE.md.

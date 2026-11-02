@@ -1,0 +1,4 @@
+build: schema do biome.json na 2.6.5
+
+Saida do biome migrate com a 2.6.5: so o $schema muda, e some o aviso informativo de versao do schema que a CLI
+emitia desde o bump.
