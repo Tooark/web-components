@@ -227,7 +227,7 @@ export class ArkShapePicker extends HTMLElementBase {
     );
 
     const selectedIndex = value ? this.offered.indexOf(value) : -1;
-    const stop = selectedIndex >= 0 ? selectedIndex : 0;
+    const stop = Math.max(selectedIndex, 0);
     this.options.forEach((option, index) => {
       const shape = this.offered[index];
       const selected = index === selectedIndex;

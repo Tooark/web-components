@@ -193,7 +193,7 @@ export class ArkColorSwatches extends HTMLElementBase {
 
     // Um tab stop: a amostra selecionada, senão a primeira.
     const selectedIndex = colors.findIndex((color) => color.value === value);
-    const stop = selectedIndex >= 0 ? selectedIndex : 0;
+    const stop = Math.max(selectedIndex, 0);
     this.swatches.forEach((swatch, index) => {
       const color = colors[index];
       const selected = index === selectedIndex;
