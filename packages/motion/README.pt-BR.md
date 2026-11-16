@@ -91,7 +91,7 @@ const dispose = arkSwipe(linha, {
   threshold: 64,
   onSwipe: (direcao) => {
     if (direcao === "left") arquivar(linha);
-  },
+  }
 });
 ```
 

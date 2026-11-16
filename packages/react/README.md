@@ -99,7 +99,7 @@ import { type FormEvent, useState } from "react";
 
 const ROLES = [
   { value: "dev", label: "Developer" },
-  { value: "ops", label: "Operations" },
+  { value: "ops", label: "Operations" }
 ];
 
 export function ProfileForm() {

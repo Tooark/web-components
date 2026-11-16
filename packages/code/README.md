@@ -131,7 +131,7 @@ const url = document.querySelector("ark-code-editor")!;
 url.variables = [
   { key: "baseUrl", scope: "global", intent: "info", value: "https://api.example.com" },
   { key: "token", scope: "environment", intent: "success" }, // no value: kept out of the tooltip
-  { key: "userId", scope: "local", intent: "primary", value: "42" },
+  { key: "userId", scope: "local", intent: "primary", value: "42" }
 ];
 url.value = "{{baseUrl}}/users/{{userId}}";
 url.addEventListener("ark-submit", (event) => send((event as CustomEvent<{ value: string }>).detail.value));
@@ -156,7 +156,7 @@ editor.setAttribute("line-ending", "lf");
 editor.completions = [
   { label: "apiVersion", type: "keyword" },
   { label: "kind", type: "keyword" },
-  { label: "metadata" },
+  { label: "metadata" }
 ];
 editor.formatter = (value) => dump(load(value), { indent: editor.indentSize });
 editor.addEventListener("ark-format-error", (event) => toast.error(String((event as CustomEvent).detail.error)));
@@ -186,7 +186,7 @@ const blame = gutter({
   lineMarker: (view, line) => {
     const author = file.blame.get(view.state.doc.lineAt(line.from).number);
     return author ? new Author(author) : null;
-  },
+  }
 });
 viewer.extensions = [grammar ?? [], Prec.high(blame)]; // Prec.high: left of the line numbers
 viewer.value = file.content;

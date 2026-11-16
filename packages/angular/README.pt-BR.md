@@ -87,7 +87,7 @@ import {
   ArkInputComponent,
   ArkSelectComponent,
   ArkToasterComponent,
-  toast,
+  toast
 } from "@tooark/angular";
 
 @Component({
@@ -120,12 +120,12 @@ import {
 
       <ark-toaster-wrapper position="bottom-right" lang="pt"></ark-toaster-wrapper>
     </form>
-  `,
+  `
 })
 export class FormularioPerfilComponent {
   papeis = [
     { value: "dev", label: "Desenvolvimento" },
-    { value: "ops", label: "Operações" },
+    { value: "ops", label: "Operações" }
   ];
   nome = "";
   papel = "dev";
@@ -148,7 +148,7 @@ import { registerTooarkChart } from "@tooark/chart";
   selector: "app-vendas",
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  template: `<ark-chart #chart height="320px"></ark-chart>`,
+  template: `<ark-chart #chart height="320px"></ark-chart>`
 })
 export class VendasComponent implements AfterViewInit {
   @ViewChild("chart") chart!: ElementRef<HTMLElement & { option: object }>;

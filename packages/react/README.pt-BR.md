@@ -99,7 +99,7 @@ import { type FormEvent, useState } from "react";
 
 const PAPEIS = [
   { value: "dev", label: "Desenvolvimento" },
-  { value: "ops", label: "Operações" },
+  { value: "ops", label: "Operações" }
 ];
 
 export function FormularioPerfil() {
