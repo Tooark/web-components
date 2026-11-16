@@ -43,14 +43,22 @@ const revealStops = new WeakMap<HTMLElement, () => void>();
 const tick = (ms: number): Promise<void> => new Promise((resolve) => window.setTimeout(resolve, ms));
 const nextFrame = (): Promise<number> => new Promise((resolve) => requestAnimationFrame(resolve));
 
-// Fim de uma entrada: o transform (animado em JS) chega a `none` um frame antes da opacidade (WAAPI) fechar em 1,
-// entao os dois entram na mesma espera.
+// Deslocamento em curso de um elemento. Desde a 14.2 a lib Motion anima x/y/scale pela WAAPI, no compositor: o
+// `style.transform` inline fica em `none` do primeiro ao último quadro, e o que se move é o transform computado.
+const offset = (el: HTMLElement): { x: number; y: number } => {
+  const matrix = new DOMMatrixReadOnly(getComputedStyle(el).transform);
+  return { x: matrix.m41, y: matrix.m42 };
+};
+
+// Fim de uma entrada: transform e opacidade rodam em animações WAAPI separadas (fill both) e a lib só as cancela ao
+// terminar, então os dois valores computados entram na mesma espera.
 const settled = (...elements: HTMLElement[]): Promise<void> =>
   waitFor(
     () => {
       for (const el of elements) {
-        expect(el.style.transform).toBe("none");
-        expect(getComputedStyle(el).opacity).toBe("1");
+        const style = getComputedStyle(el);
+        expect(style.transform).toBe("none");
+        expect(style.opacity).toBe("1");
       }
     },
     { timeout: 3000 }
@@ -301,8 +309,13 @@ export const FlipReorder = {
     });
     expect(grid.children).toHaveLength(8);
     expect(grid.lastElementChild).toBe(first);
-    await waitFor(() => expect(first.style.transform).toMatch(/^translateX\(.+\) translateY\(.+\)$/));
-    await waitFor(() => expect(second.style.transform).toMatch(/^translateX\(.+\)$/));
+    // Cada um parte da posição antiga: o primeiro vem de cima e da esquerda, o segundo da direita.
+    await waitFor(() => {
+      expect(offset(first).x).toBeLessThan(0);
+      expect(offset(first).y).toBeLessThan(0);
+      expect(offset(second).x).toBeGreaterThan(0);
+      expect(offset(second).y).toBeCloseTo(0);
+    });
     expect(last.style.transform).toBe("");
     await run;
     expect(first.style.transform).toBe("none");
@@ -315,7 +328,10 @@ export const FlipReorder = {
     const spacer = document.createElement("div");
     spacer.className = "col-span-3 h-8";
     const push = arkFlip([shuffle, ...cards], () => grid.prepend(spacer), { stiffness: 600, damping: 40 });
-    await waitFor(() => expect(first.style.transform).toMatch(/^translateY\(.+\)$/));
+    await waitFor(() => {
+      expect(offset(first).y).toBeLessThan(0);
+      expect(offset(first).x).toBeCloseTo(0);
+    });
     expect(shuffle.style.transform).toBe("");
     await push;
     expect(first.style.transform).toBe("none");
@@ -332,7 +348,7 @@ export const FlipReorder = {
         spacer.remove();
       });
       await nextFrame();
-      expect(first.style.transform).toBe("none");
+      expect(getComputedStyle(first).transform).toBe("none");
       await reduced;
     });
     expect(mutated).toBe(2);
@@ -404,7 +420,8 @@ export const Swipe = {
     pointer(card, "pointermove", x0 + 21, y0);
     pointer(card, "pointerup", x0 + 21, y0);
     expect(status.textContent).toBe("Arraste o cartao para os lados");
-    await waitFor(() => expect(card.style.transform).toMatch(/^translateX\(/));
+    // O retorno parte de onde o cartão foi solto; ao terminar a lib grava `transform: none` inline.
+    await waitFor(() => expect(offset(card).x).toBeGreaterThan(0));
     await waitFor(() => expect(card.style.transform).toBe("none"), { timeout: 3000 });
 
     // Distancia acima do threshold (48px) com velocidade baixa: swipe para a direita.
@@ -541,7 +558,7 @@ export const TargetsAndOptions = {
       duration: 150,
       interval: 20
     });
-    await waitFor(() => expect(cards[2].style.transform).toMatch(/^translateX\(/));
+    await waitFor(() => expect(offset(cards[2]).x).toBeGreaterThan(0));
     await run;
     await settled(...cards);
 
@@ -552,7 +569,7 @@ export const TargetsAndOptions = {
       ease: "easeInOut",
       duration: 150
     });
-    await waitFor(() => expect(cards[1].style.transform).toMatch(/^translateY\(-/));
+    await waitFor(() => expect(offset(cards[1]).y).toBeLessThan(0));
     await down;
     await settled(...cards);
 
