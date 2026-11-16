@@ -91,7 +91,7 @@ const dispose = arkSwipe(row, {
   threshold: 64,
   onSwipe: (direction) => {
     if (direction === "left") archive(row);
-  },
+  }
 });
 ```
 

@@ -84,7 +84,7 @@ chart.setAttribute("height", "320px");
 chart.option = {
   xAxis: { type: "category", data: ["Seg", "Ter", "Qua"] },
   yAxis: { type: "value" },
-  series: [{ type: "bar", data: [120, 200, 150] }],
+  series: [{ type: "bar", data: [120, 200, 150] }]
 };
 chart.addEventListener("ark-chart-click", (event) => {
   console.log((event as CustomEvent).detail.name, (event as CustomEvent).detail.value);

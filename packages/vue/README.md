@@ -62,7 +62,7 @@ import "@tooark/web-components/styles.css";
 import vue from "@vitejs/plugin-vue";
 
 export default {
-  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })],
+  plugins: [vue({ template: { compilerOptions: { isCustomElement: (tag) => tag.startsWith("ark-") } } })]
 };
 ```
 
