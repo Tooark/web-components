@@ -13,6 +13,7 @@ import type {
   ArkCommandItem,
   ArkCommandPalette,
   ArkCopyButton,
+  ArkDataView,
   ArkDatepicker,
   ArkDialog,
   ArkDrawer,
@@ -24,6 +25,7 @@ import type {
   ArkMark,
   ArkMenu,
   ArkMenuItem,
+  ArkPagination,
   ArkProgress,
   ArkRadio,
   ArkScheduler,
@@ -58,6 +60,7 @@ declare global {
     "ark-command-item": ArkCommandItem;
     "ark-command-palette": ArkCommandPalette;
     "ark-copy-button": ArkCopyButton;
+    "ark-data-view": ArkDataView;
     "ark-datepicker": ArkDatepicker;
     "ark-dialog": ArkDialog;
     "ark-drawer": ArkDrawer;
@@ -69,6 +72,7 @@ declare global {
     "ark-mark": ArkMark;
     "ark-menu": ArkMenu;
     "ark-menu-item": ArkMenuItem;
+    "ark-pagination": ArkPagination;
     "ark-progress": ArkProgress;
     "ark-radio": ArkRadio;
     "ark-scheduler": ArkScheduler;

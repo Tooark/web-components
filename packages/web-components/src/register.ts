@@ -12,6 +12,7 @@ import {
   ArkCommandItem,
   ArkCommandPalette,
   ArkCopyButton,
+  ArkDataView,
   ArkDatepicker,
   ArkDialog,
   ArkDrawer,
@@ -23,6 +24,7 @@ import {
   ArkMark,
   ArkMenu,
   ArkMenuItem,
+  ArkPagination,
   ArkProgress,
   ArkRadio,
   ArkScheduler,
@@ -119,6 +121,11 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkSelect.tagName)) {
     customElements.define(ArkSelect.tagName, ArkSelect);
+  }
+
+  // Depois do select: o seletor de itens por página é um ark-select.
+  if (!customElements.get(ArkPagination.tagName)) {
+    customElements.define(ArkPagination.tagName, ArkPagination);
   }
 
   if (!customElements.get(ArkSkeleton.tagName)) {
@@ -219,5 +226,11 @@ export function registerTooarkComponents(): void {
   // Por último: compõe checkbox, input, textarea e button, que precisam estar definidos.
   if (!customElements.get(ArkKvEditor.tagName)) {
     customElements.define(ArkKvEditor.tagName, ArkKvEditor);
+  }
+
+  // Compõe input, select, toggle-group, checkbox, button, empty, skeleton, pagination e menu, que precisam estar
+  // definidos.
+  if (!customElements.get(ArkDataView.tagName)) {
+    customElements.define(ArkDataView.tagName, ArkDataView);
   }
 }
