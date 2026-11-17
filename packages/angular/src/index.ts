@@ -11,6 +11,12 @@ export { ArkClockComponent } from "./ark-clock.component";
 export { ArkColorSwatchesComponent } from "./ark-color-swatches.component";
 export { ArkCommandItemComponent, ArkCommandPaletteComponent } from "./ark-command-palette.component";
 export { ArkCopyButtonComponent } from "./ark-copy-button.component";
+export type { ArkDataViewCardTemplateContext, ArkDataViewCellTemplateContext } from "./ark-data-view.component";
+export {
+  ArkDataViewCardDirective,
+  ArkDataViewCellDirective,
+  ArkDataViewComponent
+} from "./ark-data-view.component";
 export { ArkDatepickerComponent } from "./ark-datepicker.component";
 export { ArkDialogComponent } from "./ark-dialog.component";
 export { ArkDrawerComponent } from "./ark-drawer.component";
@@ -21,6 +27,7 @@ export { ArkKbdComponent } from "./ark-kbd.component";
 export { ArkKvEditorComponent } from "./ark-kv-editor.component";
 export { ArkMarkComponent } from "./ark-mark.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
+export { ArkPaginationComponent } from "./ark-pagination.component";
 export { ArkProgressComponent } from "./ark-progress.component";
 export { ArkRadioComponent } from "./ark-radio.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
