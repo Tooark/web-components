@@ -9,6 +9,55 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-pagination`: new element. The host is the `role="navigation"`; it renders the range summary (`31–40 of 134`),
+  an optional page-size select (`page-sizes`, an `ark-select`) and the page strip with previous, next, ellipses and a
+  constant number of items (`siblings` around the current page). `page`, `page-size` and `total` are the source of
+  truth: a click rewrites `page`, emits `ark-page-change` with `detail: { page, pageSize, pageCount }` and announces
+  the page; changing the page size keeps the first visible item on screen. `disabled`, `size`, `intent`, `lang`.
+  `ArkPagination` wrappers for React, Vue and Angular (`ArkPaginationComponent`, with `ariaLabel`).
+- `ark-data-view`: new element, a collection of records shown as a real `<table>` or as a list of cards. `rows` (your
+  objects, kept by reference) and `columns` are JS properties; a column picks a field (`key`, dotted paths included),
+  where it shows (`show`), how it sorts (`sortable`, `compare`), its place in the card (`cardRole`, `cardSpan`,
+  `cardLabel`) and its content through `render`, which returns a DOM node (an `ark-avatar`, two lines of text) or a
+  text, never HTML; `cardRender` draws a whole card body. `view="auto"` (the default) shows cards while the component
+  itself is narrower than `breakpoint`, `table` and `cards` pin one; the selector in the corner rewrites `view`
+  (`ark-view-change`) and `no-view-selector` hides it while `view` keeps deciding. `mode="client"` searches, sorts
+  and pages `rows`; `mode="server"` only publishes the query in `ark-query-change`
+  (`{ page, pageSize, sort, search, reason }`) and shows what the app hands back, with `total` and `loading`. With
+  nothing else set it is a plain table with the view selector; everything else is opt-in: `searchable`, `page-size`
+  (composes `ark-pagination`), `selectable` (checkboxes, select all with a mixed state, `selected`,
+  `ark-selection-change`, and a `slot="selection"` for bulk actions that shows only while something is selected),
+  `reorderable` (a handle per record: pointer drag with a drop mark and auto-scroll near the edges of the scrolling
+  area, arrow keys, and a move menu on click with up, down, to start and to end, the alternative to dragging;
+  `ark-reorder`) and `clickable` (focusable rows and cards, `ark-row-click`). Slots `toolbar`, `selection` and
+  `empty`: the component's own nodes fit around your children, also when a framework adds one later, so the tab
+  order follows the visual one. `ark-render` (does not bubble) follows every redraw of the content.
+- `ark-data-view` wrappers with the cell content in each framework's own terms, same result in all of them: React
+  `ArkDataView` (generic over the record type, `<ArkDataView<User> … />`) draws a column's `render` and `cardRender`
+  as JSX through portals, re-run on every render, so `columns` needs no `useMemo`; Vue `ArkDataView` takes the scoped
+  slots `#cell-<key>` and `#card` (or a column `render` returning VNodes), teleported into the cells and reactive;
+  Angular `ArkDataViewComponent` takes `<ng-template arkDataViewCell="<key>" let-row>` and
+  `<ng-template arkDataViewCard let-row>` (`ArkDataViewCellDirective`, `ArkDataViewCardDirective`), checked with the
+  component that declares them. Plain HTML/JS returns a DOM node from `render`.
+- `@tooark/core`: the `ArkDataView*` types (`ArkDataViewColumn`, `ArkDataViewRow`, `ArkDataViewSort`,
+  `ArkDataViewQuery`, the event details, `ArkDataViewStyleOptions`), `ArkPageChangeDetail`,
+  `ArkPaginationStyleOptions`, and 25 strings in `ArkLocale` (en/pt/es) for both elements (`pagination`,
+  `previousPage`, `nextPage`, `pageNumber`, `pageOf`, `perPage`, `rangeOf`, `viewMode`, `viewTable`, `viewCards`,
+  `sortBy`, `sortAscending`, `sortDescending`, `sortedBy`, `sortCleared`, `selectAll`, `selectRow`, `selectedCount`,
+  `clearSelection`, `reorder`, `movedTo`, `moveUp`, `moveDown`, `moveToStart`, `moveToEnd`); a `locale-json` without
+  them falls back to English.
+
+### Changed
+
+- The Storybook suite now runs the Angular wrappers too (`Integration/Angular Wrappers`): they are JIT-compiled from
+  source (the Storybook Vite config turns on legacy decorators for them) and mounted in a zoneless application, next
+  to the React and Vue integration stories. `pnpm check:ssr` also renders the React and Vue `ArkDataView`.
+- Portuguese accents fixed in the Storybook stories (docs descriptions and demo texts) and in source comments,
+  including the JSDoc of the React and Vue wrappers that reaches the editor tooltip and the published `.d.ts`. Text
+  only: no attribute, event, test id or locale string changed.
+
 ## [1.6.1] - 2026-10-16
 
 ### Fixed
