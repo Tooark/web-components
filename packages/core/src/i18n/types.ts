@@ -174,6 +174,10 @@ export interface ArkLocale {
   moveToStart: string;
   /** Item do menu da alça de reordenar que leva o registro ao fim da lista. */
   moveToEnd: string;
+  /** Rótulo do botão que recolhe a navegação lateral. */
+  collapse: string;
+  /** Rótulo do botão que expande a navegação lateral recolhida. */
+  expand: string;
 }
 
 /** Nome anterior de ArkLocale, mantido por compatibilidade. */

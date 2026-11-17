@@ -859,6 +859,49 @@ export type ArkMenuItemStyleOptions = {
   intent?: ArkIntent;
 };
 
+// Exports types específicos do componente nav
+
+/** Apresentação do ark-nav: coluna lateral, barra horizontal ou barra de abas (ícone sobre o texto). */
+export type ArkNavVariant = "sidebar" | "navbar" | "tabbar";
+
+/** Borda da página em que a sidebar encosta; define a borda desenhada e a direção do chevron de recolher. */
+export type ArkNavSide = "left" | "right";
+
+/** O que resta da sidebar recolhida: um trilho de ícones ou só o cabeçalho (logo) com o botão de expandir. */
+export type ArkNavCollapsible = "rail" | "hidden";
+
+/** Props de estilo do ark-nav, propagadas a cada ark-nav-item e ark-nav-group. */
+export type ArkNavStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** sidebar (coluna, recolhível), navbar (barra, ícone ao lado do texto) ou tabbar (abas, ícone sobre o texto). Padrão: "sidebar". */
+  variant?: ArkNavVariant;
+  /** Borda em que a sidebar encosta. Padrão: "left". */
+  side?: ArkNavSide;
+  /** Altura dos itens via token --ark-size-*. Padrão: "md". */
+  size?: ArkSize;
+  /** Intenção semântica de cor do item atual e do anel de foco. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos rótulos internos (recolher, expandir). Padrão: "en". */
+  lang?: ArkLang;
+  /** Strings customizadas (JSON) quando lang é "custom". */
+  localeJson?: string;
+};
+
+/** Props de estilo do ark-nav-item; tamanho, intent e apresentação chegam propagados do ark-nav. */
+export type ArkNavItemStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas (link, label). */
+  testid?: string;
+};
+
+/** Props de estilo do ark-nav-group; tamanho e apresentação chegam propagados do ark-nav. */
+export type ArkNavGroupStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas (heading). */
+  testid?: string;
+};
+
 // Exports types específicos do componente tooltip
 
 /** Lado do gatilho onde a dica abre; vira para o oposto quando não cabe. */
