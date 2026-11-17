@@ -250,6 +250,9 @@ importers:
 
   apps/storybook:
     dependencies:
+      '@tooark/angular':
+        specifier: workspace:*
+        version: link:../../packages/angular/dist
       '@tooark/chart':
         specifier: workspace:*
         version: link:../../packages/chart
@@ -275,6 +278,18 @@ importers:
         specifier: workspace:*
         version: link:../../packages/wysiwyg
     devDependencies:
+      '@angular/common':
+        specifier: ~21.2.26
+        version: 21.2.26(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
+      '@angular/compiler':
+        specifier: ~21.2.26
+        version: 21.2.26
+      '@angular/core':
+        specifier: ~21.2.26
+        version: 21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3)
+      '@angular/platform-browser':
+        specifier: 21.2.26
+        version: 21.2.26(@angular/common@21.2.26(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))
       '@codemirror/language':
         specifier: ^6.13.1
         version: 6.13.1
@@ -290,6 +305,9 @@ importers:
       react-dom:
         specifier: ^19.3.1
         version: 19.3.1(react@19.3.1)
+      rxjs:
+        specifier: ^7.8.2
+        version: 7.8.2
       vite:
         specifier: ^8.3.6
         version: 8.3.6(@types/node@26.6.6)(esbuild@0.28.2)(jiti@2.7.0)(less@4.9.1(supports-color@7.2.0))(sass@1.104.0)
@@ -558,6 +576,17 @@ packages:
       '@angular/compiler':
         optional: true
       zone.js:
+        optional: true
+
+  '@angular/platform-browser@21.2.26':
+    resolution: {integrity: sha512-0yJN5FZX88SqdAnsmZC5E0MGpkQyG4CXjdWN3wTX3vFMsnetvm9MqyZKalxNFneucXV0KLrb8oRma5San3Hmeg==}
+    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    peerDependencies:
+      '@angular/animations': 21.2.26
+      '@angular/common': 21.2.26
+      '@angular/core': 21.2.26
+    peerDependenciesMeta:
+      '@angular/animations':
         optional: true
 
   '@arethetypeswrong/cli@0.18.5':
@@ -3586,6 +3615,12 @@ snapshots:
     optionalDependencies:
       '@angular/compiler': 21.2.26
       zone.js: 0.16.3
+
+  '@angular/platform-browser@21.2.26(@angular/common@21.2.26(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))':
+    dependencies:
+      '@angular/common': 21.2.26(@angular/core@21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
+      '@angular/core': 21.2.26(@angular/compiler@21.2.26)(rxjs@7.8.2)(zone.js@0.16.3)
+      tslib: 2.9.1
 
   '@arethetypeswrong/cli@0.18.5':
     dependencies:

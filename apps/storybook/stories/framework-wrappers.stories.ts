@@ -1,9 +1,21 @@
-import { type ArkKvRow, type ArkKvValueField, type ArkMarkShape, type ArkSchedulerEvent, toast } from "@tooark/core";
+import {
+  type ArkDataViewColumn,
+  type ArkDataViewQueryChangeDetail,
+  type ArkDataViewRowClickDetail,
+  type ArkDataViewSelectionChangeDetail,
+  type ArkKvRow,
+  type ArkKvValueField,
+  type ArkMarkShape,
+  type ArkPageChangeDetail,
+  type ArkSchedulerEvent,
+  toast
+} from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
   ArkCheckbox as ReactArkCheckbox,
   ArkClock as ReactArkClock,
+  ArkDataView as ReactArkDataView,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
   ArkFileInput as ReactArkFileInput,
@@ -11,6 +23,7 @@ import {
   ArkKvEditor as ReactArkKvEditor,
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
+  ArkPagination as ReactArkPagination,
   ArkScheduler as ReactArkScheduler,
   ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
@@ -18,18 +31,22 @@ import {
   ArkToaster as ReactArkToaster
 } from "@tooark/react";
 import {
+  type ArkDataViewVueColumn,
   ArkButton as VueArkButton,
   ArkCheckbox as VueArkCheckbox,
   ArkClock as VueArkClock,
+  ArkDataView as VueArkDataView,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
+  ArkPagination as VueArkPagination,
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
   ArkToaster as VueArkToaster
 } from "@tooark/vue";
 import type {
   ArkButton as ArkButtonElement,
+  ArkDataView as ArkDataViewElement,
   ArkDialog as ArkDialogElement,
   ArkKvEditor as ArkKvEditorElement,
   ArkSwitch as ArkSwitchElement
@@ -44,7 +61,9 @@ import { createApp, h, nextTick, ref } from "vue";
 // e os frameworks gravam as props como propriedade: o caminho que o React 19 e o Vue seguem num app real a partir do
 // segundo render.
 const meta = {
-  title: "Integration/Framework Wrappers"
+  title: "Integration/Framework Wrappers",
+  // Só testes (não há o que ver): rodam na suíte, mas ficam fora da barra lateral e da página de docs.
+  tags: ["!dev", "!autodocs"]
 };
 
 export default meta;
@@ -676,6 +695,359 @@ export const VueKvValueFieldAndShapes = {
     shapes.value = "all";
     await nextTick();
     await expect(values()).toHaveLength(10);
+    await expect(problems).toEqual([]);
+  }
+};
+
+type Person = { id: number; name: string; team: string };
+
+const PEOPLE: Person[] = [
+  { id: 1, name: "Ana Lima", team: "Plataforma" },
+  { id: 2, name: "Bruno Reis", team: "Produto" },
+  { id: 3, name: "Carla Dias", team: "Suporte" }
+];
+
+// `render` devolve um nó: o caminho para pôr um componente (aqui um ark-badge) numa célula a partir de um wrapper.
+const PEOPLE_COLUMNS: ArkDataViewColumn<Person>[] = [
+  { key: "name", label: "Nome", sortable: true },
+  {
+    key: "team",
+    label: "Time",
+    render: ({ row }) => {
+      const badge = document.createElement("ark-badge");
+      badge.textContent = row.team;
+      return badge;
+    }
+  }
+];
+
+function shownKeys(root: HTMLElement): string[] {
+  return Array.from(root.querySelectorAll<HTMLElement>("ark-data-view [data-ark-row]")).map(
+    (row) => row.dataset.arkRow ?? ""
+  );
+}
+
+// `rows`, `columns` e `selected` vão como propriedade (objetos e funções), o resto como atributo; os eventos chegam
+// como CustomEvent com o registro do app; os filhos são os slots; o ArkPagination avulso segue o mesmo caminho.
+export const ReactDataViewAndPagination = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const viewRef = createRef<ArkDataViewElement>();
+    const queries: ArkDataViewQueryChangeDetail[] = [];
+    const clicks: Array<ArkDataViewRowClickDetail<Person>> = [];
+    const selections: Array<ArkDataViewSelectionChangeDetail<Person>> = [];
+    const pages: ArkPageChangeDetail[] = [];
+    const onQueryChange = (event: CustomEvent<ArkDataViewQueryChangeDetail>) => queries.push(event.detail);
+    const onRowClick = (event: CustomEvent<ArkDataViewRowClickDetail<Person>>) => clicks.push(event.detail);
+    const onSelectionChange = (event: CustomEvent<ArkDataViewSelectionChangeDetail<Person>>) =>
+      selections.push(event.detail);
+    const onPageChange = (event: CustomEvent<ArkPageChangeDetail>) => pages.push(event.detail);
+    const tree = (rows: Person[], page: number, selected: number[]): ReactNode => [
+      createElement(
+        ReactArkDataView<Person>,
+        {
+          key: "dv",
+          ref: viewRef,
+          rows,
+          columns: PEOPLE_COLUMNS,
+          view: "table",
+          pageSize: 2,
+          page,
+          sort: { key: "name", direction: "asc" },
+          selectable: true,
+          selected,
+          clickable: true,
+          label: "Pessoas",
+          lang: "pt",
+          onQueryChange,
+          onRowClick,
+          onSelectionChange
+        },
+        createElement("div", { slot: "selection" }, createElement(ReactArkButton, { intent: "danger" }, "Excluir"))
+      ),
+      createElement(ReactArkPagination, { key: "pg", page: 1, pageSize: 10, total: 35, lang: "pt", onPageChange })
+    ];
+
+    render(tree(PEOPLE, 1, []));
+    await expect(errors).toEqual([]);
+    const view = viewRef.current as ArkDataViewElement;
+    await expect(view.tagName).toBe("ARK-DATA-VIEW");
+    await expect(view).toHaveAttribute("page-size", "2");
+    await expect(view).toHaveAttribute("sort", "name:asc");
+    await expect(view.rows.every((row, index) => row === PEOPLE[index])).toBe(true);
+    await expect(shownKeys(canvasElement)).toEqual(["1", "2"]);
+    await expect(view.querySelector('[data-ark-row="1"] ark-badge')).toHaveTextContent("Plataforma");
+    // O slot do app só aparece com seleção.
+    const actions = view.querySelector('[slot="selection"]') as HTMLElement;
+    await expect(actions).not.toBeVisible();
+
+    // Eventos: o registro do detail é o objeto do app.
+    (view.querySelector('[data-ark-row="2"] td:last-child') as HTMLElement).click();
+    await expect(clicks).toHaveLength(1);
+    await expect(clicks[0].row === PEOPLE[1]).toBe(true);
+    (view.querySelector('[data-ark-row="1"] ark-checkbox') as HTMLElement & { toggle: () => void }).toggle();
+    await expect(selections.at(-1)?.selected).toEqual([1]);
+    await expect(actions).toBeVisible();
+    (view.querySelector('button[data-ark-page="2"]') as HTMLElement).click();
+    await expect(queries.at(-1)).toMatchObject({ page: 2, pageSize: 2, reason: "page" });
+    await expect(shownKeys(canvasElement)).toEqual(["3"]);
+
+    // Props controladas: página, seleção e registros novos chegam ao elemento sem recriar o nó.
+    render(tree(PEOPLE.slice(0, 2), 1, [2]));
+    await expect(errors).toEqual([]);
+    await expect(viewRef.current === view).toBe(true);
+    await expect(shownKeys(canvasElement)).toEqual(["1", "2"]);
+    await expect(view.selected).toEqual([2]);
+    await expect(view.querySelector('[data-ark-row="2"]')).toHaveAttribute("data-ark-selected");
+
+    const pagination = canvasElement.querySelector("ark-data-view + ark-pagination") as HTMLElement;
+    await expect(pagination).toHaveAttribute("total", "35");
+    (pagination.querySelector('button[data-ark-page="3"]') as HTMLElement).click();
+    await expect(pages).toEqual([{ page: 3, pageSize: 10, pageCount: 4 }]);
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueDataViewAndPagination = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const rows = ref<Person[]>(PEOPLE);
+    const selected = ref<number[]>([]);
+    const queries: ArkDataViewQueryChangeDetail[] = [];
+    const selections: Array<ArkDataViewSelectionChangeDetail<Person>> = [];
+    const pages: ArkPageChangeDetail[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(
+            VueArkDataView,
+            {
+              rows: rows.value,
+              columns: PEOPLE_COLUMNS,
+              view: "table",
+              pageSize: 2,
+              sort: "name:desc",
+              selectable: true,
+              selected: selected.value,
+              lang: "pt",
+              "onArk-query-change": (event: CustomEvent<ArkDataViewQueryChangeDetail>) => queries.push(event.detail),
+              "onArk-selection-change": (event: CustomEvent<ArkDataViewSelectionChangeDetail<Person>>) =>
+                selections.push(event.detail)
+            },
+            () => h("div", { slot: "selection" }, "Ações")
+          ),
+          h(VueArkPagination, {
+            page: 2,
+            pageSize: 10,
+            total: 35,
+            pageSizes: [10, 20],
+            lang: "pt",
+            "onArk-page-change": (event: CustomEvent<ArkPageChangeDetail>) => pages.push(event.detail)
+          })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+
+    const view = canvasElement.querySelector("ark-data-view") as ArkDataViewElement;
+    await expect(view).toHaveAttribute("page-size", "2");
+    await expect(view).toHaveAttribute("sort", "name:desc");
+    await expect(shownKeys(canvasElement)).toEqual(["3", "2"]);
+    await expect(view.querySelector('[data-ark-row="3"] ark-badge')).toHaveTextContent("Suporte");
+    await expect(view.querySelector('[slot="selection"]')).toHaveTextContent("Ações");
+
+    (view.querySelector('[data-ark-row="3"] ark-checkbox') as HTMLElement & { toggle: () => void }).toggle();
+    await expect(selections.at(-1)?.selected).toEqual([3]);
+    (view.querySelector('button[data-ark-page="2"]') as HTMLElement).click();
+    await expect(queries.at(-1)).toMatchObject({ page: 2, reason: "page" });
+    await expect(shownKeys(canvasElement)).toEqual(["1"]);
+
+    // Props reativas: lista e seleção novas chegam como propriedade.
+    rows.value = PEOPLE.slice(1);
+    selected.value = [2];
+    await nextTick();
+    await expect(view.rows.map((row) => row.id)).toEqual([2, 3]);
+    await expect(view.selected).toEqual([2]);
+
+    const pagination = canvasElement.querySelector("ark-data-view + ark-pagination") as HTMLElement & { page: number };
+    await expect(pagination.page).toBe(2);
+    await expect(pagination).toHaveAttribute("page-sizes", "10,20");
+    (pagination.querySelector('button[data-ark-page="next"]') as HTMLElement).click();
+    await expect(pages).toEqual([{ page: 3, pageSize: 10, pageCount: 4 }]);
+    await expect(problems).toEqual([]);
+  }
+};
+
+// Conteúdo de célula em JSX: o `render` da coluna devolve elementos React (inclusive componentes com eventos), que o
+// wrapper desenha por portal nos nós que o elemento cria. As colunas são declaradas inline (novas a cada render do
+// app) e o JSX fecha sobre o estado do app: ele se atualiza sem o elemento refazer a tabela.
+export const ReactDataViewJsxCells = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const clicks: string[] = [];
+    const tree = (rows: Person[], highlight: number | null, cards: boolean): ReactNode =>
+      createElement(ReactArkDataView<Person>, {
+        rows,
+        view: cards ? "cards" : "table",
+        lang: "pt",
+        columns: [
+          {
+            key: "name",
+            label: "Nome",
+            sortable: true,
+            cardRole: "title",
+            render: ({ row }) =>
+              createElement(
+                "strong",
+                { className: "nome", "data-destaque": row.id === highlight ? "sim" : "nao" },
+                row.name
+              )
+          },
+          {
+            key: "team",
+            label: "Time",
+            render: ({ row }) =>
+              createElement(ReactArkButton, { size: "sm", onClick: () => clicks.push(row.name) }, row.team)
+          },
+          { key: "id", label: "#", render: ({ row }) => (row.id > 1 ? `#${row.id}` : null) }
+        ],
+        cardRender: cards
+          ? ({ row, index }) => createElement("p", { className: "corpo" }, `${index}: ${row.team}`)
+          : undefined
+      });
+    const view = () => canvasElement.querySelector("ark-data-view") as ArkDataViewElement;
+    const cell = (key: string, column: number) =>
+      view().querySelectorAll(`[data-ark-row="${key}"] [data-ark="data-view-cell"]`)[column] as HTMLElement;
+
+    const root = render(tree(PEOPLE, null, false));
+    // Os portais entram num microtask depois de o elemento desenhar, antes da pintura.
+    await waitFor(() => expect(view().querySelectorAll("td .nome")).toHaveLength(3));
+    await expect(errors).toEqual([]);
+    await expect(cell("1", 0).querySelector(".nome")).toHaveTextContent("Ana Lima");
+    await expect(cell("1", 0).querySelector(".nome")).toHaveAttribute("data-destaque", "nao");
+    // Texto vira texto; null não desenha nada (a célula é do React).
+    await expect(cell("2", 2)).toHaveTextContent("#2");
+    await expect(cell("1", 2).textContent).toBe("");
+    // Um componente React dentro da célula, com o evento dele.
+    (cell("2", 1).querySelector("ark-button") as HTMLElement).click();
+    await expect(clicks).toEqual(["Bruno Reis"]);
+
+    // Outro render do app: colunas novas com os mesmos dados e outro estado. A linha é o mesmo nó (o elemento não
+    // refez a tabela) e o JSX mostra o estado novo.
+    const firstRow = view().querySelector('[data-ark-row="1"]');
+    render(tree(PEOPLE, 1, false));
+    await expect(view().querySelector('[data-ark-row="1"]') === firstRow).toBe(true);
+    await expect(cell("1", 0).querySelector(".nome")).toHaveAttribute("data-destaque", "sim");
+
+    // Ordenar refaz as células: os portais das antigas saem e os das novas entram.
+    const sortButton = view().querySelector('[data-ark-sort-key="name"]') as HTMLElement;
+    sortButton.click();
+    (view().querySelector('[data-ark-sort-key="name"]') as HTMLElement).click();
+    await waitFor(() => expect(view().querySelectorAll("td .nome")).toHaveLength(3));
+    await expect(shownKeys(canvasElement)).toEqual(["3", "2", "1"]);
+    await expect(cell("3", 0).querySelector(".nome")).toHaveTextContent("Carla Dias");
+    await expect(document.querySelectorAll(".nome")).toHaveLength(3);
+
+    // Cards: o título continua em JSX e o corpo vem de `cardRender`.
+    render(tree(PEOPLE, null, true));
+    await waitFor(() => expect(view().querySelectorAll("li .corpo")).toHaveLength(3));
+    await expect(view().querySelector("dl")).toBeNull();
+    await expect(view().querySelector('li[data-ark-row="3"] .nome')).toHaveTextContent("Carla Dias");
+    await expect(view().querySelector('li[data-ark-row="3"] .corpo')).toHaveTextContent("2: Suporte");
+
+    // Registros novos; desmontar leva os portais junto, sem erro.
+    render(tree(PEOPLE.slice(0, 1), null, true));
+    await waitFor(() => expect(view().querySelectorAll("li .corpo")).toHaveLength(1));
+    await expect(errors).toEqual([]);
+    root.unmount();
+    await expect(canvasElement.querySelector(".corpo")).toBeNull();
+    await expect(errors).toEqual([]);
+  }
+};
+
+// Conteúdo de célula no Vue: o slot `cell-<key>` (o jeito do template), ou o `render` da coluna devolvendo VNodes;
+// o wrapper teleporta para os nós que o elemento cria. O conteúdo é reativo: muda com o estado do app e com os
+// campos do registro, sem o elemento refazer a tabela.
+export const VueDataViewCellSlots = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const rows = ref<Person[]>(PEOPLE.map((person) => ({ ...person })));
+    const highlight = ref<number | null>(null);
+    const cards = ref(false);
+    const clicks: string[] = [];
+    const columns: ArkDataViewVueColumn<Person>[] = [
+      { key: "name", label: "Nome", sortable: true, cardRole: "title" },
+      { key: "team", label: "Time" },
+      { key: "id", label: "#", render: ({ row }) => h("em", { class: "numero" }, `#${row.id}`) }
+    ];
+    const app = createApp({
+      setup: () => () =>
+        h(
+          VueArkDataView,
+          { rows: rows.value, columns, view: cards.value ? "cards" : "table", lang: "pt" },
+          {
+            "cell-name": ({ row }: { row: Person }) =>
+              h("strong", { class: "nome", "data-destaque": row.id === highlight.value ? "sim" : "nao" }, row.name),
+            "cell-team": ({ row }: { row: Person }) =>
+              h(VueArkButton, { size: "sm", onClick: () => clicks.push(row.name) }, () => row.team),
+            ...(cards.value
+              ? {
+                  card: ({ row, index }: { row: Person; index: number }) =>
+                    h("p", { class: "corpo" }, `${index}: ${row.team}`)
+                }
+              : {}),
+            default: () => h("div", { slot: "toolbar" }, "Ações")
+          }
+        )
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+    const view = canvasElement.querySelector("ark-data-view") as ArkDataViewElement;
+    const cell = (key: string, column: number) =>
+      view.querySelectorAll(`[data-ark-row="${key}"] [data-ark="data-view-cell"]`)[column] as HTMLElement;
+
+    await waitFor(() => expect(view.querySelectorAll("td .nome")).toHaveLength(3));
+    await expect(cell("1", 0).querySelector(".nome")).toHaveTextContent("Ana Lima");
+    await expect(cell("2", 2).querySelector(".numero")).toHaveTextContent("#2");
+    await expect(view.querySelector('[slot="toolbar"]')).toHaveTextContent("Ações");
+    (cell("2", 1).querySelector("ark-button") as HTMLElement).click();
+    await expect(clicks).toEqual(["Bruno Reis"]);
+
+    // Reativo ao estado do app e aos campos do registro, na mesma linha (o elemento não refez a tabela).
+    const firstRow = view.querySelector('[data-ark-row="1"]');
+    highlight.value = 1;
+    rows.value[0].name = "Ana Maria";
+    await nextTick();
+    await expect(view.querySelector('[data-ark-row="1"]') === firstRow).toBe(true);
+    await expect(cell("1", 0).querySelector(".nome")).toHaveAttribute("data-destaque", "sim");
+    await expect(cell("1", 0).querySelector(".nome")).toHaveTextContent("Ana Maria");
+
+    // Ordenar refaz as células: os Teleports das antigas saem e os das novas entram.
+    (view.querySelector('[data-ark-sort-key="name"]') as HTMLElement).click();
+    (view.querySelector('[data-ark-sort-key="name"]') as HTMLElement).click();
+    await waitFor(() => expect(view.querySelectorAll("td .nome")).toHaveLength(3));
+    await expect(shownKeys(canvasElement)).toEqual(["3", "2", "1"]);
+    await expect(document.querySelectorAll(".nome")).toHaveLength(3);
+
+    // Cards: o slot `card` desenha o corpo e o título segue do slot da célula.
+    cards.value = true;
+    await waitFor(() => expect(view.querySelectorAll("li .corpo")).toHaveLength(3));
+    await expect(view.querySelector("dl")).toBeNull();
+    await expect(view.querySelector('li[data-ark-row="3"] .nome')).toHaveTextContent("Carla Dias");
+    await expect(view.querySelector('li[data-ark-row="3"] .corpo')).toHaveTextContent("2: Suporte");
+
+    // Sem o slot `card` a grade de campos volta.
+    cards.value = false;
+    await waitFor(() => expect(view.querySelectorAll("td .nome")).toHaveLength(3));
+    app.unmount();
     await expect(problems).toEqual([]);
   }
 };
