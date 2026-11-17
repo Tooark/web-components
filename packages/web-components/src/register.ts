@@ -24,6 +24,9 @@ import {
   ArkMark,
   ArkMenu,
   ArkMenuItem,
+  ArkNav,
+  ArkNavGroup,
+  ArkNavItem,
   ArkPagination,
   ArkProgress,
   ArkRadio,
@@ -176,6 +179,19 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkMenu.tagName)) {
     customElements.define(ArkMenu.tagName, ArkMenu);
+  }
+
+  // Item e grupo antes do nav: o ark-nav coordena filhos já upgraded.
+  if (!customElements.get(ArkNavItem.tagName)) {
+    customElements.define(ArkNavItem.tagName, ArkNavItem);
+  }
+
+  if (!customElements.get(ArkNavGroup.tagName)) {
+    customElements.define(ArkNavGroup.tagName, ArkNavGroup);
+  }
+
+  if (!customElements.get(ArkNav.tagName)) {
+    customElements.define(ArkNav.tagName, ArkNav);
   }
 
   if (!customElements.get(ArkCard.tagName)) {

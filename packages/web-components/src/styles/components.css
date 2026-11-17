@@ -933,4 +933,209 @@
   ark-data-view[data-ark-drop-stacked] li[data-ark-drop="after"]::after {
     bottom: calc(-0.375rem - 2.5px);
   }
+
+  /* ---------- ark-nav: coluna (sidebar), barra (navbar) ou abas (tabbar); cabeçalho e rodapé do usuário ordenados ---------- */
+
+  /*
+   * Larguras da sidebar em custom properties (redefina-as no host ou em :root)
+   * e a transição de largura pelos tokens de movimento. O cabeçalho (logo), o
+   * rodapé (avatar) e o botão de recolher ficam presos nas pontas (sticky) e
+   * só os itens rolam entre eles; a altura do botão, por size, é o quanto o
+   * rodapé sobe para parar acima dele.
+   */
+  ark-nav {
+    --ark-nav-width: 16rem;
+    --ark-nav-rail-width: 3.5rem;
+    --ark-nav-toggle-height: var(--ark-size-md);
+  }
+
+  ark-nav[size="xs"] {
+    --ark-nav-toggle-height: var(--ark-size-xs);
+  }
+
+  ark-nav[size="sm"] {
+    --ark-nav-toggle-height: var(--ark-size-sm);
+  }
+
+  ark-nav[size="lg"] {
+    --ark-nav-toggle-height: var(--ark-size-lg);
+  }
+
+  ark-nav[size="xl"] {
+    --ark-nav-toggle-height: var(--ark-size-xl);
+  }
+
+  ark-nav[data-ark-variant="sidebar"] {
+    transition: width var(--ark-duration-default, 250ms) var(--ark-ease-standard, cubic-bezier(0.4, 0, 0.2, 1));
+  }
+
+  /* Navbar: logo no início, rodapé (avatar, ações) no fim; rola por trackpad, toque e foco, sem barra visível. */
+  ark-nav[data-ark-variant="navbar"] {
+    scrollbar-width: none;
+  }
+
+  ark-nav[data-ark-variant="navbar"]::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Presos nas pontas, com fundo surface, acima dos itens (que são position: relative) que rolam por baixo. */
+  ark-nav[data-ark-variant="sidebar"] > [slot="header"] {
+    order: -1;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-bottom: 0.25rem;
+    @apply ark:bg-surface;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [slot="footer"] {
+    order: 1;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    flex-shrink: 0;
+    margin-top: auto;
+    padding-top: 0.25rem;
+    @apply ark:bg-surface;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"] {
+    order: 2;
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-top: auto;
+    @apply ark:bg-surface;
+  }
+
+  ark-nav[data-ark-variant="navbar"] > [slot="header"] {
+    order: -1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-inline-end: 0.5rem;
+  }
+
+  ark-nav[data-ark-variant="navbar"] > [slot="footer"] {
+    order: 1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    margin-inline-start: auto;
+  }
+
+  /* Recolhida (trilho ou hidden): logo e rodapé centrados na coluna estreita, seja qual for o display deles. */
+  ark-nav:is([data-ark-rail], [data-ark-hidden])[data-ark-variant="sidebar"] > :is([slot="header"], [slot="footer"]) {
+    justify-content: center;
+    text-align: center;
+  }
+
+  /* Recolhida em hidden o botão fica logo abaixo do logo, com ou sem rodapé (o rodapé some e não empurra mais). */
+  ark-nav[data-ark-hidden] > [data-ark-chrome="toggle"] {
+    margin-top: 0;
+  }
+
+  /* O sticky para no padding do host (p-2) e deixa transparentes a margem e o gap (0.25rem + 0.125rem) entre as
+     pontas e os itens: faixas pintadas fora de cada ponta cobrem os itens que passariam por ali. Pseudoelementos, e
+     não box-shadow, porque o anel de foco do botão trocaria a sombra. */
+  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::before,
+  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::after,
+  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::before,
+  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::after,
+  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::before,
+  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    @apply ark:bg-surface;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::before {
+    top: -0.5rem;
+    height: 0.5rem;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [slot="header"]::after {
+    bottom: -0.375rem;
+    height: 0.375rem;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::before,
+  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::before {
+    top: -0.125rem;
+    height: 0.125rem;
+  }
+
+  ark-nav[data-ark-variant="sidebar"] > [slot="footer"]::after,
+  ark-nav[data-ark-variant="sidebar"] > [data-ark-chrome="toggle"]::after {
+    bottom: -0.5rem;
+    height: 0.5rem;
+  }
+
+  /* Com rodapé, o botão é quem fica no fundo e o rodapé para logo acima dele. */
+  ark-nav[data-ark-variant="sidebar"]:has(> [slot="footer"]) > [data-ark-chrome="toggle"] {
+    margin-top: 0;
+  }
+
+  ark-nav[data-ark-variant="sidebar"]:has(> [data-ark-chrome="toggle"]) > [slot="footer"] {
+    bottom: calc(var(--ark-nav-toggle-height) + 0.125rem);
+  }
+
+  /* Recolhida com collapsible="hidden": só o cabeçalho e o botão ficam; o resto sai também da árvore de acessibilidade.
+     Com !important porque os filhos são hosts ark-* (item, grupo) cujas utilities de display venceriam esta camada. */
+  ark-nav[data-ark-hidden] > :not([slot="header"]):not([data-ark-chrome="toggle"]) {
+    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:flex dos hosts filhos */
+    display: none !important;
+  }
+
+  /* Item: o ícone do usuário vem antes do rótulo, no tamanho do size; o trailing (badge, atalho) vai à direita. */
+  ark-nav-item > [slot="icon"] {
+    order: -1;
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  ark-nav-item > [slot="icon"] > :where(svg) {
+    width: 100%;
+    height: 100%;
+  }
+
+  ark-nav-item:is([size="xs"], [size="sm"]) > [slot="icon"] {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  ark-nav-item:is([size="xl"], [variant="tabbar"]) > [slot="icon"] {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  ark-nav-item > [slot="trailing"] {
+    order: 1;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-inline-start: auto;
+    @apply ark:text-xs ark:text-fg-muted;
+  }
+
+  /* Trilho: só o ícone (o rótulo próprio fica sr-only, para o nome do link); tabbar: ícone e rótulo, sem trailing. Com
+     !important porque o trailing costuma ser um host ark-* (badge) cuja utility de display venceria esta camada. */
+  ark-nav-item[data-ark-rail] > :not([slot="icon"]):not([data-ark-chrome]),
+  ark-nav-item[variant="tabbar"] > [slot="trailing"] {
+    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:inline-flex de um ark-badge no slot */
+    display: none !important;
+  }
+
+  /* Grupo expansível fechado: os itens somem; no trilho ficam, porque o cabeçalho que os abriria está oculto. Com
+     !important porque os itens são hosts ark-nav-item, cujo ark:flex venceria esta camada. */
+  ark-nav-group[expandable]:not([open]):not([data-ark-rail]) > :not([data-ark-chrome]) {
+    /* biome-ignore lint/complexity/noImportantStyles: vence o ark:flex dos itens */
+    display: none !important;
+  }
 }
