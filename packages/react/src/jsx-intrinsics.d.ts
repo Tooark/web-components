@@ -21,6 +21,9 @@ import type {
   ArkMarkShape,
   ArkMenuAlign,
   ArkMenuDirection,
+  ArkNavCollapsible,
+  ArkNavSide,
+  ArkNavVariant,
   ArkRounded,
   ArkSize,
   ArkTabsFill,
@@ -381,6 +384,36 @@ interface ArkIntrinsicElements {
     checked?: boolean | "false";
     divider?: boolean;
     static?: boolean;
+  };
+  "ark-nav": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    variant?: ArkNavVariant;
+    side?: ArkNavSide;
+    value?: string;
+    collapsed?: boolean;
+    collapsible?: boolean | ArkNavCollapsible;
+    label?: string;
+    size?: ArkSize;
+    intent?: ArkIntent;
+    theme?: ArkTheme;
+    lang?: ArkLang;
+    "locale-json"?: string;
+  };
+  "ark-nav-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    href?: string;
+    target?: string;
+    label?: string;
+    value?: string;
+    current?: boolean;
+    disabled?: boolean;
+    divider?: boolean;
+  };
+  "ark-nav-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    label?: string;
+    expandable?: boolean;
+    open?: boolean;
   };
   "ark-tooltip": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;

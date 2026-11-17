@@ -27,6 +27,8 @@ export { ArkKbdComponent } from "./ark-kbd.component";
 export { ArkKvEditorComponent } from "./ark-kv-editor.component";
 export { ArkMarkComponent } from "./ark-mark.component";
 export { ArkMenuComponent, ArkMenuItemComponent } from "./ark-menu.component";
+export type { ArkNavNavigateDetail } from "./ark-nav.component";
+export { ArkNavComponent, ArkNavGroupComponent, ArkNavItemComponent } from "./ark-nav.component";
 export { ArkPaginationComponent } from "./ark-pagination.component";
 export { ArkProgressComponent } from "./ark-progress.component";
 export { ArkRadioComponent } from "./ark-radio.component";
