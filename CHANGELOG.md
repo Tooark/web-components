@@ -49,6 +49,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `clearSelection`, `reorder`, `movedTo`, `moveUp`, `moveDown`, `moveToStart`, `moveToEnd`); a `locale-json` without
   them falls back to English.
 
+- `ark-nav`, `ark-nav-item` and `ark-nav-group`: app navigation in three presentations, `sidebar` (default: a column
+  where `slot="header"` for the logo, `slot="footer"` for the avatar and the collapse button stay pinned to the ends
+  and only the items scroll between them), `navbar` (a horizontal bar, no visible scrollbar) and `tabbar` (mobile
+  bottom tabs, icon above the label). The sidebar collapses (`collapsed`, reflected) to an icon rail, header and
+  footer centered, the labels visually hidden but still naming the links and a `title` on each item, or, with
+  `collapsible="hidden"`, to the logo and the expand button alone; `collapsible` also adds the component's collapse
+  button (new `collapse`/`expand` strings in `ArkLocale`, en/pt/es), whose click emits `ark-collapse`; `collapsed` on
+  the navbar turns the items icon-only.
+  Each item is a real stretched `<a href>` (Ctrl+click and new tab work; `aria-current="page"` when `current`) or a
+  `role="button"` without `href`, emits a cancelable `ark-navigate` for SPA routing, and takes `slot="icon"` and
+  `slot="trailing"`; `value` on the nav marks the current item by its `value` or `href`. Groups have a heading from
+  `label`, `expandable` with `open` and `ark-toggle`. Widths come from `--ark-nav-width`/`--ark-nav-rail-width`. React,
+  Vue and Angular wrappers (`ArkNav`, `ArkNavItem`, `ArkNavGroup`) and hooks `nav`, `nav-toggle`, `nav-header`,
+  `nav-footer`, `nav-item`, `nav-item-link`, `nav-item-label`, `nav-item-icon`, `nav-item-trailing`, `nav-divider`,
+  `nav-group`, `nav-group-heading`.
+
 ### Changed
 
 - The Storybook suite now runs the Angular wrappers too (`Integration/Angular Wrappers`): they are JIT-compiled from
