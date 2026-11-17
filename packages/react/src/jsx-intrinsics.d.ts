@@ -10,6 +10,8 @@ import type {
   ArkButtonVariant,
   ArkCardPadding,
   ArkCarouselSnap,
+  ArkDataViewMode,
+  ArkDataViewView,
   ArkDatepickerLang,
   ArkDialogSize,
   ArkDrawerMode,
@@ -302,6 +304,53 @@ interface ArkIntrinsicElements {
     "value-placeholder"?: string;
     "description-placeholder"?: string;
     readonly?: boolean;
+    size?: ArkSize;
+    theme?: ArkTheme;
+    lang?: ArkLang;
+    "locale-json"?: string;
+  };
+  "ark-pagination": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    page?: number | string;
+    "page-size"?: number | string;
+    total?: number | string;
+    /** Opções do seletor de itens por página, separadas por vírgula; sem ele o seletor não aparece. */
+    "page-sizes"?: string;
+    siblings?: number | string;
+    disabled?: boolean;
+    size?: ArkSize;
+    intent?: ArkIntent;
+    theme?: ArkTheme;
+    lang?: ArkLang;
+    "locale-json"?: string;
+  };
+  "ark-data-view": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    /** JSON das colunas (sem `render`/`compare`, que só existem na propriedade JS). */
+    columns?: string;
+    rows?: string;
+    "row-key"?: string;
+    view?: ArkDataViewView;
+    /** Esconde o seletor de visualização; `view` continua valendo. */
+    "no-view-selector"?: boolean;
+    breakpoint?: number | string;
+    mode?: ArkDataViewMode;
+    page?: number | string;
+    "page-size"?: number | string;
+    "page-sizes"?: string;
+    total?: number | string;
+    /** "chave:asc" ou "chave:desc". */
+    sort?: string;
+    search?: string;
+    searchable?: boolean;
+    "search-placeholder"?: string;
+    "search-debounce"?: number | string;
+    selectable?: boolean;
+    reorderable?: boolean;
+    clickable?: boolean;
+    loading?: boolean;
+    "card-columns"?: number | string;
+    label?: string;
     size?: ArkSize;
     theme?: ArkTheme;
     lang?: ArkLang;

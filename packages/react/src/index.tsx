@@ -23,6 +23,8 @@ export type { ArkCommandItemProps, ArkCommandPaletteProps } from "./ark-command-
 export { ArkCommandItem, ArkCommandPalette } from "./ark-command-palette.js";
 export type { ArkCopyButtonProps } from "./ark-copy-button.js";
 export { ArkCopyButton } from "./ark-copy-button.js";
+export type { ArkDataViewProps, ArkDataViewReactCardRender, ArkDataViewReactColumn } from "./ark-data-view.js";
+export { ArkDataView } from "./ark-data-view.js";
 export type { ArkDatepickerProps } from "./ark-datepicker.js";
 export { ArkDatepicker } from "./ark-datepicker.js";
 export type { ArkDialogProps } from "./ark-dialog.js";
@@ -43,6 +45,8 @@ export type { ArkMarkProps } from "./ark-mark.js";
 export { ArkMark } from "./ark-mark.js";
 export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu.js";
 export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
+export type { ArkPaginationProps } from "./ark-pagination.js";
+export { ArkPagination } from "./ark-pagination.js";
 export type { ArkProgressProps } from "./ark-progress.js";
 export { ArkProgress } from "./ark-progress.js";
 export type { ArkRadioProps } from "./ark-radio.js";

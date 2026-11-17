@@ -62,15 +62,37 @@ await check("react (renderToString)", async () => {
   if (!html.includes("<ark-dialog") || !html.includes('<ark-button type="submit"')) {
     throw new Error(`HTML inesperado: ${html.slice(0, 160)}`);
   }
+  // O data-view desenha as células em JSX por portal, que só existe no navegador: no servidor sai só a tag.
+  const { ArkDataView } = await import(distUrl("react"));
+  const table = renderToString(
+    createElement(ArkDataView, {
+      rows: [{ id: 1, name: "Ana" }],
+      columns: [{ key: "name", label: "Nome", render: ({ row }) => createElement("strong", null, row.name) }],
+      pageSize: 10
+    })
+  );
+  if (!table.includes('<ark-data-view page-size="10"')) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
 });
 
 // Vue: o setup roda no servidor e chama o registro, que precisa ser no-op.
 await check("vue (renderToString)", async () => {
   const { createSSRApp, h } = await importFrom("vue", "vue");
   const { renderToString } = await importFrom("vue", "vue/server-renderer");
-  const { ArkButton } = await import(distUrl("vue"));
+  const { ArkButton, ArkDataView } = await import(distUrl("vue"));
   const html = await renderToString(createSSRApp({ render: () => h(ArkButton, { type: "submit" }, () => "Salvar") }));
   if (!html.includes("<ark-button")) throw new Error(`HTML inesperado: ${html.slice(0, 160)}`);
+  // O data-view teleporta os slots de célula, o que só acontece no navegador: no servidor sai só a tag.
+  const table = await renderToString(
+    createSSRApp({
+      render: () =>
+        h(
+          ArkDataView,
+          { rows: [{ id: 1, name: "Ana" }], columns: [{ key: "name", label: "Nome" }], pageSize: 10 },
+          { "cell-name": ({ row }) => h("strong", row.name) }
+        )
+    })
+  );
+  if (!table.includes("<ark-data-view")) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
 });
 
 // Angular: o bundle parcial (FESM) avaliado com o compilador JIT, como num servidor sem o linker do CLI.
@@ -88,7 +110,10 @@ await check("angular (import + registro)", async () => {
 // Todo wrapper Angular expõe o elemento que renderiza: o getter `element` procura, no host do wrapper, o filho direto
 // com a tag do próprio seletor (`ark-x-wrapper` -> `ark-x`).
 await check("angular (element de cada wrapper)", async () => {
-  const { ElementRef, Injector, runInInjectionContext } = await importFrom("angular", "@angular/core");
+  const { ElementRef, Injector, runInInjectionContext, ViewContainerRef } = await importFrom(
+    "angular",
+    "@angular/core"
+  );
   const angular = await import(distUrl("angular", "fesm2022/tooark-angular.mjs"));
   const wrappers = Object.entries(angular).filter(([name]) => name.endsWith("Component"));
   if (wrappers.length === 0) throw new Error("nenhum wrapper exportado");
@@ -96,7 +121,13 @@ await check("angular (element de cada wrapper)", async () => {
     const tag = Wrapper.ɵcmp.selectors[0][0].replace(/-wrapper$/, "");
     const queried = [];
     const host = { querySelector: (selector) => queried.push(selector) && null };
-    const injector = Injector.create({ providers: [{ provide: ElementRef, useValue: new ElementRef(host) }] });
+    // O ViewContainerRef é do wrapper do data-view, que instancia nele os templates de célula.
+    const injector = Injector.create({
+      providers: [
+        { provide: ElementRef, useValue: new ElementRef(host) },
+        { provide: ViewContainerRef, useValue: {} }
+      ]
+    });
     const wrapper = runInInjectionContext(injector, () => new Wrapper());
     if (wrapper.element !== null || queried[0] !== `:scope > ${tag}`) {
       throw new Error(`${name}.element procurou ${JSON.stringify(queried[0])}, esperado ":scope > ${tag}"`);
