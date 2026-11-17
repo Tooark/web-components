@@ -100,8 +100,8 @@ export const InlineWithText = {
   }
 };
 
-// role="status" com rotulo so para leitores de tela (padrao pelo idioma, ou `label`); o SVG gira pelo preset
-// ark-spin do core, isento de movimento reduzido; o diametro segue size.
+// role="status" com rótulo só para leitores de tela (padrão pelo idioma, ou `label`); o SVG gira pelo preset
+// ark-spin do core, isento de movimento reduzido; o diâmetro segue size.
 export const Semantics = {
   render: () => createSpinner({ lang: "pt" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

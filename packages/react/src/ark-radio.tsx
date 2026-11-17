@@ -9,16 +9,16 @@ export type ArkRadioProps = PropsWithChildren<
   ArkDomProps<
     ArkRadioStyleOptions & {
       disabled?: boolean;
-      /** Nome do grupo: agrupa no formulario e para setas/roving tabindex. */
+      /** Nome do grupo: agrupa no formulário e para setas/roving tabindex. */
       name?: string;
-      /** Valor submetido e publicado em `change` quando marcado. Padrao: "on". */
+      /** Valor submetido e publicado em `change` quando marcado. Padrão: "on". */
       value?: string;
-      /** Rotulo proprio (<label for>); sem ele use aria-label ou filhos como rotulo livre. */
+      /** Rótulo próprio (<label for>); sem ele use aria-label ou filhos como rótulo livre. */
       label?: string;
-      /** Dica abaixo do rotulo, ligada ao controle por aria-describedby. */
+      /** Dica abaixo do rótulo, ligada ao controle por aria-describedby. */
       helper?: string;
       className?: string;
-      /** Dispara so no radio que ganhou a marca. */
+      /** Dispara só no radio que ganhou a marca. */
       onChange?: (event: CustomEvent<{ value: string }>) => void;
     }
   >

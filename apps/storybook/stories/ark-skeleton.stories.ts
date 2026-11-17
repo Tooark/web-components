@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Placeholder de carregamento: o host `ark-skeleton` e o bloco (`.ark-skeleton` do core, `aria-hidden`); largura e altura vem de class ou style. `rows` acima de 1 troca o bloco por barras em coluna, a ultima mais curta. `animated` liga o brilho que varre (fase sorteada por elemento e escalonada entre as barras), opt-in e parado sob prefers-reduced-motion. O conteudo que substitui o skeleton entra com `.ark-animate-fade-in`; nao existe elemento de reveal."
+          "Placeholder de carregamento: o host `ark-skeleton` é o bloco (`.ark-skeleton` do core, `aria-hidden`); largura e altura vêm de class ou style. `rows` acima de 1 troca o bloco por barras em coluna, a última mais curta. `animated` liga o brilho que varre (fase sorteada por elemento e escalonada entre as barras), opt-in e parado sob prefers-reduced-motion. O conteúdo que substitui o skeleton entra com `.ark-animate-fade-in`; não existe elemento de reveal."
       }
     }
   },
@@ -17,10 +17,10 @@ const meta = {
     animated: { control: "boolean" },
     rounded: { control: "select", options: ["", "none", "xs", "sm", "md", "lg", "xl", "full"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    color: { control: "color", description: "Cor base propria no lugar de muted" },
-    ratio: { control: "text", description: "Proporcao do bloco (16/9, 9/16, 1/1); a altura vem da largura" },
+    color: { control: "color", description: "Cor base própria no lugar de muted" },
+    ratio: { control: "text", description: "Proporção do bloco (16/9, 9/16, 1/1); a altura vem da largura" },
     width: { control: "text", description: "style.width do host" },
-    height: { control: "text", description: "style.height do host (so no bloco unico)" }
+    height: { control: "text", description: "style.height do host (só no bloco único)" }
   },
   args: {
     rows: 1,
@@ -113,7 +113,7 @@ export const Reveal = {
     button.setAttribute("variant", "outline");
     button.textContent = "Carregou";
     button.addEventListener("click", () => {
-      // O conteudo real substitui o skeleton e entra com o preset de fade do core.
+      // O conteúdo real substitui o skeleton e entra com o preset de fade do core.
       const content = document.createElement("p");
       content.className = "ark-animate-fade-in text-sm text-slate-700";
       content.textContent = "GET /users respondeu 200 em 12 ms.";
@@ -122,7 +122,7 @@ export const Reveal = {
     wrap.append(slot, button);
     return wrap;
   },
-  // Reveal e so .ark-animate-fade-in no conteudo que substitui o skeleton.
+  // Reveal é só .ark-animate-fade-in no conteúdo que substitui o skeleton.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const slot = canvasElement.querySelector("[data-slot]")!;
@@ -138,8 +138,8 @@ export const Reveal = {
 
 export const BlockAndRows = {
   render: () => createSkeleton({ width: "16rem" }),
-  // Bloco unico: o host leva .ark-skeleton, aria-hidden e 1rem de altura por padrao (class/style do usuario
-  // vencem); rows > 1 troca por barras proprias, a ultima mais curta; voltar a 1 remove as barras.
+  // Bloco único: o host leva .ark-skeleton, aria-hidden e 1rem de altura por padrão (class/style do usuário
+  // vencem); rows > 1 troca por barras próprias, a última mais curta; voltar a 1 remove as barras.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const skeleton = canvasElement.querySelector("ark-skeleton") as SkeletonEl;
 
@@ -172,7 +172,7 @@ export const BlockAndRows = {
 export const AnimatedAndRounded = {
   render: () => createSkeleton({ width: "16rem" }),
   // animated liga .ark-skeleton-animated no bloco e em cada barra; rounded vai por border-radius inline,
-  // porque o raio padrao de .ark-skeleton vem do motion.css sem layer.
+  // porque o raio padrão de .ark-skeleton vem do motion.css sem layer.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const skeleton = canvasElement.querySelector("ark-skeleton") as SkeletonEl;
 
@@ -197,7 +197,7 @@ export const AnimatedAndRounded = {
       expect(getComputedStyle(row).borderTopLeftRadius).toBe("4px");
       expect(getComputedStyle(row).animationName).toBe("ark-shimmer");
     }
-    // Fases escalonadas: as barras nao varrem juntas.
+    // Fases escalonadas: as barras não varrem juntas.
     expect(rows[0].style.animationDelay).not.toBe(rows[1].style.animationDelay);
     expect(skeleton.classList.contains("ark-skeleton-animated")).toBe(false);
     expect(skeleton.style.borderRadius).toBe("");
@@ -242,7 +242,7 @@ export const Colored = {
 
 export const ColorAndRatio = {
   render: () => createSkeleton({ width: "16rem" }),
-  // ratio vira aspect-ratio inline (a altura padrao sai so com ratio valido; com rows e ignorado); color troca o
+  // ratio vira aspect-ratio inline (a altura padrão sai só com ratio válido; com rows é ignorado); color troca o
   // tint base via --ark-skeleton-color, lida pelo .ark-skeleton e herdada pelas barras.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const skeleton = canvasElement.querySelector("ark-skeleton") as SkeletonEl;

@@ -19,7 +19,7 @@ export {
 } from "./engine";
 export { resolveWysiwygLabels } from "./i18n";
 export { registerTooarkWysiwyg } from "./register";
-// Seguranca do conteudo
+// Segurança do conteúdo
 export { isSafeColor, isSafeUrl, sanitizeWysiwygContent } from "./security";
 // Estilos
 export { ensureWysiwygStyles, WYSIWYG_STYLE_ID, wysiwygCss } from "./styles";

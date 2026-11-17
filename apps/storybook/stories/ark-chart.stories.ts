@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Grafico baseado em ECharts exposto como Custom Element <ark-chart>. As opcoes do ECharts sao passadas pela propriedade `option` (objeto). Atributos: theme, renderer, height e auto-resize. Funciona em projetos puros e nos frameworks via DOM nativo."
+          "Gráfico baseado em ECharts exposto como Custom Element <ark-chart>. As opções do ECharts são passadas pela propriedade `option` (objeto). Atributos: theme, renderer, height e auto-resize. Funciona em projetos puros e nos frameworks via DOM nativo."
       }
     }
   },
@@ -57,7 +57,7 @@ function buildOption(type: ChartType): EChartsOption {
       grid: undefined,
       series: [
         {
-          name: "Receita por mes",
+          name: "Receita por mês",
           type: "pie",
           radius: ["40%", "70%"],
           itemStyle: { borderRadius: 8, borderWidth: 2 },
@@ -149,7 +149,7 @@ export const FollowsPageTheme = {
     docs: {
       description: {
         story:
-          'Em `theme="auto"` o grafico resolve o color-scheme da pagina e acompanha a troca em tempo de execucao (`observeColorScheme` de @tooark/tokens observa html/body e a preferencia do sistema). `resolvedTheme` expoe o lado aplicado.'
+          'Em `theme="auto"` o gráfico resolve o color-scheme da página e acompanha a troca em tempo de execução (`observeColorScheme` de @tooark/tokens observa html/body e a preferência do sistema). `resolvedTheme` expõe o lado aplicado.'
       }
     }
   },
@@ -163,7 +163,7 @@ export const FollowsPageTheme = {
       await waitFor(() => expect(chart.resolvedTheme).toBe("light"));
       root.style.colorScheme = "dark";
       await waitFor(() => expect(chart.resolvedTheme).toBe("dark"));
-      // Tema fixo ignora a pagina.
+      // Tema fixo ignora a página.
       chart.setAttribute("theme", "light");
       await waitFor(() => expect(chart.resolvedTheme).toBe("light"));
       root.style.colorScheme = "light";

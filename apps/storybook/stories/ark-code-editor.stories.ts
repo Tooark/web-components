@@ -90,7 +90,7 @@ spec:
   text: "Texto puro, sem realce.\nSegunda linha.\n"
 };
 
-// Exemplos das propriedades que recebem funcao. O texto de cada um vai igual para o "Show code".
+// Exemplos das propriedades que recebem função. O texto de cada um vai igual para o "Show code".
 const FORMATTER_CODE = `(value) => value.split("\\n").map((line) => line.trimEnd()).join("\\n").trimEnd() + "\\n"`;
 const exampleFormatter: ArkCodeFormatter = (value) =>
   `${value
@@ -282,7 +282,7 @@ const theme = EditorView.theme({
 // Uma referência estável (fora do render, ou num useMemo); Prec.high põe o blame antes da numeração.
 editor.extensions = [go, Prec.high(blameGutter), searchHits, theme];`;
 
-// Atributos que os args ligam, fora dos padroes do elemento: a mesma lista monta o elemento e o "Show code".
+// Atributos que os args ligam, fora dos padrões do elemento: a mesma lista monta o elemento e o "Show code".
 function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
   const attributes: Array<[string, string]> = [];
   if (args.language && args.language !== "text") attributes.push(["language", args.language]);
@@ -306,7 +306,7 @@ function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
   return attributes;
 }
 
-// Sem `value` nos args, o texto e o exemplo da linguagem.
+// Sem `value` nos args, o texto é o exemplo da linguagem.
 function textOf(args: Partial<StoryArgs>): string {
   // Com o exemplo de `extensions` e sem linguagem da lib, o texto é o arquivo Go que a gramática do exemplo realça.
   if (args.value === undefined && args.extensions && (args.language ?? "text") === "text") return GO_SAMPLE;
@@ -375,7 +375,7 @@ function snippet(args: Partial<StoryArgs>): string {
   return `${tag}\n\n<script type="module">\n${body}\n</script>`;
 }
 
-// Tipo, padrao e grupo de cada linha da tabela de parametros.
+// Tipo, padrão e grupo de cada linha da tabela de parâmetros.
 function row(category: string, type: string, defaultValue?: string): Record<string, unknown> {
   return {
     category,
@@ -384,15 +384,15 @@ function row(category: string, type: string, defaultValue?: string): Record<stri
   };
 }
 
-const CONTENT = "Conteudo e aparencia";
+const CONTENT = "Conteúdo e aparência";
 const INDENT = "Recuo e fim de linha";
 const COMPLETION = "Completions";
-const VARIABLES = "Variaveis (opcional)";
+const VARIABLES = "Variáveis (opcional)";
 const SINGLE_LINE = "Campo de uma linha (opcional)";
-const FORMAT = "Formatacao";
+const FORMAT = "Formatação";
 const EXTENSIONS = "Extensões do app (opcional)";
 const EVENTS = "Eventos";
-const READ = "Leitura e metodos";
+const READ = "Leitura e métodos";
 
 const meta = {
   title: "Code/ArkCodeEditor",
@@ -401,16 +401,16 @@ const meta = {
     docs: {
       description: {
         component: [
-          "Editor de codigo CodeMirror 6 como Custom Element `<ark-code-editor>` (pacote lateral `@tooark/code`, CodeMirror como peer dependency).",
+          "Editor de código CodeMirror 6 como Custom Element `<ark-code-editor>` (pacote lateral `@tooark/code`, CodeMirror como peer dependency).",
           "",
-          "- **Conteudo**: `value` (propriedade; o atributo so da o texto inicial) volta em `change` com `detail: { value }` a cada edicao do usuario.",
+          "- **Conteúdo**: `value` (propriedade; o atributo só dá o texto inicial) volta em `change` com `detail: { value }` a cada edição do usuário.",
           "- **Linguagens**: `json`, `javascript`, `yaml` e `text`, com realce, dobra, busca (Ctrl+F), pares e linha ativa.",
           "- **Completions**: as da linguagem, `variableKeys` depois de `{{`, `completions` em qualquer linguagem e `completionSource` com contexto.",
-          "- **Formatacao**: `format()` e Shift+Alt+F; JSON de fabrica, outras linguagens pelo `formatter` do app.",
-          "- **Opcionais**, desligados ate o app pedir: `variables` pinta cada `{{chave}}` pelo intent da variavel (escopo livre, com tooltip), `mark-unknown-variables` marca a chave desconhecida, `single-line` vira um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`, e `extensions` soma extensões do CodeMirror do app (gramáticas que a lib não traz, calhas, decorações).",
-          "- **Tema**: `auto` segue o color-scheme da pagina e acompanha a troca em tempo de execucao; o chrome usa os tokens `--ark-color-*` com fallback.",
+          "- **Formatação**: `format()` e Shift+Alt+F; JSON de fábrica, outras linguagens pelo `formatter` do app.",
+          "- **Opcionais**, desligados até o app pedir: `variables` pinta cada `{{chave}}` pelo intent da variável (escopo livre, com tooltip), `mark-unknown-variables` marca a chave desconhecida, `single-line` vira um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`, e `extensions` soma extensões do CodeMirror do app (gramáticas que a lib não traz, calhas, decorações).",
+          "- **Tema**: `auto` segue o color-scheme da página e acompanha a troca em tempo de execução; o chrome usa os tokens `--ark-color-*` com fallback.",
           "",
-          'O **Playground** tem todos os parametros nos controles, agrupados como na tabela (as propriedades JS `variableKeys`, `variables` e `completions` se editam em JSON; `completionSource`, `formatter` e `extensions` ligam um exemplo). Abaixo do editor ficam os botoes de `format()` e `focus()` e o registro dos eventos; "Show code" de cada story mostra o HTML e o JS equivalentes.'
+          'O **Playground** tem todos os parâmetros nos controles, agrupados como na tabela (as propriedades JS `variableKeys`, `variables` e `completions` se editam em JSON; `completionSource`, `formatter` e `extensions` ligam um exemplo). Abaixo do editor ficam os botões de `format()` e `focus()` e o registro dos eventos; "Show code" de cada story mostra o HTML e o JS equivalentes.'
         ].join("\n")
       },
       source: {
@@ -422,7 +422,7 @@ const meta = {
     value: {
       control: "text",
       description:
-        "Texto do editor (propriedade JS; o atributo `value` so da o texto inicial). Atribuir nao emite `change`. Sem valor, a story usa o exemplo da linguagem.",
+        "Texto do editor (propriedade JS; o atributo `value` só dá o texto inicial). Atribuir não emite `change`. Sem valor, a story usa o exemplo da linguagem.",
       table: row(CONTENT, "string", '""')
     },
     language: {
@@ -434,12 +434,12 @@ const meta = {
     theme: {
       control: "select",
       options: ["auto", "light", "dark"],
-      description: "`auto` segue o color-scheme da pagina e acompanha a troca em tempo de execucao.",
+      description: "`auto` segue o color-scheme da página e acompanha a troca em tempo de execução.",
       table: row(CONTENT, '"auto" | "light" | "dark"', '"auto"')
     },
     readonly: {
       control: "boolean",
-      description: "Somente leitura: sem cursor de edicao nem realce da linha ativa.",
+      description: "Somente leitura: sem cursor de edição nem realce da linha ativa.",
       table: row(CONTENT, "boolean", "false")
     },
     placeholder: {
@@ -451,19 +451,19 @@ const meta = {
       name: "aria-label",
       control: "text",
       description:
-        'Nome acessivel do conteudo editavel (o `role="textbox"` do CodeMirror), para um editor sem `<label>` visivel.',
+        'Nome acessível do conteúdo editável (o `role="textbox"` do CodeMirror), para um editor sem `<label>` visível.',
       table: row(CONTENT, "string")
     },
     minHeight: {
       name: "min-height",
       control: "text",
-      description: "Altura minima do editor (comprimento CSS); em `single-line` quem manda e `size`.",
+      description: "Altura mínima do editor (comprimento CSS); em `single-line` quem manda é `size`.",
       table: row(CONTENT, "string", '"8rem"')
     },
     lineNumbers: {
       name: "line-numbers",
       control: "boolean",
-      description: 'Numeracao das linhas; `"false"` desliga.',
+      description: 'Numeração das linhas; `"false"` desliga.',
       table: row(CONTENT, "boolean", "true")
     },
     fold: {
@@ -480,25 +480,25 @@ const meta = {
       control: "inline-radio",
       options: ["xs", "sm", "md", "lg", "xl"],
       description:
-        "Fonte e recuo lateral, na escala do `ark-input`; em `single-line`, tambem a altura. `md` e o editor de sempre.",
+        "Fonte e recuo lateral, na escala do `ark-input`; em `single-line`, também a altura. `md` é o editor de sempre.",
       table: row(CONTENT, '"xs" | "sm" | "md" | "lg" | "xl"', '"md"')
     },
     testid: {
       control: "text",
-      description: 'Vai como `data-testid` no no raiz do CodeMirror (que ja leva `data-ark="code-editor"`).',
+      description: 'Vai como `data-testid` no nó raiz do CodeMirror (que já leva `data-ark="code-editor"`).',
       table: row(CONTENT, "string")
     },
     indentStyle: {
       name: "indent-style",
       control: "inline-radio",
       options: ["space", "tab"],
-      description: "Recuo com espacos ou tabulacao.",
+      description: "Recuo com espaços ou tabulação.",
       table: row(INDENT, '"space" | "tab"', '"space"')
     },
     indentSize: {
       name: "indent-size",
       control: { type: "number", min: 1, max: 16 },
-      description: "Espacos por nivel, ou largura visual da tabulacao (1 a 16).",
+      description: "Espaços por nível, ou largura visual da tabulação (1 a 16).",
       table: row(INDENT, "number", "2")
     },
     lineEnding: {
@@ -506,24 +506,24 @@ const meta = {
       control: "inline-radio",
       options: ["auto", "lf", "crlf"],
       description:
-        "Fim de linha de `value` e `change`; por dentro o documento e sempre LF. `auto` segue o ultimo valor.",
+        "Fim de linha de `value` e `change`; por dentro o documento é sempre LF. `auto` segue o último valor.",
       table: row(INDENT, '"auto" | "lf" | "crlf"', '"auto"')
     },
     tabIndent: {
       name: "tab-indent",
       control: "boolean",
-      description: 'Tab recua e Shift+Tab desfaz; Esc e depois Tab sai do editor. `"false"` deixa o Tab so navegar.',
+      description: 'Tab recua e Shift+Tab desfaz; Esc e depois Tab sai do editor. `"false"` deixa o Tab só navegar.',
       table: row(INDENT, "boolean", "true")
     },
     autocomplete: {
       control: "boolean",
-      description: 'Completions ao digitar e por Ctrl+Espaco; `"false"` desliga todas.',
+      description: 'Completions ao digitar e por Ctrl+Espaço; `"false"` desliga todas.',
       table: row(COMPLETION, "boolean", "true")
     },
     variableKeys: {
       control: "object",
       description:
-        "Propriedade JS: chaves oferecidas depois de `{{`; a escolha insere `{{chave}}`. So completam, nao pintam.",
+        "Propriedade JS: chaves oferecidas depois de `{{`; a escolha insere `{{chave}}`. Só completam, não pintam.",
       table: row(COMPLETION, "string[]", "[]")
     },
     completions: {
@@ -535,19 +535,19 @@ const meta = {
     completionSource: {
       control: "boolean",
       description:
-        "Propriedade JS com uma fonte propria (`(context) => CompletionResult | null`). O controle liga o exemplo: depois de `Content-Type:` sugere tipos de midia.",
+        "Propriedade JS com uma fonte própria (`(context) => CompletionResult | null`). O controle liga o exemplo: depois de `Content-Type:` sugere tipos de mídia.",
       table: row(COMPLETION, "ArkCodeCompletionSource", "undefined")
     },
     variables: {
       control: "object",
       description:
-        "Propriedade JS: `{ key, scope?, intent?, value? }` por chave. Pinta cada `{{chave}}` pelo intent (padrao `primary`), com tooltip do escopo e do valor, e completa como `variableKeys`. Escopo livre; a precedencia entre escopos e do app.",
+        "Propriedade JS: `{ key, scope?, intent?, value? }` por chave. Pinta cada `{{chave}}` pelo intent (padrão `primary`), com tooltip do escopo e do valor, e completa como `variableKeys`. Escopo livre; a precedência entre escopos é do app.",
       table: row(VARIABLES, "ArkCodeVariable[]", "[]")
     },
     markUnknownVariables: {
       name: "mark-unknown-variables",
       control: "boolean",
-      description: "Pinta em `danger`, sublinhado, o `{{chave}}` que nao esta em `variables` nem em `variableKeys`.",
+      description: "Pinta em `danger`, sublinhado, o `{{chave}}` que não está em `variables` nem em `variableKeys`.",
       table: row(VARIABLES, "boolean", "false")
     },
     singleLine: {
@@ -560,13 +560,13 @@ const meta = {
     formatter: {
       control: "boolean",
       description:
-        "Propriedade JS `(value, language) => string | Promise<string>` usada por `format()`; com ela o JSON tambem passa por ela. O controle liga o exemplo: tira os espacos do fim das linhas.",
+        "Propriedade JS `(value, language) => string | Promise<string>` usada por `format()`; com ela o JSON também passa por ela. O controle liga o exemplo: tira os espaços do fim das linhas.",
       table: row(FORMAT, "ArkCodeFormatter", "undefined")
     },
     "format()": {
       control: false,
       description:
-        "Formata o documento (tambem Shift+Alt+F): `false` sem formatador ou quando falha, com `ark-format-error`.",
+        "Formata o documento (também Shift+Alt+F): `false` sem formatador ou quando falha, com `ark-format-error`.",
       table: row(FORMAT, "() => Promise<boolean>")
     },
     canFormat: {
@@ -582,7 +582,7 @@ const meta = {
     },
     change: {
       control: false,
-      description: "A cada edicao do usuario (nao em atribuicoes a `value`), com o fim de linha configurado.",
+      description: "A cada edição do usuário (não em atribuições a `value`), com o fim de linha configurado.",
       table: row(EVENTS, "CustomEvent<{ value: string }>")
     },
     "ark-submit": {
@@ -592,7 +592,7 @@ const meta = {
     },
     "ark-format-error": {
       control: false,
-      description: "`format()` falhou: JSON invalido ou formatador que lancou.",
+      description: "`format()` falhou: JSON inválido ou formatador que lançou.",
       table: row(EVENTS, "CustomEvent<{ error: unknown }>")
     },
     "focus()": {
@@ -612,17 +612,17 @@ const meta = {
     },
     view: {
       control: false,
-      description: "Leitura: o `EditorView` do CodeMirror (uso avancado); `null` antes de montar.",
+      description: "Leitura: o `EditorView` do CodeMirror (uso avançado); `null` antes de montar.",
       table: row(READ, "EditorView | null")
     }
   },
-  // A ordem dos args e a ordem das linhas na tabela; `value` sem valor usa o exemplo da linguagem.
+  // A ordem dos args é a ordem das linhas na tabela; `value` sem valor usa o exemplo da linguagem.
   args: {
     value: undefined,
     language: "json",
     theme: "auto",
     readonly: false,
-    placeholder: "Cole o corpo da requisicao...",
+    placeholder: "Cole o corpo da requisição...",
     ariaLabel: "",
     minHeight: "12rem",
     lineNumbers: true,
@@ -648,7 +648,7 @@ const meta = {
 
 export default meta;
 
-// Bancada do Playground: botoes dos metodos e o registro dos eventos, para testar pela pagina de docs.
+// Bancada do Playground: botões dos métodos e o registro dos eventos, para testar pela página de docs.
 function withBench(editor: ArkCodeEditor): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "flex flex-col gap-2";
@@ -659,7 +659,7 @@ function withBench(editor: ArkCodeEditor): HTMLElement {
   log.setAttribute("aria-label", "Eventos do editor");
   log.textContent = "Os eventos aparecem aqui (o mais recente no topo).";
   const entries: string[] = [];
-  // Texto numa linha so, com as quebras visiveis e cortado no fim, com o tamanho total.
+  // Texto numa linha só, com as quebras visíveis e cortado no fim, com o tamanho total.
   const record = (name: string, detail: unknown): void => {
     const text = typeof detail === "string" ? detail.replace(/\r?\n/g, "↵") : String(detail);
     entries.unshift(`${name}: ${text.length > 90 ? `${text.slice(0, 90)}... (${text.length} caracteres)` : text}`);
@@ -694,7 +694,7 @@ function withBench(editor: ArkCodeEditor): HTMLElement {
 }
 
 export const Playground = {
-  // Variaveis de exemplo para o controle ja mostrar o formato; os padroes do elemento estao na tabela.
+  // Variáveis de exemplo para o controle já mostrar o formato; os padrões do elemento estão na tabela.
   args: {
     variableKeys: ["token"],
     variables: [
@@ -706,7 +706,7 @@ export const Playground = {
     docs: {
       description: {
         story:
-          "Todos os parametros nos controles abaixo. `variables` e `variableKeys` vem com um exemplo (o `{{user.email}}` do texto fica pintado; digite `{{` para as completions); esvazie as listas para ver o editor sem o recurso. `format()` e `focus()` pelos botoes, `value` le a propriedade, e `change`, `ark-submit` e `ark-format-error` entram no registro."
+          "Todos os parâmetros nos controles abaixo. `variables` e `variableKeys` vêm com um exemplo (o `{{user.email}}` do texto fica pintado; digite `{{` para as completions); esvazie as listas para ver o editor sem o recurso. `format()` e `focus()` pelos botões, `value` lê a propriedade, e `change`, `ark-submit` e `ark-format-error` entram no registro."
       }
     }
   },
@@ -719,7 +719,7 @@ export const JavaScript = {
     docs: {
       description: {
         story:
-          '`language="javascript"`: realce, dobra de blocos e as completions da propria linguagem (palavras-chave e variaveis locais).'
+          '`language="javascript"`: realce, dobra de blocos e as completions da própria linguagem (palavras-chave e variáveis locais).'
       }
     }
   },
@@ -731,7 +731,7 @@ export const Yaml = {
   parameters: {
     docs: {
       description: {
-        story: '`language="yaml"`: realce e dobra por recuo. Sem `formatter` do app, YAML nao formata.'
+        story: '`language="yaml"`: realce e dobra por recuo. Sem `formatter` do app, YAML não formata.'
       }
     }
   },
@@ -743,7 +743,7 @@ export const Readonly = {
   parameters: {
     docs: {
       description: {
-        story: "Somente leitura: sem cursor de edicao nem realce da linha ativa; a busca (Ctrl+F) e a dobra continuam."
+        story: "Somente leitura: sem cursor de edição nem realce da linha ativa; a busca (Ctrl+F) e a dobra continuam."
       }
     }
   },
@@ -755,7 +755,7 @@ export const Empty = {
   parameters: {
     docs: {
       description: {
-        story: "Documento vazio: o `placeholder` aparece ate a primeira edicao."
+        story: "Documento vazio: o `placeholder` aparece até a primeira edição."
       }
     }
   },
@@ -789,7 +789,7 @@ export const DarkTheme = {
     docs: {
       description: {
         story:
-          '`theme="dark"` fixa o lado escuro independentemente da pagina; o chrome continua nos tokens `--ark-color-*`.'
+          '`theme="dark"` fixa o lado escuro independentemente da página; o chrome continua nos tokens `--ark-color-*`.'
       }
     }
   },
@@ -808,7 +808,7 @@ export const VariableCompletion = {
     docs: {
       description: {
         story:
-          "`variableKeys` (propriedade JS) lista as chaves oferecidas depois de `{{`: a escolha insere `{{chave}}` e, se o `}}` ja foi fechado pelo par automatico, so a chave entra e o cursor pula o fechamento."
+          "`variableKeys` (propriedade JS) lista as chaves oferecidas depois de `{{`: a escolha insere `{{chave}}` e, se o `}}` já foi fechado pelo par automático, só a chave entra e o cursor pula o fechamento."
       }
     }
   },
@@ -818,9 +818,9 @@ export const VariableCompletion = {
     const content = editor.querySelector<HTMLElement>(".cm-content")!;
 
     await userEvent.click(content);
-    // No user-event "{{" e um "{" literal; closeBrackets fecha cada par conforme digita.
+    // No user-event "{{" é um "{" literal; closeBrackets fecha cada par conforme digita.
     await userEvent.keyboard("{{{{us");
-    // closeBrackets fecha os pares: o texto e "{{us}}" com o cursor antes do fechamento.
+    // closeBrackets fecha os pares: o texto é "{{us}}" com o cursor antes do fechamento.
     await expect(editor.value).toBe("{{us}}");
     const list = await waitFor(() => {
       const ul = document.querySelector<HTMLElement>(".cm-tooltip-autocomplete ul");
@@ -834,15 +834,15 @@ export const VariableCompletion = {
     await new Promise((resolve) => setTimeout(resolve, 120));
     await userEvent.keyboard("{Enter}");
     await expect(editor.value).toBe("{{user.email}}");
-    // O cursor pulou o "}}" fechado: continuar digitando fica depois da variavel.
+    // O cursor pulou o "}}" fechado: continuar digitando fica depois da variável.
     await userEvent.keyboard(" ok");
     await expect(editor.value).toBe("{{user.email}} ok");
-    // So `variableKeys`: completa, mas nada e pintado (a pintura e opt-in por `variables`).
+    // Só `variableKeys`: completa, mas nada e pintado (a pintura e opt-in por `variables`).
     expect(editor.querySelector(".cm-ark-variable")).toBeNull();
   }
 };
 
-// Escopos de um cliente HTTP; a lib nao conhece nenhum, so recebe o nome, o intent e o valor de cada chave.
+// Escopos de um cliente HTTP; a lib não conhece nenhum, só recebe o nome, o intent e o valor de cada chave.
 const SCOPED_VARIABLES: ArkCodeVariable[] = [
   { key: "baseUrl", scope: "global", intent: "info", value: "https://api.tooark.com" },
   { key: "token", scope: "environment", intent: "success" },
@@ -876,7 +876,7 @@ export const ScopedVariables = {
     docs: {
       description: {
         story:
-          "`variables` (propriedade JS) recebe `{ key, scope?, intent?, value? }` por chave: cada `{{chave}}` e pintado com o fundo e o texto suaves do intent (padrao `primary`), inclusive dentro de uma string JSON, e o span leva `data-key`, `data-scope` e `data-intent` para o app sobrescrever a cor por CSS. O escopo e livre (a lib nao conhece nenhum) e a precedencia entre escopos e do app: ele manda uma entrada por chave. `mark-unknown-variables` pinta em `danger`, com sublinhado ondulado, a chave que nao esta em `variables` nem em `variableKeys` (estas completam mas nao pintam). Sem `variables` e sem o atributo, nada muda."
+          "`variables` (propriedade JS) recebe `{ key, scope?, intent?, value? }` por chave: cada `{{chave}}` é pintado com o fundo e o texto suaves do intent (padrão `primary`), inclusive dentro de uma string JSON, e o span leva `data-key`, `data-scope` e `data-intent` para o app sobrescrever a cor por CSS. O escopo é livre (a lib não conhece nenhum) e a precedência entre escopos é do app: ele manda uma entrada por chave. `mark-unknown-variables` pinta em `danger`, com sublinhado ondulado, a chave que não está em `variables` nem em `variableKeys` (estas completam mas não pintam). Sem `variables` e sem o atributo, nada muda."
       }
     }
   },
@@ -893,11 +893,11 @@ export const ScopedVariables = {
     expect(base).toHaveAttribute("data-intent", "info");
     expect(base.classList.contains("cm-ark-variable-info")).toBe(true);
     expect(base.textContent).toBe("{{baseUrl}}");
-    // Espacos dentro das chaves nao mudam a chave.
+    // Espaços dentro das chaves não mudam a chave.
     expect(variableMark(editor, "requestId")).toHaveAttribute("data-scope", "local");
     expect(variableMark(editor, "token")).toHaveAttribute("data-intent", "success");
 
-    // Dentro da string JSON a cor e a da variavel: o span dela fica por fora e o realce da string, dentro, herda.
+    // Dentro da string JSON a cor é a da variável: o span dela fica por fora e o realce da string, dentro, herda.
     const inner = base.firstElementChild as HTMLElement;
     expect(inner).not.toBeNull();
     expect(getComputedStyle(inner).color).toBe(getComputedStyle(base).color);
@@ -905,7 +905,7 @@ export const ScopedVariables = {
     expect(getComputedStyle(base).color).not.toBe(stringColor);
     expect(getComputedStyle(base).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
 
-    // Desconhecida marcada; a de `variableKeys` e conhecida e fica sem pintura.
+    // Desconhecida marcada; a de `variableKeys` é conhecida e fica sem pintura.
     const typo = variableMark(editor, "tokn");
     expect(typo).toHaveAttribute("data-unknown", "");
     expect(typo).toHaveAttribute("data-intent", "danger");
@@ -917,19 +917,19 @@ export const ScopedVariables = {
     await waitFor(() => expect(variableMark(editor, "tokn")).toBeNull());
     expect(variableMark(editor, "baseUrl")).not.toBeNull();
 
-    // Digitar uma variavel conhecida pinta na hora.
+    // Digitar uma variável conhecida pinta na hora.
     editor.value = "";
     await userEvent.click(editor.querySelector<HTMLElement>(".cm-content")!);
     await userEvent.keyboard("{{{{token");
     await waitFor(() => expect(variableMark(editor, "token")).not.toBeNull());
 
-    // Sem intent valido vale primary; sem escopo, nao ha data-scope.
+    // Sem intent válido vale primary; sem escopo, não há data-scope.
     editor.value = SCOPED_BODY;
     editor.variables = [{ key: "baseUrl", intent: "rosa" as never }];
     await waitFor(() => expect(variableMark(editor, "baseUrl")).toHaveAttribute("data-intent", "primary"));
     expect(variableMark(editor, "baseUrl")?.hasAttribute("data-scope")).toBe(false);
 
-    // Lista vazia: nenhuma extensao, nenhuma pintura.
+    // Lista vazia: nenhuma extensão, nenhuma pintura.
     editor.variables = [];
     await waitFor(() => expect(editor.querySelector(".cm-ark-variable")).toBeNull());
   }
@@ -941,7 +941,7 @@ export const VariableHints = {
     docs: {
       description: {
         story:
-          "Passar o mouse sobre uma variavel com `scope` ou `value` mostra um tooltip com o escopo (na cor do intent) e o valor; a completion depois de `{{` traz o escopo como detalhe e o valor como info. Todo o texto e do app: quem nao deve expor um valor (um token, uma senha) so nao manda `value`. O tooltip complementa a cor, que sozinha nao informa o escopo a quem nao distingue cores."
+          "Passar o mouse sobre uma variável com `scope` ou `value` mostra um tooltip com o escopo (na cor do intent) e o valor; a completion depois de `{{` traz o escopo como detalhe e o valor como info. Todo o texto é do app: quem não deve expor um valor (um token, uma senha) só não manda `value`. O tooltip complementa a cor, que sozinha não informa o escopo a quem não distingue cores."
       }
     }
   },
@@ -954,7 +954,7 @@ export const VariableHints = {
       return mark!;
     });
 
-    // O hover do CodeMirror le as coordenadas do mousemove; o user-event nao as preenche, entao o evento vai a mao.
+    // O hover do CodeMirror lê as coordenadas do mousemove; o user-event não as preenche, então o evento vai à mão.
     const rect = base.getBoundingClientRect();
     base.dispatchEvent(
       new MouseEvent("mousemove", {
@@ -1007,7 +1007,7 @@ export const SingleLine = {
     docs: {
       description: {
         story:
-          "`single-line` faz do editor um campo de endereco: uma linha na altura dos controles do mesmo `size` (alinha com `ark-button` e `ark-input`), sem calhas nem linha ativa. Enter emite `ark-submit` com `detail: { value }` (com a lista de completions aberta, o Enter e dela), quebras coladas sao removidas como num `<input>`, Tab sai do campo e Ctrl+F fica com o navegador. Variaveis, completions e `mark-unknown-variables` valem igual."
+          "`single-line` faz do editor um campo de endereço: uma linha na altura dos controles do mesmo `size` (alinha com `ark-button` e `ark-input`), sem calhas nem linha ativa. Enter emite `ark-submit` com `detail: { value }` (com a lista de completions aberta, o Enter é dela), quebras coladas são removidas como num `<input>`, Tab sai do campo e Ctrl+F fica com o navegador. Variáveis, completions e `mark-unknown-variables` valem igual."
       }
     }
   },
@@ -1033,7 +1033,7 @@ export const SingleLine = {
     );
     editor.addEventListener("change", (event) => changes.push((event as CustomEvent<{ value: string }>).detail.value));
 
-    // Sem calhas, uma linha, na altura do botao do mesmo size.
+    // Sem calhas, uma linha, na altura do botão do mesmo size.
     expect(root.classList.contains("cm-ark-single-line")).toBe(true);
     expect(editor.querySelector(".cm-gutters")).toBeNull();
     expect(content).toHaveAttribute("aria-multiline", "false");
@@ -1041,7 +1041,7 @@ export const SingleLine = {
     expect(Math.round(root.getBoundingClientRect().height)).toBe(Math.round(send.getBoundingClientRect().height));
     expect(variableMark(editor, "query")).toHaveAttribute("data-unknown", "");
 
-    // Enter envia e nao quebra a linha.
+    // Enter envia e não quebra a linha.
     await userEvent.click(content);
     await userEvent.keyboard("{End}{Enter}");
     expect(submits).toEqual(["{{baseUrl}}/users/{{userId}}?q={{query}}"]);
@@ -1056,13 +1056,13 @@ export const SingleLine = {
     await userEvent.keyboard("{Enter}");
     await expect(editor.value).toBe("{{baseUrl}}");
     expect(submits.length).toBe(1);
-    // Com o cursor encostado no "}}" o par de colchetes fica realcado, e a variavel continua num span so.
+    // Com o cursor encostado no "}}" o par de colchetes fica realçado, e a variável continua num span só.
     await waitFor(() => expect(editor.querySelector(".cm-matchingBracket")).not.toBeNull());
     expect(editor.querySelectorAll('[data-ark="code-editor-variable"][data-key="baseUrl"]').length).toBe(1);
     await userEvent.keyboard("{Enter}");
     expect(submits[submits.length - 1]).toBe("{{baseUrl}}");
 
-    // Colar texto com quebras junta tudo numa linha, e o change sai ja sem elas.
+    // Colar texto com quebras junta tudo numa linha, e o change sai já sem elas.
     editor.view!.dispatch({
       changes: { from: editor.view!.state.doc.length, insert: "/a\n/b\r\n/c" },
       userEvent: "input.paste"
@@ -1070,7 +1070,7 @@ export const SingleLine = {
     await expect(editor.value).toBe("{{baseUrl}}/a/b/c");
     expect(changes[changes.length - 1]).toBe("{{baseUrl}}/a/b/c");
 
-    // Tab e Ctrl+F (Cmd+F no macOS) nao sao do campo: o keydown nao e consumido.
+    // Tab e Ctrl+F (Cmd+F no macOS) não são do campo: o keydown não é consumido.
     const press = (init: KeyboardEventInit): boolean =>
       content.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, cancelable: true, ...init }));
     const mod = /Mac/.test(navigator.platform) ? { metaKey: true } : { ctrlKey: true };
@@ -1078,7 +1078,7 @@ export const SingleLine = {
     expect(press({ key: "f", keyCode: 70, ...mod })).toBe(true);
     expect(editor.querySelector(".cm-search")).toBeNull();
 
-    // Desligar devolve o editor de sempre; ligar sobre um texto de varias linhas junta sem emitir change.
+    // Desligar devolve o editor de sempre; ligar sobre um texto de várias linhas junta sem emitir change.
     editor.removeAttribute("single-line");
     expect(editor.querySelector(".cm-lineNumbers")).not.toBeNull();
     expect(content).toHaveAttribute("aria-multiline", "true");
@@ -1104,7 +1104,7 @@ export const SingleLineSizes = {
     docs: {
       description: {
         story:
-          "`size` no campo de uma linha: a altura vem de `--ark-size-*` (24/28/36/44/52 px de xs a xl) e a fonte e o recuo seguem o `ark-input`, entao editor, input e botao do mesmo `size` alinham lado a lado."
+          "`size` no campo de uma linha: a altura vem de `--ark-size-*` (24/28/36/44/52 px de xs a xl) e a fonte e o recuo seguem o `ark-input`, então editor, input e botão do mesmo `size` alinham lado a lado."
       }
     }
   },
@@ -1148,7 +1148,7 @@ export const IndentationAndLineEndings = {
     docs: {
       description: {
         story:
-          "Tab recua e Shift+Tab desfaz (Esc e depois Tab sai do editor; Ctrl+M alterna o modo de vez). `indent-style` escolhe espacos ou tabulacao e `indent-size` o tamanho; `line-ending` (auto, lf, crlf) vale so na fronteira do valor: por dentro o documento e sempre LF, `value`/`change` saem com o fim de linha configurado, e `auto` segue o ultimo valor atribuido."
+          "Tab recua e Shift+Tab desfaz (Esc e depois Tab sai do editor; Ctrl+M alterna o modo de vez). `indent-style` escolhe espaços ou tabulação e `indent-size` o tamanho; `line-ending` (auto, lf, crlf) vale só na fronteira do valor: por dentro o documento é sempre LF, `value`/`change` saem com o fim de linha configurado, e `auto` segue o último valor atribuído."
       }
     }
   },
@@ -1158,7 +1158,7 @@ export const IndentationAndLineEndings = {
     const after = document.createElement("button");
     after.type = "button";
     after.className = "self-start rounded border border-slate-300 px-3 py-1 text-sm";
-    after.textContent = "Proximo campo";
+    after.textContent = "Próximo campo";
     wrap.append(createEditor(args), after);
     return wrap;
   },
@@ -1167,7 +1167,7 @@ export const IndentationAndLineEndings = {
     const content = editor.querySelector<HTMLElement>(".cm-content")!;
     const after = canvasElement.querySelector<HTMLButtonElement>("button")!;
 
-    // Tab recua com o tamanho configurado (2 espacos por padrao).
+    // Tab recua com o tamanho configurado (2 espaços por padrão).
     editor.value = "a";
     await userEvent.click(content);
     await userEvent.keyboard("{Home}{Tab}");
@@ -1185,9 +1185,9 @@ export const IndentationAndLineEndings = {
     await userEvent.keyboard("{Home}{Tab}");
     await expect(editor.value).toBe("\tb");
 
-    // Esc e depois Tab deixam o editor em vez de recuar. O user-event nao envia keyCode, que o tab-focus mode do
-    // CodeMirror le: os eventos vao a mao, e a prova de que o Tab escapou e o keydown nao ter sido consumido (no
-    // navegador o foco segue entao para o proximo campo, o botao abaixo).
+    // Esc e depois Tab deixam o editor em vez de recuar. O user-event não envia keyCode, que o tab-focus mode do
+    // CodeMirror lê: os eventos vão à mão, e a prova de que o Tab escapou é o keydown não ter sido consumido (no
+    // navegador o foco segue então para o próximo campo, o botão abaixo).
     const press = (key: string, keyCode: number): boolean =>
       content.dispatchEvent(new KeyboardEvent("keydown", { key, keyCode, bubbles: true, cancelable: true }));
     expect(press("Tab", 9)).toBe(false);
@@ -1197,13 +1197,13 @@ export const IndentationAndLineEndings = {
     await expect(editor.value).toBe("\t\tb");
     expect(after).toBeInTheDocument();
 
-    // tab-indent="false": Tab e navegacao pura.
+    // tab-indent="false": Tab é navegação pura.
     editor.setAttribute("tab-indent", "false");
     expect(press("Tab", 9)).toBe(true);
     await expect(editor.value).toBe("\t\tb");
     editor.removeAttribute("tab-indent");
 
-    // Fim de linha: auto detecta CRLF do valor; lf/crlf forcam; por dentro o documento fica em LF.
+    // Fim de linha: auto detecta CRLF do valor; lf/crlf forçam; por dentro o documento fica em LF.
     editor.value = "x\r\ny";
     expect(editor.resolvedLineEnding).toBe("crlf");
     await expect(editor.value).toBe("x\r\ny");
@@ -1227,7 +1227,7 @@ export const Formatting = {
     docs: {
       description: {
         story:
-          "`format()` (tambem Shift+Alt+F) formata o documento: JSON de fabrica, com o recuo configurado; outras linguagens so com a propriedade `formatter(value, language)` do app (Prettier, js-yaml...). JSON invalido ou formatador que lanca disparam `ark-format-error` e devolvem `false`; a formatacao entra no historico e emite `change`."
+          "`format()` (também Shift+Alt+F) formata o documento: JSON de fábrica, com o recuo configurado; outras linguagens só com a propriedade `formatter(value, language)` do app (Prettier, js-yaml...). JSON inválido ou formatador que lança disparam `ark-format-error` e devolvem `false`; a formatação entra no histórico e emite `change`."
       }
     }
   },
@@ -1244,20 +1244,20 @@ export const Formatting = {
     await expect(editor.value).toBe('{\n  "a": 1,\n  "b": [\n    1,\n    2,\n    {\n      "c": true\n    }\n  ]\n}');
     expect(changes.length).toBe(1);
 
-    // Recuo por tabulacao vale para o JSON formatado; o atalho faz o mesmo que format().
+    // Recuo por tabulação vale para o JSON formatado; o atalho faz o mesmo que format().
     editor.setAttribute("indent-style", "tab");
     editor.value = '{"k":[1]}';
     await userEvent.click(editor.querySelector<HTMLElement>(".cm-content")!);
     await userEvent.keyboard("{Shift>}{Alt>}f{/Alt}{/Shift}");
     await waitFor(() => expect(editor.value).toBe('{\n\t"k": [\n\t\t1\n\t]\n}'));
 
-    // JSON invalido: erro reportado, documento intacto.
+    // JSON inválido: erro reportado, documento intacto.
     editor.value = "{oops";
     await expect(editor.format()).resolves.toBe(false);
     expect(errors.length).toBe(1);
     await expect(editor.value).toBe("{oops");
 
-    // Sem formatador, YAML nao formata; com o formatador do app, formata o que ele devolver.
+    // Sem formatador, YAML não formata; com o formatador do app, formata o que ele devolver.
     editor.setAttribute("language", "yaml");
     expect(editor.canFormat).toBe(false);
     await expect(editor.format()).resolves.toBe(false);
@@ -1285,7 +1285,7 @@ export const Completions = {
     docs: {
       description: {
         story:
-          'Alem das completions da propria linguagem (JavaScript traz palavras-chave e variaveis locais), `completions` oferece palavras do app em qualquer linguagem (chaves de um schema, por exemplo) e `completionSource` uma fonte com contexto; `autocomplete="false"` desliga tudo. Ctrl+Espaco abre a lista a qualquer momento.'
+          'Além das completions da própria linguagem (JavaScript traz palavras-chave e variáveis locais), `completions` oferece palavras do app em qualquer linguagem (chaves de um schema, por exemplo) e `completionSource` uma fonte com contexto; `autocomplete="false"` desliga tudo. Ctrl+Espaço abre a lista a qualquer momento.'
       }
     }
   },
@@ -1306,7 +1306,7 @@ export const Completions = {
     await userEvent.keyboard("{Enter}");
     await expect(editor.value).toBe("apiVersion");
 
-    // Fonte propria com contexto: depois de "kind: " sugere os tipos.
+    // Fonte própria com contexto: depois de "kind: " sugere os tipos.
     editor.completionSource = (context) => {
       const match = context.matchBefore(/kind:\s*\w*/);
       if (!match) return null;
@@ -1319,7 +1319,7 @@ export const Completions = {
     await waitFor(() => expect(document.querySelector(".cm-tooltip-autocomplete li")?.textContent).toBe("Deployment"));
     await userEvent.keyboard("{Escape}");
 
-    // autocomplete="false" desliga tudo, inclusive Ctrl+Espaco.
+    // autocomplete="false" desliga tudo, inclusive Ctrl+Espaço.
     editor.setAttribute("autocomplete", "false");
     editor.value = "";
     await userEvent.click(content);
@@ -1335,7 +1335,7 @@ export const FollowsPageTheme = {
     docs: {
       description: {
         story:
-          'Em `theme="auto"` o editor resolve o color-scheme da pagina e acompanha a troca em tempo de execucao (`observeColorScheme` de @tooark/tokens); `resolvedTheme` expoe o lado aplicado e o CodeMirror recebe `color-scheme` para os tokens `light-dark()` seguirem.'
+          'Em `theme="auto"` o editor resolve o color-scheme da página e acompanha a troca em tempo de execução (`observeColorScheme` de @tooark/tokens); `resolvedTheme` expõe o lado aplicado e o CodeMirror recebe `color-scheme` para os tokens `light-dark()` seguirem.'
       }
     }
   },
@@ -1365,12 +1365,12 @@ export const Editing = {
     docs: {
       description: {
         story:
-          "Atribuir `value` nao emite `change`; digitar emite com `detail.value`. `readonly` bloqueia a edicao e os atributos trocam extensoes sem recriar o editor."
+          "Atribuir `value` não emite `change`; digitar emite com `detail.value`. `readonly` bloqueia a edição e os atributos trocam extensões sem recriar o editor."
       }
     }
   },
   render: (args: StoryArgs) => createEditor(args),
-  // value por propriedade nao emite change; digitar emite change com detail.value; readonly bloqueia.
+  // value por propriedade não emite change; digitar emite change com detail.value; readonly bloqueia.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
     const changes: string[] = [];
@@ -1395,7 +1395,7 @@ export const Editing = {
     editor.removeAttribute("readonly");
     expect(content.getAttribute("contenteditable")).toBe("true");
 
-    // Atributos trocam extensoes sem recriar o editor.
+    // Atributos trocam extensões sem recriar o editor.
     editor.setAttribute("line-numbers", "false");
     expect(editor.querySelector(".cm-lineNumbers")).toBeNull();
     editor.setAttribute("line-numbers", "true");
@@ -1414,7 +1414,7 @@ export const TestHooks = {
     docs: {
       description: {
         story:
-          'Hooks de E2E: a raiz do CodeMirror leva `data-ark="code-editor"` e o `testid` como `data-testid`; cada variavel pintada leva `data-ark="code-editor-variable"` com `data-key`, e o tooltip dela `data-ark="code-editor-variable-tooltip"`.'
+          'Hooks de E2E: a raiz do CodeMirror leva `data-ark="code-editor"` e o `testid` como `data-testid`; cada variável pintada leva `data-ark="code-editor-variable"` com `data-key`, e o tooltip dela `data-ark="code-editor-variable-tooltip"`.'
       }
     }
   },
@@ -1432,7 +1432,7 @@ export const TestHooks = {
     editor.removeAttribute("testid");
     expect(root.hasAttribute("data-testid")).toBe(false);
 
-    // Cada variavel pintada leva o hook e a chave.
+    // Cada variável pintada leva o hook e a chave.
     editor.variables = [{ key: "id", scope: "local" }];
     editor.value = '{ "a": "{{id}}" }';
     await waitFor(() =>
@@ -1447,7 +1447,7 @@ export const Properties = {
     docs: {
       description: {
         story:
-          'Cada propriedade JS reflete no atributo correspondente e le de volta com validacao (valor fora da faixa cai no padrao); booleanos seguem a regra dos wrappers ("" e true ligam, false, "false", null e undefined desligam). `variableKeys`, `completions`, `completionSource` e `formatter` tambem valem depois de montado, e `focus()` foca o CodeMirror.'
+          'Cada propriedade JS reflete no atributo correspondente e lê de volta com validação (valor fora da faixa cai no padrão); booleanos seguem a regra dos wrappers ("" e true ligam, false, "false", null e undefined desligam). `variableKeys`, `completions`, `completionSource` e `formatter` também valem depois de montado, e `focus()` foca o CodeMirror.'
       }
     }
   },
@@ -1457,7 +1457,7 @@ export const Properties = {
     const content = editor.querySelector<HTMLElement>(".cm-content")!;
     const root = editor.view!.dom;
 
-    // Padroes (os argumentos da story deixam placeholder e theme nos valores do meta).
+    // Padrões (os argumentos da story deixam placeholder e theme nos valores do meta).
     expect(editor.indentStyle).toBe("space");
     expect(editor.indentSize).toBe(2);
     expect(editor.lineEnding).toBe("auto");
@@ -1536,7 +1536,7 @@ export const Properties = {
     expect(root.classList.contains("cm-ark-single-line")).toBe(false);
     expect(editor.querySelector(".cm-lineNumbers")).not.toBeNull();
 
-    // Tamanho: reflete, valida e escala a fonte ("md" e o editor de sempre).
+    // Tamanho: reflete, valida e escala a fonte ("md" é o editor de sempre).
     expect(getComputedStyle(root).fontSize).toBe("14px");
     editor.size = "lg";
     await expect(editor).toHaveAttribute("size", "lg");
@@ -1546,7 +1546,7 @@ export const Properties = {
     expect(getComputedStyle(root).fontSize).toBe("14px");
     editor.removeAttribute("size");
 
-    // Linguagem, placeholder, altura minima e tema.
+    // Linguagem, placeholder, altura mínima e tema.
     editor.language = "yaml";
     await expect(editor).toHaveAttribute("language", "yaml");
     expect(editor.language).toBe("yaml");
@@ -1573,7 +1573,7 @@ export const Properties = {
     editor.setAttribute("theme", "sepia");
     expect(editor.theme).toBe("auto");
 
-    // Propriedades JS depois de montado: entradas invalidas sao filtradas.
+    // Propriedades JS depois de montado: entradas inválidas são filtradas.
     editor.variableKeys = ["baseUrl", "", 3 as never];
     expect(editor.variableKeys).toEqual(["baseUrl"]);
     editor.variableKeys = null;
@@ -1586,7 +1586,7 @@ export const Properties = {
     expect(editor.completions).toEqual([{ label: "tooark" }]);
     editor.completions = undefined;
     expect(editor.completions).toEqual([]);
-    // O instrumentador do Storybook embrulha funcoes passadas ao expect: a identidade e comparada fora dele.
+    // O instrumentador do Storybook embrulha funções passadas ao expect: a identidade é comparada fora dele.
     const source = (): null => null;
     editor.completionSource = source;
     expect(editor.completionSource === source).toBe(true);
@@ -1606,15 +1606,15 @@ export const Properties = {
   }
 };
 
-// `aria-label` no host vira o nome do conteudo editavel, que e o `role="textbox"`; sem ele nada muda.
+// `aria-label` no host vira o nome do conteúdo editável, que é o `role="textbox"`; sem ele nada muda.
 export const AccessibleName = {
-  args: { language: "json", minHeight: "4rem", ariaLabel: "Corpo da requisicao", value: "{}" },
+  args: { language: "json", minHeight: "4rem", ariaLabel: "Corpo da requisição", value: "{}" },
   render: (args: StoryArgs) => createEditor(args),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
     const content = editor.view?.contentDOM as HTMLElement;
-    await expect(canvas.getByRole("textbox", { name: "Corpo da requisicao" })).toBe(content);
+    await expect(canvas.getByRole("textbox", { name: "Corpo da requisição" })).toBe(content);
 
     editor.setAttribute("aria-label", "Resposta");
     await expect(content).toHaveAttribute("aria-label", "Resposta");

@@ -20,7 +20,7 @@ const CLOSE_SVG = `
     <path d="M5 5l10 10M15 5L5 15"></path>
   </svg>`;
 
-/** Contador para o id do título, que o `aria-labelledby` do painel referencia. */
+/** Contador para o id do título, que o `aria-labelledby` do painel referência. */
 let dialogSeq = 0;
 
 /** Normaliza uma medida vinda de atributo: número sem unidade vira px; vazio vira null. */

@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Faixa de abas: o host `ark-tabs` e o `role="tablist"` e cada `ark-tab` e o proprio `role="tab"` (icone, texto e badge como filhos livres). Tres variantes: `underline` (padrao), `chips` (filtros) e `editor` (abas fechaveis com `closable`, ponto de nao salvo com `dirty`, clique do meio e Delete fecham). Setas, Home e End movem e selecionam; um filho `slot="actions"` vai para o fim da faixa. Os paineis sao do app: o grupo emite `change` com `detail: { value }` e a aba emite `ark-close`. Sem motion na troca.'
+          'Faixa de abas: o host `ark-tabs` é o `role="tablist"` e cada `ark-tab` é o próprio `role="tab"` (ícone, texto e badge como filhos livres). Três variantes: `underline` (padrão), `chips` (filtros) e `editor` (abas fecháveis com `closable`, ponto de não salvo com `dirty`, clique do meio e Delete fecham). Setas, Home e End movem e selecionam; um filho `slot="actions"` vai para o fim da faixa. Os painéis são do app: o grupo emite `change` com `detail: { value }` e a aba emite `ark-close`. Sem motion na troca.'
       }
     }
   },
@@ -19,12 +19,12 @@ const meta = {
     rounded: {
       control: "select",
       options: ["", "none", "xs", "sm", "md", "lg", "xl", "full"],
-      description: "Cantos das abas (so o topo em editor). Padrao: full em chips, none nas outras"
+      description: "Cantos das abas (só o topo em editor). Padrão: full em chips, none nas outras"
     },
     fill: {
       control: "inline-radio",
       options: ["", "none", "soft", "solid"],
-      description: "Pintura da aba ativa. Padrao: soft em chips, none nas outras"
+      description: "Pintura da aba ativa. Padrão: soft em chips, none nas outras"
     },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     lang: { control: "select", options: ["en", "pt", "es"] },
@@ -39,7 +39,7 @@ const meta = {
     fill: "",
     theme: "auto",
     lang: "pt",
-    label: "Secoes da requisicao"
+    label: "Seções da requisição"
   }
 };
 
@@ -123,13 +123,13 @@ export const Chips = {
 export const Editor = {
   render: (args: StoryArgs) => {
     const tabs = createTabs({ ...args, variant: "editor", value: "req-2" }, REQUESTS);
-    // O "+" e um ark-button do usuario no slot de acoes; vai para o fim da faixa.
+    // O "+" é um ark-button do usuário no slot de ações; vai para o fim da faixa.
     const add = document.createElement("ark-button");
     add.setAttribute("slot", "actions");
     add.setAttribute("variant", "ghost");
     add.setAttribute("size", "xs");
     add.setAttribute("icon-only", "");
-    add.setAttribute("aria-label", "Nova requisicao");
+    add.setAttribute("aria-label", "Nova requisição");
     add.textContent = "+";
     tabs.appendChild(add);
     return tabs;
@@ -156,7 +156,7 @@ export const Rounded = {
     wrap.appendChild(createTabs({ variant: "chips", value: "headers" }));
     return wrap;
   },
-  // `rounded` propaga as abas; chips sao pilula por padrao e o editor arredonda so o topo.
+  // `rounded` propaga às abas; chips são pílula por padrão e o editor arredonda só o topo.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const [chips, editor, defaults] = Array.from(canvasElement.querySelectorAll("ark-tabs"));
     await expect(chips.querySelector("ark-tab")).toHaveClass("ark:rounded-md");
@@ -178,7 +178,7 @@ export const Fill = {
     wrap.appendChild(createTabs({ variant: "editor", fill: "solid", value: "req-1" }, REQUESTS));
     return wrap;
   },
-  // `fill` pinta a aba ativa inteira: solid com a cor do intent, soft com a versao suave; chips vem soft por padrao.
+  // `fill` pinta a aba ativa inteira: solid com a cor do intent, soft com a versão suave; chips vêm soft por padrão.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const [solidChips, defaultChips, softUnderline, solidEditor] = Array.from(
       canvasElement.querySelectorAll("ark-tabs")
@@ -210,7 +210,7 @@ export const DarkTheme = {
 
 export const ClickSelectsAndEmitsOnce = {
   render: () => createTabs({ value: "params", lang: "pt" }),
-  // O grupo publica um unico `change` com o value; o da aba nao vaza acima dele nem para quem escuta no grupo.
+  // O grupo publica um único `change` com o value; o da aba não vaza acima dele nem para quem escuta no grupo.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const tabs = canvasElement.querySelector("ark-tabs")!;
@@ -232,8 +232,8 @@ export const ClickSelectsAndEmitsOnce = {
     await expect(received).toEqual(["ark-tabs:headers"]);
     await expect(onHost).toEqual(["ark-tabs"]);
 
-    // Clicar na aba ativa nao emite de novo; aba desabilitada nao seleciona (pointer-events: none barra o
-    // ponteiro real, entao o clique sintetico cobre a guarda do handler).
+    // Clicar na aba ativa não emite de novo; aba desabilitada não seleciona (pointer-events: none barra o
+    // ponteiro real, então o clique sintético cobre a guarda do handler).
     await userEvent.click(headers);
     canvas.getByRole("tab", { name: "Auth" }).dispatchEvent(new MouseEvent("click", { bubbles: true }));
     await expect(received).toHaveLength(1);
@@ -243,7 +243,7 @@ export const ClickSelectsAndEmitsOnce = {
 
 export const KeyboardRoving = {
   render: () => createTabs({ value: "params" }),
-  // Setas e Home/End movem o foco, pulam abas desabilitadas e selecionam; so a ativa e parada de Tab.
+  // Setas e Home/End movem o foco, pulam abas desabilitadas e selecionam; só a ativa é parada de Tab.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const params = canvas.getByRole("tab", { name: "Params" });
@@ -262,7 +262,7 @@ export const KeyboardRoving = {
     await expect(headers).toHaveAttribute("tabindex", "0");
     await expect(params).toHaveAttribute("tabindex", "-1");
 
-    // Da ultima habilitada, a seta pula a desabilitada e volta ao inicio.
+    // Da última habilitada, a seta pula a desabilitada e volta ao início.
     await userEvent.keyboard("{End}");
     await expect(document.activeElement).toBe(body);
     await userEvent.keyboard("{ArrowRight}");
@@ -281,7 +281,7 @@ export const EditorCloseAndDirty = {
       { ...REQUESTS[0], testid: "req-get" },
       ...REQUESTS.slice(1)
     ]),
-  // Botao proprio (fora da ordem de Tab), clique do meio e Delete emitem ark-close; o ponto de dirty tem nome.
+  // Botão próprio (fora da ordem de Tab), clique do meio e Delete emitem ark-close; o ponto de dirty tem nome.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const tabs = canvasElement.querySelector("ark-tabs")!;
@@ -292,12 +292,12 @@ export const EditorCloseAndDirty = {
     const close = first.querySelector<HTMLButtonElement>('[data-ark="tab-close"]')!;
     await expect(close).toHaveAttribute("aria-label", "Fechar aba");
     await expect(close).toHaveAttribute("tabindex", "-1");
-    // O testid e por aba (a faixa nao o propaga): a parte interna recebe o sufixo.
+    // O testid é por aba (a faixa não o propaga): a parte interna recebe o sufixo.
     await expect(close).toHaveAttribute("data-testid", "req-get-close");
 
     await userEvent.click(close);
     await expect(closed).toEqual(["req-1"]);
-    // Fechar nao seleciona nem remove: remover a aba e do app.
+    // Fechar não seleciona nem remove: remover a aba é do app.
     await expect(tabs).toHaveAttribute("value", "req-1");
     await expect(first.isConnected).toBe(true);
 
@@ -313,7 +313,7 @@ export const EditorCloseAndDirty = {
     await userEvent.keyboard("{Delete}");
     await expect(closed).toEqual(["req-1", "req-2", "req-2"]);
 
-    // Fora da variante editor, closable e ignorado.
+    // Fora da variante editor, closable é ignorado.
     tabs.setAttribute("variant", "underline");
     await waitFor(() => expect(first.querySelector('[data-ark="tab-close"]')).toBeNull());
   }
@@ -346,7 +346,7 @@ export const RemovingSelectedTabPicksNeighbour = {
 
 export const TestHooks = {
   render: () => {
-    const tabs = createTabs({ variant: "editor", value: "req-2", label: "Requisicoes" }, REQUESTS, "requests");
+    const tabs = createTabs({ variant: "editor", value: "req-2", label: "Requisições" }, REQUESTS, "requests");
     const add = document.createElement("ark-button");
     add.setAttribute("slot", "actions");
     add.textContent = "+";
@@ -357,7 +357,7 @@ export const TestHooks = {
     const tabs = canvasElement.querySelector("ark-tabs")!;
     await expect(tabs).toHaveAttribute("data-ark", "tabs");
     await expect(tabs).toHaveAttribute("data-testid", "requests");
-    await expect(tabs).toHaveAttribute("aria-label", "Requisicoes");
+    await expect(tabs).toHaveAttribute("aria-label", "Requisições");
     await expect(tabs.querySelector('[slot="actions"]')).toHaveAttribute("data-ark", "tabs-actions");
 
     const tab = tabs.querySelector('[value="req-2"]')!;

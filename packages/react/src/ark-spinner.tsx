@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSpinnerProps = ArkDomProps<
   ArkSpinnerStyleOptions & {
-    /** Rotulo so para leitores de tela. Padrao: a string `loading` do idioma. */
+    /** Rótulo só para leitores de tela. Padrão: a string `loading` do idioma. */
     label?: string;
     className?: string;
   }

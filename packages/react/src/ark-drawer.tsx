@@ -10,20 +10,20 @@ import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 export type ArkDrawerProps = PropsWithChildren<
   ArkDomProps<
     ArkDrawerStyleOptions & {
-      /** Aberta; a saida anima antes de esconder. */
+      /** Aberta; a saída anima antes de esconder. */
       open?: boolean;
-      /** Titulo (h2) e nome acessivel. Sem ele, passe aria-label. */
+      /** Título (h2) e nome acessível. Sem ele, passe aria-label. */
       label?: string;
-      /** Esconde o botao de fechar do cabecalho. */
+      /** Esconde o botão de fechar do cabeçalho. */
       noCloseButton?: boolean;
-      /** Esc e clique no scrim nao fecham (so no overlay). */
+      /** Esc e clique no scrim não fecham (só no overlay). */
       persistent?: boolean;
-      /** A pagina continua rolando com a gaveta aberta em overlay. */
+      /** A página continua rolando com a gaveta aberta em overlay. */
       noScrollLock?: boolean;
       "aria-label"?: string;
       className?: string;
       onOpen?: (event: CustomEvent) => void;
-      /** O fechamento comecou; detail.reason diz por que (escape, backdrop, close-button, api). */
+      /** O fechamento começou; detail.reason diz por que (escape, backdrop, close-button, api). */
       onClose?: (event: CustomEvent<{ reason: ArkDrawerCloseReason }>) => void;
     }
   >
@@ -69,7 +69,7 @@ export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
       ref: setRef,
       class: className,
       open: open ? "" : undefined,
-      // Numero vira string aqui; o componente acrescenta px a numeros sem unidade.
+      // Número vira string aqui; o componente acrescenta px a números sem unidade.
       size: size === undefined ? undefined : String(size),
       "no-close-button": noCloseButton ? "" : undefined,
       persistent: persistent ? "" : undefined,

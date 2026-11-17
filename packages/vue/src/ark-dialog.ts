@@ -25,7 +25,7 @@ export const ArkDialog = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Eventos customizados do DOM: ouvidos no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
     const openHandler = (event: Event) => emit("ark-open", event as CustomEvent);
     const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent<{ reason: ArkDialogCloseReason }>);
     onMounted(() => {

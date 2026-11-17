@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "announce(text, politeness) do @tooark/core: live region unica em document.body para leitores de tela. Os componentes a usam para anunciar resultado no lugar (status do botao, copiado, arquivos escolhidos) sem criar live regions dentro do host, que entrariam no nome acessivel do controle."
+          "announce(text, politeness) do @tooark/core: live region única em document.body para leitores de tela. Os componentes a usam para anunciar resultado no lugar (status do botão, copiado, arquivos escolhidos) sem criar live regions dentro do host, que entrariam no nome acessível do controle."
       }
     }
   }
@@ -24,7 +24,7 @@ export const Default = {
     const text = document.createElement("p");
     text.className = "text-sm text-slate-600";
     text.textContent =
-      'Os botoes anunciam para o leitor de tela; nada muda na tela. Inspecione [data-ark="announcer"] no fim do body.';
+      'Os botões anunciam para o leitor de tela; nada muda na tela. Inspecione [data-ark="announcer"] no fim do body.';
     container.appendChild(text);
 
     const row = document.createElement("div");
@@ -32,7 +32,7 @@ export const Default = {
 
     const polite = document.createElement("ark-button");
     polite.textContent = "Anunciar (polite)";
-    polite.addEventListener("click", () => announce("Requisicao enviada"));
+    polite.addEventListener("click", () => announce("Requisição enviada"));
     row.appendChild(polite);
 
     const assertive = document.createElement("ark-button");
@@ -45,7 +45,7 @@ export const Default = {
     container.appendChild(row);
     return container;
   },
-  // Uma unica live region no body, com role por urgencia, e o texto entra depois de esvaziar a regiao.
+  // Uma única live region no body, com role por urgência, e o texto entra depois de esvaziar a região.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
 
@@ -54,17 +54,17 @@ export const Default = {
     expect(polite).not.toBeNull();
     expect(polite?.getAttribute("role")).toBe("status");
     expect(polite?.getAttribute("aria-live")).toBe("polite");
-    await waitFor(() => expect(polite?.textContent).toBe("Requisicao enviada"));
+    await waitFor(() => expect(polite?.textContent).toBe("Requisição enviada"));
 
     await userEvent.click(canvas.getByText("Anunciar (assertive)"));
     const assertive = document.querySelector<HTMLElement>('[data-ark="announcer-assertive"]');
     expect(assertive?.getAttribute("role")).toBe("alert");
     await waitFor(() => expect(assertive?.textContent).toBe("Falha ao enviar"));
 
-    // O mesmo texto de novo: a regiao esvazia antes de receber o texto, senao o leitor nao repete.
+    // O mesmo texto de novo: a região esvazia antes de receber o texto, senão o leitor não repete.
     await userEvent.click(canvas.getByText("Anunciar (polite)"));
     expect(polite?.textContent).toBe("");
-    await waitFor(() => expect(polite?.textContent).toBe("Requisicao enviada"));
+    await waitFor(() => expect(polite?.textContent).toBe("Requisição enviada"));
 
     expect(document.querySelectorAll('[data-ark="announcer"]').length).toBe(1);
     expect(canvasElement.querySelector('[role="status"], [role="alert"]')).toBeNull();

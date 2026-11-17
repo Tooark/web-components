@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Carousel baseado no comportamento do Embla: suporte a drag/swipe, snap configuravel, loop, autoplay, navegacao por setas e dots. O conteudo dos slides e livre e pode ser qualquer HTML."
+          "Carousel baseado no comportamento do Embla: suporte a drag/swipe, snap configurável, loop, autoplay, navegação por setas e dots. O conteúdo dos slides é livre e pode ser qualquer HTML."
       }
     }
   },
@@ -105,12 +105,12 @@ function renderCarousel(args: StoryArgs): HTMLElement {
   const slides = [
     createSlide(
       "Lago Azul",
-      "Colecao de paisagens autorais",
+      "Coleção de paisagens autorais",
       "linear-gradient(130deg, #bae6fd 0%, #7dd3fc 45%, #0ea5e9 100%)"
     ),
     createSlide(
       "Studio Portrait",
-      "Retratos com contraste cinematografico",
+      "Retratos com contraste cinematográfico",
       "linear-gradient(130deg, #fecdd3 0%, #fda4af 45%, #fb7185 100%)"
     ),
     createSlide(
@@ -125,7 +125,7 @@ function renderCarousel(args: StoryArgs): HTMLElement {
     ),
     createSlide(
       "Minimal Product",
-      "Composicao clean para catalogo digital",
+      "Composição clean para catálogo digital",
       "linear-gradient(130deg, #bbf7d0 0%, #4ade80 45%, #16a34a 100%)"
     )
   ];
@@ -213,7 +213,7 @@ export const NextBeforeFirstFrame = {
     docs: {
       description: {
         story:
-          "Um `next()` no mesmo frame da montagem (um framework chamando a API logo apos o mount) vale: o posicionamento inicial, que espera um frame pelo layout, parte do indice atual e nao volta ao `start-index`, entao `ark-slide-change` dispara uma unica vez."
+          "Um `next()` no mesmo frame da montagem (um framework chamando a API logo após o mount) vale: o posicionamento inicial, que espera um frame pelo layout, parte do índice atual e não volta ao `start-index`, então `ark-slide-change` dispara uma única vez."
       }
     }
   },
@@ -224,7 +224,7 @@ export const NextBeforeFirstFrame = {
     const changes: number[] = [];
     carousel.addEventListener("ark-slide-change", (event) => changes.push((event as CustomEvent).detail.index));
 
-    // Conecta e avanca sincronamente, antes do requestAnimationFrame da montagem.
+    // Conecta e avança sincronamente, antes do requestAnimationFrame da montagem.
     host.appendChild(carousel);
     carousel.next();
     await expect(carousel.index).toBe(1);
@@ -232,7 +232,7 @@ export const NextBeforeFirstFrame = {
 
     const target = canvasElement.querySelector<HTMLElement>('[data-ark="carousel-slide-1"]')!;
     await waitFor(() => expect(Math.abs(carousel.scrollLeft - target.offsetLeft)).toBeLessThan(2));
-    // A sincronizacao por rolagem (80 ms apos parar) nao pode emitir de novo nem voltar o indice.
+    // A sincronização por rolagem (80 ms após parar) não pode emitir de novo nem voltar o índice.
     await new Promise((resolve) => setTimeout(resolve, 200));
     await expect(carousel.index).toBe(1);
     await expect(changes).toEqual([1]);

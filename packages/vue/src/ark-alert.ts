@@ -22,7 +22,7 @@ export const ArkAlert = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Evento customizado do DOM: ouvido no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
     const dismissHandler = (event: Event) => emit("ark-dismiss", event as CustomEvent);
     onMounted(() => elRef.value?.addEventListener("ark-dismiss", dismissHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-dismiss", dismissHandler));

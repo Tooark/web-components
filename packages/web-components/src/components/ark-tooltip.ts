@@ -3,7 +3,7 @@ import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
-/** Contador para o id do balão, que o `aria-describedby` do gatilho referencia. */
+/** Contador para o id do balão, que o `aria-describedby` do gatilho referência. */
 let tooltipSeq = 0;
 
 /** Tolerância para o ponteiro atravessar o espaço entre gatilho e balão sem fechar a dica. */

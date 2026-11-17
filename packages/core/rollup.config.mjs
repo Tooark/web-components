@@ -24,7 +24,7 @@ export default [
         declaration: false,
         declarationMap: false,
         declarationDir: undefined,
-        // Erro de tipo derruba o build: por padrao o plugin so avisa e o rollup segue.
+        // Erro de tipo derruba o build: por padrão o plugin só avisa e o rollup segue.
         noEmitOnError: true
       })
     ],
@@ -32,7 +32,7 @@ export default [
   },
   {
     input,
-    // O mesmo bundle de tipos em .d.ts (import) e .d.cts (require): o TypeScript escolhe pela extensao, e sem o
+    // O mesmo bundle de tipos em .d.ts (import) e .d.cts (require): o TypeScript escolhe pela extensão, e sem o
     // .d.cts um consumidor CommonJS com moduleResolution node16 leria os tipos como ESM.
     output: [
       { file: "dist/index.d.ts", format: "esm" },

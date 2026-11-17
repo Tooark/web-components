@@ -14,7 +14,7 @@ export type ArkTabsProps = PropsWithChildren<
       label?: string;
       className?: string;
       onChange?: (event: CustomEvent<{ value: string }>) => void;
-      /** Uma aba fechavel pediu para fechar; remover a aba e do app. */
+      /** Uma aba fechável pediu para fechar; remover a aba é do app. */
       onClose?: (event: CustomEvent<{ value: string }>) => void;
     }
   >
@@ -61,9 +61,9 @@ export type ArkTabProps = PropsWithChildren<
       disabled?: boolean;
       /** id do painel que a aba controla (aria-controls). */
       controls?: string;
-      /** Botao de fechar, clique do meio e Delete (so na variante editor). */
+      /** Botão de fechar, clique do meio e Delete (só na variante editor). */
       closable?: boolean;
-      /** Ponto de alteracoes nao salvas. */
+      /** Ponto de alterações não salvas. */
       dirty?: boolean;
       className?: string;
     }

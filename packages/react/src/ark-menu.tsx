@@ -13,9 +13,9 @@ export type ArkMenuProps = PropsWithChildren<
       htmlFor?: string;
       /** Aberto; refletido do estado do popover. */
       open?: boolean;
-      /** Alinhamento em relacao ao gatilho. Padrao: "start". */
+      /** Alinhamento em relação ao gatilho. Padrão: "start". */
       align?: ArkMenuAlign;
-      /** Lado do gatilho; vira quando nao cabe. Padrao: "down". */
+      /** Lado do gatilho; vira quando não cabe. Padrão: "down". */
       direction?: ArkMenuDirection;
       "aria-label"?: string;
       className?: string;
@@ -70,11 +70,11 @@ export type ArkMenuItemProps = PropsWithChildren<
     ArkMenuItemStyleOptions & {
       value?: string;
       disabled?: boolean;
-      /** Item checkbox: true marcado, false desmarcado; omitido e um item comum. */
+      /** Item checkbox: true marcado, false desmarcado; omitido é um item comum. */
       checked?: boolean;
       /** Linha separadora (role separator). */
       divider?: boolean;
-      /** Conteudo nao interativo (nome e e-mail), sem role de item. */
+      /** Conteúdo não interativo (nome e e-mail), sem role de item. */
       static?: boolean;
       className?: string;
     }

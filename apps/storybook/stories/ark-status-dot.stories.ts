@@ -47,10 +47,10 @@ export const WithText = {
     const wrap = document.createElement("div");
     wrap.className = "flex flex-col gap-2 text-sm";
     for (const [intent, text] of [
-      ["neutral", "Verificando conexao"],
+      ["neutral", "Verificando conexão"],
       ["success", "Conectado"],
       ["warning", "Instavel"],
-      ["danger", "Sem conexao"]
+      ["danger", "Sem conexão"]
     ] as [ArkIntent, string][]) {
       const line = document.createElement("div");
       line.className = "flex items-center gap-2";
@@ -83,7 +83,7 @@ export const Intents = {
   }
 };
 
-// Com label vira role="img" nomeado; sem label e decorativo. Estatico: nenhuma animacao.
+// Com label vira role="img" nomeado; sem label é decorativo. Estático: nenhuma animação.
 export const Semantics = {
   render: () => createDot({ intent: "success", label: "Conectado" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -93,7 +93,7 @@ export const Semantics = {
     await expect(canvas.getByRole("img", { name: "Conectado" })).toBe(dot);
     await expect(dot.getAnimations()).toHaveLength(0);
     await expect(Math.round(dot.getBoundingClientRect().width)).toBe(10);
-    // rounded-full do Tailwind v4 e calc(infinity * 1px): basta ser maior que o raio do ponto.
+    // rounded-full do Tailwind v4 é calc(infinity * 1px): basta ser maior que o raio do ponto.
     await expect(Number.parseFloat(getComputedStyle(dot).borderRadius)).toBeGreaterThanOrEqual(5);
 
     dot.removeAttribute("label");

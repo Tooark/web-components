@@ -18,7 +18,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Paleta de cores como radiogroup. As amostras vem de `colors` (`{ name, value }[]`): como atributo JSON no HTML ou como propriedade JS; qualquer cor CSS vale (hex, oklch, var(--token)). Edite `colors` nos controles do Playground para ver a paleta mudar."
+          "Paleta de cores como radiogroup. As amostras vêm de `colors` (`{ name, value }[]`): como atributo JSON no HTML ou como propriedade JS; qualquer cor CSS vale (hex, oklch, var(--token)). Edite `colors` nos controles do Playground para ver a paleta mudar."
       }
     }
   },
@@ -116,7 +116,7 @@ export const FromProperty = {
 };
 
 // radiogroup com radios nomeados pela cor; clique e setas selecionam e emitem change uma vez; um tab stop;
-// atribuir value nao emite; disabled ignora.
+// atribuir value não emite; disabled ignora.
 export const Selection = {
   render: () => createSwatches({ value: "#2563eb" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

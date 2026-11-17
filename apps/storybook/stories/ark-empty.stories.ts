@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Estado vazio: o host `ark-empty` e a caixa de borda tracejada. Icone (`slot="icon"`, apagado) e acao (`slot="action"`, um ark-button) sao filhos do usuario e ficam onde estao; `heading` e `description` viram titulo (h3) e texto criados pelo componente. A ordem visual (icone, titulo, descricao, outros filhos, acao) vem de CSS, nao da ordem do DOM.'
+          'Estado vazio: o host `ark-empty` é a caixa de borda tracejada. Ícone (`slot="icon"`, apagado) e ação (`slot="action"`, um ark-button) são filhos do usuário e ficam onde estão; `heading` e `description` viram título (h3) e texto criados pelo componente. A ordem visual (ícone, título, descrição, outros filhos, ação) vem de CSS, não da ordem do DOM.'
       }
     }
   },
@@ -20,8 +20,8 @@ const meta = {
     withAction: { control: "boolean" }
   },
   args: {
-    heading: "Nenhuma requisicao",
-    description: "Crie a primeira requisicao desta colecao ou importe de um arquivo.",
+    heading: "Nenhuma requisição",
+    description: "Crie a primeira requisição desta coleção ou importe de um arquivo.",
     theme: "auto",
     withIcon: true,
     withAction: true
@@ -59,7 +59,7 @@ function createEmpty(args: Partial<StoryArgs>): HTMLElement {
     const action = document.createElement("ark-button");
     action.setAttribute("slot", "action");
     action.setAttribute("size", "sm");
-    action.textContent = "Nova requisicao";
+    action.textContent = "Nova requisição";
     empty.appendChild(action);
   }
   return empty;
@@ -81,11 +81,11 @@ export const HeadingOnly = {
 
 export const ExtraContent = {
   render: () => {
-    const empty = createEmpty({ heading: "Sem variaveis", description: "Este ambiente ainda nao tem variaveis." });
-    // Filhos sem slot entram entre a descricao e a acao.
+    const empty = createEmpty({ heading: "Sem variáveis", description: "Este ambiente ainda não tem variáveis." });
+    // Filhos sem slot entram entre a descrição e a ação.
     const hint = document.createElement("p");
     hint.className = "text-xs text-slate-500";
-    hint.textContent = "Dica: use {{nome}} nas requisicoes.";
+    hint.textContent = "Dica: use {{nome}} nas requisições.";
     empty.appendChild(hint);
     return empty;
   }
@@ -96,7 +96,7 @@ export const DarkTheme = {
     const wrap = document.createElement("div");
     wrap.className = "rounded-xl p-4";
     wrap.style.background = "oklch(20.8% 0.042 265.755)";
-    const empty = createEmpty({ heading: "Nenhuma requisicao", description: "Crie a primeira.", theme: "dark" });
+    const empty = createEmpty({ heading: "Nenhuma requisição", description: "Crie a primeira.", theme: "dark" });
     empty.querySelector("ark-button")?.setAttribute("theme", "dark");
     wrap.appendChild(empty);
     return wrap;
@@ -105,25 +105,25 @@ export const DarkTheme = {
 
 export const StructureAndOrder = {
   render: () => {
-    const empty = createEmpty({ heading: "Nenhuma requisicao", description: "Crie a primeira." });
+    const empty = createEmpty({ heading: "Nenhuma requisição", description: "Crie a primeira." });
     const hint = document.createElement("p");
-    hint.textContent = "Conteudo livre";
+    hint.textContent = "Conteúdo livre";
     empty.appendChild(hint);
     return empty;
   },
-  // Titulo e descricao sao nos do componente; a ordem visual e icone, titulo, descricao, livre, acao, seja qual
-  // for a ordem do DOM; a acao do usuario continua clicavel; sem heading/description os nos somem.
+  // Título e descrição são nós do componente; a ordem visual é ícone, título, descrição, livre, ação, seja qual
+  // for a ordem do DOM; a ação do usuário continua clicável; sem heading/description os nós somem.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const empty = canvasElement.querySelector("ark-empty")!;
     const icon = empty.querySelector('[slot="icon"]')!;
     const heading = empty.querySelector('[data-ark="empty-heading"]')!;
     const description = empty.querySelector('[data-ark="empty-description"]')!;
-    const free = canvas.getByText("Conteudo livre");
+    const free = canvas.getByText("Conteúdo livre");
     const action = empty.querySelector('[slot="action"]') as HTMLElement;
 
     expect(heading.tagName).toBe("H3");
-    expect(heading.textContent).toBe("Nenhuma requisicao");
+    expect(heading.textContent).toBe("Nenhuma requisição");
     expect(description.textContent).toBe("Crie a primeira.");
     expect(getComputedStyle(empty).borderStyle).toBe("dashed");
 
@@ -153,7 +153,7 @@ export const StructureAndOrder = {
 
 export const TestHooks = {
   render: () =>
-    createEmpty({ heading: "Nenhuma requisicao", description: "Crie a primeira.", testid: "requests-empty" }),
+    createEmpty({ heading: "Nenhuma requisição", description: "Crie a primeira.", testid: "requests-empty" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const empty = canvasElement.querySelector("ark-empty")!;
 

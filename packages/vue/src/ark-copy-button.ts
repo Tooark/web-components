@@ -31,7 +31,7 @@ export const ArkCopyButton = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Evento customizado do DOM: ouvido no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
     const copyHandler = (event: Event) => emit("ark-copy", event as CustomEvent<{ value: string }>);
     onMounted(() => elRef.value?.addEventListener("ark-copy", copyHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-copy", copyHandler));

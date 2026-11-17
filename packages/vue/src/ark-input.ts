@@ -35,7 +35,7 @@ export const ArkInput = defineComponent({
     min: { type: [String, Number], default: undefined },
     max: { type: [String, Number], default: undefined },
     step: { type: [String, Number], default: undefined },
-    // String, nao Boolean: Vue converte Boolean ausente em false, o que desligaria a correcao por padrao.
+    // String, não Boolean: Vue converte Boolean ausente em false, o que desligaria a correção por padrão.
     spellcheck: { type: String as PropType<"true" | "false">, default: undefined }
   },
   setup(props, { attrs, slots }) {

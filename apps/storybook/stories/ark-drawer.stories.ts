@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Gaveta ancorada numa borda. O host `ark-drawer` e o painel: em `mode="overlay"` abre como popover manual (top layer, scrim, focus trap, Esc e scrim fecham); em `mode="inline"` fica no fluxo da pagina e so anima (console inferior, painel lateral). `side` escolhe a borda e a direcao do slide (easing `sheet`), `size` e um preset ou um comprimento CSS. Filhos sao o corpo; `slot="footer"` vai ao fim; o cabecalho vem de `label`.'
+          'Gaveta ancorada numa borda. O host `ark-drawer` é o painel: em `mode="overlay"` abre como popover manual (top layer, scrim, focus trap, Esc e scrim fecham); em `mode="inline"` fica no fluxo da página e só anima (console inferior, painel lateral). `side` escolhe a borda e a direção do slide (easing `sheet`), `size` é um preset ou um comprimento CSS. Filhos são o corpo; `slot="footer"` vai ao fim; o cabeçalho vem de `label`.'
       }
     }
   },
@@ -68,7 +68,7 @@ function createDrawer(args: Partial<StoryArgs>): DrawerEl {
   const body = document.createElement("div");
   body.className = "flex flex-col gap-3 text-sm";
   body.innerHTML =
-    "<p>Filhos do usuario sao o corpo e ficam onde estao.</p><label class='flex flex-col gap-1'>Nome <input class='rounded border px-2 py-1' placeholder='primeiro focavel'></label><p>Mais conteudo para a gaveta rolar quando precisar.</p>";
+    "<p>Filhos do usuário são o corpo e ficam onde estão.</p><label class='flex flex-col gap-1'>Nome <input class='rounded border px-2 py-1' placeholder='primeiro focável'></label><p>Mais conteúdo para a gaveta rolar quando precisar.</p>";
   drawer.appendChild(body);
 
   if (args.withFooter !== false) {
@@ -126,13 +126,13 @@ export const Sides = {
 export const MobileSidebar = {
   render: () => {
     const wrap = document.createElement("div");
-    const drawer = createDrawer({ side: "left", label: "Colecoes", size: "100%", lang: "pt", withFooter: false });
+    const drawer = createDrawer({ side: "left", label: "Coleções", size: "100%", lang: "pt", withFooter: false });
     wrap.append(createOpener(drawer, "Abrir sidebar (largura toda)"), drawer);
     return wrap;
   }
 };
 
-// Console inferior: no fluxo, nao modal, com altura propria; o botao alterna e o layout acompanha.
+// Console inferior: no fluxo, não modal, com altura própria; o botão alterna e o layout acompanha.
 export const InlineConsole = {
   render: () => {
     const wrap = document.createElement("div");
@@ -156,7 +156,7 @@ export const InlineConsole = {
     toggle.addEventListener("click", () => {
       drawer.open = !drawer.open;
     });
-    main.append(toggle, "Area principal: a gaveta inline divide o espaco com ela, sem scrim.");
+    main.append(toggle, "Área principal: a gaveta inline divide o espaço com ela, sem scrim.");
     wrap.append(main, drawer);
     return wrap;
   }
@@ -176,7 +176,7 @@ export const HeaderActions = {
     frame.style.borderColor = "var(--ark-color-border)";
     const main = document.createElement("div");
     main.className = "flex-1 p-4 text-sm";
-    main.textContent = "Area principal";
+    main.textContent = "Área principal";
     const consoleDrawer = createDrawer({
       side: "bottom",
       mode: "inline",
@@ -206,7 +206,7 @@ export const HeaderActions = {
     consoleDrawer.appendChild(actions);
     frame.append(main, consoleDrawer);
 
-    const details = createDrawer({ label: "Detalhes da requisicao", lang: "pt", testid: "detalhes" });
+    const details = createDrawer({ label: "Detalhes da requisição", lang: "pt", testid: "detalhes" });
     const detailsActions = document.createElement("div");
     detailsActions.setAttribute("slot", "actions");
     const edit = document.createElement("ark-button");
@@ -216,7 +216,7 @@ export const HeaderActions = {
     detailsActions.appendChild(edit);
     details.appendChild(detailsActions);
 
-    wrap.append(frame, createOpener(details, "Abrir detalhes (overlay com acoes)"), details);
+    wrap.append(frame, createOpener(details, "Abrir detalhes (overlay com ações)"), details);
     return wrap;
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -274,7 +274,7 @@ export const HeaderActions = {
       expect(Math.abs(middle(part("detalhes-actions")) - middle(part("detalhes-title")))).toBeLessThanOrEqual(1)
     );
     await near(rect(part("detalhes-close")).left - rect(part("detalhes-actions")).right, 16);
-    await expect(details.ownerDocument.activeElement).toHaveAttribute("placeholder", "primeiro focavel");
+    await expect(details.ownerDocument.activeElement).toHaveAttribute("placeholder", "primeiro focável");
     details.close();
     await waitFor(() => expect(details.matches(":popover-open")).toBe(false));
   }
@@ -350,7 +350,7 @@ export const OverlayBehavior = {
   }
 };
 
-// Inline: sem popover, role=region, no fluxo; open alterna a exibicao com a animacao de slide e a altura
+// Inline: sem popover, role=region, no fluxo; open alterna a exibição com a animação de slide e a altura
 // vem de size no eixo da gaveta.
 export const InlineBehavior = {
   render: () => {
@@ -374,7 +374,7 @@ export const InlineBehavior = {
     toggle.addEventListener("click", () => {
       drawer.open = !drawer.open;
     });
-    main.append(toggle, "Fechada no inicio: o play abre e fecha pela propriedade open.");
+    main.append(toggle, "Fechada no início: o play abre e fecha pela propriedade open.");
     wrap.append(main, drawer);
     return wrap;
   },
@@ -395,7 +395,7 @@ export const InlineBehavior = {
     await expect(getComputedStyle(drawer).borderTopWidth).toBe("1px");
     await expect(getComputedStyle(drawer).borderBottomWidth).toBe("0px");
 
-    // Esc nao fecha o inline; open=false anima a saida e esconde.
+    // Esc não fecha o inline; open=false anima a saída e esconde.
     drawer.focus();
     await userEvent.keyboard("{Escape}");
     await expect(drawer).toHaveAttribute("open");

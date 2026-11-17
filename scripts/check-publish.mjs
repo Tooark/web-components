@@ -24,7 +24,7 @@ const packages = readdirSync(packagesDir).filter((name) => {
 const out = mkdtempSync(path.join(tmpdir(), "tooark-pack-"));
 let failed = false;
 
-// Le um arquivo de dentro do .tgz sem depender do tar do sistema (o bsdtar do Windows le "C:" como host remoto).
+// Lê um arquivo de dentro do .tgz sem depender do tar do sistema (o bsdtar do Windows lê "C:" como host remoto).
 function readFromTarball(tarball, wanted) {
   const data = gunzipSync(readFileSync(tarball));
   let offset = 0;
@@ -43,7 +43,7 @@ function readFromTarball(tarball, wanted) {
     if (name === wanted) return data.subarray(offset + 512, offset + 512 + size).toString("utf8");
     offset += 512 + Math.ceil(size / 512) * 512;
   }
-  throw new Error(`${wanted} nao esta em ${tarball}`);
+  throw new Error(`${wanted} não está em ${tarball}`);
 }
 
 function run(command, args, options = {}) {
@@ -72,11 +72,11 @@ for (const name of packages) {
     .at(-1);
   if (!tarball) {
     failed = true;
-    console.log("tarball nao encontrado");
+    console.log("tarball não encontrado");
     continue;
   }
 
-  // O manifesto dentro do tarball e o que vai para o npm: nenhum workspace: pode sobrar.
+  // O manifesto dentro do tarball é o que vai para o npm: nenhum workspace: pode sobrar.
   const manifest = readFromTarball(tarball, "package/package.json");
   const leaked = Object.entries({ ...JSON.parse(manifest).dependencies, ...JSON.parse(manifest).peerDependencies })
     .filter(([, range]) => String(range).startsWith("workspace:"))

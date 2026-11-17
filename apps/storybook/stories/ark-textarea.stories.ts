@@ -7,18 +7,18 @@ const meta = {
     docs: {
       description: {
         component:
-          "Area de texto padronizada: a mesma grid label / campo / mensagem do ark-input e os mesmos atributos de label, helper e erro. `rows` da a altura inicial, `autosize` cresce com o conteudo (field-sizing nativo, com fallback por JS), `monospace` usa fonte mono (edicao em massa, codigo) e `resize` limita o redimensionamento. Atributos nativos como maxlength e spellcheck sao espelhados no <textarea>. Emite `input` e `change` nativos."
+          "Área de texto padronizada: a mesma grid label / campo / mensagem do ark-input e os mesmos atributos de label, helper e erro. `rows` dá a altura inicial, `autosize` cresce com o conteúdo (field-sizing nativo, com fallback por JS), `monospace` usa fonte mono (edição em massa, código) e `resize` limita o redimensionamento. Atributos nativos como maxlength e spellcheck são espelhados no <textarea>. Emite `input` e `change` nativos."
       }
     }
   },
   argTypes: {
-    label: { control: "text", description: "Rotulo acessivel; vazio esconde o label" },
+    label: { control: "text", description: "Rótulo acessível; vazio esconde o label" },
     placeholder: { control: "text" },
-    value: { control: "text", description: "Valor inicial (tambem disponivel como propriedade JS)" },
+    value: { control: "text", description: "Valor inicial (também disponível como propriedade JS)" },
     name: { control: "text" },
-    rows: { control: "number", description: "Linhas visiveis iniciais. Padrao: 3" },
-    autosize: { control: "boolean", description: "Cresce com o conteudo" },
-    monospace: { control: "boolean", description: "Fonte monoespacada" },
+    rows: { control: "number", description: "Linhas visíveis iniciais. Padrão: 3" },
+    autosize: { control: "boolean", description: "Cresce com o conteúdo" },
+    monospace: { control: "boolean", description: "Fonte monoespaçada" },
     resize: { control: "inline-radio", options: ["vertical", "none"] },
     helper: { control: "text" },
     errorMessage: { control: "text", description: "Mensagem de erro; substitui o helper e liga o estado de erro" },
@@ -37,7 +37,7 @@ const meta = {
     testid: { control: "text" }
   },
   args: {
-    label: "Descricao",
+    label: "Descrição",
     placeholder: "Escreva aqui",
     value: "",
     name: "",
@@ -122,9 +122,9 @@ export const Playground = {
 export const States = {
   render: () => {
     const wrap = createStack();
-    wrap.appendChild(createTextarea({ label: "Com helper", placeholder: "Escreva", helper: "Ate 500 caracteres" }));
-    wrap.appendChild(createTextarea({ label: "Com erro", value: "texto", errorMessage: "Descricao obrigatoria" }));
-    wrap.appendChild(createTextarea({ label: "Desabilitada", value: "Nao editavel", disabled: true }));
+    wrap.appendChild(createTextarea({ label: "Com helper", placeholder: "Escreva", helper: "Até 500 caracteres" }));
+    wrap.appendChild(createTextarea({ label: "Com erro", value: "texto", errorMessage: "Descrição obrigatória" }));
+    wrap.appendChild(createTextarea({ label: "Desabilitada", value: "Não editável", disabled: true }));
     wrap.appendChild(createTextarea({ label: "Somente leitura", value: "Gerado pelo sistema", readonly: true }));
     return wrap;
   }
@@ -143,7 +143,7 @@ export const Sizes = {
 
 export const Monospace = {
   args: {
-    label: "Cabecalhos",
+    label: "Cabeçalhos",
     monospace: true,
     rows: 4,
     value: "Content-Type: application/json\nAuthorization: Bearer {{token}}",
@@ -163,15 +163,15 @@ export const DarkTheme = {
     wrap.style.padding = "16px";
     wrap.style.borderRadius = "12px";
     wrap.style.background = "#0f172a";
-    wrap.appendChild(createTextarea({ label: "Descricao", theme: "dark", value: "Tema escuro forcado" }));
+    wrap.appendChild(createTextarea({ label: "Descrição", theme: "dark", value: "Tema escuro forcado" }));
     return wrap;
   }
 };
 
 export const Autosize = {
-  args: { label: "Corpo", autosize: true, rows: 1, placeholder: "Cresce enquanto voce digita" },
+  args: { label: "Corpo", autosize: true, rows: 1, placeholder: "Cresce enquanto você digita" },
   render: Playground.render,
-  // A altura acompanha o conteudo: field-sizing nativo onde existe, senao a medicao por JS.
+  // A altura acompanha o conteúdo: field-sizing nativo onde existe, senão a medição por JS.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const textarea = canvasElement.querySelector<HTMLTextAreaElement>('[data-ark="textarea"]')!;
     const before = textarea.getBoundingClientRect().height;
@@ -209,7 +209,7 @@ export const TypingUpdatesValue = {
 };
 
 export const TestHooks = {
-  args: { label: "Descricao", helper: "Ajuda", testid: "descricao" },
+  args: { label: "Descrição", helper: "Ajuda", testid: "descricao" },
   render: Playground.render,
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-textarea")!;
@@ -222,7 +222,7 @@ export const TestHooks = {
     await expect(helper).toHaveAttribute("data-testid", "descricao-helper");
     await expect(textarea).toHaveAttribute("aria-describedby", helper.id);
 
-    host.setAttribute("error-message", "Invalido");
+    host.setAttribute("error-message", "Inválido");
     await expect(host.querySelector('[data-ark="textarea-error"]')).toHaveAttribute("data-testid", "descricao-error");
     await expect(textarea).toHaveAttribute("aria-invalid", "true");
   }

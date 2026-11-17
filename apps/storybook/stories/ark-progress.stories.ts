@@ -94,7 +94,7 @@ export const Indeterminate = {
     )
 };
 
-// Tela de inicializacao: o valor sobe em etapas e a largura acompanha com a transicao dos tokens.
+// Tela de inicialização: o valor sobe em etapas e a largura acompanha com a transição dos tokens.
 export const Startup = {
   render: () => {
     const wrap = column(createProgress({ value: 0, showValue: true, label: "Inicializando" }));
@@ -111,7 +111,7 @@ export const Startup = {
 };
 
 // aria-valuenow/min/max seguem value/max com clamp; a largura da barra acompanha o valor depois da
-// transicao; indeterminate tira o valuenow, esconde o texto e anima o segmento em loop.
+// transição; indeterminate tira o valuenow, esconde o texto e anima o segmento em loop.
 export const Semantics = {
   render: () => createProgress({ value: 25, showValue: true, label: "Upload" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -137,7 +137,7 @@ export const Semantics = {
     await settled();
     await expect(Math.abs(ratio() - 0.7)).toBeLessThan(0.01);
 
-    // Clamp e max proprio.
+    // Clamp e max próprio.
     el.setAttribute("value", "150");
     await expect(el).toHaveAttribute("aria-valuenow", "100");
     el.setAttribute("value", "-5");

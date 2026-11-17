@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 export type ArkCardProps = PropsWithChildren<
   ArkDomProps<
     ArkCardStyleOptions & {
-      /** Titulo (h2) na linha de cima; com ele o filho slot="header" vira a linha seguinte do cabecalho. */
+      /** Título (h2) na linha de cima; com ele o filho slot="header" vira a linha seguinte do cabeçalho. */
       heading?: string;
       className?: string;
     }

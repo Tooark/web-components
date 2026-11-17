@@ -8,12 +8,12 @@ import { useForwardedRef } from "./use-forwarded-ref.js";
 export type ArkAlertProps = PropsWithChildren<
   ArkDomProps<
     ArkAlertStyleOptions & {
-      /** Titulo proprio no inicio do alerta. */
+      /** Título próprio no início do alerta. */
       heading?: string;
-      /** Botao de dispensar (rotulo por lang/localeJson). */
+      /** Botão de dispensar (rótulo por lang/localeJson). */
       dismissible?: boolean;
       className?: string;
-      /** Depois da saida animada: o host ganha `hidden`; desmontar e do app. */
+      /** Depois da saída animada: o host ganha `hidden`; desmontar é do app. */
       onDismiss?: (event: CustomEvent) => void;
     }
   >

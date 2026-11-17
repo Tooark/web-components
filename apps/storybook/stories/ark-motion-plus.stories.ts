@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Camada 3 do motion Tooark (@tooark/motion): helpers de alto nivel sobre a lib Motion (motion.dev) — stagger, scroll reveal, FLIP e swipe com fisica de spring. Pacote opt-in, integrado aos tokens --ark-*."
+          "Camada 3 do motion Tooark (@tooark/motion): helpers de alto nível sobre a lib Motion (motion.dev) — stagger, scroll reveal, FLIP e swipe com física de spring. Pacote opt-in, integrado aos tokens --ark-*."
       }
     }
   }
@@ -37,7 +37,7 @@ function createActionButton(label: string): HTMLButtonElement {
   return button;
 }
 
-// Cleanup do reveal de cada pagina, para o play parar a observacao no fim.
+// Cleanup do reveal de cada página, para o play parar a observação no fim.
 const revealStops = new WeakMap<HTMLElement, () => void>();
 
 const tick = (ms: number): Promise<void> => new Promise((resolve) => window.setTimeout(resolve, ms));
@@ -71,7 +71,7 @@ async function withReducedMotion(run: () => Promise<void> | void): Promise<void>
   window.matchMedia = (query: string): MediaQueryList => {
     const list = original.call(window, query);
     if (!query.includes("prefers-reduced-motion")) return list;
-    // `matches` e um getter do prototipo sem setter: a propriedade propria sombreia sem atribuir.
+    // `matches` é um getter do protótipo sem setter: a propriedade própria sombreia sem atribuir.
     return Object.defineProperty(Object.create(list) as MediaQueryList, "matches", { value: true });
   };
   try {
@@ -81,8 +81,8 @@ async function withReducedMotion(run: () => Promise<void> | void): Promise<void>
   }
 }
 
-// Evento de ponteiro sintetico: o swipe exige `isPrimary` e o mouse (pointerId 1) e sempre um ponteiro ativo, entao
-// setPointerCapture nao lanca.
+// Evento de ponteiro sintético: o swipe exige `isPrimary` e o mouse (pointerId 1) é sempre um ponteiro ativo, então
+// setPointerCapture não lança.
 function pointer(target: HTMLElement, type: string, x: number, y: number, init: PointerEventInit = {}): void {
   target.dispatchEvent(
     new PointerEvent(type, { pointerId: 1, isPrimary: true, clientX: x, clientY: y, bubbles: true, ...init })
@@ -121,10 +121,10 @@ export const Stagger = {
     const cards = Array.from(canvasElement.querySelectorAll<HTMLElement>(".grid > div"));
     expect(cards).toHaveLength(9);
 
-    // A entrada inicial roda num microtask e termina com todos visiveis e sem transform residual.
+    // A entrada inicial roda num microtask e termina com todos visíveis e sem transform residual.
     await settled(...cards);
 
-    // Reexecutar: os itens ainda no intervalo ficam invisiveis (fill both) e tudo termina visivel de novo.
+    // Reexecutar: os itens ainda no intervalo ficam invisíveis (fill both) e tudo termina visível de novo.
     await userEvent.click(canvas.getByRole("button", { name: "Reexecutar stagger" }));
     await waitFor(() => expect(cards.map((card) => getComputedStyle(card).opacity)).toContain("0"));
     await settled(...cards);
@@ -158,7 +158,7 @@ export const ScrollReveal = {
   parameters: {
     layout: "fullscreen",
     docs: {
-      description: { story: "arkReveal: anima a entrada de cada bloco quando ele aparece na viewport (role a pagina)." }
+      description: { story: "arkReveal: anima a entrada de cada bloco quando ele aparece na viewport (role a página)." }
     }
   },
   render: (): HTMLElement => {
@@ -190,7 +190,7 @@ export const ScrollReveal = {
     const first = blocks[0];
     const last = blocks[blocks.length - 1];
 
-    // O primeiro bloco ja esta na viewport: revela e anima ate ficar visivel; o ultimo espera escondido.
+    // O primeiro bloco já está na viewport: revela e anima até ficar visível; o último espera escondido.
     await settled(first);
     expect(last.style.opacity).toBe("0");
     expect(last.style.willChange).toBe("opacity, transform");
@@ -198,14 +198,14 @@ export const ScrollReveal = {
     last.scrollIntoView({ block: "center" });
     await settled(last);
 
-    // once: false — sair da viewport esconde de novo e a proxima entrada revela outra vez.
+    // once: false — sair da viewport esconde de novo e a próxima entrada revela outra vez.
     window.scrollTo(0, 0);
     await waitFor(() => expect(last.style.opacity).toBe("0"));
     last.scrollIntoView({ block: "center" });
     await waitFor(() => expect(last.style.opacity).toBe(""));
     await settled(last);
 
-    // Cleanup: para de observar; voltar a viewport nao revela mais.
+    // Cleanup: para de observar; voltar à viewport não revela mais.
     window.scrollTo(0, 0);
     await waitFor(() => expect(last.style.opacity).toBe("0"));
     revealStops.get(page)!();
@@ -221,7 +221,7 @@ export const RevealOnce = {
     layout: "fullscreen",
     docs: {
       description: {
-        story: "arkReveal com `once` (padrao): cada bloco anima na primeira entrada e fica visivel ao sair da viewport."
+        story: "arkReveal com `once` (padrão): cada bloco anima na primeira entrada e fica visível ao sair da viewport."
       }
     }
   },
@@ -254,7 +254,7 @@ export const RevealOnce = {
     last.scrollIntoView({ block: "center" });
     await settled(last);
 
-    // Sair da viewport nao esconde: a observacao do bloco termina na primeira entrada.
+    // Sair da viewport não esconde: a observação do bloco termina na primeira entrada.
     window.scrollTo(0, 0);
     await tick(150);
     expect(last.style.opacity).not.toBe("0");
@@ -267,7 +267,7 @@ export const FlipReorder = {
   parameters: {
     docs: {
       description: {
-        story: "arkFlip: embaralha a lista mudando o DOM e anima cada item da posicao antiga para a nova com spring."
+        story: "arkFlip: embaralha a lista mudando o DOM e anima cada item da posição antiga para a nova com spring."
       }
     }
   },
@@ -301,8 +301,8 @@ export const FlipReorder = {
     const last = cards[cards.length - 1];
     const slotOfEighth = cards[7].getBoundingClientRect();
 
-    // Primeiro vai para o fim e o ultimo sai do DOM: o primeiro cruza a grade (x e y), o segundo so anda em x e
-    // o removido, desconectado, e pulado. Alvos por seletor.
+    // Primeiro vai para o fim e o último sai do DOM: o primeiro cruza a grade (x e y), o segundo só anda em x e
+    // o removido, desconectado, é pulado. Alvos por seletor.
     const run = arkFlip(".grid > div", () => {
       last.remove();
       grid.appendChild(first);
@@ -324,7 +324,7 @@ export const FlipReorder = {
     expect(rect.left).toBeCloseTo(slotOfEighth.left, 0);
     expect(rect.top).toBeCloseTo(slotOfEighth.top, 0);
 
-    // Um espacador no topo empurra todos so em y; o botao, fora da grade, nao se move e nao recebe animacao.
+    // Um espaçador no topo empurra todos só em y; o botão, fora da grade, não se move e não recebe animação.
     const spacer = document.createElement("div");
     spacer.className = "col-span-3 h-8";
     const push = arkFlip([shuffle, ...cards], () => grid.prepend(spacer), { stiffness: 600, damping: 40 });
@@ -336,7 +336,7 @@ export const FlipReorder = {
     await push;
     expect(first.style.transform).toBe("none");
 
-    // Sem alvos ou com movimento reduzido a mutacao e aplicada e nada anima.
+    // Sem alvos ou com movimento reduzido a mutação é aplicada e nada anima.
     let mutated = 0;
     await arkFlip([], () => {
       mutated += 1;
@@ -354,7 +354,7 @@ export const FlipReorder = {
     expect(mutated).toBe(2);
     expect(grid.contains(spacer)).toBe(false);
 
-    // O botao da demo embaralha de verdade.
+    // O botão da demo embaralha de verdade.
     await userEvent.click(shuffle);
     expect(grid.children).toHaveLength(8);
   }
@@ -365,7 +365,7 @@ export const Swipe = {
     docs: {
       description: {
         story:
-          "arkSwipe: gesto de arrastar com feedback visual, deteccao por distancia/velocidade e retorno com spring."
+          "arkSwipe: gesto de arrastar com feedback visual, detecção por distância/velocidade e retorno com spring."
       }
     }
   },
@@ -375,7 +375,7 @@ export const Swipe = {
 
     const status = document.createElement("p");
     status.className = "text-sm text-slate-500";
-    status.textContent = "Arraste o cartao para os lados";
+    status.textContent = "Arraste o cartão para os lados";
 
     const card = createCard("Arraste-me", 260);
     card.style.height = "8rem";
@@ -398,20 +398,20 @@ export const Swipe = {
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const card = canvas.getByText("Arraste-me");
-    const status = canvas.getByText("Arraste o cartao para os lados");
+    const status = canvas.getByText("Arraste o cartão para os lados");
     const box = card.getBoundingClientRect();
     const x0 = box.left + box.width / 2;
     const y0 = box.top + box.height / 2;
 
     expect(card.style.touchAction).toBe("pan-y");
 
-    // Arrasto curto e lento: o cartao acompanha com resistencia (0.4 -> 60% do delta), nao e swipe e volta com
-    // spring ate a posicao original.
+    // Arrasto curto e lento: o cartão acompanha com resistência (0.4 -> 60% do delta), não é swipe e volta com
+    // spring até a posição original.
     pointer(card, "pointerdown", x0, y0);
     await tick(20);
     pointer(card, "pointermove", x0 + 20, y0);
     expect(card.style.transform).toBe("translateX(12px)");
-    // Outro ponteiro e um evento com id diferente sao ignorados enquanto o gesto esta ativo.
+    // Outro ponteiro e um evento com id diferente são ignorados enquanto o gesto está ativo.
     pointer(card, "pointerdown", x0, y0, { pointerId: 2 });
     pointer(card, "pointermove", x0 + 200, y0, { pointerId: 2 });
     pointer(card, "pointerup", x0 + 200, y0, { pointerId: 2 });
@@ -419,12 +419,12 @@ export const Swipe = {
     await tick(300);
     pointer(card, "pointermove", x0 + 21, y0);
     pointer(card, "pointerup", x0 + 21, y0);
-    expect(status.textContent).toBe("Arraste o cartao para os lados");
+    expect(status.textContent).toBe("Arraste o cartão para os lados");
     // O retorno parte de onde o cartão foi solto; ao terminar a lib grava `transform: none` inline.
     await waitFor(() => expect(offset(card).x).toBeGreaterThan(0));
     await waitFor(() => expect(card.style.transform).toBe("none"), { timeout: 3000 });
 
-    // Distancia acima do threshold (48px) com velocidade baixa: swipe para a direita.
+    // Distância acima do threshold (48px) com velocidade baixa: swipe para a direita.
     pointer(card, "pointerdown", x0, y0);
     await tick(20);
     pointer(card, "pointermove", x0 + 80, y0);
@@ -434,7 +434,7 @@ export const Swipe = {
     expect(status.textContent).toMatch(/^Swipe → #1 \(delta 81px, \d+px\/s\)$/);
     await waitFor(() => expect(card.style.transform).toBe("none"), { timeout: 3000 });
 
-    // Abaixo do threshold mas rapido (>= 500px/s): swipe para a esquerda pela velocidade; pointercancel encerra
+    // Abaixo do threshold mas rápido (>= 500px/s): swipe para a esquerda pela velocidade; pointercancel encerra
     // como pointerup.
     pointer(card, "pointerdown", x0, y0);
     await tick(5);
@@ -443,14 +443,14 @@ export const Swipe = {
     expect(status.textContent).toMatch(/^Swipe ← #2 \(delta -40px, -\d+px\/s\)$/);
     await waitFor(() => expect(card.style.transform).toBe("none"), { timeout: 3000 });
 
-    // Ponteiro nao primario nao inicia gesto.
+    // Ponteiro não primário não inicia gesto.
     pointer(card, "pointerdown", x0, y0, { isPrimary: false });
     pointer(card, "pointermove", x0 + 100, y0, { isPrimary: false });
     pointer(card, "pointerup", x0 + 100, y0, { isPrimary: false });
     expect(card.style.transform).toBe("none");
     expect(status.textContent).toMatch(/#2 /);
 
-    // Com movimento reduzido o retorno e imediato, sem spring.
+    // Com movimento reduzido o retorno é imediato, sem spring.
     await withReducedMotion(async () => {
       pointer(card, "pointerdown", x0, y0);
       await tick(20);
@@ -462,7 +462,7 @@ export const Swipe = {
       expect(card.style.transform).toBe("");
     });
 
-    // Eixo y sem feedback: nada de transform; resistencia fora de 0-1 e limitada; cleanup restaura touch-action e
+    // Eixo y sem feedback: nada de transform; resistência fora de 0-1 é limitada; cleanup restaura touch-action e
     // remove os listeners.
     const column = createCard("Vertical", 120);
     column.style.height = "6rem";
@@ -511,7 +511,7 @@ export const TargetsAndOptions = {
     docs: {
       description: {
         story:
-          "Alvos aceitos (seletor, elemento, lista, NodeList; SVG e ignorado), presets, distancia em rem/em/px, easing por token, curva ou nome da lib e o atalho com movimento reduzido."
+          "Alvos aceitos (seletor, elemento, lista, NodeList; SVG é ignorado), presets, distância em rem/em/px, easing por token, curva ou nome da lib e o atalho com movimento reduzido."
       }
     }
   },
@@ -534,21 +534,21 @@ export const TargetsAndOptions = {
     const cards = Array.from(canvasElement.querySelectorAll<HTMLElement>(".motion-target"));
     const svg = canvasElement.querySelector<SVGSVGElement>("svg")!;
 
-    // Sem alvos, ou so com elementos que nao sao HTMLElement, resolve na hora.
+    // Sem alvos, ou só com elementos que não são HTMLElement, resolve na hora.
     await arkStaggerEnter([]);
     await arkStaggerEnter(svg);
     await arkStaggerEnter([svg]);
     expect(svg.getAnimations()).toHaveLength(0);
 
-    // Seletor + scale + duracao em ms.
+    // Seletor + scale + duração em ms.
     await arkStaggerEnter(".motion-target", { preset: "scale", duration: 80, interval: 0 });
     await settled(...cards);
 
-    // Elemento unico + slide-left com distancia em rem, easing por token e duracao por token.
+    // Elemento único + slide-left com distância em rem, easing por token e duração por token.
     await arkStaggerEnter(cards[0], { preset: "slide-left", distance: "1rem", ease: "overshoot", duration: "quick" });
     await settled(...cards);
 
-    // NodeList + slide-right com distancia em em, curva custom e escalonamento a partir do ultimo.
+    // NodeList + slide-right com distância em em, curva custom e escalonamento a partir do último.
     const list = canvasElement.querySelectorAll(".motion-target");
     const run = arkStaggerEnter(list, {
       preset: "slide-right",
@@ -573,7 +573,7 @@ export const TargetsAndOptions = {
     await down;
     await settled(...cards);
 
-    // Distancia invalida cai no padrao; fade nao tem deslocamento.
+    // Distância inválida cai no padrão; fade não tem deslocamento.
     await arkStaggerEnter(cards, { preset: "slide-up", distance: "abc", duration: 50, interval: 0 });
     await arkStaggerEnter(cards, { preset: "fade", duration: 50, interval: 0 });
     await settled(...cards);

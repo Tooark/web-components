@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Grid de mes inline no estilo DateCalendar do MUI. O titulo alterna dias → meses → anos, a navegacao por teclado segue o padrao WAI-ARIA (setas, Home/End no mes, PageUp/PageDown troca de mes) e `value` e sempre interpretado no fuso local. Aceita eventos por dia (atributo `events` em JSON ou propriedade JS `events`) exibidos como `dots`, `count` ou `list`. Emite `ark-change` com `detail: { value, date, events }`."
+          "Grid de mês inline no estilo DateCalendar do MUI. O título alterna dias → meses → anos, a navegação por teclado segue o padrão WAI-ARIA (setas, Home/End no mês, PageUp/PageDown troca de mês) e `value` é sempre interpretado no fuso local. Aceita eventos por dia (atributo `events` em JSON ou propriedade JS `events`) exibidos como `dots`, `count` ou `list`. Emite `ark-change` com `detail: { value, date, events }`."
       }
     }
   },
@@ -25,11 +25,11 @@ const meta = {
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     accentColor: {
       control: "color",
-      description: "Cor custom dos estados selecionado/hoje (tem precedencia sobre intent)"
+      description: "Cor custom dos estados selecionado/hoje (tem precedência sobre intent)"
     },
     value: { control: "text", description: "Selected date in YYYY-MM-DD format" },
-    min: { control: "text", description: "Menor data selecionavel (YYYY-MM-DD)" },
-    max: { control: "text", description: "Maior data selecionavel (YYYY-MM-DD)" },
+    min: { control: "text", description: "Menor data selecionável (YYYY-MM-DD)" },
+    max: { control: "text", description: "Maior data selecionável (YYYY-MM-DD)" },
     events: {
       control: "text",
       description: "JSON com os eventos: [{ date, label?, color?, intent? }]"
@@ -37,9 +37,9 @@ const meta = {
     eventDisplay: {
       control: "inline-radio",
       options: ["dots", "count", "list"],
-      description: "Como os eventos do dia sao exibidos"
+      description: "Como os eventos do dia são exibidos"
     },
-    testid: { control: "text", description: "Propaga data-testid para o calendario e suas partes" }
+    testid: { control: "text", description: "Propaga data-testid para o calendário e suas partes" }
   },
   args: {
     lang: "en",

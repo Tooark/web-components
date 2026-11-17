@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 export type ArkSkeletonProps = PropsWithChildren<
   ArkDomProps<
     ArkSkeletonStyleOptions & {
-      /** Numero de barras; acima de 1 troca o bloco por barras em coluna. Padrao: 1. */
+      /** Número de barras; acima de 1 troca o bloco por barras em coluna. Padrão: 1. */
       rows?: number;
       /** Liga o brilho que varre (opt-in; para sob movimento reduzido). */
       animated?: boolean;

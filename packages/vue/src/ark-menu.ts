@@ -20,7 +20,7 @@ export const ArkMenu = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Eventos customizados do DOM: ouvidos no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
     const selectHandler = (event: Event) => emit("ark-select", event as CustomEvent<{ value: string }>);
     const openHandler = (event: Event) => emit("ark-open", event as CustomEvent);
     const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent);
@@ -63,7 +63,7 @@ export const ArkMenuItem = defineComponent({
     value: { type: String, default: undefined },
     disabled: { type: Boolean, default: false },
     intent: { type: String as PropType<ArkIntent>, default: undefined },
-    // true/"true" marca e false/"false" desmarca um item checkbox; ausente (undefined) e um item comum, como no React.
+    // true/"true" marca e false/"false" desmarca um item checkbox; ausente (undefined) é um item comum, como no React.
     checked: { type: [Boolean, String] as PropType<boolean | "true" | "false">, default: undefined },
     divider: { type: Boolean, default: false },
     static: { type: Boolean, default: false }

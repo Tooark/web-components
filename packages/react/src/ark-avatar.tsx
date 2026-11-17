@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkAvatarProps = ArkDomProps<
   ArkAvatarStyleOptions & {
-    /** Nome da pessoa: vira aria-label e as iniciais (primeira letra, ou primeira + ultima com sobrenome). */
+    /** Nome da pessoa: vira aria-label e as iniciais (primeira letra, ou primeira + última com sobrenome). */
     name?: string;
     /** Imagem; em erro de carga caem as iniciais. */
     src?: string;

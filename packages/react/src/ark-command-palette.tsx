@@ -13,23 +13,23 @@ import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 export type ArkCommandPaletteProps = PropsWithChildren<
   ArkDomProps<
     ArkCommandPaletteStyleOptions & {
-      /** Aberta; a saida anima antes de sair do top layer. */
+      /** Aberta; a saída anima antes de sair do top layer. */
       open?: boolean;
-      /** Placeholder e nome do campo de busca. Padrao: a string `search` do idioma. */
+      /** Placeholder e nome do campo de busca. Padrão: a string `search` do idioma. */
       placeholder?: string;
       /** Atalho global: "/", "mod+k" (Ctrl ou Cmd), "ctrl+shift+p"... */
       hotkey?: string;
       /** Filtra localmente pelo label dos itens. */
       filter?: boolean;
-      /** Debounce de ark-query em ms. Padrao: 150. */
+      /** Debounce de ark-query em ms. Padrão: 150. */
       queryDelay?: number;
-      /** Nome acessivel do dialogo. */
+      /** Nome acessível do diálogo. */
       label?: string;
-      /** Mensagem sem opcoes enquanto o campo esta vazio (no lugar de `noResults`). */
+      /** Mensagem sem opções enquanto o campo está vazio (no lugar de `noResults`). */
       hint?: string;
-      /** Busca assincrona em andamento: sem opcoes a mensagem vira `searching`, e o listbox fica aria-busy. */
+      /** Busca assíncrona em andamento: sem opções a mensagem vira `searching`, e o listbox fica aria-busy. */
       busy?: boolean;
-      /** A pagina continua rolando com a paleta aberta. */
+      /** A página continua rolando com a paleta aberta. */
       noScrollLock?: boolean;
       "aria-label"?: string;
       className?: string;
@@ -104,9 +104,9 @@ export type ArkCommandItemProps = PropsWithChildren<
   ArkDomProps<
     ArkCommandItemStyleOptions & {
       value: string;
-      /** Secao em que a paleta lista o item. */
+      /** Seção em que a paleta lista o item. */
       group?: string;
-      /** Texto do filtro e nome da opcao. Padrao: o texto dos filhos sem slot. */
+      /** Texto do filtro e nome da opção. Padrão: o texto dos filhos sem slot. */
       label?: string;
       disabled?: boolean;
       className?: string;

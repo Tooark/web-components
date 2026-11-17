@@ -55,7 +55,7 @@ export const Shortcuts = {
     for (const [label, keys] of [
       ["Busca global", ["/"]],
       ["Trocar de workspace", ["Ctrl", "K"]],
-      ["Enviar requisicao", ["Ctrl", "Enter"]],
+      ["Enviar requisição", ["Ctrl", "Enter"]],
       ["Salvar", ["⌘", "S"]]
     ] as [string, string[]][]) {
       const line = document.createElement("div");
@@ -78,7 +78,7 @@ export const Sizes = {
   }
 };
 
-// Nao interativo e sem role: o texto da tecla e o filho do usuario; a altura minima segue size.
+// Não interativo e sem role: o texto da tecla é o filho do usuário; a altura mínima segue size.
 export const Semantics = {
   render: () => createKbd({ text: "Esc" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

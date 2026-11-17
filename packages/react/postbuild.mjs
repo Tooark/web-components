@@ -1,5 +1,5 @@
-// As tipagens JSX dos ark-* (jsx-intrinsics.d.ts) sao um .d.ts de augmentacao global que o tsc nao copia nem
-// referencia: entram no dist e o index.d.ts publicado passa a apontar para elas, entao quem importa @tooark/react
+// As tipagens JSX dos ark-* (jsx-intrinsics.d.ts) são um .d.ts de augmentação global que o tsc não copia nem
+// referência: entram no dist e o index.d.ts publicado passa a apontar para elas, então quem importa @tooark/react
 // ganha <ark-chart> e companhia tipados no JSX.
 import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
 

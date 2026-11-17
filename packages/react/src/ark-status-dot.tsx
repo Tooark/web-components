@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkStatusDotProps = ArkDomProps<
   ArkStatusDotStyleOptions & {
-    /** Com rotulo o ponto vira role="img" nomeado; sem ele e decorativo (aria-hidden). */
+    /** Com rótulo o ponto vira role="img" nomeado; sem ele é decorativo (aria-hidden). */
     label?: string;
     className?: string;
   }

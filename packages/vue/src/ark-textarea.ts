@@ -30,7 +30,7 @@ export const ArkTextarea = defineComponent({
     autofocus: { type: Boolean, default: false },
     maxlength: { type: Number, default: undefined },
     minlength: { type: Number, default: undefined },
-    // String, nao Boolean: Vue converte Boolean ausente em false, o que desligaria a correcao por padrao.
+    // String, não Boolean: Vue converte Boolean ausente em false, o que desligaria a correção por padrão.
     spellcheck: { type: String as PropType<"true" | "false">, default: undefined },
     wrap: { type: String as PropType<"soft" | "hard" | "off">, default: undefined }
   },

@@ -10,11 +10,11 @@ export type ArkKvEditorProps = ArkDomProps<
   ArkKvEditorStyleOptions & {
     /** Linhas { id, key, value, enabled }; atribuir substitui tudo e renderiza de novo. */
     rows?: ArkKvRow[];
-    /** Modo de edicao em massa (textarea). */
+    /** Modo de edição em massa (textarea). */
     bulk?: boolean;
     /** Tipos de valor da coluna de tipo (string, number, date, time, datetime, email, url); vazio esconde a coluna. */
     types?: string[];
-    /** Mostra a coluna de descricao. */
+    /** Mostra a coluna de descrição. */
     description?: boolean;
     /** Mostra o cadeado por linha: fechado mascara o valor como senha, com o olho para revelar. */
     secret?: boolean;
@@ -23,12 +23,12 @@ export type ArkKvEditorProps = ArkDomProps<
     descriptionPlaceholder?: string;
     readonly?: boolean;
     /**
-     * Cria a celula de valor de cada linha no lugar do ark-input (um campo com autocomplete de variaveis, por exemplo);
-     * linhas secretas mantem o campo de senha. Precisa ser estavel (useCallback): uma funcao nova recria as celulas.
+     * Cria a célula de valor de cada linha no lugar do ark-input (um campo com autocomplete de variáveis, por exemplo);
+     * linhas secretas mantêm o campo de senha. Precisa ser estável (useCallback): uma função nova recria as células.
      */
     valueField?: ArkKvValueField;
     className?: string;
-    /** Qualquer edicao, inclusive ao sair do modo em massa: detail.rows sao as linhas. */
+    /** Qualquer edição, inclusive ao sair do modo em massa: detail.rows são as linhas. */
     onChange?: (event: CustomEvent<{ rows: ArkKvRow[] }>) => void;
     onAdd?: (event: CustomEvent<{ id: string }>) => void;
     onDelete?: (event: CustomEvent<{ id: string }>) => void;
@@ -62,12 +62,12 @@ export const ArkKvEditor = forwardRef<ArkKvEditorElement, ArkKvEditorProps>(
       ensureTooarkComponentsRegistered();
     }, []);
 
-    // `rows` e propriedade (objetos), nao atributo.
+    // `rows` é propriedade (objetos), não atributo.
     useEffect(() => {
       if (ref.current && rows) ref.current.rows = rows;
     }, [ref, rows]);
 
-    // `valueField` e funcao, entao propriedade; so passa a ser gravada quando o app da uma, para o editor sem ela nao
+    // `valueField` é função, então propriedade; só passa a ser gravada quando o app dá uma, para o editor sem ela não
     // recriar as linhas na montagem.
     useEffect(() => {
       const el = ref.current;

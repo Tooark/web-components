@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Paleta de comandos sobre a Popover API. O host `ark-command-palette` e o painel (role=dialog, scrim, focus trap); o campo de busca e um `ark-input` proprio (combobox) e os filhos `ark-command-item` ficam onde estao, agrupados por `group` com cabecalhos proprios ordenados por CSS. `filter` filtra localmente pelo label; `ark-query` sai com debounce para busca assincrona. `hotkey` abre de qualquer lugar da pagina."
+          "Paleta de comandos sobre a Popover API. O host `ark-command-palette` é o painel (role=dialog, scrim, focus trap); o campo de busca é um `ark-input` próprio (combobox) e os filhos `ark-command-item` ficam onde estão, agrupados por `group` com cabeçalhos próprios ordenados por CSS. `filter` filtra localmente pelo label; `ark-query` sai com debounce para busca assíncrona. `hotkey` abre de qualquer lugar da página."
       }
     }
   },
@@ -47,13 +47,13 @@ type PaletteEl = HTMLElement & { open: boolean; query: string; show: () => void;
 type Command = { value: string; label: string; group?: string; shortcut?: string; disabled?: boolean };
 
 const COMMANDS: Command[] = [
-  { value: "new-request", label: "Nova requisicao", group: "Requisicoes", shortcut: "Ctrl N" },
-  { value: "duplicate", label: "Duplicar requisicao", group: "Requisicoes" },
-  { value: "send", label: "Enviar", group: "Requisicoes", shortcut: "Ctrl Enter" },
+  { value: "new-request", label: "Nova requisição", group: "Requisições", shortcut: "Ctrl N" },
+  { value: "duplicate", label: "Duplicar requisição", group: "Requisições" },
+  { value: "send", label: "Enviar", group: "Requisições", shortcut: "Ctrl Enter" },
   { value: "switch-workspace", label: "Trocar de workspace", group: "Workspace", shortcut: "Ctrl K" },
-  { value: "settings", label: "Configuracoes do workspace", group: "Workspace" },
+  { value: "settings", label: "Configurações do workspace", group: "Workspace" },
   { value: "archive", label: "Arquivar workspace", group: "Workspace", disabled: true },
-  { value: "docs", label: "Documentacao", group: "Ajuda" }
+  { value: "docs", label: "Documentação", group: "Ajuda" }
 ];
 
 function createItem(command: Command): HTMLElement {
@@ -112,14 +112,14 @@ function createScene(palette: PaletteEl, hint: string): HTMLElement {
 
 export const Playground = {
   render: (args: StoryArgs) =>
-    createScene(createPalette(args), "Ou pressione Ctrl+K / Cmd+K em qualquer lugar da pagina.")
+    createScene(createPalette(args), "Ou pressione Ctrl+K / Cmd+K em qualquer lugar da página.")
 };
 
 export const SlashHotkey = {
   render: () => {
     const wrap = createScene(
       createPalette({ hotkey: "/", filter: true, lang: "pt" }),
-      'Pressione "/" fora de um campo de texto. No campo abaixo a tecla e digitada normalmente.'
+      'Pressione "/" fora de um campo de texto. No campo abaixo a tecla é digitada normalmente.'
     );
     const input = document.createElement("ark-input");
     input.setAttribute("label", "Um campo qualquer");
@@ -129,7 +129,7 @@ export const SlashHotkey = {
   }
 };
 
-// Busca assincrona: sem `filter`, o app escuta ark-query e troca os itens (aqui com um timeout).
+// Busca assíncrona: sem `filter`, o app escuta ark-query e troca os itens (aqui com um timeout).
 export const AsyncQuery = {
   render: () => {
     const palette = createPalette({ hotkey: "mod+k", lang: "pt", queryDelay: 200 }, [
@@ -164,7 +164,7 @@ const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).to
 export const HintAndBusy = {
   render: () => {
     const palette = createPalette({ lang: "pt", queryDelay: 50, testid: "busca" }, []);
-    palette.setAttribute("hint", "Digite para buscar requisicoes e variaveis");
+    palette.setAttribute("hint", "Digite para buscar requisições e variáveis");
     const clearItems = () => {
       for (const item of Array.from(palette.querySelectorAll("ark-command-item"))) item.remove();
     };
@@ -190,7 +190,7 @@ export const HintAndBusy = {
         (palette as PaletteEl & { busy: boolean }).busy = false;
       }, 150);
     });
-    return createScene(palette, 'Digite um caminho; "zzz" nao encontra nada.');
+    return createScene(palette, 'Digite um caminho; "zzz" não encontra nada.');
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
@@ -202,7 +202,7 @@ export const HintAndBusy = {
     await settled(palette);
     const combobox = canvas.getByRole("combobox");
     await expect(empty()).toBeVisible();
-    await expect(empty().textContent).toBe("Digite para buscar requisicoes e variaveis");
+    await expect(empty().textContent).toBe("Digite para buscar requisições e variáveis");
     await expect(list()).not.toHaveAttribute("aria-busy");
 
     // Digitando: busy até os resultados chegarem.
@@ -216,7 +216,7 @@ export const HintAndBusy = {
 
     // Busca sem resultado: noResults, como antes.
     await userEvent.clear(combobox);
-    await expect(empty().textContent).toBe("Digite para buscar requisicoes e variaveis");
+    await expect(empty().textContent).toBe("Digite para buscar requisições e variáveis");
     await userEvent.type(combobox, "zzz");
     await waitFor(() => expect(palette.busy).toBe(false));
     await expect(empty()).toBeVisible();
@@ -239,14 +239,14 @@ export const HintAndBusy = {
   }
 };
 
-// Dialogo em popover com o combobox focado; filtro por label com grupos que somem junto; setas movem a ativa
+// Diálogo em popover com o combobox focado; filtro por label com grupos que somem junto; setas movem a ativa
 // (aria-activedescendant, pulando desabilitada, dando a volta); Enter seleciona e fecha; ark-query com
 // debounce; hotkey abre de fora e e ignorado num campo de texto; Esc fecha.
 export const Navigation = {
   render: () => {
     const wrap = createScene(
       createPalette({ hotkey: "mod+k", filter: true, lang: "pt", queryDelay: 10 }),
-      "Teclado: setas, Home/End, Enter, Esc; Ctrl+K abre de fora, mas nao dentro do campo acima."
+      "Teclado: setas, Home/End, Enter, Esc; Ctrl+K abre de fora, mas não dentro do campo acima."
     );
     const field = document.createElement("input");
     field.id = "campo-externo";
@@ -284,14 +284,14 @@ export const Navigation = {
     await expect(combobox).toHaveFocus();
     await expect(combobox).toHaveAttribute("aria-expanded", "true");
     await expect(combobox).toHaveAttribute("placeholder", "Buscar");
-    await expect(groups()).toEqual(["Requisicoes", "Workspace", "Ajuda"]);
+    await expect(groups()).toEqual(["Requisições", "Workspace", "Ajuda"]);
     await expect(visible()).toHaveLength(7);
     await expect(items()[0]).toHaveAttribute("aria-selected", "true");
     await expect(combobox).toHaveAttribute("aria-activedescendant", items()[0].id);
     await expect(events).toEqual(["ark-open"]);
     await settled(palette);
 
-    // Ordem visual: cabecalho de grupo antes dos itens do grupo.
+    // Ordem visual: cabeçalho de grupo antes dos itens do grupo.
     const header = palette.querySelector('[data-ark="command-palette-group"]') as HTMLElement;
     await expect(header.getBoundingClientRect().bottom).toBeLessThanOrEqual(items()[0].getBoundingClientRect().top + 1);
     await expect(combobox.getBoundingClientRect().top).toBeLessThan(header.getBoundingClientRect().top);
@@ -342,7 +342,7 @@ export const Navigation = {
     palette.show();
     await waitFor(() => expect(palette.matches(":popover-open")).toBe(true));
     await settled(palette);
-    await userEvent.click(canvas.getByRole("option", { name: "Documentacao" }));
+    await userEvent.click(canvas.getByRole("option", { name: "Documentação" }));
     await expect(events.at(-2)).toBe("ark-select:docs");
     await waitFor(() => expect(palette.matches(":popover-open")).toBe(false));
   }
@@ -353,7 +353,7 @@ export const Navigation = {
 export const WrappedItems = {
   render: () => {
     const palette = createPalette({ filter: true, lang: "pt", queryDelay: 10 }, []);
-    return createScene(palette, "Itens dentro de um elemento intermediario, como o wrapper do Angular.");
+    return createScene(palette, "Itens dentro de um elemento intermediário, como o wrapper do Angular.");
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
@@ -376,7 +376,7 @@ export const WrappedItems = {
     await expect(palette.querySelector('[data-ark="command-palette-empty"]')).not.toBeVisible();
     await expect(
       Array.from(palette.querySelectorAll('[data-ark="command-palette-group"]')).map((el) => el.textContent)
-    ).toEqual(["Requisicoes", "Workspace", "Ajuda"]);
+    ).toEqual(["Requisições", "Workspace", "Ajuda"]);
     await expect(items()[0]).toHaveAttribute("aria-selected", "true");
 
     await userEvent.type(combobox, "workspace");
