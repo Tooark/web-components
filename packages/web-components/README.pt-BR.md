@@ -28,7 +28,7 @@ Os Custom Elements nativos (`ark-*`) do design system Tooark, estilizados com Ta
 
 O pacote `@tooark/web-components` fornece:
 
-- 43 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) e a família calendário/relógio/agenda;
+- 46 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) e a família calendário/relógio/agenda;
 - light DOM: os componentes nunca movem nem envolvem os seus filhos; o host é o controle ou o container;
 - `styles.css` é a única folha de estilo necessária: tokens, presets de motion e estilos dos componentes, tudo com prefixo (`ark:*`, `--ark-*`), sem reset global;
 - temas por `color-scheme` (`theme="light|dark"` por elemento), tamanhos `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -96,6 +96,9 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-mark` — Marca de escopo: uma de dez formas (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) numa `color`, cor e forma juntas para a identidade nunca depender só da cor; `size`, `label`.
 - `ark-menu` — Menu suspenso/de contexto sobre a Popover API (`role="menu"`, `popover="auto"`): ancorado ao gatilho por `for`, `align`/`direction` com flip, teclado, `openAt(x, y)`; itens ficam como filhos. Emite `ark-select`.
 - `ark-menu-item` — Item de menu (o host é o item): filhos livres, `slot="trailing"`, `disabled`, `intent`, `checked` (item checkbox), `divider`, `static` (conteúdo não interativo).
+- `ark-nav` — Navegação do app (`role="navigation"`): `sidebar` (recolhe para um trilho de ícones ou, com `collapsible="hidden"`, para só o logo), `navbar` ou `tabbar` (abas de rodapé do celular); `slot="header"`/`slot="footer"` ordenados por CSS, `value` marca o item atual, `size`/`intent` propagados. Emite `ark-collapse`.
+- `ark-nav-group` — Seção da navegação (`role="group"` nomeado por `label`): título simples ou botão `expandable` (`open`, `aria-expanded`) que mostra e esconde os itens; faixa separada no trilho, itens soltos nas barras. Emite `ark-toggle`.
+- `ark-nav-item` — Item de navegação (o host é a linha): `href` → um `<a>` real esticado (Ctrl+clique, nova aba), `label`, `slot="icon"`, `slot="trailing"`, `current` (`aria-current`), `disabled`, `divider`; sem `href` um `role="button"`. Emite `ark-navigate` cancelável.
 - `ark-pagination` — Paginação (`role="navigation"`): resumo do intervalo, seletor opcional de itens por página (`page-sizes`), faixa de páginas com reticências, anterior/próxima; `page`/`page-size`/`total` reescritos no clique, localizada, anunciada. Emite `ark-page-change`.
 - `ark-progress` — Barra de progresso (`role="progressbar"` no host): `value`/`max` com transição de largura pelos tokens, `show-value`, `indeterminate` em loop isento de movimento reduzido, `label`, tamanhos, intents.
 - `ark-radio` — Radio desenhado pelo componente (botão `role="radio"` + input nativo oculto): agrupa por `name` no mesmo form, um tab stop por grupo, setas movem e marcam, `label`/filhos como rótulo, dica `helper`. Emite `change` na que marcou.
