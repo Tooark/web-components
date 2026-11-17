@@ -25,6 +25,9 @@ import type {
   ArkMark,
   ArkMenu,
   ArkMenuItem,
+  ArkNav,
+  ArkNavGroup,
+  ArkNavItem,
   ArkPagination,
   ArkProgress,
   ArkRadio,
@@ -72,6 +75,9 @@ declare global {
     "ark-mark": ArkMark;
     "ark-menu": ArkMenu;
     "ark-menu-item": ArkMenuItem;
+    "ark-nav": ArkNav;
+    "ark-nav-group": ArkNavGroup;
+    "ark-nav-item": ArkNavItem;
     "ark-pagination": ArkPagination;
     "ark-progress": ArkProgress;
     "ark-radio": ArkRadio;
