@@ -23,6 +23,8 @@ export { ArkKbd } from "./ark-kbd.js";
 export { ArkKvEditor } from "./ark-kv-editor.js";
 export { ArkMark } from "./ark-mark.js";
 export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
+export type { ArkNavNavigateDetail } from "./ark-nav.js";
+export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
 export { ArkPagination } from "./ark-pagination.js";
 export { ArkProgress } from "./ark-progress.js";
 export { ArkRadio } from "./ark-radio.js";

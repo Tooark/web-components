@@ -45,6 +45,8 @@ export type { ArkMarkProps } from "./ark-mark.js";
 export { ArkMark } from "./ark-mark.js";
 export type { ArkMenuItemProps, ArkMenuProps } from "./ark-menu.js";
 export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
+export type { ArkNavGroupProps, ArkNavItemProps, ArkNavNavigateDetail, ArkNavProps } from "./ark-nav.js";
+export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
 export type { ArkPaginationProps } from "./ark-pagination.js";
 export { ArkPagination } from "./ark-pagination.js";
 export type { ArkProgressProps } from "./ark-progress.js";
