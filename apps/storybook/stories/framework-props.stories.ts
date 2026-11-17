@@ -6,6 +6,8 @@ import { expect } from "storybook/test";
 // setAttribute aceitaria: sem setter a atribuição lança TypeError (React, módulo strict) ou é descartada (Vue).
 const meta = {
   title: "Integration/Framework Props",
+  // Só testes (não há o que ver): rodam na suíte, mas ficam fora da barra lateral e da página de docs.
+  tags: ["!dev", "!autodocs"],
   parameters: { a11y: { disable: true } }
 };
 
@@ -25,6 +27,7 @@ const TAGS = [
   "ark-command-item",
   "ark-command-palette",
   "ark-copy-button",
+  "ark-data-view",
   "ark-datepicker",
   "ark-dialog",
   "ark-drawer",
@@ -36,6 +39,7 @@ const TAGS = [
   "ark-mark",
   "ark-menu",
   "ark-menu-item",
+  "ark-pagination",
   "ark-progress",
   "ark-radio",
   "ark-scheduler",
@@ -200,6 +204,17 @@ export const PropertiesSetBeforeRegistration = {
 // padrão, o que já basta para provar que passaram pelo setter (a propriedade própria some).
 const PRE_REGISTRATION_SAMPLES: Record<string, unknown> = {
   "ark-kv-editor.rows": [{ id: "r1", key: "host", value: "{{baseUrl}}", enabled: true }],
+  "ark-data-view.rows": [
+    { id: 1, name: "Ana" },
+    { id: 2, name: "Bruno" }
+  ],
+  "ark-data-view.columns": [{ key: "name", label: "Nome", sortable: true }],
+  "ark-data-view.selected": [2],
+  "ark-data-view.sort": { key: "name", direction: "desc" },
+  "ark-data-view.pageSizes": [10, 25],
+  "ark-pagination.pageSizes": [10, 25],
+  "ark-pagination.total": 80,
+  "ark-pagination.page": 3,
   "ark-select.options": [
     { value: "a", label: "A" },
     { value: "b", label: "B" }

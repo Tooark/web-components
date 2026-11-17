@@ -10,8 +10,8 @@ const config: StorybookConfig = {
     disableTelemetry: true
   },
   stories: ["../stories/**/*.stories.@(ts|mdx)"],
-  // Arquivos estaticos: a imagem que o uploader de exemplo do wysiwyg devolve, o logo da sidebar (manager.ts) e o
-  // favicon.svg, que o Storybook usa no lugar do proprio por estar na raiz do diretorio.
+  // Arquivos estáticos: a imagem que o uploader de exemplo do wysiwyg devolve, o logo da sidebar (manager.ts) e o
+  // favicon.svg, que o Storybook usa no lugar do próprio por estar na raiz do diretório.
   staticDirs: ["../public"],
   addons: [
     getAbsolutePath("@storybook/addon-docs"),
@@ -36,6 +36,13 @@ const config: StorybookConfig = {
       cssTarget: ["chrome123", "edge123", "firefox120", "safari17.5"]
     };
 
+    // Os wrappers Angular usam decorators do TypeScript (legados), que o JIT do Angular espera; sem a opção o Oxc
+    // os deixa como estão e o navegador não os entende. Só os arquivos de packages/angular têm decorators.
+    viteConfig.oxc = {
+      ...(viteConfig.oxc || {}),
+      decorator: { legacy: true }
+    };
+
     viteConfig.resolve = viteConfig.resolve || {};
     viteConfig.resolve.alias = {
       ...(viteConfig.resolve.alias || {}),
@@ -50,7 +57,9 @@ const config: StorybookConfig = {
       "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts"),
       // Wrappers exercitados com react-dom e vue reais (framework-wrappers.stories.ts).
       "@tooark/react": path.resolve(rootDir, "packages/react/src/index.tsx"),
-      "@tooark/vue": path.resolve(rootDir, "packages/vue/src/index.ts")
+      "@tooark/vue": path.resolve(rootDir, "packages/vue/src/index.ts"),
+      // Wrappers Angular compilados em JIT a partir do src (framework-angular.stories.ts).
+      "@tooark/angular": path.resolve(rootDir, "packages/angular/src/index.ts")
     };
 
     return viteConfig;
