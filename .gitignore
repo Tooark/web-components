@@ -51,3 +51,6 @@ pnpm-debug.log*
 .rpt2_cache/
 .rollup.cache
 .sass-cache
+
+# prompts
+prompts/
