@@ -101,5 +101,7 @@ export const es: ArkLocale = {
   moveUp: "Mover arriba",
   moveDown: "Mover abajo",
   moveToStart: "Mover al inicio",
-  moveToEnd: "Mover al final"
+  moveToEnd: "Mover al final",
+  collapse: "Contraer",
+  expand: "Expandir"
 };
