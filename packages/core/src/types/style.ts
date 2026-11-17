@@ -328,6 +328,202 @@ export type ArkKvEditorStyleOptions = {
   localeJson?: string;
 };
 
+// Exports types específicos do componente pagination
+
+/** O que o ark-pagination publica em `ark-page-change`. */
+export type ArkPageChangeDetail = {
+  /** Página atual, a partir de 1. */
+  page: number;
+  /** Itens por página. */
+  pageSize: number;
+  /** Total de páginas. */
+  pageCount: number;
+};
+
+/** Props de estilo do ark-pagination. */
+export type ArkPaginationStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Altura dos botões via token --ark-size-* e tamanho do texto. Padrão: "md". */
+  size?: ArkSize;
+  /** Intenção semântica de cor da página atual e do anel de foco. Padrão: "primary". */
+  intent?: ArkIntent;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos rótulos (pagination, previousPage, nextPage, pageNumber, pageOf, perPage, rangeOf). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+};
+
+// Exports types específicos do componente data-view
+
+/**
+ * Um registro do ark-data-view: qualquer objeto. O índice é `any` para uma `interface` do app ser aceita sem cast (um
+ * índice `unknown` só aceita type aliases).
+ */
+// biome-ignore lint/suspicious/noExplicitAny: só um índice `any` aceita interfaces do app como registro
+export type ArkDataViewRow = Record<string, any>;
+
+/** Identidade de um registro: o valor do campo `row-key`, ou a posição em `rows` quando o campo falta. */
+export type ArkDataViewKey = string | number;
+
+/** Apresentação dos registros: tabela ou cards. */
+export type ArkDataViewLayout = "table" | "cards";
+
+/** Valor do atributo `view`: uma apresentação fixa, ou "auto" (cards quando o componente fica estreito). */
+export type ArkDataViewView = ArkDataViewLayout | "auto";
+
+/** Quem ordena, filtra e pagina: o componente ("client") ou o app, a cada `ark-query-change` ("server"). */
+export type ArkDataViewMode = "client" | "server";
+
+/** Sentido de uma ordenação. */
+export type ArkDataViewSortDirection = "asc" | "desc";
+
+/** Ordenação atual do ark-data-view; no atributo `sort` é "chave:asc" ou "chave:desc". */
+export type ArkDataViewSort = {
+  /** `key` da coluna ordenada. */
+  key: string;
+  direction: ArkDataViewSortDirection;
+};
+
+/** O que o ark-data-view entrega ao `render` de uma coluna. */
+export type ArkDataViewCellContext<Row extends object = ArkDataViewRow> = {
+  /** O registro, o mesmo objeto recebido em `rows`. */
+  row: Row;
+  /** A coluna que está sendo desenhada. */
+  column: ArkDataViewColumn<Row>;
+  /** Valor do campo `column.key` no registro. */
+  value: unknown;
+  /** Posição do registro em `rows`. */
+  index: number;
+  /** Onde a célula vai aparecer, para o conteúdo poder mudar entre tabela e card. */
+  view: ArkDataViewLayout;
+};
+
+/** Uma coluna do ark-data-view: um campo do registro, na tabela e/ou no card. */
+export type ArkDataViewColumn<Row extends object = ArkDataViewRow> = {
+  /** Campo do registro; aceita caminho com ponto ("address.city"). Também identifica a coluna em `sort`. */
+  key: string;
+  /** Cabeçalho na tabela e rótulo do campo no card. */
+  label: string;
+  /** Cabeçalho clicável que ordena por este campo. Padrão: false. */
+  sortable?: boolean;
+  /** O campo entra na busca do modo "client". Padrão: true. */
+  searchable?: boolean;
+  /** Alinhamento do cabeçalho e das células na tabela. Padrão: "left". */
+  align?: "left" | "center" | "right";
+  /** Largura da coluna na tabela (comprimento CSS). Padrão: automática. */
+  width?: string;
+  /** Onde o campo aparece. Padrão: "both". */
+  show?: "both" | ArkDataViewLayout;
+  /** Colunas da grade do card que o campo ocupa, limitado a `card-columns`. Padrão: 1. */
+  cardSpan?: number;
+  /** "title" leva o campo ao cabeçalho do card, sem rótulo. Padrão: "field". */
+  cardRole?: "title" | "field";
+  /** Rótulo visível acima do valor no card; `false` deixa só para o leitor de tela. Padrão: true. */
+  cardLabel?: boolean;
+  /**
+   * Conteúdo próprio da célula (propriedade JS): um nó (um ark-avatar, duas linhas de texto), um texto ou um número.
+   * `null` ou `undefined` mantém o valor do campo como texto. Método, e não propriedade, para colunas tipadas com o
+   * registro do app serem aceitas onde o tipo é o registro genérico.
+   */
+  render?(context: ArkDataViewCellContext<Row>): Node | string | number | null | undefined;
+  /** Comparador próprio da ordenação no modo "client" (crescente; o componente inverte no decrescente). */
+  compare?(a: Row, b: Row): number;
+};
+
+/** O que o ark-data-view entrega a `cardRender`. */
+export type ArkDataViewCardContext<Row extends object = ArkDataViewRow> = {
+  /** O registro, o mesmo objeto recebido em `rows`. */
+  row: Row;
+  /** Posição do registro em `rows`. */
+  index: number;
+};
+
+/**
+ * Desenha o corpo inteiro de um card no lugar da grade de campos. `null` ou `undefined` mantém a grade naquele card.
+ * A caixa de seleção, a alça de reordenar e o clique continuam do componente. Tirado de um método (parâmetros
+ * bivariantes), para uma função tipada com o registro do app ser aceita onde o tipo é o registro genérico.
+ */
+export type ArkDataViewCardRender<Row extends object = ArkDataViewRow> = {
+  render(context: ArkDataViewCardContext<Row>): Node | string | number | null | undefined;
+}["render"];
+
+/** Consulta atual do ark-data-view: o que o app envia ao servidor no modo "server". */
+export type ArkDataViewQuery = {
+  /** Página atual, a partir de 1. */
+  page: number;
+  /** Itens por página; 0 sem paginação. */
+  pageSize: number;
+  /** Ordenação, ou `null` sem nenhuma. */
+  sort: ArkDataViewSort | null;
+  /** Texto da busca; vazio sem busca. */
+  search: string;
+};
+
+/** Detalhe de `ark-query-change`: a consulta inteira e o que mudou nela. */
+export type ArkDataViewQueryChangeDetail = ArkDataViewQuery & {
+  reason: "page" | "page-size" | "sort" | "search";
+};
+
+/** Detalhe de `ark-view-change`: a apresentação que o usuário escolheu. */
+export type ArkDataViewViewChangeDetail = {
+  view: ArkDataViewLayout;
+};
+
+/** Detalhe de `ark-row-click`. */
+export type ArkDataViewRowClickDetail<Row extends object = ArkDataViewRow> = {
+  row: Row;
+  key: ArkDataViewKey;
+  /** Posição do registro em `rows`. */
+  index: number;
+};
+
+/** Detalhe de `ark-selection-change`. */
+export type ArkDataViewSelectionChangeDetail<Row extends object = ArkDataViewRow> = {
+  /** Chaves selecionadas, na ordem em que foram marcadas; no modo "server" inclui as de outras páginas. */
+  selected: ArkDataViewKey[];
+  /** Os registros selecionados entre os que estão em `rows`. */
+  rows: Row[];
+};
+
+/** Detalhe de `ark-reorder`. */
+export type ArkDataViewReorderDetail<Row extends object = ArkDataViewRow> = {
+  /** Chave do registro movido. */
+  key: ArkDataViewKey;
+  /** Posição de origem em `rows`. */
+  from: number;
+  /** Posição de destino em `rows`. */
+  to: number;
+  /** `rows` na ordem nova. */
+  rows: Row[];
+};
+
+/** Props de estilo e comportamento do ark-data-view. */
+export type ArkDataViewStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes internas. */
+  testid?: string;
+  /** Densidade: texto e padding das células, e o tamanho dos controles compostos. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+  /** Idioma dos rótulos (busca, ordenação, seleção, reordenar, vazio e os da paginação). Padrão: "en". */
+  lang?: ArkLang;
+  /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
+  localeJson?: string;
+  /** Apresentação ao carregar; a escolha do usuário no seletor reescreve o atributo. Padrão: "auto". */
+  view?: ArkDataViewView;
+  /** Esconde o seletor de visualização do canto; `view` continua decidindo a apresentação. Padrão: false. */
+  noViewSelector?: boolean;
+  /** Largura do componente, em px, abaixo da qual "auto" mostra cards. Padrão: 640. */
+  breakpoint?: number;
+  /** Quem ordena, filtra e pagina. Padrão: "client". */
+  mode?: ArkDataViewMode;
+  /** Colunas da grade de campos de cada card, de 1 a 4. Padrão: 2. */
+  cardColumns?: number;
+};
+
 // Exports types específicos do componente kbd
 
 /** Props de estilo do ark-kbd. */

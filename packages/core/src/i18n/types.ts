@@ -124,6 +124,56 @@ export interface ArkLocale {
   type: string;
   /** Rótulo acessível do cadeado que marca uma linha do editor chave/valor como segredo. */
   secret: string;
+  /** Rótulo acessível da navegação de páginas (ark-pagination). */
+  pagination: string;
+  /** Rótulo acessível do botão que volta uma página. */
+  previousPage: string;
+  /** Rótulo acessível do botão que avança uma página. */
+  nextPage: string;
+  /** Rótulo acessível do botão de uma página; `{page}` dá lugar ao número. */
+  pageNumber: string;
+  /** Anúncio da página atual; `{page}` e `{count}` dão lugar à página e ao total de páginas. */
+  pageOf: string;
+  /** Rótulo do seletor de itens por página. */
+  perPage: string;
+  /** Resumo do intervalo exibido; `{from}`, `{to}` e `{total}` dão lugar aos números. */
+  rangeOf: string;
+  /** Rótulo acessível do seletor de visualização do ark-data-view. */
+  viewMode: string;
+  /** Rótulo da visualização em tabela. */
+  viewTable: string;
+  /** Rótulo da visualização em cards. */
+  viewCards: string;
+  /** Rótulo do seletor de ordenação e da opção sem ordenação. */
+  sortBy: string;
+  /** Palavra "crescente", usada no anúncio e nas opções de ordenação. */
+  sortAscending: string;
+  /** Palavra "decrescente", usada no anúncio e nas opções de ordenação. */
+  sortDescending: string;
+  /** Anúncio de uma ordenação aplicada; `{column}` e `{direction}` dão lugar à coluna e ao sentido. */
+  sortedBy: string;
+  /** Anúncio de uma ordenação removida. */
+  sortCleared: string;
+  /** Rótulo acessível da caixa que seleciona todos os itens visíveis. */
+  selectAll: string;
+  /** Rótulo acessível da caixa que seleciona um item; o texto principal do item vem depois. */
+  selectRow: string;
+  /** Contagem dos itens selecionados; `{count}` dá lugar ao número. */
+  selectedCount: string;
+  /** Rótulo do botão que limpa a seleção. */
+  clearSelection: string;
+  /** Rótulo acessível da alça que reordena um item; o texto principal do item vem depois. */
+  reorder: string;
+  /** Anúncio de um item reordenado; `{position}` e `{count}` dão lugar à posição nova e ao total. */
+  movedTo: string;
+  /** Item do menu da alça de reordenar que sobe o registro uma posição. */
+  moveUp: string;
+  /** Item do menu da alça de reordenar que desce o registro uma posição. */
+  moveDown: string;
+  /** Item do menu da alça de reordenar que leva o registro ao início da lista. */
+  moveToStart: string;
+  /** Item do menu da alça de reordenar que leva o registro ao fim da lista. */
+  moveToEnd: string;
 }
 
 /** Nome anterior de ArkLocale, mantido por compatibilidade. */
