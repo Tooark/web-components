@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Seletor de data/hora que compoe ark-input + ark-calendar + ark-clock. O `mode` define o formato do valor: `datetime` (padrao, YYYY-MM-DDTHH:mm:ss), `date` (YYYY-MM-DD) ou `time` (HH:mm:ss). Sem `input` os paineis sao renderizados inline; com `input`, vira campo + popup com digitacao validada (`format`), fechamento por Esc/clique fora e envio em formulario via input hidden (`name`). Emite `ark-change` com `detail: { value, date }`."
+          "Seletor de data/hora que compõe ark-input + ark-calendar + ark-clock. O `mode` define o formato do valor: `datetime` (padrão, YYYY-MM-DDTHH:mm:ss), `date` (YYYY-MM-DD) ou `time` (HH:mm:ss). Sem `input` os painéis são renderizados inline; com `input`, vira campo + popup com digitação validada (`format`), fechamento por Esc/clique fora e envio em formulário via input hidden (`name`). Emite `ark-change` com `detail: { value, date }`."
       }
     }
   },
@@ -15,11 +15,11 @@ const meta = {
     mode: {
       control: "inline-radio",
       options: ["datetime", "date", "time"],
-      description: "datetime = calendario + relogio, date = so calendario, time = so relogio"
+      description: "datetime = calendário + relógio, date = só calendário, time = só relógio"
     },
     input: {
       control: "boolean",
-      description: "Renderiza campo de texto + popup no lugar dos paineis inline"
+      description: "Renderiza campo de texto + popup no lugar dos painéis inline"
     },
     value: {
       control: "text",
@@ -27,24 +27,24 @@ const meta = {
     },
     placeholder: {
       control: "text",
-      description: "So no modo input; vazio usa o proprio format em minusculas"
+      description: "Só no modo input; vazio usa o próprio format em minúsculas"
     },
     name: {
       control: "text",
-      description: "So no modo input; nome do campo hidden enviado no formulario com o valor ISO"
+      description: "Só no modo input; nome do campo hidden enviado no formulário com o valor ISO"
     },
     format: {
       control: "text",
       description:
-        "Mascara de exibicao e digitacao com tokens YYYY MM DD HH mm ss (sensivel a maiusculas). Vazio = MM/DD/YYYY HH:mm em en e DD/MM/YYYY HH:mm nos demais"
+        "Máscara de exibição e digitação com tokens YYYY MM DD HH mm ss (sensível a maiúsculas). Vazio = MM/DD/YYYY HH:mm em en e DD/MM/YYYY HH:mm nos demais"
     },
     seconds: {
       control: "boolean",
-      description: "Adiciona a coluna de segundos e o token ss ao format padrao"
+      description: "Adiciona a coluna de segundos e o token ss ao format padrão"
     },
     stepMinutes: {
       control: { type: "number", min: 1, max: 30, step: 1 },
-      description: "Intervalo da coluna de minutos do relogio (1 a 30)"
+      description: "Intervalo da coluna de minutos do relógio (1 a 30)"
     },
     hoursFormat: {
       control: "inline-radio",
@@ -77,16 +77,16 @@ const meta = {
     max: { control: "text", description: "Maximum selectable date (YYYY-MM-DD)" },
     events: {
       control: "text",
-      description: "JSON repassado ao calendario interno: [{ date, label?, color?, intent? }]"
+      description: "JSON repassado ao calendário interno: [{ date, label?, color?, intent? }]"
     },
     eventDisplay: {
       control: "inline-radio",
       options: ["dots", "count", "list"],
-      description: "Como os eventos aparecem no calendario interno"
+      description: "Como os eventos aparecem no calendário interno"
     },
     testid: {
       control: "text",
-      description: "Propaga data-testid: <testid> no campo, <testid>-calendar e <testid>-clock nos paineis"
+      description: "Propaga data-testid: <testid> no campo, <testid>-calendar e <testid>-clock nos painéis"
     }
   },
   args: {
@@ -270,13 +270,13 @@ export const InputMode = {
     const popup = canvasElement.querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
 
     await userEvent.click(toggle);
-    // O popup e um popover manual proprio: top layer, ancorado abaixo do campo por positionAnchored.
+    // O popup é um popover manual próprio: top layer, ancorado abaixo do campo por positionAnchored.
     await expect(popup).toHaveAttribute("popover", "manual");
     expect(popup.matches(":popover-open")).toBe(true);
     await expect(popup).toHaveAttribute("data-ark-side", "bottom");
     const field = canvasElement.querySelector<HTMLElement>("ark-input")!.getBoundingClientRect();
     expect(popup.getBoundingClientRect().top).toBeGreaterThanOrEqual(field.bottom);
-    // Alinhado ao inicio do campo (positionAnchored ainda respeita a margem minima da viewport).
+    // Alinhado ao início do campo (positionAnchored ainda respeita a margem mínima da viewport).
     expect(popup.getBoundingClientRect().left).toBeGreaterThanOrEqual(field.left);
 
     const day = popup.querySelector<HTMLButtonElement>('[data-ark="calendar-day"][data-date$="-15"]')!;
@@ -289,7 +289,7 @@ export const InputMode = {
     const input = canvasElement.querySelector<HTMLInputElement>('[data-ark="input"]')!;
     const [y, m, d] = iso.split("-");
     await expect(input.value).toBe(`${d}/${m}/${y}`);
-    // A saida anima antes de sair do top layer.
+    // A saída anima antes de sair do top layer.
     await waitFor(() => expect(popup.matches(":popover-open")).toBe(false));
     expect(getComputedStyle(popup).display).toBe("none");
   }
@@ -301,7 +301,7 @@ export const InsideOverflowHidden = {
     docs: {
       description: {
         story:
-          "O popup vive no top layer (popover manual): um container com `overflow: hidden` e altura curta nao o corta, e nao ha z-index para disputar. Sem espaco abaixo ele vira para cima (`data-ark-side`)."
+          "O popup vive no top layer (popover manual): um container com `overflow: hidden` e altura curta não o corta, e não há z-index para disputar. Sem espaço abaixo ele vira para cima (`data-ark-side`)."
       }
     }
   },
@@ -320,7 +320,7 @@ export const InsideOverflowHidden = {
     expect(popup.matches(":popover-open")).toBe(true);
     const rect = popup.getBoundingClientRect();
     expect(rect.bottom).toBeGreaterThan(box.getBoundingClientRect().bottom);
-    // Visivel de verdade: o ponto central do popup e dele mesmo, nao do container que o cortaria.
+    // Visível de verdade: o ponto central do popup é dele mesmo, não do container que o cortaria.
     const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
     expect(popup.contains(hit)).toBe(true);
 
@@ -348,7 +348,7 @@ export const EnterSubmitsForm = {
     docs: {
       description: {
         story:
-          'Num formulario, Enter no campo confirma o texto digitado e, com o popup fechado, envia o formulario pelo botao padrao (aqui um `ark-button type="submit"`), como um `<input type="date">`. Texto invalido volta ao ultimo valor e nao envia; com o popup aberto, o Enter so confirma.'
+          'Num formulário, Enter no campo confirma o texto digitado e, com o popup fechado, envia o formulário pelo botão padrão (aqui um `ark-button type="submit"`), como um `<input type="date">`. Texto inválido volta ao último valor e não envia; com o popup aberto, o Enter só confirma.'
       }
     }
   },

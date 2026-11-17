@@ -10,7 +10,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Toaster inspirado no Sonner com API programatica: tipos de toast, posicao configuravel, rich colors, botoes de acao/cancelamento e dismiss global."
+          "Toaster inspirado no Sonner com API programática: tipos de toast, posição configurável, rich colors, botões de ação/cancelamento e dismiss global."
       }
     }
   },
@@ -50,7 +50,7 @@ type StoryArgs = {
   testid?: string;
 };
 
-// Titulos dos cards na ordem da pilha (o mais novo primeiro).
+// Títulos dos cards na ordem da pilha (o mais novo primeiro).
 function titlesOf(root: HTMLElement): string[] {
   return Array.from(root.querySelectorAll('[data-ark="toaster-toast-title"]')).map((title) => title.textContent ?? "");
 }
@@ -98,7 +98,7 @@ function renderToaster(args: StoryArgs): HTMLElement {
   controls.appendChild(
     createButton("Default", () => {
       toast("Projeto salvo", {
-        description: "Alteracoes publicadas no repositorio.",
+        description: "Alterações publicadas no repositório.",
         duration: args.duration
       });
     })
@@ -115,7 +115,7 @@ function renderToaster(args: StoryArgs): HTMLElement {
 
   controls.appendChild(
     createButton("Info", () => {
-      toast.info("Nova versao disponivel", {
+      toast.info("Nova versão disponível", {
         description: "Atualize para acessar os novos componentes.",
         duration: args.duration
       });
@@ -124,7 +124,7 @@ function renderToaster(args: StoryArgs): HTMLElement {
 
   controls.appendChild(
     createButton("Warning", () => {
-      toast.warning("Conexao instavel", {
+      toast.warning("Conexão instável", {
         description: "Reconectando ao servidor...",
         duration: args.duration
       });
@@ -230,7 +230,7 @@ export const FluxoDeDismiss = {
     docs: {
       description: {
         story:
-          "Interaction test: dispara um toast, verifica a exibicao, fecha pelo botao Close e aguarda a animacao de saida remover o card do DOM."
+          "Interaction test: dispara um toast, verifica a exibição, fecha pelo botão Close e aguarda a animação de saída remover o card do DOM."
       }
     }
   },
@@ -248,7 +248,7 @@ export const FluxoDeDismiss = {
 
     await userEvent.click(canvas.getByRole("button", { name: "Close" }));
 
-    // arkExit anima a saida antes de remover o card do DOM
+    // arkExit anima a saída antes de remover o card do DOM
     await waitFor(() => expect(canvas.queryByText("Projeto salvo")).not.toBeInTheDocument());
   }
 };
@@ -258,7 +258,7 @@ export const TopLayer = {
     docs: {
       description: {
         story:
-          'A pilha e um `popover="manual"` proprio: entra no top layer com o primeiro toast e sai quando esvazia, sem z-index. Um toast que chega com um dialogo aberto fica por cima do scrim, porque a pilha reentra no top layer a cada toast novo.'
+          'A pilha é um `popover="manual"` próprio: entra no top layer com o primeiro toast e sai quando esvazia, sem z-index. Um toast que chega com um diálogo aberto fica por cima do scrim, porque a pilha reentra no top layer a cada toast novo.'
       }
     }
   },
@@ -268,20 +268,20 @@ export const TopLayer = {
   render: (args: StoryArgs) => {
     const page = renderToaster(args);
     const dialog = document.createElement("ark-dialog");
-    dialog.setAttribute("label", "Dialogo aberto");
+    dialog.setAttribute("label", "Diálogo aberto");
     dialog.setAttribute("lang", "pt");
     const body = document.createElement("p");
-    body.textContent = "Dispare um toast com este dialogo aberto: ele aparece por cima do scrim.";
+    body.textContent = "Dispare um toast com este diálogo aberto: ele aparece por cima do scrim.";
     dialog.appendChild(body);
     const footer = document.createElement("div");
     footer.setAttribute("slot", "footer");
     footer.appendChild(
       createButton("Toast por cima", () => {
-        toast.success("Por cima do dialogo", { duration: args.duration });
+        toast.success("Por cima do diálogo", { duration: args.duration });
       })
     );
     dialog.appendChild(footer);
-    page.querySelector("div")?.appendChild(createButton("Abrir dialogo", () => dialog.setAttribute("open", "")));
+    page.querySelector("div")?.appendChild(createButton("Abrir diálogo", () => dialog.setAttribute("open", "")));
     page.appendChild(dialog);
     return page;
   },
@@ -297,12 +297,12 @@ export const TopLayer = {
     expect(stack.matches(":popover-open")).toBe(true);
     expect(getComputedStyle(stack).display).toBe("flex");
 
-    // Dialogo aberto depois da pilha: o toast seguinte reentra no top layer e fica por cima do scrim.
-    await userEvent.click(canvas.getByRole("button", { name: "Abrir dialogo" }));
+    // Diálogo aberto depois da pilha: o toast seguinte reentra no top layer e fica por cima do scrim.
+    await userEvent.click(canvas.getByRole("button", { name: "Abrir diálogo" }));
     const dialog = canvasElement.querySelector<HTMLElement>("ark-dialog")!;
     await waitFor(() => expect(dialog.matches(":popover-open")).toBe(true));
     await userEvent.click(canvas.getByRole("button", { name: "Toast por cima" }));
-    const card = (await canvas.findByText("Por cima do dialogo")).closest<HTMLElement>('[data-ark="toaster-toast"]')!;
+    const card = (await canvas.findByText("Por cima do diálogo")).closest<HTMLElement>('[data-ark="toaster-toast"]')!;
     await waitFor(() => expect(card.getAnimations().length).toBe(0));
     const rect = card.getBoundingClientRect();
     const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
@@ -323,7 +323,7 @@ export const TiposAcoesERichColors = {
     docs: {
       description: {
         story:
-          "Interaction test: cada tipo do servico (`toast.success/info/warning/error/loading`) ganha icone e, com `rich-colors`, a paleta do intent; o botao de acao emite `ark-toast-action` e o de cancelamento so fecha; o mais novo fica no topo e o excedente de `max-visible` espera na fila, voltando quando um card sai."
+          "Interaction test: cada tipo do serviço (`toast.success/info/warning/error/loading`) ganha ícone e, com `rich-colors`, a paleta do intent; o botão de ação emite `ark-toast-action` e o de cancelamento só fecha; o mais novo fica no topo e o excedente de `max-visible` espera na fila, voltando quando um card sai."
       }
     }
   },
@@ -347,8 +347,8 @@ export const TiposAcoesERichColors = {
     await canvas.findByText("Falha ao publicar");
     expect(titlesOf(canvasElement)).toEqual([
       "Falha ao publicar",
-      "Conexao instavel",
-      "Nova versao disponivel",
+      "Conexão instável",
+      "Nova versão disponível",
       "Upload concluido"
     ]);
 
@@ -358,28 +358,28 @@ export const TiposAcoesERichColors = {
       expect(card.className).toContain(`ark:bg-${intent}-soft`);
     };
     expectType("Upload concluido", "✓", "success");
-    expectType("Nova versao disponivel", "i", "info");
-    expectType("Conexao instavel", "!", "warning");
+    expectType("Nova versão disponível", "i", "info");
+    expectType("Conexão instável", "!", "warning");
     expectType("Falha ao publicar", "x", "danger");
 
-    // Acao: emite ark-toast-action com o actionId e fecha o toast; a story responde com um toast informativo,
-    // disparado enquanto o card sai (re-render no meio da saida).
+    // Ação: emite ark-toast-action com o actionId e fecha o toast; a story responde com um toast informativo,
+    // disparado enquanto o card sai (re-render no meio da saída).
     await userEvent.click(
       cardOf(canvasElement, "Falha ao publicar").querySelector('[data-ark="toaster-toast-action"]')!
     );
     expect(actions).toEqual([{ id: expect.stringMatching(/^ark-toast-/), actionId: "retry-publish" }]);
     await canvas.findByText("Tentando novamente");
-    // O toast de resposta e o quinto: com max-visible 4 o mais antigo espera na fila e volta quando um card sai.
+    // O toast de resposta é o quinto: com max-visible 4 o mais antigo espera na fila e volta quando um card sai.
     expect(canvas.queryByText("Upload concluido")).not.toBeInTheDocument();
     await waitFor(() => expect(canvas.queryByText("Falha ao publicar")).not.toBeInTheDocument());
     expect(titlesOf(canvasElement)).toEqual([
       "Tentando novamente",
-      "Conexao instavel",
-      "Nova versao disponivel",
+      "Conexão instável",
+      "Nova versão disponível",
       "Upload concluido"
     ]);
 
-    // Cancelamento: so fecha, sem evento.
+    // Cancelamento: só fecha, sem evento.
     await userEvent.click(canvas.getByRole("button", { name: "Error" }));
     await canvas.findByText("Falha ao publicar");
     await userEvent.click(
@@ -388,15 +388,15 @@ export const TiposAcoesERichColors = {
     await waitFor(() => expect(canvas.queryByText("Falha ao publicar")).not.toBeInTheDocument());
     expect(actions).toHaveLength(1);
 
-    // Loading entra no topo e nao expira sozinho (direto pelo servico: o botao da demo agenda um timer de 1,8 s
+    // Loading entra no topo e não expira sozinho (direto pelo serviço: o botão da demo agenda um timer de 1,8 s
     // que vazaria para a story seguinte).
     toast.loading("Processando pagamento", { description: "Validando dados de cobranca." });
     await canvas.findByText("Processando pagamento");
     expect(titlesOf(canvasElement)).toEqual([
       "Processando pagamento",
       "Tentando novamente",
-      "Conexao instavel",
-      "Nova versao disponivel"
+      "Conexão instável",
+      "Nova versão disponível"
     ]);
     expectType("Processando pagamento", "...", "info");
 
@@ -410,7 +410,7 @@ export const Posicoes = {
     docs: {
       description: {
         story:
-          "Interaction test: as seis posicoes ancoram a pilha nos cantos e no centro; a entrada desce nas de cima e sobe nas de baixo, a saida vai para o lado da borda (fade no centro). Valor invalido cai em bottom-right."
+          "Interaction test: as seis posições ancoram a pilha nos cantos e no centro; a entrada desce nas de cima e sobe nas de baixo, a saída vai para o lado da borda (fade no centro). Valor inválido cai em bottom-right."
       }
     }
   },
@@ -437,14 +437,14 @@ export const Posicoes = {
       toaster.setAttribute("position", position);
       expect(stack.className).toContain(classes);
 
-      const id = toast(`Posicao ${position}`);
-      const card = cardOf(canvasElement, `Posicao ${position}`);
+      const id = toast(`Posição ${position}`);
+      const card = cardOf(canvasElement, `Posição ${position}`);
       expect(card.getAnimations().length, `entrada em ${position}`).toBeGreaterThan(0);
       await waitFor(() => expect(card.getAnimations()).toHaveLength(0));
 
       toast.dismiss(id);
-      expect(card.getAnimations().length, `saida em ${position}`).toBeGreaterThan(0);
-      await waitFor(() => expect(canvas.queryByText(`Posicao ${position}`)).not.toBeInTheDocument());
+      expect(card.getAnimations().length, `saída em ${position}`).toBeGreaterThan(0);
+      await waitFor(() => expect(canvas.queryByText(`Posição ${position}`)).not.toBeInTheDocument());
     }
   }
 };
@@ -454,7 +454,7 @@ export const AutoDismissEFila = {
     docs: {
       description: {
         story:
-          "Interaction test: `duration` do host vale para toasts sem duracao propria e o timer para enquanto o toast espera na fila de `max-visible` e quando o host sai do DOM; o mesmo `id` substitui o toast; valores invalidos dos atributos caem nos padroes e um evento sem titulo e ignorado."
+          "Interaction test: `duration` do host vale para toasts sem duração própria e o timer para enquanto o toast espera na fila de `max-visible` e quando o host sai do DOM; o mesmo `id` substitui o toast; valores inválidos dos atributos caem nos padrões e um evento sem título é ignorado."
       }
     }
   },
@@ -467,7 +467,7 @@ export const AutoDismissEFila = {
     const toaster = canvasElement.querySelector<ArkToaster>("ark-toaster")!;
     const cards = (): number => canvasElement.querySelectorAll('[data-ark="toaster-toast"]').length;
 
-    // Tres toasts sem duracao propria com max-visible 2: o primeiro espera na fila com o relogio parado e so
+    // Três toasts sem duração própria com max-visible 2: o primeiro espera na fila com o relógio parado e só
     // aparece (e conta os seus 300 ms) quando os outros expiram.
     toast("Primeiro");
     toast("Segundo");
@@ -476,8 +476,8 @@ export const AutoDismissEFila = {
     await waitFor(() => expect(titlesOf(canvasElement)).toEqual(["Primeiro"]), { timeout: 3000, interval: 20 });
     await waitFor(() => expect(cards()).toBe(0), { timeout: 3000 });
 
-    // Mesmo id substitui o toast por um card novo; dispensar duas vezes durante a saida nao quebra e um toast novo
-    // nesse meio tempo entra por cima sem tocar no card que sai (a animacao de saida segue nele).
+    // Mesmo id substitui o toast por um card novo; dispensar duas vezes durante a saída não quebra e um toast novo
+    // nesse meio tempo entra por cima sem tocar no card que sai (a animação de saída segue nele).
     toast("Um", { id: "fixo", duration: 0 });
     const um = cardOf(canvasElement, "Um");
     toast("Dois", { id: "fixo", duration: 0 });
@@ -486,23 +486,23 @@ export const AutoDismissEFila = {
     expect(dois).not.toBe(um);
     toast.dismiss("fixo");
     toast.dismiss("fixo");
-    toast("Durante a saida", { duration: 0 });
+    toast("Durante a saída", { duration: 0 });
     expect(cardOf(canvasElement, "Dois")).toBe(dois);
     expect(dois.getAnimations().length).toBeGreaterThan(0);
-    expect(titlesOf(canvasElement)).toEqual(["Durante a saida", "Dois"]);
-    await waitFor(() => expect(titlesOf(canvasElement)).toEqual(["Durante a saida"]));
+    expect(titlesOf(canvasElement)).toEqual(["Durante a saída", "Dois"]);
+    await waitFor(() => expect(titlesOf(canvasElement)).toEqual(["Durante a saída"]));
 
-    // Atributos invalidos: max-visible volta a 4 e duration a 4000 ms; evento sem titulo e ignorado.
+    // Atributos inválidos: max-visible volta a 4 e duration a 4000 ms; evento sem título é ignorado.
     toaster.setAttribute("max-visible", "abc");
     toaster.setAttribute("duration", "abc");
     for (let i = 1; i <= 5; i++) toast(`Fila ${i}`, { duration: 0 });
     expect(titlesOf(canvasElement)).toEqual(["Fila 5", "Fila 4", "Fila 3", "Fila 2"]);
-    window.dispatchEvent(new CustomEvent("ark-toast", { detail: { description: "sem titulo" } }));
+    window.dispatchEvent(new CustomEvent("ark-toast", { detail: { description: "sem título" } }));
     expect(cards()).toBe(4);
     toast("Base");
     expect(titlesOf(canvasElement)[0]).toBe("Base");
 
-    // Fora do DOM os timers pendentes sao cancelados; de volta, a pilha e re-renderizada.
+    // Fora do DOM os timers pendentes são cancelados; de volta, a pilha é re-renderizada.
     toaster.remove();
     canvasElement.appendChild(toaster);
     expect(titlesOf(canvasElement)[0]).toBe("Base");
@@ -516,7 +516,7 @@ export const FocoNoTeclado = {
     docs: {
       description: {
         story:
-          "Interaction test: um toast novo entra por cima sem recriar os cards existentes, entao o botao que o usuario de teclado esta lendo continua focado (e a pilha nao reentra no top layer nesse caso). Trocar um atributo do host recria os cards, sem reanimar a entrada."
+          "Interaction test: um toast novo entra por cima sem recriar os cards existentes, então o botão que o usuário de teclado está lendo continua focado (e a pilha não reentra no top layer nesse caso). Trocar um atributo do host recria os cards, sem reanimar a entrada."
       }
     }
   },
@@ -540,7 +540,7 @@ export const FocoNoTeclado = {
     expect(titlesOf(canvasElement)).toEqual(["Outro", "Lendo", "Verde"]);
     expect(cardOf(canvasElement, "Verde").className).not.toContain("ark:bg-success-soft");
 
-    // Atributo do host: cards recriados com a nova aparencia, sem animacao de entrada.
+    // Atributo do host: cards recriados com a nova aparência, sem animação de entrada.
     toaster.setAttribute("rich-colors", "");
     const verde = cardOf(canvasElement, "Verde");
     expect(verde.className).toContain("ark:bg-success-soft");
@@ -564,7 +564,7 @@ export const TestHooks = {
     await expect(stack).toHaveAttribute("data-testid", "avisos");
 
     const id = toast.error("Hooks", {
-      description: "Descricao",
+      description: "Descrição",
       actionLabel: "Tentar",
       cancelLabel: "Cancelar"
     });

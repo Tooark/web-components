@@ -7,7 +7,7 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkMarkProps = ArkDomProps<
   ArkMarkStyleOptions & {
-    /** Com rotulo a marca vira role="img" nomeado; sem ele e decorativa (aria-hidden). */
+    /** Com rótulo a marca vira role="img" nomeado; sem ele é decorativa (aria-hidden). */
     label?: string;
     className?: string;
   }

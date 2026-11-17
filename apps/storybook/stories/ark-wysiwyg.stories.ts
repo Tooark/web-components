@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Editor e viewer WYSIWYG (Custom Elements) baseados em Tiptap. O conteudo trafega como JSON (nao HTML cru) pela propriedade `content` e e sanitizado ao entrar: nos e marcas fora do schema caem, `href`/`src` so em http(s), mailto, tel ou caminho relativo, cores so em formato de cor. A toolbar e montada por grupos opt-in (`toolbar="style,marks,color,align,lists,link,media,blocks,clear,history"` ou `all`); `media` so aparece com a propriedade `uploadFile`, que recebe o arquivo e devolve a URL externa (nunca base64). O editor dispara `ark-wysiwyg-change` com o JSON e `ark-wysiwyg-upload-error` quando um arquivo e recusado; o viewer renderiza o mesmo JSON em modo somente-leitura.'
+          'Editor e viewer WYSIWYG (Custom Elements) baseados em Tiptap. O conteúdo trafega como JSON (não HTML cru) pela propriedade `content` e é sanitizado ao entrar: nós e marcas fora do schema caem, `href`/`src` só em http(s), mailto, tel ou caminho relativo, cores só em formato de cor. A toolbar é montada por grupos opt-in (`toolbar="style,marks,color,align,lists,link,media,blocks,clear,history"` ou `all`); `media` só aparece com a propriedade `uploadFile`, que recebe o arquivo e devolve a URL externa (nunca base64). O editor dispara `ark-wysiwyg-change` com o JSON e `ark-wysiwyg-upload-error` quando um arquivo é recusado; o viewer renderiza o mesmo JSON em modo somente-leitura.'
       }
     }
   },
@@ -24,7 +24,7 @@ const meta = {
     toolbar: {
       control: "text",
       description:
-        "Grupos e/ou itens separados por virgula, `all`, ou `none`. Padrao: style,marks,lists,link,blocks,clear,history"
+        "Grupos e/ou itens separados por vírgula, `all`, ou `none`. Padrão: style,marks,lists,link,blocks,clear,history"
     },
     placeholder: { control: "text" }
   },
@@ -55,7 +55,7 @@ const SAMPLE_CONTENT: ArkWysiwygContent = {
         { type: "text", text: "Edite este texto: " },
         { type: "text", marks: [{ type: "bold" }], text: "negrito" },
         { type: "text", text: ", " },
-        { type: "text", marks: [{ type: "italic" }], text: "italico" },
+        { type: "text", marks: [{ type: "italic" }], text: "itálico" },
         { type: "text", text: ", " },
         { type: "text", marks: [{ type: "underline" }], text: "sublinhado" },
         { type: "text", text: " e um " },
@@ -66,14 +66,14 @@ const SAMPLE_CONTENT: ArkWysiwygContent = {
     {
       type: "bulletList",
       content: [
-        { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Conteudo em JSON" }] }] },
+        { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Conteúdo em JSON" }] }] },
         { type: "listItem", content: [{ type: "paragraph", content: [{ type: "text", text: "Seguro contra XSS" }] }] }
       ]
     }
   ]
 };
 
-// Uploader de exemplo: devolve uma URL estatica do Storybook, como um app devolveria a URL do seu storage.
+// Uploader de exemplo: devolve uma URL estática do Storybook, como um app devolveria a URL do seu storage.
 const fakeUploader = async (file: File): Promise<ArkWysiwygUploadResult> => {
   await new Promise((resolve) => setTimeout(resolve, 50));
   return file.type.startsWith("image/")
@@ -128,7 +128,7 @@ export const AllGroups = {
     docs: {
       description: {
         story:
-          '`toolbar="all"` com o gancho `uploadFile` configurado: estilo (select), marcas, cor e marca-texto (paletas em popover), alinhamento, listas com recuo, link (popover com URL), imagem e video (upload pelo app), blocos, limpar formatacao e historico.'
+          '`toolbar="all"` com o gancho `uploadFile` configurado: estilo (select), marcas, cor e marca-texto (paletas em popover), alinhamento, listas com recuo, link (popover com URL), imagem e vídeo (upload pelo app), blocos, limpar formatação e histórico.'
       }
     }
   },
@@ -145,7 +145,7 @@ export const ToolbarGroups = {
     docs: {
       description: {
         story:
-          "Cada grupo liga ou desliga um conjunto de botoes; itens soltos tambem valem (`bold,italic,undo`). `media` so entra quando `uploadFile` existe, mesmo com `all`."
+          "Cada grupo liga ou desliga um conjunto de botões; itens soltos também valem (`bold,italic,undo`). `media` só entra quando `uploadFile` existe, mesmo com `all`."
       }
     }
   },
@@ -155,7 +155,7 @@ export const ToolbarGroups = {
     expect(buttonsOf(editor)).toEqual(["Negrito", "Itálico", "Sublinhado", "Tachado", "Código", "Desfazer", "Refazer"]);
     expect(editor.querySelectorAll('[role="separator"]').length).toBe(1);
 
-    // Itens soltos, na ordem pedida; `all` sem uploader nao mostra imagem/video.
+    // Itens soltos, na ordem pedida; `all` sem uploader não mostra imagem/vídeo.
     editor.setAttribute("toolbar", "undo,bold");
     expect(buttonsOf(editor)).toEqual(["Desfazer", "Negrito"]);
     editor.setAttribute("toolbar", "all");
@@ -174,7 +174,7 @@ export const ToolbarGroups = {
     editor.setAttribute("toolbar", "none");
     expect(editor.querySelector('[role="toolbar"]')).toBeNull();
 
-    // Rotulos em ingles por padrao e por JSON.
+    // Rótulos em inglês por padrão e por JSON.
     editor.removeAttribute("toolbar");
     editor.setAttribute("lang", "en");
     expect(buttonsOf(editor)[1]).toBe("Bold");
@@ -186,7 +186,7 @@ export const ToolbarGroups = {
 export const Formatting = {
   args: { toolbar: "all" },
   render: (args: StoryArgs): HTMLElement => makeEditor(args, null),
-  // Estilo pelo select, sublinhado e tachado, cores pela paleta, alinhamento, listas com recuo e limpar formatacao.
+  // Estilo pelo select, sublinhado e tachado, cores pela paleta, alinhamento, listas com recuo e limpar formatação.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const editor = canvasElement.querySelector("ark-wysiwyg-editor") as ArkWysiwygEditor;
@@ -195,7 +195,7 @@ export const Formatting = {
 
     const content = editor.querySelector<HTMLElement>(".ProseMirror")!;
     await userEvent.click(content);
-    await userEvent.keyboard("Titulo");
+    await userEvent.keyboard("Título");
     const select = canvas.getByRole("combobox", { name: "Estilo do texto" }) as HTMLSelectElement;
     expect(select.value).toBe("paragraph");
     await userEvent.selectOptions(select, "2");
@@ -203,7 +203,7 @@ export const Formatting = {
     expect(select.value).toBe("2");
     expect(editor.content?.content?.[0]).toMatchObject({ type: "heading", attrs: { level: 2 } });
 
-    // Marcas: sublinhado e tachado sao independentes.
+    // Marcas: sublinhado e tachado são independentes.
     selectAll(editor);
     await userEvent.click(canvas.getByRole("button", { name: "Sublinhado" }));
     await userEvent.click(canvas.getByRole("button", { name: "Tachado" }));
@@ -211,7 +211,7 @@ export const Formatting = {
     expect(content.querySelector("u")).not.toBeNull();
     expect(content.querySelector("s")).not.toBeNull();
 
-    // Cor do texto pela paleta: o botao mostra a cor na barra; "Sem cor" limpa.
+    // Cor do texto pela paleta: o botão mostra a cor na barra; "Sem cor" limpa.
     await userEvent.click(canvas.getByRole("button", { name: "Cor do texto" }));
     const palette = await waitFor(() => canvas.getByRole("group", { name: "Cor do texto" }));
     await userEvent.click(within(palette).getByRole("button", { name: "#3b82f6" }));
@@ -234,17 +234,17 @@ export const Formatting = {
     expect(editor.editor?.isActive({ textAlign: "center" })).toBe(true);
     expect(canvas.getByRole("button", { name: "Centralizar" })).toHaveAttribute("aria-pressed", "true");
 
-    // Listas: recuo so entra depois do segundo item; sair de lista desabilita de novo.
+    // Listas: recuo só entra depois do segundo item; sair de lista desabilita de novo.
     editor.editor?.chain().focus("end").setParagraph().insertContent("\nUm").run();
-    // Com o mouse pressionado (antes do click) o foco continua no editor: o botao cancela o mousedown, entao o
-    // Enter a seguir chega ao editor, nao ao botao (o focus() do Tiptap so voltaria no frame seguinte).
+    // Com o mouse pressionado (antes do click) o foco continua no editor: o botão cancela o mousedown, então o
+    // Enter a seguir chega ao editor, não ao botão (o focus() do Tiptap só voltaria no frame seguinte).
     const bulletList = canvas.getByRole("button", { name: "Lista com marcadores" });
     const mouse = userEvent.setup();
     await mouse.pointer({ keys: "[MouseLeft>]", target: bulletList });
     expect(content).toHaveFocus();
     await mouse.pointer({ keys: "[/MouseLeft]", target: bulletList });
     await waitFor(() => expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeDisabled());
-    // O ProseMirror le a digitacao pelo MutationObserver do DOM, entao o estado da barra chega um tick depois.
+    // O ProseMirror lê a digitação pelo MutationObserver do DOM, então o estado da barra chega um tick depois.
     await userEvent.keyboard("{Enter}Dois");
     await waitFor(() => expect(canvas.getByRole("button", { name: "Aumentar recuo" })).toBeEnabled());
     await userEvent.click(canvas.getByRole("button", { name: "Aumentar recuo" }));
@@ -252,7 +252,7 @@ export const Formatting = {
     await userEvent.click(canvas.getByRole("button", { name: "Diminuir recuo" }));
     expect(content.querySelectorAll("ul ul").length).toBe(0);
 
-    // Limpar formatacao tira marcas e volta os blocos a paragrafo.
+    // Limpar formatação tira marcas e volta os blocos a parágrafo.
     selectAll(editor);
     await userEvent.click(canvas.getByRole("button", { name: "Limpar formatação" }));
     expect(content.querySelector("h2, u, s, mark, ul")).toBeNull();
@@ -266,7 +266,7 @@ export const Links = {
     docs: {
       description: {
         story:
-          "O popover de link aplica a URL a selecao (ou insere a URL como texto linkado); um host sem esquema ganha `https://`; `javascript:`/`data:` sao recusados com mensagem. Links renderizam com `target=_blank` e `rel=noopener noreferrer nofollow`."
+          "O popover de link aplica a URL à seleção (ou insere a URL como texto linkado); um host sem esquema ganha `https://`; `javascript:`/`data:` são recusados com mensagem. Links renderizam com `target=_blank` e `rel=noopener noreferrer nofollow`."
       }
     }
   },
@@ -306,7 +306,7 @@ export const Links = {
     await userEvent.click(canvas.getByRole("button", { name: "Remover" }));
     await waitFor(() => expect(content.querySelector("a")).toBeNull());
 
-    // Sem selecao, a URL e inserida como texto linkado.
+    // Sem seleção, a URL é inserida como texto linkado.
     editor.editor?.chain().focus("end").run();
     await userEvent.click(canvas.getByRole("button", { name: "Link" }));
     await userEvent.type(canvas.getByRole("textbox", { name: "URL" }), "https://example.org/docs{Enter}");
@@ -320,7 +320,7 @@ export const Media = {
     docs: {
       description: {
         story:
-          "Imagem e video entram pelo gancho `uploadFile(file, kind)`: o app envia o arquivo para onde quiser e devolve `{ src }`; o JSON guarda so a URL. Sem gancho o botao nao existe e arquivos colados/arrastados sao recusados (`ark-wysiwyg-upload-error`). URLs `data:`/`blob:` devolvidas pelo gancho tambem sao recusadas."
+          "Imagem e vídeo entram pelo gancho `uploadFile(file, kind)`: o app envia o arquivo para onde quiser e devolve `{ src }`; o JSON guarda só a URL. Sem gancho o botão não existe e arquivos colados/arrastados são recusados (`ark-wysiwyg-upload-error`). URLs `data:`/`blob:` devolvidas pelo gancho também são recusadas."
       }
     }
   },
@@ -348,20 +348,20 @@ export const Media = {
     await waitFor(() => expect(content.querySelector("video")).toHaveAttribute("src", "/sample-video.mp4"));
     expect(content.querySelector("video")).toHaveAttribute("controls");
 
-    // Tipo fora de imagem/video e tamanho acima do limite sao recusados com motivo.
+    // Tipo fora de imagem/vídeo e tamanho acima do limite são recusados com motivo.
     await expect(editor.insertFile(new File(["x"], "nota.txt", { type: "text/plain" }))).resolves.toBe(false);
     editor.setAttribute("max-file-size", "2");
     await expect(editor.insertFile(png)).resolves.toBe(false);
     expect(errors.map((error) => error.reason)).toEqual(["unsupported-type", "too-large"]);
 
-    // Gancho que devolve base64: o no nao entra.
+    // Gancho que devolve base64: o nó não entra.
     editor.removeAttribute("max-file-size");
     editor.uploadFile = async () => ({ src: "data:image/png;base64,AAAA" });
     await expect(editor.insertFile(png)).resolves.toBe(false);
     expect(errors.at(-1)?.reason).toBe("invalid-src");
     expect(content.querySelectorAll("img").length).toBe(1);
 
-    // Sem gancho: botoes somem e o arquivo e recusado.
+    // Sem gancho: botões somem e o arquivo é recusado.
     editor.uploadFile = null;
     expect(canvas.queryByRole("button", { name: "Imagem" })).toBeNull();
     await expect(editor.insertFile(png)).resolves.toBe(false);
@@ -427,7 +427,7 @@ export const SanitizedContent = {
     docs: {
       description: {
         story:
-          "O JSON que entra pela propriedade `content` (editor e viewer) e sanitizado: link `javascript:` cai, imagem `data:` cai, cor com `;` cai, alinhamento invalido cai e no desconhecido cai sem derrubar o resto."
+          "O JSON que entra pela propriedade `content` (editor e viewer) é sanitizado: link `javascript:` cai, imagem `data:` cai, cor com `;` cai, alinhamento inválido cai e nó desconhecido cai sem derrubar o resto."
       }
     }
   },
@@ -488,7 +488,7 @@ export const SanitizedContent = {
 export const ToolbarKeyboard = {
   args: { toolbar: "marks,history" },
   render: (args: StoryArgs): HTMLElement => makeEditor(args),
-  // Um tab stop na toolbar: setas circulam entre os botoes habilitados, Home/End vao as pontas.
+  // Um tab stop na toolbar: setas circulam entre os botões habilitados, Home/End vão às pontas.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const bold = canvas.getByRole("button", { name: "Negrito" });
@@ -501,7 +501,7 @@ export const ToolbarKeyboard = {
     await userEvent.keyboard("{ArrowRight}");
     expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Itálico" }));
     await userEvent.keyboard("{End}");
-    // Desfazer e refazer estao desabilitados sem historico: End para no ultimo habilitado.
+    // Desfazer e refazer estão desabilitados sem histórico: End para no último habilitado.
     expect(document.activeElement).toBe(code);
     await userEvent.keyboard("{ArrowRight}");
     expect(document.activeElement).toBe(bold);
@@ -523,7 +523,7 @@ export const FollowsPageTheme = {
     docs: {
       description: {
         story:
-          'Em `theme="auto"` editor e viewer resolvem o color-scheme da pagina e acompanham a troca em tempo de execucao (`observeColorScheme` de @tooark/tokens). `resolvedTheme` expoe o lado aplicado; o wrapper leva `data-ark-theme`.'
+          'Em `theme="auto"` editor e viewer resolvem o color-scheme da página e acompanham a troca em tempo de execução (`observeColorScheme` de @tooark/tokens). `resolvedTheme` expõe o lado aplicado; o wrapper leva `data-ark-theme`.'
       }
     }
   },
@@ -563,7 +563,7 @@ export const EditorAndViewer = {
     wrap.style.maxWidth = "720px";
 
     const editorLabel = document.createElement("strong");
-    editorLabel.textContent = "Editor (usuario cria/formata)";
+    editorLabel.textContent = "Editor (usuário cria/formata)";
     const viewerLabel = document.createElement("strong");
     viewerLabel.textContent = "Viewer (renderiza o que foi criado)";
 

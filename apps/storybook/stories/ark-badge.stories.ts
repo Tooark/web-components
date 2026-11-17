@@ -11,7 +11,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Rotulo curto de status ou categoria. O proprio host e o badge: icone e texto entram como filhos e ficam onde estao. `intent` (padrao neutral), `variant` soft/solid/outline, `size` xs/sm/md, `rounded` (padrao full) e `color` para cores do app (metodos HTTP, tags) com fundo suave por color-mix. Nao e interativo: um badge clicavel e um ark-button pequeno."
+          "Rótulo curto de status ou categoria. O próprio host é o badge: ícone e texto entram como filhos e ficam onde estão. `intent` (padrão neutral), `variant` soft/solid/outline, `size` xs/sm/md, `rounded` (padrão full) e `color` para cores do app (métodos HTTP, tags) com fundo suave por color-mix. Não é interativo: um badge clicável é um ark-button pequeno."
       }
     }
   },
@@ -20,7 +20,7 @@ const meta = {
     variant: { control: "inline-radio", options: VARIANTS },
     size: { control: "inline-radio", options: SIZES },
     rounded: { control: "select", options: ["none", "xs", "sm", "md", "lg", "xl", "full"] },
-    color: { control: "color", description: "Cor propria; vence o intent" },
+    color: { control: "color", description: "Cor própria; vence o intent" },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     label: { control: "text" }
   },
@@ -117,7 +117,7 @@ export const Rounded = {
   }
 };
 
-// Cores do app, nao da lib: metodos HTTP de um cliente de API.
+// Cores do app, não da lib: métodos HTTP de um cliente de API.
 const HTTP_METHODS: Array<[string, string]> = [
   ["GET", "#2563eb"],
   ["POST", "#16a34a"],
@@ -145,7 +145,7 @@ export const WithIcon = {
     const row = createRow();
     for (const intent of ["success", "warning", "danger"]) {
       const badge = createBadge("", { intent });
-      // Icone do usuario: qualquer SVG, sem biblioteca embutida.
+      // Ícone do usuário: qualquer SVG, sem biblioteca embutida.
       badge.innerHTML =
         '<svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true"><circle cx="4" cy="4" r="4" fill="currentColor"></circle></svg>';
       badge.appendChild(
@@ -176,7 +176,7 @@ export const DarkTheme = {
 
 export const HostIsTheBadge = {
   render: () => createBadge("Ativo", { intent: "success" }),
-  // O host carrega as classes; um framework que reescreve `class` nao as apaga, e mudar o atributo troca a paleta.
+  // O host carrega as classes; um framework que reescreve `class` não as apaga, e mudar o atributo troca a paleta.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const badge = canvasElement.querySelector<HTMLElement>("ark-badge")!;
 
@@ -201,7 +201,7 @@ export const HostIsTheBadge = {
 
 export const CustomColorUsesVariables = {
   render: () => createBadge("GET", { color: "#2563eb" }),
-  // Com `color` as classes apontam para variaveis inline e o intent sai de cena; sem `color` tudo volta.
+  // Com `color` as classes apontam para variáveis inline e o intent sai de cena; sem `color` tudo volta.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const badge = canvasElement.querySelector<HTMLElement>("ark-badge")!;
 

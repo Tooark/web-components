@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Campo de texto padronizado da familia Ark. Serve como componente publico e como base visual de orquestradores (ark-datepicker), que colocam seus botoes na area de sufixo (`slot="suffix"`) e acessam o campo nativo via `inputElement`/`focus()`. O `label` vira um `<label for>` real e a mensagem de erro tem precedencia sobre o helper, refletida em `aria-invalid`/`aria-describedby`.'
+          'Campo de texto padronizado da família Ark. Serve como componente público e como base visual de orquestradores (ark-datepicker), que colocam seus botões na área de sufixo (`slot="suffix"`) e acessam o campo nativo via `inputElement`/`focus()`. O `label` vira um `<label for>` real e a mensagem de erro tem precedência sobre o helper, refletida em `aria-invalid`/`aria-describedby`.'
       }
     }
   },
@@ -17,20 +17,20 @@ const meta = {
       options: ["text", "password", "email", "number", "tel", "url", "search"],
       description: "Tipo do input nativo; valores fora da lista caem para text"
     },
-    label: { control: "text", description: "Rotulo acessivel; vazio esconde o label" },
+    label: { control: "text", description: "Rótulo acessível; vazio esconde o label" },
     placeholder: { control: "text" },
-    value: { control: "text", description: "Valor inicial do campo (tambem disponivel como propriedade JS)" },
-    name: { control: "text", description: "Nome do campo para envio em formulario" },
+    value: { control: "text", description: "Valor inicial do campo (também disponível como propriedade JS)" },
+    name: { control: "text", description: "Nome do campo para envio em formulário" },
     helper: { control: "text", description: "Texto de ajuda abaixo do campo" },
     errorMessage: { control: "text", description: "Mensagem de erro; substitui o helper e liga o estado de erro" },
     error: { control: "boolean", description: "Estado de erro sem mensagem (borda + aria-invalid)" },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     readonly: { control: "boolean", description: "Campo somente leitura" },
-    reveal: { control: "boolean", description: "Com type=password, botao de mostrar/ocultar na ponta direita" },
-    lang: { control: "select", options: ["en", "pt", "es"], description: "Idioma dos rotulos internos (reveal)" },
-    prefix: { control: "text", description: 'Conteudo do slot="prefix" (ex.: R$); vazio nao renderiza prefixo' },
-    suffix: { control: "text", description: 'Conteudo do slot="suffix" (ex.: um icone); vazio nao renderiza sufixo' },
+    reveal: { control: "boolean", description: "Com type=password, botão de mostrar/ocultar na ponta direita" },
+    lang: { control: "select", options: ["en", "pt", "es"], description: "Idioma dos rótulos internos (reveal)" },
+    prefix: { control: "text", description: 'Conteúdo do slot="prefix" (ex.: R$); vazio não renderiza prefixo' },
+    suffix: { control: "text", description: 'Conteúdo do slot="suffix" (ex.: um ícone); vazio não renderiza sufixo' },
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
     intent: {
       control: "select",
@@ -237,7 +237,7 @@ export const WithPrefix = {
     const prefix = host.querySelector<HTMLElement>('[slot="prefix"]')!;
     const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
 
-    // O prefixo do usuario continua filho direto do host, posicionado por CSS sobre a ponta esquerda.
+    // O prefixo do usuário continua filho direto do host, posicionado por CSS sobre a ponta esquerda.
     await expect(prefix.parentElement).toBe(host);
     await expect(prefix).toHaveAttribute("data-ark", "input-prefix");
 
@@ -256,7 +256,7 @@ export const WithPrefix = {
 export const RevealPassword = {
   args: { type: "password", label: "Senha", value: "segredo", reveal: true, lang: "pt" },
   render: Playground.render,
-  // O botao alterna o type do input, reflete aria-pressed e fala o idioma do host.
+  // O botão alterna o type do input, reflete aria-pressed e fala o idioma do host.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-input")!;
     const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
@@ -278,7 +278,7 @@ export const RevealPassword = {
     await userEvent.click(button);
     await expect(input.type).toBe("password");
 
-    // Sem `reveal` o botao some e o campo volta a ser uma senha comum.
+    // Sem `reveal` o botão some e o campo volta a ser uma senha comum.
     host.removeAttribute("reveal");
     await expect(host.querySelector('[data-ark="input-reveal"]')).toBeNull();
     await expect(input.type).toBe("password");
@@ -288,7 +288,7 @@ export const RevealPassword = {
 export const RevealWithSuffix = {
   args: { type: "password", label: "Senha", reveal: true, suffix: "🔒" },
   render: Playground.render,
-  // Sufixo do usuario e botao de revelar convivem: o sufixo abre espaco e nao sobrepoe o botao.
+  // Sufixo do usuário e botão de revelar convivem: o sufixo abre espaço e não sobrepõe o botão.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-input")!;
     const suffix = host.querySelector<HTMLElement>('[slot="suffix"]')!;
@@ -310,7 +310,7 @@ export const PassThroughAttributes = {
     el.setAttribute("aria-label", "CEP");
     return el;
   },
-  // Atributos nativos do host chegam ao <input> sem interpretacao e somem quando removidos.
+  // Atributos nativos do host chegam ao <input> sem interpretação e somem quando removidos.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-input")!;
     const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;

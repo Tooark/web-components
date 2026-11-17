@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Cartao: o host `ark-card` e a caixa (fundo surface, borda, cantos) e uma grid. Os filhos do usuario ficam onde estao: `slot="header"` e `slot="actions"` na linha de cima, `slot="footer"` na ultima linha com divisor, e os demais sao o corpo. `heading` cria um h2 proprio; com ele o `slot="header"` vira a linha seguinte do cabecalho. `padding` escala padding e gap juntos.'
+          'Cartão: o host `ark-card` é a caixa (fundo surface, borda, cantos) e uma grid. Os filhos do usuário ficam onde estão: `slot="header"` e `slot="actions"` na linha de cima, `slot="footer"` na última linha com divisor, e os demais são o corpo. `heading` cria um h2 próprio; com ele o `slot="header"` vira a linha seguinte do cabeçalho. `padding` escala padding e gap juntos.'
       }
     }
   },
@@ -53,7 +53,7 @@ type CardOptions = Partial<StoryArgs> & {
 };
 
 const BODY_HTML =
-  "<p>Variaveis, certificados e cabecalhos padrao aplicados a toda requisicao deste ambiente.</p><p>Ultima alteracao ha 2 dias por Ana Lima.</p>";
+  "<p>Variáveis, certificados e cabeçalhos padrão aplicados a toda requisição deste ambiente.</p><p>Última alteração há 2 dias por Ana Lima.</p>";
 
 function html(markup: string): HTMLElement[] {
   const template = document.createElement("template");
@@ -115,7 +115,7 @@ export const Playground = {
 };
 
 export const BodyOnly = {
-  render: () => createCard({ body: "<p>Um cartao e so uma caixa: qualquer filho sem slot e o corpo.</p>" })
+  render: () => createCard({ body: "<p>Um cartão é só uma caixa: qualquer filho sem slot é o corpo.</p>" })
 };
 
 export const SlotHeader = {
@@ -130,9 +130,9 @@ export const SlotHeader = {
 export const HeadingAndHeader = {
   render: () =>
     createCard({
-      heading: "Integracoes",
+      heading: "Integrações",
       header:
-        '<span class="text-sm" style="color: var(--ark-color-fg-muted)">Com heading, o slot="header" vira a linha seguinte do cabecalho: descricao, filtros, abas.</span>',
+        '<span class="text-sm" style="color: var(--ark-color-fg-muted)">Com heading, o slot="header" vira a linha seguinte do cabeçalho: descrição, filtros, abas.</span>',
       withActions: true,
       withFooter: true
     })
@@ -149,7 +149,7 @@ export const Paddings = {
           padding,
           withActions: true,
           withFooter: true,
-          body: "<p>O padding do host e o gap entre as linhas sao o mesmo valor.</p>",
+          body: "<p>O padding do host e o gap entre as linhas são o mesmo valor.</p>",
           width: "18rem"
         })
       );
@@ -176,7 +176,7 @@ export const Grid = {
     const wrap = document.createElement("div");
     wrap.className = "grid grid-cols-3 gap-4";
     for (const [name, count] of [
-      ["Requisicoes", "1.284"],
+      ["Requisições", "1.284"],
       ["Falhas", "12"],
       ["Latencia p95", "412 ms"]
     ]) {
@@ -193,8 +193,8 @@ export const Grid = {
   }
 };
 
-// A grid coloca cada parte no lugar independentemente da ordem do DOM: h2 no inicio do host, acoes na mesma
-// linha, corpo na largura toda, rodape por ultimo com divisor; padding e gap seguem o atributo.
+// A grid coloca cada parte no lugar independentemente da ordem do DOM: h2 no início do host, ações na mesma
+// linha, corpo na largura toda, rodapé por último com divisor; padding e gap seguem o atributo.
 export const Layout = {
   render: () => createCard({ heading: "Layout", withActions: true, withFooter: true }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -214,15 +214,15 @@ export const Layout = {
     const footerBox = footer.getBoundingClientRect();
     const bodyBox = body[0].getBoundingClientRect();
 
-    // Titulo e acoes na mesma linha (centros alinhados), acoes encostadas a direita.
+    // Título e ações na mesma linha (centros alinhados), ações encostadas a direita.
     await expect(
       Math.abs(headingBox.top + headingBox.height / 2 - (actionsBox.top + actionsBox.height / 2))
     ).toBeLessThan(2);
     await expect(Math.round(actionsBox.right)).toBe(Math.round(cardBox.right - 16 - 1));
-    // Corpo abaixo do cabecalho, na largura toda (padding 16 + borda 1 de cada lado).
+    // Corpo abaixo do cabeçalho, na largura toda (padding 16 + borda 1 de cada lado).
     await expect(bodyBox.top).toBeGreaterThan(actionsBox.bottom);
     await expect(Math.round(bodyBox.width)).toBe(Math.round(cardBox.width - 34));
-    // Rodape por ultimo, com divisor.
+    // Rodapé por último, com divisor.
     await expect(footerBox.top).toBeGreaterThan(body[body.length - 1].getBoundingClientRect().bottom);
     await expect(getComputedStyle(footer).borderTopWidth).toBe("1px");
     await expect(getComputedStyle(card).padding).toBe("16px");
@@ -240,12 +240,12 @@ export const Layout = {
     card.setAttribute("rounded", "xl");
     await expect(getComputedStyle(card).borderTopLeftRadius).toBe("12px");
 
-    // Sem heading o h2 sai; com um slot="header" ele ocupa a linha de cima ao lado das acoes.
+    // Sem heading o h2 sai; com um slot="header" ele ocupa a linha de cima ao lado das ações.
     card.removeAttribute("heading");
     await expect(card.querySelector('[data-ark="card-heading"]')).toBeNull();
     const header = document.createElement("div");
     header.setAttribute("slot", "header");
-    header.textContent = "Cabecalho livre";
+    header.textContent = "Cabeçalho livre";
     card.appendChild(header);
     await waitFor(() => expect(header).toHaveAttribute("data-ark", "card-header"));
     const headerBox = header.getBoundingClientRect();
@@ -297,7 +297,7 @@ export const TestHooks = {
       "data-testid",
       "meu-card-footer"
     );
-    // O corpo nao e marcado: e conteudo livre, que pode ser outro ark-* com os proprios hooks.
+    // O corpo não é marcado: é conteúdo livre, que pode ser outro ark-* com os próprios hooks.
     await expect(canvasElement.querySelector('[data-ark="card-body"]')).toBeNull();
   }
 };

@@ -7,9 +7,9 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 export type ArkEmptyProps = PropsWithChildren<
   ArkDomProps<
     ArkEmptyStyleOptions & {
-      /** Titulo (h3). */
+      /** Título (h3). */
       heading?: string;
-      /** Texto abaixo do titulo. */
+      /** Texto abaixo do título. */
       description?: string;
       className?: string;
     }

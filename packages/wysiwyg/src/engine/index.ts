@@ -229,7 +229,7 @@ function createInstance(element: HTMLElement, options: InternalOptions): ArkWysi
   const setContent = (content: JSONContent | null): void => {
     applying = true;
     try {
-      // Fora do historico: Ctrl+Z depois de o app trocar o conteudo nao pode voltar ao documento anterior.
+      // Fora do histórico: Ctrl+Z depois de o app trocar o conteúdo não pode voltar ao documento anterior.
       editor
         .chain()
         .setMeta("addToHistory", false)

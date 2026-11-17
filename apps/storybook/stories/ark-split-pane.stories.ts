@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Paineis redimensionaveis. Os filhos do host `ark-split-pane` sao os paineis e ficam onde estao; as alcas sao nos proprios ao fim do host, posicionados na grid por coluna/linha explicita. `sizes` (percentuais) e a fonte da verdade e e reescrito a cada arrasto ou seta; `data-min`/`data-max` nos filhos limitam. Emite `ark-resize`; persistir e do app."
+          "Painéis redimensionáveis. Os filhos do host `ark-split-pane` são os painéis e ficam onde estão; as alças são nós próprios ao fim do host, posicionados na grid por coluna/linha explícita. `sizes` (percentuais) é a fonte da verdade e é reescrito a cada arrasto ou seta; `data-min`/`data-max` nos filhos limitam. Emite `ark-resize`; persistir é do app."
       }
     }
   },
@@ -60,7 +60,7 @@ function createPanel(panel: Panel): HTMLElement {
 
 function createSplitPane(
   args: Partial<StoryArgs>,
-  panels: Panel[] = [{ label: "Arvore de colecoes" }, { label: "Editor" }]
+  panels: Panel[] = [{ label: "Árvore de coleções" }, { label: "Editor" }]
 ): SplitPaneEl {
   const el = document.createElement("ark-split-pane") as SplitPaneEl;
   if (args.direction) el.setAttribute("direction", args.direction);
@@ -88,33 +88,33 @@ export const Vertical = {
 export const ThreePanels = {
   render: () =>
     createSplitPane({ sizes: "20,50,30", lang: "pt" }, [
-      { label: "Arvore", min: "15" },
+      { label: "Árvore", min: "15" },
       { label: "Editor", min: "30" },
       { label: "Resposta", min: "15", max: "50" }
     ])
 };
 
-// Um split-pane divide num eixo so. O layout "um painel inteiro a esquerda, dois empilhados a direita" sao dois
-// split-panes: o de fora horizontal (arvore | resto) e, como segundo painel dele, um vertical (editor / resposta).
+// Um split-pane divide num eixo só. O layout "um painel inteiro à esquerda, dois empilhados à direita" são dois
+// split-panes: o de fora horizontal (árvore | resto) e, como segundo painel dele, um vertical (editor / resposta).
 export const Nested = {
   parameters: {
     docs: {
       description: {
         story:
-          "Layout de IDE: o `ark-split-pane` de fora e horizontal e tem dois filhos, a arvore e OUTRO `ark-split-pane`, vertical, com editor e resposta. O interno nao precisa de largura nem altura: e um painel do externo e ocupa a faixa dele. Arraste a alca vertical (entre arvore e editor) e a horizontal (entre editor e resposta); cada uma pertence ao seu split-pane e emite o proprio `ark-resize`."
+          "Layout de IDE: o `ark-split-pane` de fora é horizontal e tem dois filhos, a árvore e OUTRO `ark-split-pane`, vertical, com editor e resposta. O interno não precisa de largura nem altura: é um painel do externo e ocupa a faixa dele. Arraste a alça vertical (entre árvore e editor) e a horizontal (entre editor e resposta); cada uma pertence ao seu split-pane e emite o próprio `ark-resize`."
       }
     }
   },
   render: () => {
     const outer = createSplitPane({ sizes: "25,75", lang: "pt" }, [
-      { label: "Arvore de colecoes", min: "15", hint: "painel 1 do split horizontal (min 15%)" }
+      { label: "Árvore de coleções", min: "15", hint: "painel 1 do split horizontal (min 15%)" }
     ]);
     outer.style.height = "20rem";
     const inner = createSplitPane({ direction: "vertical", sizes: "55,45", lang: "pt" }, [
       { label: "Editor", hint: "painel 1 do split vertical interno" },
       { label: "Resposta", hint: "painel 2 do split vertical interno" }
     ]);
-    // O interno e um painel do externo: sem borda, largura ou altura proprias.
+    // O interno é um painel do externo: sem borda, largura ou altura próprias.
     inner.className = "";
     inner.style.width = "";
     inner.style.height = "";
@@ -128,13 +128,13 @@ export const Nested = {
 export const PixelConstraints = {
   render: () =>
     createSplitPane({ sizes: "30,70", lang: "pt" }, [
-      { label: "Minimo 120px, maximo 320px", min: "120px", max: "320px" },
+      { label: "Mínimo 120px, máximo 320px", min: "120px", max: "320px" },
       { label: "Livre" }
     ])
 };
 
-// Grid com os paineis no lugar e a alca ao fim; sizes normalizado e refletido; setas e arrasto redimensionam
-// respeitando data-min/data-max e emitem ark-resize; paineis que entram ganham alca.
+// Grid com os painéis no lugar e a alça ao fim; sizes normalizado e refletido; setas e arrasto redimensionam
+// respeitando data-min/data-max e emitem ark-resize; painéis que entram ganham alça.
 export const Resizing = {
   render: () =>
     createSplitPane({ sizes: "30,70", lang: "pt" }, [
@@ -181,7 +181,7 @@ export const Resizing = {
     await expect(pane.sizes).toEqual([20, 80]);
     await expect(events).toHaveLength(5);
 
-    // Arrasto: move 10% do espaco dos paineis para a direita.
+    // Arrasto: move 10% do espaço dos painéis para a direita.
     pane.sizes = [40, 60];
     await expect(events).toHaveLength(5);
     const box = handle.getBoundingClientRect();
@@ -216,7 +216,7 @@ export const Resizing = {
     await expect(pane).not.toHaveAttribute("data-ark-dragging");
     await expect(events.at(-1)?.map(Math.round)).toEqual([50, 50]);
 
-    // Um painel novo ganha alca e os tamanhos sao redistribuidos.
+    // Um painel novo ganha alça e os tamanhos são redistribuídos.
     pane.appendChild(createPanel({ label: "Terceiro" }));
     // O MutationObserver reage num microtask.
     await waitFor(() => expect(canvas.getAllByRole("separator")).toHaveLength(2));

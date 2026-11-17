@@ -11,7 +11,7 @@ export const ArkFileInput = defineComponent({
     testid: { type: String, default: undefined },
     accept: { type: String, default: undefined },
     multiple: { type: Boolean, default: false },
-    /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona le as pastas soltas. */
+    /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona lê as pastas soltas. */
     directory: { type: Boolean, default: false },
     label: { type: String, default: undefined },
     helper: { type: String, default: undefined },

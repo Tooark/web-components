@@ -19,7 +19,7 @@ export type ArkInputProps = PropsWithChildren<
       disabled?: boolean;
       required?: boolean;
       readonly?: boolean;
-      /** Com type="password", botao de mostrar/ocultar na ponta direita. */
+      /** Com type="password", botão de mostrar/ocultar na ponta direita. */
       reveal?: boolean;
       lang?: ArkLang;
       localeJson?: string;

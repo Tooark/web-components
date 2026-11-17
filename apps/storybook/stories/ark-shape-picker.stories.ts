@@ -113,7 +113,7 @@ export const WithSwatches = {
   }
 };
 
-// Dez radios nomeados no idioma; clique e setas selecionam e emitem change; cada opcao e um ark-mark na cor.
+// Dez radios nomeados no idioma; clique e setas selecionam e emitem change; cada opção é um ark-mark na cor.
 export const Selection = {
   render: () => createPicker({ value: "circle", color: "rgb(37, 99, 235)", lang: "pt" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

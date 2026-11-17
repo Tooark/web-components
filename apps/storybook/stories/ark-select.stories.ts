@@ -2,14 +2,14 @@ import type { ArkIntent, ArkRounded, ArkSelectOption, ArkSize, ArkTheme } from "
 import { expect, userEvent, waitFor } from "storybook/test";
 
 const LANGUAGES: ArkSelectOption[] = [
-  { value: "pt", label: "Portugues" },
-  { value: "en", label: "Ingles" },
+  { value: "pt", label: "Português" },
+  { value: "en", label: "Inglês" },
   { value: "es", label: "Espanhol" },
   { value: "la", label: "Latim", disabled: true }
 ];
 
 const GROUPED: ArkSelectOption[] = [
-  { value: "sp", label: "Sao Paulo", group: "Sudeste" },
+  { value: "sp", label: "São Paulo", group: "Sudeste" },
   { value: "rj", label: "Rio de Janeiro", group: "Sudeste" },
   { value: "pr", label: "Parana", group: "Sul" },
   { value: "rs", label: "Rio Grande do Sul", group: "Sul" },
@@ -22,15 +22,15 @@ const meta = {
     docs: {
       description: {
         component:
-          "Campo de selecao padronizado: um <select> nativo estilizado (teclado, leitor de tela e mobile de graca) com a mesma grid label / campo / mensagem do ark-input e um chevron proprio. As opcoes vem do atributo `options` (JSON) ou da propriedade JS `options` ({ value, label, disabled?, group? }[]; `group` vira <optgroup>), nunca de filhos. `placeholder` vira uma opcao vazia desabilitada. Emite `change` com `detail: { value }` (o change nativo nao sobe duplicado) e `input`."
+          "Campo de seleção padronizado: um <select> nativo estilizado (teclado, leitor de tela e mobile de graça) com a mesma grid label / campo / mensagem do ark-input e um chevron próprio. As opções vêm do atributo `options` (JSON) ou da propriedade JS `options` ({ value, label, disabled?, group? }[]; `group` vira <optgroup>), nunca de filhos. `placeholder` vira uma opção vazia desabilitada. Emite `change` com `detail: { value }` (o change nativo não sobe duplicado) e `input`."
       }
     }
   },
   argTypes: {
-    label: { control: "text", description: "Rotulo acessivel; vazio esconde o label" },
-    placeholder: { control: "text", description: "Opcao vazia desabilitada mostrada enquanto nada foi escolhido" },
-    value: { control: "text", description: "Valor selecionado (tambem disponivel como propriedade JS)" },
-    name: { control: "text", description: "Nome do campo para envio em formulario" },
+    label: { control: "text", description: "Rótulo acessível; vazio esconde o label" },
+    placeholder: { control: "text", description: "Opção vazia desabilitada mostrada enquanto nada foi escolhido" },
+    value: { control: "text", description: "Valor selecionado (também disponível como propriedade JS)" },
+    name: { control: "text", description: "Nome do campo para envio em formulário" },
     helper: { control: "text", description: "Texto de ajuda abaixo do campo" },
     errorMessage: { control: "text", description: "Mensagem de erro; substitui o helper e liga o estado de erro" },
     error: { control: "boolean", description: "Estado de erro sem mensagem (borda + aria-invalid)" },
@@ -122,9 +122,9 @@ export const States = {
   render: () => {
     const wrap = createStack();
     wrap.appendChild(createSelect({ label: "Com helper", placeholder: "Escolha", helper: "Texto de ajuda opcional" }));
-    wrap.appendChild(createSelect({ label: "Com erro", value: "en", errorMessage: "Idioma nao disponivel" }));
+    wrap.appendChild(createSelect({ label: "Com erro", value: "en", errorMessage: "Idioma não disponível" }));
     wrap.appendChild(createSelect({ label: "Desabilitado", value: "pt", disabled: true }));
-    wrap.appendChild(createSelect({ label: "Obrigatorio", placeholder: "Escolha", required: true }));
+    wrap.appendChild(createSelect({ label: "Obrigatório", placeholder: "Escolha", required: true }));
     return wrap;
   }
 };
@@ -159,7 +159,7 @@ export const DarkTheme = {
 export const SelectingEmitsChange = {
   args: { label: "Idioma", placeholder: "Escolha um idioma", testid: "campo-idioma" },
   render: Playground.render,
-  // Um unico `change` chega ao consumidor, com detail.value, e o nativo do <select> nao sobe duplicado.
+  // Um único `change` chega ao consumidor, com detail.value, e o nativo do <select> não sobe duplicado.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-select") as HTMLElement & { value: string };
     const select = canvasElement.querySelector<HTMLSelectElement>('[data-ark="select"]')!;
@@ -204,7 +204,7 @@ export const OptionsPropertyAndValue = {
     host.value = "df";
     await expect(select.value).toBe("df");
 
-    // Opcoes iguais nao reconstroem o <select> (a selecao do usuario sobrevive a um rerender de atributos).
+    // Opções iguais não reconstroem o <select> (a seleção do usuário sobrevive a um rerender de atributos).
     host.setAttribute("size", "sm");
     await expect(select.value).toBe("df");
   }
@@ -226,14 +226,14 @@ export const TestHooks = {
     await expect(helper).toHaveAttribute("data-testid", "idioma-helper");
     await expect(select).toHaveAttribute("aria-describedby", helper.id);
 
-    // O chevron fica sobre a ponta direita do campo e nao rouba o clique.
+    // O chevron fica sobre a ponta direita do campo e não rouba o clique.
     const selectRect = select.getBoundingClientRect();
     const chevronRect = chevron.getBoundingClientRect();
     await expect(chevronRect.right).toBeLessThanOrEqual(selectRect.right);
     await expect(chevronRect.left).toBeGreaterThan(selectRect.left + selectRect.width / 2);
     await expect(getComputedStyle(chevron).pointerEvents).toBe("none");
 
-    host.setAttribute("error-message", "Invalido");
+    host.setAttribute("error-message", "Inválido");
     await expect(host.querySelector('[data-ark="select-error"]')).toHaveAttribute("data-testid", "idioma-error");
     await expect(select).toHaveAttribute("aria-invalid", "true");
   }

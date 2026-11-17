@@ -81,7 +81,7 @@ export const Shapes = {
   }
 };
 
-// D-049: workspace e ambiente identificados por cor E forma; cor sozinha nao e distincao acessivel.
+// D-049: workspace e ambiente identificados por cor E forma; cor sozinha não é distinção acessível.
 export const ScopeList = {
   render: () => {
     const wrap = document.createElement("ul");
@@ -124,8 +124,8 @@ export const InheritsColor = {
   }
 };
 
-// Um path por forma no viewBox 24; size em px ou CSS; label da role=img, sem ele fica decorativa; cor
-// propria ou herdada.
+// Um path por forma no viewBox 24; size em px ou CSS; label dá role=img, sem ele fica decorativa; cor
+// própria ou herdada.
 export const Semantics = {
   render: () => createMark({ shape: "star", label: "Favorito", size: 24, color: "rgb(220, 38, 38)" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

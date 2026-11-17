@@ -26,7 +26,7 @@ export const ArkCommandPalette = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Eventos customizados do DOM: ouvidos no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
     const handlers: Array<[string, (event: Event) => void]> = [
       ["ark-select", (event) => emit("ark-select", event as CustomEvent<{ value: string }>)],
       ["ark-query", (event) => emit("ark-query", event as CustomEvent<{ query: string }>)],

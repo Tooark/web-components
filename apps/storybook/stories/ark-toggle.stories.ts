@@ -169,7 +169,7 @@ export const GroupExclusiveSelection = {
 
 export const GroupEmitsOnce = {
   render: Group.render,
-  // Quem escuta `change` no proprio grupo recebe so o consolidado, nunca o do item.
+  // Quem escuta `change` no próprio grupo recebe só o consolidado, nunca o do item.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const group = canvasElement.querySelector("ark-toggle-group")!;
     const received: string[] = [];
@@ -200,8 +200,8 @@ export const KeyboardAndDisabled = {
     wrap.append(toggle, createToggle("Bloqueado", { disabled: true, value: "locked" }));
     return wrap;
   },
-  // Enter e Espaco alternam (Espaco no keyup, como um botao nativo); teclas vindas de um filho sao ignoradas;
-  // desabilitado nao reage a clique nem teclado e sai do tabindex; os setters aceitam a regra dos wrappers.
+  // Enter e Espaço alternam (Espaço no keyup, como um botão nativo); teclas vindas de um filho são ignoradas;
+  // desabilitado não reage a clique nem teclado e sai do tabindex; os setters aceitam a regra dos wrappers.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const toggle = canvas.getByRole("button", { name: /Favorito/ }) as ToggleElement;
@@ -221,13 +221,13 @@ export const KeyboardAndDisabled = {
       { pressed: false, value: "fav" }
     ]);
 
-    // Tecla disparada por um filho nao alterna.
+    // Tecla disparada por um filho não alterna.
     const inner = toggle.querySelector("span")!;
     inner.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     inner.dispatchEvent(new KeyboardEvent("keyup", { key: " ", bubbles: true }));
     await expect(toggle).toHaveAttribute("aria-pressed", "false");
 
-    // Desabilitado: tabindex -1, aria-disabled, clique cancelado (o CSS ja corta pointer-events; o evento vai
+    // Desabilitado: tabindex -1, aria-disabled, clique cancelado (o CSS já corta pointer-events; o evento vai
     // direto) e teclado ignorado.
     await expect(locked).toHaveAttribute("tabindex", "-1");
     await expect(locked).toHaveAttribute("aria-disabled", "true");
@@ -263,7 +263,7 @@ export const ClassAndTestHooks = {
     toggle.className = "extra";
     return toggle;
   },
-  // O host carrega as classes: um framework que reescreve `class` nao as apaga; os hooks ficam no proprio host.
+  // O host carrega as classes: um framework que reescreve `class` não as apaga; os hooks ficam no próprio host.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const toggle = canvasElement.querySelector<HTMLElement>("ark-toggle")!;
     await expect(toggle).toHaveAttribute("data-ark", "toggle");
@@ -293,7 +293,7 @@ export const GroupPropagation = {
     return group;
   },
   // `value` por propriedade seleciona o item (vazio limpa); size/intent/theme/disabled do grupo descem para os itens
-  // e o disabled do grupo e retirado sem apagar o individual; `class` reescrita mantem as classes do host.
+  // e o disabled do grupo é retirado sem apagar o individual; `class` reescrita mantém as classes do host.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const group = canvasElement.querySelector<HTMLElement & { value: string }>("ark-toggle-group")!;
@@ -322,7 +322,7 @@ export const GroupPropagation = {
     group.setAttribute("disabled", "");
     await expect(left).toHaveAttribute("aria-disabled", "true");
     await expect(left).toHaveAttribute("data-group-disabled", "true");
-    // O "Right" ja era desabilitado por conta propria: nao leva a marca do grupo.
+    // O "Right" já era desabilitado por conta própria: não leva a marca do grupo.
     expect(right.hasAttribute("data-group-disabled")).toBe(false);
     group.removeAttribute("disabled");
     expect(left.hasAttribute("disabled")).toBe(false);

@@ -185,13 +185,13 @@ export const Sizes = {
 
       const button = document.createElement("ark-button");
       button.setAttribute("size", size);
-      button.textContent = `Botao ${size}`;
+      button.textContent = `Botão ${size}`;
 
       const iconOnly = document.createElement("ark-button");
       iconOnly.setAttribute("size", size);
       iconOnly.setAttribute("icon-only", "");
       iconOnly.setAttribute("rounded", "full");
-      iconOnly.setAttribute("aria-label", `Icone ${size}`);
+      iconOnly.setAttribute("aria-label", `Ícone ${size}`);
       iconOnly.textContent = "+";
 
       row.append(button, iconOnly);
@@ -200,14 +200,14 @@ export const Sizes = {
 
     return wrap;
   },
-  // A altura vem do token --ark-size-* (min-height); o botao so de icone tambem e quadrado.
+  // A altura vem do token --ark-size-* (min-height); o botão só de ícone também é quadrado.
   // O alinhamento com os outros controles do mesmo size fica em alignment.stories.ts.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const heights: Record<ArkSize, number> = { xs: 24, sm: 28, md: 36, lg: 44, xl: 52 };
 
     for (const [size, height] of Object.entries(heights) as [ArkSize, number][]) {
       const row = canvasElement.querySelector<HTMLElement>(`[data-size="${size}"]`);
-      if (!row) throw new Error(`linha ${size} nao encontrada`);
+      if (!row) throw new Error(`linha ${size} não encontrada`);
 
       const controls = [
         row.querySelector<HTMLElement>("ark-button:not([icon-only])"),
@@ -461,7 +461,7 @@ export const EnterSubmitsForm = {
     docs: {
       description: {
         story:
-          'Formulario de login: dois campos de texto e nenhum submit nativo, onde o navegador sozinho nao envia no Enter (um elemento form-associated nunca e o botao padrao). O primeiro `ark-button` com `type="submit"` faz esse papel: Enter em qualquer campo de texto do formulario o clica, com validacao e o `submit` do formulario.'
+          'Formulário de login: dois campos de texto e nenhum submit nativo, onde o navegador sozinho não envia no Enter (um elemento form-associated nunca é o botão padrão). O primeiro `ark-button` com `type="submit"` faz esse papel: Enter em qualquer campo de texto do formulário o clica, com validação e o `submit` do formulário.'
       }
     }
   },
@@ -502,7 +502,7 @@ export const EnterSubmitsForm = {
     await userEvent.type(canvas.getByLabelText("Senha"), "segredo{Enter}");
     await waitFor(() => expect(submits).toEqual([["ana@tooark.com", "segredo"]]));
 
-    // Enter no primeiro campo tambem envia, e uma vez so por Enter.
+    // Enter no primeiro campo também envia, e uma vez só por Enter.
     await userEvent.type(canvas.getByLabelText("E-mail"), "{Enter}");
     await settle();
     await expect(submits).toHaveLength(2);
@@ -514,13 +514,13 @@ export const EnterSubmitRules = {
     docs: {
       description: {
         story:
-          'Regras do Enter, as do botao padrao nativo: um submit nativo no formulario fica com o Enter, um `ark-button` padrao desabilitado ou em `loading` bloqueia o envio, o Enter que o app ou um componente ja cancelou fica com eles, `textarea` quebra linha, composicao de IME e Ctrl/Alt/Meta+Enter nao enviam, e `form="id"` num campo fora do `<form>` vale.'
+          'Regras do Enter, as do botão padrão nativo: um submit nativo no formulário fica com o Enter, um `ark-button` padrão desabilitado ou em `loading` bloqueia o envio, o Enter que o app ou um componente já cancelou fica com eles, `textarea` quebra linha, composição de IME e Ctrl/Alt/Meta+Enter não enviam, e `form="id"` num campo fora do `<form>` vale.'
       }
     }
   },
   render: () => document.createElement("div"),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
-    // Um formulario isolado por caso: campos nativos, botoes de submit e a contagem de envios.
+    // Um formulário isolado por caso: campos nativos, botões de submit e a contagem de envios.
     const setup = (fields = 2): { form: HTMLFormElement; inputs: HTMLInputElement[]; count: () => number } => {
       const form = document.createElement("form");
       const inputs = Array.from({ length: fields }, (_, index) => {
@@ -545,7 +545,7 @@ export const EnterSubmitRules = {
       form.appendChild(el);
       return el;
     };
-    // KeyboardEvent feito a mao: o retorno de dispatchEvent diz se o Enter foi cancelado.
+    // KeyboardEvent feito à mão: o retorno de dispatchEvent diz se o Enter foi cancelado.
     const enter = (target: Element, init: KeyboardEventInit = {}): KeyboardEvent => {
       const event = new KeyboardEvent("keydown", {
         key: "Enter",
@@ -558,7 +558,7 @@ export const EnterSubmitRules = {
       return event;
     };
 
-    // Dois campos: o Enter e cancelado (para o navegador nao agir junto) e vira o click no botao.
+    // Dois campos: o Enter é cancelado (para o navegador não agir junto) e vira o click no botão.
     const login = setup();
     const loginButton = submitButton(login.form);
     let clicks = 0;
@@ -568,14 +568,14 @@ export const EnterSubmitRules = {
     await expect(clicks).toBe(1);
     await expect(login.count()).toBe(1);
 
-    // Um campo so: o navegador submeteria sozinho; o preventDefault evita o envio duplo.
+    // Um campo só: o navegador submeteria sozinho; o preventDefault evita o envio duplo.
     const single = setup(1);
     submitButton(single.form);
     await expect(enter(single.inputs[0]).defaultPrevented).toBe(true);
     await settle();
     await expect(single.count()).toBe(1);
 
-    // Com dois ark-button de submit, so o primeiro e clicado.
+    // Com dois ark-button de submit, só o primeiro é clicado.
     const pair = setup();
     submitButton(pair.form);
     const second = submitButton(pair.form);
@@ -586,7 +586,7 @@ export const EnterSubmitRules = {
     await expect(pair.count()).toBe(1);
     await expect(secondClicks).toBe(0);
 
-    // Um submit nativo, mesmo depois do ark-button, e o botao padrao do navegador: o Enter fica com ele.
+    // Um submit nativo, mesmo depois do ark-button, é o botão padrão do navegador: o Enter fica com ele.
     const native = setup();
     const nativeArk = submitButton(native.form);
     const nativeButton = document.createElement("button");
@@ -599,7 +599,7 @@ export const EnterSubmitRules = {
     await settle();
     await expect(nativeArkClicks).toBe(0);
 
-    // Botao padrao desabilitado ou carregando: o Enter e cancelado e nada e enviado.
+    // Botão padrão desabilitado ou carregando: o Enter é cancelado e nada é enviado.
     for (const state of ["disabled", "loading"]) {
       const blocked = setup();
       submitButton(blocked.form).setAttribute(state, "");
@@ -608,14 +608,14 @@ export const EnterSubmitRules = {
       await expect(blocked.count()).toBe(0);
     }
 
-    // O app cancela o click do botao: o Enter passa pelo mesmo caminho e tambem nao envia.
+    // O app cancela o click do botão: o Enter passa pelo mesmo caminho e também não envia.
     const cancelled = setup();
     submitButton(cancelled.form).addEventListener("click", (event) => event.preventDefault());
     enter(cancelled.inputs[0]);
     await settle();
     await expect(cancelled.count()).toBe(0);
 
-    // Enter ja cancelado pelo app (ou por um componente, como o ark-kv-editor) fica com quem o cancelou.
+    // Enter já cancelado pelo app (ou por um componente, como o ark-kv-editor) fica com quem o cancelou.
     const consumed = setup();
     submitButton(consumed.form);
     consumed.inputs[0].addEventListener("keydown", (event) => event.preventDefault());
@@ -623,7 +623,7 @@ export const EnterSubmitRules = {
     await settle();
     await expect(consumed.count()).toBe(0);
 
-    // Composicao de IME, modificadores, textarea, checkbox e formulario sem ark-button de submit: nada acontece.
+    // Composição de IME, modificadores, textarea, checkbox e formulário sem ark-button de submit: nada acontece.
     const ignored = setup();
     submitButton(ignored.form);
     const area = document.createElement("textarea");
@@ -643,7 +643,7 @@ export const EnterSubmitRules = {
     await expect(ignored.count()).toBe(0);
     await expect(plain.count()).toBe(0);
 
-    // Campo fora do <form>, ligado por form="id": envia o formulario dele.
+    // Campo fora do <form>, ligado por form="id": envia o formulário dele.
     const owner = setup(0);
     owner.form.id = "ark-button-enter-owner";
     submitButton(owner.form);
@@ -703,8 +703,8 @@ export const StatusAnnounces = {
     el.textContent = "Enviar";
     return el;
   },
-  // success/error trocam o glifo (com fade-in) e anunciam status-label pela live region unica do core; loading
-  // vence o status; nada de live region dentro do host, cujo nome acessivel continua "Enviar".
+  // success/error trocam o glifo (com fade-in) e anunciam status-label pela live region única do core; loading
+  // vence o status; nada de live region dentro do host, cujo nome acessível continua "Enviar".
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const host = canvasElement.querySelector("ark-button")!;
     const icon = (): Element | null => host.querySelector('[data-ark="button-status-icon"]');
@@ -712,17 +712,17 @@ export const StatusAnnounces = {
       document.querySelector<HTMLElement>(`[data-ark="announcer-${politeness}"]`);
 
     expect(icon()).toBeNull();
-    host.setAttribute("status-label", "Requisicao enviada");
+    host.setAttribute("status-label", "Requisição enviada");
     host.setAttribute("status", "success");
     expect(icon()).not.toBeNull();
     await expect(icon()).toHaveAttribute("aria-hidden", "true");
     expect(icon()?.querySelector("svg")?.classList.contains("ark-animate-fade-in")).toBe(true);
     expect(host.firstElementChild).toBe(icon());
-    await waitFor(() => expect(region("polite")?.textContent).toBe("Requisicao enviada"));
+    await waitFor(() => expect(region("polite")?.textContent).toBe("Requisição enviada"));
     expect(host.querySelector('[aria-live], [role="status"], [role="alert"]')).toBeNull();
     expect(host.textContent?.trim()).toBe("Enviar");
 
-    // Ordem do React (status antes de status-label na mesma passada): o anuncio le o rotulo novo; erro e assertive.
+    // Ordem do React (status antes de status-label na mesma passada): o anúncio lê o rótulo novo; erro é assertive.
     const successIcon = icon();
     host.setAttribute("status", "error");
     host.setAttribute("status-label", "Falha ao enviar");
@@ -735,7 +735,7 @@ export const StatusAnnounces = {
     host.removeAttribute("loading");
     expect(icon()).not.toBeNull();
 
-    // O app limpa o status; o botao so mostra.
+    // O app limpa o status; o botão só mostra.
     host.removeAttribute("status");
     expect(icon()).toBeNull();
   }

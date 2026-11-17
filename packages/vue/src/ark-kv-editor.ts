@@ -19,7 +19,7 @@ export const ArkKvEditor = defineComponent({
     valuePlaceholder: { type: String, default: undefined },
     descriptionPlaceholder: { type: String, default: undefined },
     readonly: { type: Boolean, default: false },
-    /** Cria a celula de valor de cada linha no lugar do ark-input; linhas secretas mantem o campo de senha. */
+    /** Cria a célula de valor de cada linha no lugar do ark-input; linhas secretas mantêm o campo de senha. */
     valueField: { type: Function as PropType<ArkKvValueField>, default: undefined },
     size: { type: String as PropType<ArkSize>, default: "md" },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
@@ -30,21 +30,21 @@ export const ArkKvEditor = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<(HTMLElement & { rows: ArkKvRow[]; valueField: ArkKvValueField | null }) | null>(null);
 
-    // `rows` e propriedade (objetos), nao atributo.
+    // `rows` é propriedade (objetos), não atributo.
     const syncRows = () => {
       if (elRef.value && props.rows) elRef.value.rows = props.rows;
     };
     watch(() => props.rows, syncRows, { deep: true });
 
-    // `valueField` e funcao, entao propriedade; so e gravada quando o app da uma, para o editor sem ela nao recriar
-    // as linhas na montagem. Uma funcao nova recria as celulas de valor.
+    // `valueField` é função, então propriedade; só é gravada quando o app dá uma, para o editor sem ela não recriar
+    // as linhas na montagem. Uma função nova recria as células de valor.
     const syncValueField = () => {
       const el = elRef.value;
       if (el && (props.valueField || el.valueField)) el.valueField = props.valueField ?? null;
     };
     watch(() => props.valueField, syncValueField);
 
-    // Eventos customizados do DOM: ouvidos no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
     const addHandler = (event: Event) => emit("ark-add", event as CustomEvent<{ id: string }>);
     const deleteHandler = (event: Event) => emit("ark-delete", event as CustomEvent<{ id: string }>);
     onMounted(() => {

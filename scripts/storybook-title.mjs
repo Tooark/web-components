@@ -1,6 +1,6 @@
-// Troca o <title> estatico do Storybook gerado ("<pacote> - Storybook" no index.html, "Storybook" no iframe.html)
-// pela marca: o template do manager nao tem opcao para isso e quem nao roda JS (previa de link, buscador) le o
-// HTML como veio. A troca em tempo de execucao fica em apps/storybook/.storybook/manager-head.html.
+// Troca o <title> estático do Storybook gerado ("<pacote> - Storybook" no index.html, "Storybook" no iframe.html)
+// pela marca: o template do manager não tem opção para isso e quem não roda JS (prévia de link, buscador) lê o
+// HTML como veio. A troca em tempo de execução fica em apps/storybook/.storybook/manager-head.html.
 // Uso: node scripts/storybook-title.mjs (depois do `storybook build`)
 
 import { readFileSync, writeFileSync } from "node:fs";
@@ -15,9 +15,9 @@ for (const file of ["index.html", "iframe.html"]) {
   const target = path.join(outDir, file);
   const html = readFileSync(target, "utf8");
   const next = html.replace(/<title>[^<]*<\/title>/, `<title>${BRAND}</title>`);
-  // Sem <title> o template mudou: falha o build em vez de publicar o titulo antigo em silencio.
+  // Sem <title> o template mudou: falha o build em vez de publicar o título antigo em silêncio.
   if (!next.includes(`<title>${BRAND}</title>`)) {
-    console.error(`storybook-title: <title> nao encontrado em ${file}`);
+    console.error(`storybook-title: <title> não encontrado em ${file}`);
     process.exit(1);
   }
   writeFileSync(target, next);

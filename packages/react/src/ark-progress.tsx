@@ -7,13 +7,13 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkProgressProps = ArkDomProps<
   ArkProgressStyleOptions & {
-    /** Valor atual, de 0 a max. Padrao: 0. */
+    /** Valor atual, de 0 a max. Padrão: 0. */
     value?: number;
-    /** Valor maximo. Padrao: 100. */
+    /** Valor máximo. Padrão: 100. */
     max?: number;
-    /** Segmento em loop no lugar do valor (loader continuo, isento de movimento reduzido). */
+    /** Segmento em loop no lugar do valor (loader contínuo, isento de movimento reduzido). */
     indeterminate?: boolean;
-    /** Nome acessivel (aria-label). */
+    /** Nome acessível (aria-label). */
     label?: string;
     /** Mostra a porcentagem ao lado do trilho. */
     showValue?: boolean;

@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Controles do mesmo `size` (button, toggle, input, select) compartilham a altura do token `--ark-size-*` (min-height), entao alinham lado a lado sem ajuste manual: 24/28/36/44/52 px de xs a xl."
+          "Controles do mesmo `size` (button, toggle, input, select) compartilham a altura do token `--ark-size-*` (min-height), então alinham lado a lado sem ajuste manual: 24/28/36/44/52 px de xs a xl."
       }
     }
   }
@@ -31,13 +31,13 @@ export const SameSizeControls = {
 
       const button = document.createElement("ark-button");
       button.setAttribute("size", size);
-      button.textContent = `Botao ${size}`;
+      button.textContent = `Botão ${size}`;
 
       const iconOnly = document.createElement("ark-button");
       iconOnly.setAttribute("size", size);
       iconOnly.setAttribute("icon-only", "");
       iconOnly.setAttribute("rounded", "full");
-      iconOnly.setAttribute("aria-label", `Icone ${size}`);
+      iconOnly.setAttribute("aria-label", `Ícone ${size}`);
       iconOnly.textContent = "+";
 
       const toggle = document.createElement("ark-toggle");
@@ -51,7 +51,7 @@ export const SameSizeControls = {
       const select = document.createElement("ark-select");
       select.setAttribute("size", size);
       select.setAttribute("placeholder", `Select ${size}`);
-      select.setAttribute("options", JSON.stringify([{ value: "a", label: "Opcao A" }]));
+      select.setAttribute("options", JSON.stringify([{ value: "a", label: "Opção A" }]));
 
       row.append(button, iconOnly, toggle, input, select);
       wrap.appendChild(row);
@@ -65,7 +65,7 @@ export const SameSizeControls = {
 
     for (const [size, height] of Object.entries(heights) as [ArkSize, number][]) {
       const row = canvasElement.querySelector<HTMLElement>(`[data-size="${size}"]`);
-      if (!row) throw new Error(`linha ${size} nao encontrada`);
+      if (!row) throw new Error(`linha ${size} não encontrada`);
 
       const controls = [
         row.querySelector<HTMLElement>("ark-button:not([icon-only])"),

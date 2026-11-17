@@ -12,11 +12,11 @@ export type ArkColorSwatchesProps = ArkDomProps<
     value?: string;
     /** Amostras { name, value }[]; vai como JSON no atributo. */
     colors?: ArkColorSwatch[];
-    /** Nome acessivel do radiogroup. */
+    /** Nome acessível do radiogroup. */
     label?: string;
     disabled?: boolean;
     className?: string;
-    /** Selecao mudou pelo usuario: detail.value e a cor. */
+    /** Seleção mudou pelo usuário: detail.value é a cor. */
     onChange?: (event: CustomEvent<{ value: string }>) => void;
   }
 >;

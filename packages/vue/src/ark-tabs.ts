@@ -24,7 +24,7 @@ export const ArkTabs = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Evento customizado do DOM: ouvido no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
     const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent<{ value: string }>);
     onMounted(() => elRef.value?.addEventListener("ark-close", closeHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-close", closeHandler));

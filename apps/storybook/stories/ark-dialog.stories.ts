@@ -8,20 +8,20 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dialogo modal: o host `ark-dialog` e o proprio painel, aberto como `popover="manual"` (top layer, `::backdrop` como scrim, sem portal nem z-index). Os filhos sao o corpo e ficam onde estao; um filho `slot="footer"` vira o rodape. O componente cria o cabecalho (titulo `h2` de `label` + botao de fechar) como primeiro filho. `open` e a fonte da verdade (`show()`/`close(reason)` so o alternam) e a saida anima antes de esconder. Foco preso pelo `trapFocus` de core (Tab cicla, clique fora e cancelado), Esc e scrim fecham salvo `persistent`, foco volta ao opener. Emite `ark-open` e `ark-close` com `detail.reason`.'
+          'Diálogo modal: o host `ark-dialog` é o próprio painel, aberto como `popover="manual"` (top layer, `::backdrop` como scrim, sem portal nem z-index). Os filhos são o corpo e ficam onde estão; um filho `slot="footer"` vira o rodapé. O componente cria o cabeçalho (título `h2` de `label` + botão de fechar) como primeiro filho. `open` é a fonte da verdade (`show()`/`close(reason)` só o alternam) e a saída anima antes de esconder. Foco preso pelo `trapFocus` de core (Tab cicla, clique fora é cancelado), Esc e scrim fecham salvo `persistent`, foco volta ao opener. Emite `ark-open` e `ark-close` com `detail.reason`.'
       }
     }
   },
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md", "lg", "xl", "full"] },
-    width: { control: "text", description: "Largura propria (comprimento CSS; numero vira px), acima do preset" },
+    width: { control: "text", description: "Largura própria (comprimento CSS; número vira px), acima do preset" },
     height: {
       control: "text",
-      description: "Altura propria (comprimento CSS; numero vira px); sem ela, a do conteudo"
+      description: "Altura própria (comprimento CSS; número vira px); sem ela, a do conteúdo"
     },
-    label: { control: "text", description: "Titulo e nome acessivel (aria-labelledby)" },
-    persistent: { control: "boolean", description: "Esc e clique no scrim nao fecham" },
-    noCloseButton: { control: "boolean", description: "Sem o botao de fechar do cabecalho" },
+    label: { control: "text", description: "Título e nome acessível (aria-labelledby)" },
+    persistent: { control: "boolean", description: "Esc e clique no scrim não fecham" },
+    noCloseButton: { control: "boolean", description: "Sem o botão de fechar do cabeçalho" },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     lang: { control: "select", options: ["en", "pt", "es"] }
   },
@@ -29,7 +29,7 @@ const meta = {
     size: "md",
     width: "",
     height: "",
-    label: "Nova requisicao",
+    label: "Nova requisição",
     persistent: false,
     noCloseButton: false,
     theme: "auto",
@@ -89,7 +89,7 @@ function createDialog(args: Partial<StoryArgs>, options: { footer?: boolean; bod
   if (args.lang) dialog.setAttribute("lang", args.lang);
   if (args.testid) dialog.setAttribute("testid", args.testid);
 
-  // O corpo e do usuario: aqui uma coluna com dois campos.
+  // O corpo é do usuário: aqui uma coluna com dois campos.
   const body = document.createElement("div");
   body.className = "flex flex-col gap-3";
   body.append(...(options.body ?? [createField("Nome"), createField("URL")]));
@@ -119,7 +119,7 @@ function closed(dialog: HTMLElement): Promise<void> {
   return waitFor(() => expect(dialog).not.toHaveAttribute("data-ark-state"));
 }
 
-// A entrada anima scale(0.95) -> 1: medir o painel so depois da animacao.
+// A entrada anima scale(0.95) -> 1: medir o painel só depois da animação.
 function settled(dialog: HTMLElement): Promise<void> {
   return waitFor(() => expect(dialog.getAnimations().length).toBe(0));
 }
@@ -157,8 +157,8 @@ export const FullAndCustomSize = {
     );
     return wrap;
   },
-  // size="full" ocupa a viewport sem cantos; width/height aceitam qualquer comprimento CSS (numero vira px) e
-  // continuam limitados a viewport; com altura sobrando o rodape fica no fundo do painel.
+  // size="full" ocupa a viewport sem cantos; width/height aceitam qualquer comprimento CSS (número vira px) e
+  // continuam limitados à viewport; com altura sobrando o rodapé fica no fundo do painel.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const [full, custom, capped] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
@@ -205,12 +205,12 @@ export const LongContent = {
     const paragraphs = Array.from({ length: 24 }, (_, index) => {
       const p = document.createElement("p");
       p.className = "text-sm text-slate-600";
-      p.textContent = `Paragrafo ${index + 1}: o cabecalho e o rodape ficam fixos enquanto o corpo rola dentro do painel.`;
+      p.textContent = `Parágrafo ${index + 1}: o cabeçalho e o rodapé ficam fixos enquanto o corpo rola dentro do painel.`;
       return p;
     });
     return createScene({ label: "Termos de uso", lang: "pt" }, { body: paragraphs });
   },
-  // O painel rola; cabecalho e rodape sao sticky nas bordas do painel.
+  // O painel rola; cabeçalho e rodapé são sticky nas bordas do painel.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
@@ -239,8 +239,8 @@ export const DarkTheme = {
 };
 
 export const OpensClosesAndRestoresFocus = {
-  render: () => createScene({ label: "Nova requisicao", lang: "pt" }),
-  // Abre no top layer com a semantica de dialogo, foca o primeiro focavel do corpo, Esc fecha e devolve o foco.
+  render: () => createScene({ label: "Nova requisição", lang: "pt" }),
+  // Abre no top layer com a semântica de diálogo, foca o primeiro focável do corpo, Esc fecha e devolve o foco.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
@@ -260,9 +260,9 @@ export const OpensClosesAndRestoresFocus = {
 
     const title = dialog.querySelector('[data-ark="dialog-title"]') as HTMLElement;
     expect(title.tagName).toBe("H2");
-    expect(title.textContent).toBe("Nova requisicao");
+    expect(title.textContent).toBe("Nova requisição");
     await expect(dialog).toHaveAttribute("aria-labelledby", title.id);
-    // O cabecalho e o primeiro filho, para a leitura comecar pelo titulo; o corpo do usuario vem depois.
+    // O cabeçalho é o primeiro filho, para a leitura começar pelo título; o corpo do usuário vem depois.
     expect(dialog.firstElementChild).toBe(dialog.querySelector('[data-ark="dialog-header"]'));
     expect(document.activeElement).toBe(dialog.querySelector("input"));
     expect(events).toEqual(["open"]);
@@ -270,7 +270,7 @@ export const OpensClosesAndRestoresFocus = {
     await userEvent.keyboard("{Escape}");
     expect(events).toEqual(["open", "close:escape"]);
     await expect(dialog).not.toHaveAttribute("open");
-    // A saida anima antes de sair do top layer.
+    // A saída anima antes de sair do top layer.
     await expect(dialog).toHaveAttribute("data-ark-state", "closing");
     await waitFor(() => expect(dialog.matches(":popover-open")).toBe(false));
     await closed(dialog);
@@ -280,7 +280,7 @@ export const OpensClosesAndRestoresFocus = {
 
 export const FocusTrapCycles = {
   render: () => createScene({ label: "Editar", lang: "pt" }),
-  // Tab e Shift+Tab ciclam entre os focaveis do painel; foco levado para fora volta.
+  // Tab e Shift+Tab ciclam entre os focáveis do painel; foco levado para fora volta.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
@@ -298,7 +298,7 @@ export const FocusTrapCycles = {
     expect(document.activeElement).toBe(cancel);
     await userEvent.tab();
     expect(document.activeElement).toBe(save);
-    // Do ultimo volta ao primeiro do DOM, o botao de fechar do cabecalho.
+    // Do último volta ao primeiro do DOM, o botão de fechar do cabeçalho.
     await userEvent.tab();
     expect(document.activeElement).toBe(close);
     await userEvent.tab();
@@ -322,11 +322,11 @@ export const BackdropClosesAndPersistentBlocks = {
     wrap.className = "flex flex-wrap items-center gap-3";
     const behind = document.createElement("ark-button");
     behind.setAttribute("size", "sm");
-    behind.textContent = "Atras: 0";
+    behind.textContent = "Atrás: 0";
     let count = 0;
     behind.addEventListener("click", () => {
       count += 1;
-      behind.textContent = `Atras: ${count}`;
+      behind.textContent = `Atrás: ${count}`;
     });
 
     const dialog = createDialog({ label: "Confirmar", lang: "pt" });
@@ -334,11 +334,11 @@ export const BackdropClosesAndPersistentBlocks = {
     wrap.append(createOpener(dialog), createOpener(persistent, "Abrir persistente"), behind, dialog, persistent);
     return wrap;
   },
-  // Clique fora e cancelado antes de chegar a pagina e fecha pelo scrim; persistent ignora scrim e Esc.
+  // Clique fora é cancelado antes de chegar à página e fecha pelo scrim; persistent ignora scrim e Esc.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const [dialog, persistent] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
-    const behind = canvas.getByText(/^Atras/);
+    const behind = canvas.getByText(/^Atrás/);
     const reasons: string[] = [];
     for (const el of [dialog, persistent]) {
       el.addEventListener("ark-close", (event) =>
@@ -348,13 +348,13 @@ export const BackdropClosesAndPersistentBlocks = {
 
     await userEvent.click(canvas.getByText("Abrir"));
     await userEvent.click(behind);
-    expect(behind.textContent).toBe("Atras: 0");
+    expect(behind.textContent).toBe("Atrás: 0");
     expect(reasons).toEqual(["backdrop"]);
     await closed(dialog);
 
     await userEvent.click(canvas.getByText("Abrir persistente"));
     await userEvent.click(behind);
-    expect(behind.textContent).toBe("Atras: 0");
+    expect(behind.textContent).toBe("Atrás: 0");
     await userEvent.keyboard("{Escape}");
     await expect(persistent).toHaveAttribute("open");
     expect(reasons).toEqual(["backdrop"]);
@@ -367,7 +367,7 @@ export const BackdropClosesAndPersistentBlocks = {
 
 export const CloseButtonAndReopen = {
   render: () => createScene({ label: "Editar", lang: "pt" }),
-  // Botao de fechar localizado e com motivo proprio; reabrir durante a saida a abandona; no-close-button.
+  // Botão de fechar localizado e com motivo próprio; reabrir durante a saída a abandona; no-close-button.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
@@ -402,7 +402,7 @@ export const LocksPageScroll = {
     docs: {
       description: {
         story:
-          "Com o dialogo aberto a pagina para de rolar (`lockScroll` de core: `overflow: hidden` na raiz e `padding-right` do tamanho da barra que sumiu, exposto em `--ark-scroll-lock-gap`); a trava e liberada depois da saida. `no-scroll-lock` desliga."
+          "Com o diálogo aberto a página para de rolar (`lockScroll` de core: `overflow: hidden` na raiz e `padding-right` do tamanho da barra que sumiu, exposto em `--ark-scroll-lock-gap`); a trava é liberada depois da saída. `no-scroll-lock` desliga."
       }
     }
   },
@@ -412,7 +412,7 @@ export const LocksPageScroll = {
     const scene = createScene({ label: "Trava a rolagem", lang: "pt" });
     const filler = document.createElement("div");
     filler.className = "h-[140vh] rounded-lg border border-dashed border-slate-300 p-3 text-sm text-slate-500";
-    filler.textContent = "Conteudo alto: role a pagina, abra o dialogo e a rolagem para; feche e volta.";
+    filler.textContent = "Conteúdo alto: role a página, abra o diálogo e a rolagem para; feche e volta.";
     wrap.append(scene, filler);
     return wrap;
   },
@@ -427,7 +427,7 @@ export const LocksPageScroll = {
     expect(root.style.overflow).toBe("hidden");
     expect(root.style.getPropertyValue("--ark-scroll-lock-gap")).toMatch(/^\d+px$/);
 
-    // A trava dura ate o fim da saida (o scrim ainda esta visivel enquanto anima).
+    // A trava dura até o fim da saída (o scrim ainda está visível enquanto anima).
     dialog.close();
     await expect(dialog).toHaveAttribute("data-ark-state", "closing");
     expect(isScrollLocked()).toBe(true);
@@ -436,7 +436,7 @@ export const LocksPageScroll = {
     expect(root.style.overflow).toBe(before);
     expect(root.style.getPropertyValue("--ark-scroll-lock-gap")).toBe("");
 
-    // Opt-out: a pagina continua rolando.
+    // Opt-out: a página continua rolando.
     dialog.setAttribute("no-scroll-lock", "");
     dialog.show();
     await expect(dialog).toHaveAttribute("data-ark-state", "open");
@@ -453,7 +453,7 @@ export const WarnsOnceWithoutName = {
     wrap.className = "flex flex-wrap items-center gap-3";
     const unnamed = createDialog({ lang: "pt" });
     const named = createDialog({ lang: "pt" });
-    named.setAttribute("aria-label", "Sem titulo visivel");
+    named.setAttribute("aria-label", "Sem título visível");
     wrap.append(createOpener(unnamed, "Sem nome"), createOpener(named, "Com aria-label"), unnamed, named);
     return wrap;
   },
@@ -482,7 +482,7 @@ export const WarnsOnceWithoutName = {
 
       named.show();
       expect(calls.length).toBe(1);
-      await expect(named).toHaveAttribute("aria-label", "Sem titulo visivel");
+      await expect(named).toHaveAttribute("aria-label", "Sem título visível");
       named.close();
       await closed(named);
     } finally {
@@ -501,7 +501,7 @@ export const TestHooks = {
     await expect(dialog.querySelector('[data-ark="dialog-header"]')).toHaveAttribute("data-testid", "confirm-header");
     await expect(dialog.querySelector('[data-ark="dialog-title"]')).toHaveAttribute("data-testid", "confirm-title");
     await expect(dialog.querySelector('[data-ark="dialog-close"]')).toHaveAttribute("data-testid", "confirm-close");
-    // O rodape e o filho slot="footer" do usuario, marcado no lugar.
+    // O rodapé é o filho slot="footer" do usuário, marcado no lugar.
     await expect(dialog.querySelector('[slot="footer"]')).toHaveAttribute("data-ark", "dialog-footer");
     await expect(dialog.querySelector('[slot="footer"]')).toHaveAttribute("data-testid", "confirm-footer");
   }

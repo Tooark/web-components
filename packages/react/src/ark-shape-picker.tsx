@@ -10,13 +10,13 @@ export type ArkShapePickerProps = ArkDomProps<
   ArkShapePickerStyleOptions & {
     /** Forma selecionada. */
     value?: ArkMarkShape;
-    /** Formas oferecidas, na ordem (ou "all"). Padrao: as dez. */
+    /** Formas oferecidas, na ordem (ou "all"). Padrão: as dez. */
     shapes?: ArkMarkShape[] | "all";
-    /** Nome acessivel do radiogroup. */
+    /** Nome acessível do radiogroup. */
     label?: string;
     disabled?: boolean;
     className?: string;
-    /** Selecao mudou pelo usuario: detail.value e a forma. */
+    /** Seleção mudou pelo usuário: detail.value é a forma. */
     onChange?: (event: CustomEvent<{ value: ArkMarkShape }>) => void;
   }
 >;

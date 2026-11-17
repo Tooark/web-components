@@ -9,13 +9,13 @@ export type ArkCheckboxProps = PropsWithChildren<
   ArkDomProps<
     ArkCheckboxStyleOptions & {
       disabled?: boolean;
-      /** Nome no formulario (submete `value` quando marcado). */
+      /** Nome no formulário (submete `value` quando marcado). */
       name?: string;
-      /** Valor submetido quando marcado. Padrao: "on". */
+      /** Valor submetido quando marcado. Padrão: "on". */
       value?: string;
-      /** Rotulo proprio (<label for>); sem ele use aria-label ou filhos como rotulo livre. */
+      /** Rótulo próprio (<label for>); sem ele use aria-label ou filhos como rótulo livre. */
       label?: string;
-      /** Dica abaixo do rotulo, ligada ao controle por aria-describedby. */
+      /** Dica abaixo do rótulo, ligada ao controle por aria-describedby. */
       helper?: string;
       className?: string;
       onChange?: (event: CustomEvent<{ checked: boolean }>) => void;

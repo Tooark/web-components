@@ -7,7 +7,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Agenda com quatro views: `week` e `day` desenham a timeline por horario (eventos posicionados pelo horario, sobreposicoes resolvidas em colunas lado a lado e marcador da hora atual), `month` mostra o grid de celulas e `agenda` a lista cronologica. Os eventos vem do atributo `events` (JSON) ou da propriedade JS `events`. Emite `ark-event-click`, `ark-slot-click`, `ark-view-change` e `ark-range-change`."
+          "Agenda com quatro views: `week` e `day` desenham a timeline por horário (eventos posicionados pelo horário, sobreposições resolvidas em colunas lado a lado e marcador da hora atual), `month` mostra o grid de células e `agenda` a lista cronológica. Os eventos vêm do atributo `events` (JSON) ou da propriedade JS `events`. Emite `ark-event-click`, `ark-slot-click`, `ark-view-change` e `ark-range-change`."
       }
     }
   },
@@ -15,12 +15,12 @@ const meta = {
     view: {
       control: "inline-radio",
       options: ["day", "week", "month", "agenda"],
-      description: "View ativa; sincronizada ao clicar no seletor do cabecalho"
+      description: "View ativa; sincronizada ao clicar no seletor do cabeçalho"
     },
-    date: { control: "text", description: "Data de referencia (YYYY-MM-DD); vazio usa hoje. Muda ao navegar" },
+    date: { control: "text", description: "Data de referência (YYYY-MM-DD); vazio usa hoje. Muda ao navegar" },
     views: {
       control: "text",
-      description: 'Limita as views do seletor, separadas por virgula (ex.: "day,week"). Vazio mostra as quatro'
+      description: 'Limita as views do seletor, separadas por vírgula (ex.: "day,week"). Vazio mostra as quatro'
     },
     lang: {
       control: "select",
@@ -35,17 +35,17 @@ const meta = {
     intent: {
       control: "select",
       options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"],
-      description: "Cor padrao dos eventos sem color/intent proprios"
+      description: "Cor padrão dos eventos sem color/intent próprios"
     },
     hourStart: { control: { type: "number", min: 0, max: 23 }, description: "Primeira hora da timeline (0 a 23)" },
     hourEnd: {
       control: { type: "number", min: 1, max: 24 },
-      description: "Ultima hora da timeline (sempre maior que hourStart)"
+      description: "Última hora da timeline (sempre maior que hourStart)"
     },
     slotMinutes: {
       control: "inline-radio",
       options: [15, 30, 60],
-      description: "Granularidade dos slots clicaveis (15 a 60)"
+      description: "Granularidade dos slots clicáveis (15 a 60)"
     },
     hoursFormat: { control: "inline-radio", options: ["24", "12"], description: "12 exibe as horas com AM/PM" },
     testid: { control: "text", description: "Propaga data-testid para a agenda e suas partes" }
@@ -226,7 +226,7 @@ export const ClickingEventEmits = {
 export const HeaderAlignsWithGrid = {
   args: { view: "week", hourStart: 0, hourEnd: 24 },
   render: Playground.render,
-  // A barra de rolagem do corpo nao pode encolher so as colunas de baixo: cabecalho e grade dividem o scroller.
+  // A barra de rolagem do corpo não pode encolher só as colunas de baixo: cabeçalho e grade dividem o scroller.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const scroller = canvasElement.querySelector<HTMLElement>('[data-ark="scheduler-scroller"]')!;
     await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);

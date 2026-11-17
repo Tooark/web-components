@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Alerta ou banner: o host `ark-alert` e a caixa e os filhos sao a mensagem (texto solto ou elementos). `slot="icon"` a esquerda e `slot="action"` a direita ficam onde estao, posicionados por CSS; `heading` cria um titulo proprio e `dismissible` o botao de dispensar. `live` define a live region (polite = role status, assertive = role alert, off). Dispensar anima a saida, emite `ark-dismiss` e esconde o host com `hidden`; remover e do app.'
+          'Alerta ou banner: o host `ark-alert` é a caixa e os filhos são a mensagem (texto solto ou elementos). `slot="icon"` à esquerda e `slot="action"` à direita ficam onde estão, posicionados por CSS; `heading` cria um título próprio e `dismissible` o botão de dispensar. `live` define a live region (polite = role status, assertive = role alert, off). Dispensar anima a saída, emite `ark-dismiss` e esconde o host com `hidden`; remover é do app.'
       }
     }
   },
@@ -27,8 +27,8 @@ const meta = {
   args: {
     intent: "info",
     variant: "box",
-    heading: "Nova versao disponivel",
-    message: "Recarregue para usar a versao 2.4 do app.",
+    heading: "Nova versão disponível",
+    message: "Recarregue para usar a versão 2.4 do app.",
     dismissible: true,
     live: undefined,
     lang: "pt",
@@ -81,7 +81,7 @@ function createAlert(args: Partial<StoryArgs>): AlertEl {
     icon.innerHTML = args.intent === "warning" || args.intent === "danger" ? WARN_SVG : INFO_SVG;
     alert.appendChild(icon);
   }
-  const message = args.message ?? "Recarregue para usar a versao 2.4 do app.";
+  const message = args.message ?? "Recarregue para usar a versão 2.4 do app.";
   if (args.bareText) {
     alert.appendChild(document.createTextNode(message));
   } else {
@@ -120,7 +120,7 @@ export const Intents = {
       ...(["info", "success", "warning", "danger", "neutral", "primary"] as ArkIntent[]).map((intent) =>
         createAlert({
           intent,
-          message: `Alerta ${intent}: cor suave do intent, com icone e botao de dispensar.`,
+          message: `Alerta ${intent}: cor suave do intent, com ícone e botão de dispensar.`,
           dismissible: true,
           lang: "pt"
         })
@@ -134,14 +134,14 @@ export const Banner = {
       createAlert({
         variant: "banner",
         intent: "warning",
-        message: "Voce esta offline. As alteracoes serao sincronizadas quando a conexao voltar.",
+        message: "Você está offline. As alterações serão sincronizadas quando a conexão voltar.",
         withAction: false,
         lang: "pt"
       }),
       createAlert({
         variant: "banner",
         intent: "info",
-        message: "Nova versao disponivel.",
+        message: "Nova versão disponível.",
         actionLabel: "Atualizar",
         dismissible: true,
         lang: "pt"
@@ -155,7 +155,7 @@ export const HeadingAndAction = {
       intent: "primary",
       heading: "Workspace pessoal",
       message:
-        "Este workspace e so seu. Convide pessoas para colaborar ou crie um workspace de equipe para compartilhar colecoes, ambientes e variaveis com todo mundo.",
+        "Este workspace é só seu. Convide pessoas para colaborar ou crie um workspace de equipe para compartilhar coleções, ambientes e variáveis com todo mundo.",
       actionLabel: "Criar equipe",
       dismissible: true,
       lang: "pt"
@@ -168,7 +168,7 @@ export const BareText = {
       createAlert({ intent: "success", message: "Salvo com sucesso.", bareText: true, withAction: false }),
       createAlert({
         intent: "danger",
-        message: "Sem icone nem acao: o texto comeca na borda esquerda e vai ate a direita.",
+        message: "Sem ícone nem ação: o texto começa na borda esquerda e vai até a direita.",
         bareText: true,
         withIcon: false,
         withAction: false
@@ -176,8 +176,8 @@ export const BareText = {
     )
 };
 
-// Dispensar: saida animada, `ark-dismiss` uma vez, host `hidden`; tirar o hidden reexibe sem a opacidade
-// presa da animacao. O rotulo do botao segue lang; `live` e o intent definem o role.
+// Dispensar: saída animada, `ark-dismiss` uma vez, host `hidden`; tirar o hidden reexibe sem a opacidade
+// presa da animação. O rótulo do botão segue lang; `live` e o intent definem o role.
 export const Dismiss = {
   render: () => createAlert({ intent: "info", message: "Dispense este alerta.", dismissible: true, lang: "pt" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -209,7 +209,7 @@ export const Dismiss = {
     await expect(alert.getAnimations()).toHaveLength(0);
     await expect(getComputedStyle(alert).opacity).toBe("1");
 
-    // Sem dismissible o botao sai; dismiss() pelo JS continua funcionando.
+    // Sem dismissible o botão sai; dismiss() pelo JS continua funcionando.
     alert.dismissible = false;
     await expect(canvas.queryByRole("button", { name: "Dismiss" })).toBeNull();
     alert.dismiss();
@@ -218,12 +218,12 @@ export const Dismiss = {
   }
 };
 
-// Texto solto flui entre o icone e o botao de dispensar; a acao flutua a direita da primeira linha.
+// Texto solto flui entre o ícone e o botão de dispensar; a ação flutua à direita da primeira linha.
 export const Layout = {
   render: () =>
     createAlert({
       intent: "info",
-      message: "Texto solto ao lado do icone.",
+      message: "Texto solto ao lado do ícone.",
       bareText: true,
       dismissible: true,
       withAction: true
@@ -245,10 +245,10 @@ export const Layout = {
     await expect(text.right).toBeLessThanOrEqual(actionBox.left);
     await expect(actionBox.right).toBeLessThanOrEqual(dismissBox.left);
     await expect(Math.round(dismissBox.right)).toBe(Math.round(box.right - 12 - 1));
-    // Icone e texto centrados na mesma linha.
+    // Ícone e texto centrados na mesma linha.
     await expect(Math.abs(iconBox.top + iconBox.height / 2 - (text.top + text.height / 2))).toBeLessThan(2);
     await expect(Math.abs(actionBox.top + actionBox.height / 2 - (text.top + text.height / 2))).toBeLessThan(3);
-    // Sem icone o texto encosta no padding.
+    // Sem ícone o texto encosta no padding.
     icon.remove();
     await waitFor(() => expect(Math.round(range.getBoundingClientRect().left)).toBe(Math.round(box.left + 16 + 1)));
   }

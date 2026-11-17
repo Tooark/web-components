@@ -7,26 +7,26 @@ const meta = {
     docs: {
       description: {
         component:
-          'Superficie de selecao de hora com colunas digitais rolaveis (estilo DigitalClock do MUI). O valor e sempre 24h no formato HH:mm:ss; `hours-format="12"` muda apenas a exibicao, adicionando a coluna AM/PM. Emite `ark-change` com `detail: { value }`.'
+          'Superfície de seleção de hora com colunas digitais roláveis (estilo DigitalClock do MUI). O valor é sempre 24h no formato HH:mm:ss; `hours-format="12"` muda apenas a exibição, adicionando a coluna AM/PM. Emite `ark-change` com `detail: { value }`.'
       }
     }
   },
   argTypes: {
-    value: { control: "text", description: "Hora em HH:mm ou HH:mm:ss (24h). Valor invalido e ignorado" },
+    value: { control: "text", description: "Hora em HH:mm ou HH:mm:ss (24h). Valor inválido é ignorado" },
     seconds: { control: "boolean", description: "Exibe a coluna de segundos" },
     stepMinutes: {
       control: { type: "number", min: 1, max: 30, step: 1 },
-      description: "Intervalo da coluna de minutos (1 a 30; valores fora da faixa sao ajustados)"
+      description: "Intervalo da coluna de minutos (1 a 30; valores fora da faixa são ajustados)"
     },
     hoursFormat: { control: "inline-radio", options: ["24", "12"], description: "12 adiciona a coluna AM/PM" },
     lang: {
       control: "select",
       options: ["en", "pt", "es"],
-      description: "Rotulos das colunas (Horas/Minutos/Segundos)"
+      description: "Rótulos das colunas (Horas/Minutos/Segundos)"
     },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
-    testid: { control: "text", description: "Propaga data-testid para o relogio e cada coluna (<testid>-hours etc.)" }
+    testid: { control: "text", description: "Propaga data-testid para o relógio e cada coluna (<testid>-hours etc.)" }
   },
   args: {
     value: "09:30",

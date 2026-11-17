@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Editor de pares chave/valor: linhas { id, key, value, enabled } com ativar, editar, remover e adicionar. Colunas opcionais: `types` (select do tipo do valor por linha: string, number, date, time, datetime, email, url; o campo de valor segue o tipo), `secret` (cadeado por linha: fechado, o valor vira campo de senha com o olho para revelar) e `description`. Modo em massa em `bulk-format` lines (`chave:valor` por linha, `#` desativa) ou json (array com todos os campos). Compoe ark-checkbox, ark-input, ark-select, ark-textarea e ark-button porque renderiza tudo a partir de `rows`. `change` publica as linhas a cada edicao; adicionar e remover anunciam a contagem. A celula de valor e um ark-input; a propriedade `valueField` troca pelo campo que o app criar (um ark-code-editor de uma linha com `{{variavel}}`, por exemplo), exceto nas linhas secretas."
+          "Editor de pares chave/valor: linhas { id, key, value, enabled } com ativar, editar, remover e adicionar. Colunas opcionais: `types` (select do tipo do valor por linha: string, number, date, time, datetime, email, url; o campo de valor segue o tipo), `secret` (cadeado por linha: fechado, o valor vira campo de senha com o olho para revelar) e `description`. Modo em massa em `bulk-format` lines (`chave:valor` por linha, `#` desativa) ou json (array com todos os campos). Compõe ark-checkbox, ark-input, ark-select, ark-textarea e ark-button porque renderiza tudo a partir de `rows`. `change` publica as linhas a cada edição; adicionar e remover anunciam a contagem. A célula de valor é um ark-input; a propriedade `valueField` troca pelo campo que o app criar (um ark-code-editor de uma linha com `{{variavel}}`, por exemplo), exceto nas linhas secretas."
       }
     }
   },
@@ -17,8 +17,8 @@ const meta = {
     keyPlaceholder: { control: "text" },
     valuePlaceholder: { control: "text" },
     descriptionPlaceholder: { control: "text" },
-    description: { control: "boolean", description: "Coluna de descricao" },
-    types: { control: "text", description: "Tipos de valor da coluna de tipo, separados por virgula; vazio esconde" },
+    description: { control: "boolean", description: "Coluna de descrição" },
+    types: { control: "text", description: "Tipos de valor da coluna de tipo, separados por vírgula; vazio esconde" },
     secret: { control: "boolean", description: "Cadeado por linha (valor mascarado quando fechado)" },
     readonly: { control: "boolean" },
     bulk: { control: "boolean" },
@@ -30,7 +30,7 @@ const meta = {
   args: {
     keyPlaceholder: "Chave",
     valuePlaceholder: "Valor",
-    descriptionPlaceholder: "Descricao",
+    descriptionPlaceholder: "Descrição",
     description: false,
     types: "",
     secret: false,
@@ -129,9 +129,9 @@ export const Sizes = {
 const ENV_ARGS: Partial<StoryArgs> = {
   lang: "pt",
   size: "sm",
-  keyPlaceholder: "Variavel",
+  keyPlaceholder: "Variável",
   valuePlaceholder: "Valor",
-  descriptionPlaceholder: "Descricao",
+  descriptionPlaceholder: "Descrição",
   description: true,
   secret: true,
   types: "string,number,date,url"
@@ -139,12 +139,12 @@ const ENV_ARGS: Partial<StoryArgs> = {
 
 const ENV_ROWS: ArkKvRow[] = [
   { id: "v1", key: "baseUrl", value: "https://api.local", enabled: true, type: "url", description: "Raiz da API" },
-  { id: "v2", key: "token", value: "sk-live-9f2a", enabled: true, secret: true, description: "Nao commitar" },
+  { id: "v2", key: "token", value: "sk-live-9f2a", enabled: true, secret: true, description: "Não commitar" },
   { id: "v3", key: "retries", value: "3", enabled: true, type: "number" },
   { id: "v4", key: "expiresAt", value: "2026-12-31", enabled: false, type: "date" }
 ];
 
-// Cabecalhos com descricao (Postman-like): a coluna entra pelo atributo `description`.
+// Cabeçalhos com descrição (Postman-like): a coluna entra pelo atributo `description`.
 export const WithDescription = {
   render: () =>
     createEditor(
@@ -153,18 +153,18 @@ export const WithDescription = {
         size: "sm",
         keyPlaceholder: "Chave",
         valuePlaceholder: "Valor",
-        descriptionPlaceholder: "Descricao",
+        descriptionPlaceholder: "Descrição",
         description: true
       },
       [
         { id: "d1", key: "Content-Type", value: "application/json", enabled: true, description: "Corpo em JSON" },
-        { id: "d2", key: "X-Request-Id", value: "{{uuid}}", enabled: true, description: "Correlacao no log" }
+        { id: "d2", key: "X-Request-Id", value: "{{uuid}}", enabled: true, description: "Correlação no log" }
       ]
     )
 };
 
-// Variaveis de ambiente: `types` da o tipo do valor (o campo vira number, date, url...), o cadeado de `secret`
-// mascara o token com o olho para revelar, e a descricao explica o uso.
+// Variáveis de ambiente: `types` dá o tipo do valor (o campo vira number, date, url...), o cadeado de `secret`
+// mascara o token com o olho para revelar, e a descrição explica o uso.
 export const WithTypesAndSecret = {
   render: () => {
     const el = createEditor(ENV_ARGS, ENV_ROWS);
@@ -173,7 +173,7 @@ export const WithTypesAndSecret = {
   }
 };
 
-// So o cadeado, sem tipos nem descricao: o caso de uma lista de credenciais.
+// Só o cadeado, sem tipos nem descrição: o caso de uma lista de credenciais.
 export const SecretOnly = {
   render: () =>
     createEditor({ lang: "pt", size: "sm", keyPlaceholder: "Chave", valuePlaceholder: "Valor", secret: true }, [
@@ -182,12 +182,12 @@ export const SecretOnly = {
     ])
 };
 
-// Modo em massa em JSON: todos os campos viajam; JSON invalido marca o campo e nao mexe nas linhas.
+// Modo em massa em JSON: todos os campos viajam; JSON inválido marca o campo e não mexe nas linhas.
 export const JsonBulk = {
   render: () => createEditor({ ...ENV_ARGS, bulk: true, bulkFormat: "json" }, ENV_ROWS.slice(0, 2))
 };
 
-// O app escuta change e mantem o proprio estado; aqui espelha as linhas num <pre>.
+// O app escuta change e mantém o próprio estado; aqui espelha as linhas num <pre>.
 export const ControlledByApp = {
   render: () => {
     const wrap = document.createElement("div");
@@ -207,8 +207,8 @@ export const ControlledByApp = {
 };
 
 // Linhas renderizadas do modelo; editar chave/valor, ativar, remover e adicionar emitem change com as linhas
-// e anunciam a contagem; Enter no ultimo valor adiciona; o modo em massa reflete o texto e, ao sair,
-// reconstroi as linhas (ids por posicao, # desativa); readonly bloqueia.
+// e anunciam a contagem; Enter no último valor adiciona; o modo em massa reflete o texto e, ao sair,
+// reconstrói as linhas (ids por posição, # desativa); readonly bloqueia.
 export const Editing = {
   render: () => createEditor({ lang: "pt", size: "sm", keyPlaceholder: "Chave", valuePlaceholder: "Valor" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -243,7 +243,7 @@ export const Editing = {
     await expect(editor.rows[0].enabled).toBe(false);
     await expect(events.filter((e) => e === "change").length).toBeGreaterThan(10);
 
-    // Remover: evento, contagem, anuncio, foco na linha seguinte.
+    // Remover: evento, contagem, anúncio, foco na linha seguinte.
     await userEvent.click(canvas.getAllByRole("button", { name: "Excluir linha" })[1]);
     await expect(editor.rows.map((row) => row.id)).toEqual(["h1", "h3"]);
     await expect(events).toContain("delete:h2");
@@ -251,7 +251,7 @@ export const Editing = {
     await waitFor(() => expect(announcer()).toContain("2 entradas"));
     await expect(keyInputOf(rows()[1])).toHaveFocus();
 
-    // Adicionar pelo botao: linha vazia focada, ark-add, contagem.
+    // Adicionar pelo botão: linha vazia focada, ark-add, contagem.
     await userEvent.click(canvas.getByRole("button", { name: "Adicionar" }));
     await expect(rows()).toHaveLength(3);
     await expect(keyInputOf(rows()[2])).toHaveFocus();
@@ -264,7 +264,7 @@ export const Editing = {
     await expect(keyInputOf(rows()[3])).toHaveFocus();
     await expect(editor.rows[2]).toMatchObject({ key: "Accept", value: "*/*", enabled: true });
 
-    // Modo em massa: texto com # nas desativadas; editar e sair reconstroi as linhas.
+    // Modo em massa: texto com # nas desativadas; editar e sair reconstrói as linhas.
     await userEvent.click(canvas.getByRole("button", { name: "Editar em massa" }));
     await expect(editor.bulk).toBe(true);
     const textarea = canvas.getByRole("textbox", { name: "Editar em massa" }) as HTMLTextAreaElement;
@@ -284,7 +284,7 @@ export const Editing = {
     await expect(canvas.getAllByRole("checkbox")[1]).toHaveAttribute("aria-checked", "false");
     await expect(events.at(-1)).toBe("change");
 
-    // Readonly: nada editavel.
+    // Readonly: nada editável.
     editor.setAttribute("readonly", "");
     await expect(keyInputOf(rows()[0])).toHaveAttribute("readonly");
     await expect(canvas.getAllByRole("checkbox")[0]).toBeDisabled();
@@ -301,7 +301,7 @@ export const Editing = {
 const JSON_ROW = '[{ "key": "k", "value": "v", "enabled": true, "type": "string", "description": "d" }]';
 
 // Colunas opcionais: description e types entram por atributo, com os campos no modelo; o modo em massa em
-// lines preserva tipo e descricao por posicao, e em json edita tudo, sinalizando JSON invalido sem mexer.
+// lines preserva tipo e descrição por posição, e em json edita tudo, sinalizando JSON inválido sem mexer.
 // Linha sem type com a coluna de tipos: o select mostra o primeiro tipo e o campo de valor segue esse mesmo tipo.
 export const UntypedRowFollowsSelect = {
   render: () =>
@@ -331,7 +331,7 @@ export const ColumnsAndJsonBulk = {
     );
 
     // Colunas presentes, com valor do modelo; o campo de valor segue o tipo da linha.
-    const descriptions = canvas.getAllByRole("textbox", { name: "Descricao" }) as HTMLInputElement[];
+    const descriptions = canvas.getAllByRole("textbox", { name: "Descrição" }) as HTMLInputElement[];
     await expect(descriptions).toHaveLength(2);
     await expect(descriptions[0].value).toBe("Raiz");
     const types = canvas.getAllByRole("combobox", { name: "Tipo" }) as HTMLSelectElement[];
@@ -371,7 +371,7 @@ export const ColumnsAndJsonBulk = {
     editor.add({ key: "novo" });
     await expect(editor.rows[2].type).toBe("string");
 
-    // Lines preserva tipo, segredo e descricao por posicao.
+    // Lines preserva tipo, segredo e descrição por posição.
     editor.bulk = true;
     const textarea = canvas.getByRole("textbox", { name: "Editar em massa" }) as HTMLTextAreaElement;
     await expect(textarea.value).toBe("baseUrl:https://api.local\ntoken:abc\nnovo:");
@@ -383,7 +383,7 @@ export const ColumnsAndJsonBulk = {
     ]);
     editor.bulk = false;
 
-    // JSON: todos os campos; invalido marca erro e nao mexe.
+    // JSON: todos os campos; inválido marca erro e não mexe.
     editor.bulkFormat = "json";
     editor.bulk = true;
     await expect(JSON.parse(textarea.value)).toEqual([
@@ -402,14 +402,14 @@ export const ColumnsAndJsonBulk = {
     ]);
     editor.bulk = false;
     await expect(rows()).toHaveLength(1);
-    await expect((canvas.getByRole("textbox", { name: "Descricao" }) as HTMLInputElement).value).toBe("d");
+    await expect((canvas.getByRole("textbox", { name: "Descrição" }) as HTMLInputElement).value).toBe("d");
 
     // Sem os atributos as colunas somem e os campos ficam no modelo.
     editor.removeAttribute("types");
     editor.removeAttribute("description");
     editor.removeAttribute("secret");
     await expect(canvas.queryByRole("combobox", { name: "Tipo" })).toBeNull();
-    await expect(canvas.queryByRole("textbox", { name: "Descricao" })).toBeNull();
+    await expect(canvas.queryByRole("textbox", { name: "Descrição" })).toBeNull();
     await expect(canvas.queryByRole("button", { name: "Segredo" })).toBeNull();
     await expect(editor.rows[0].description).toBe("d");
   }
@@ -449,8 +449,8 @@ export const TestHooks = {
 
 type CodeFieldEl = HTMLElement & { value: string; view: EditorView | null; variables: unknown[] };
 
-// O caso que a costura resolve: um ark-code-editor de uma linha, com as variaveis pintadas e completadas depois de
-// `{{`, no lugar do ark-input de cada valor. Linhas de tipo number ficam com o ark-input (a fabrica devolve null).
+// O caso que a costura resolve: um ark-code-editor de uma linha, com as variáveis pintadas e completadas depois de
+// `{{`, no lugar do ark-input de cada valor. Linhas de tipo number ficam com o ark-input (a fábrica devolve null).
 function variableField({ size, type }: Parameters<ArkKvValueField>[0]): HTMLElement | null {
   if (type === "number") return null;
   const field = document.createElement("ark-code-editor") as CodeFieldEl;
@@ -485,7 +485,7 @@ export const ValueField = {
         | CodeFieldEl
         | HTMLElement;
 
-    // As linhas comuns ganham o campo do app, com o valor, os hooks e o nome acessivel no conteudo editavel.
+    // As linhas comuns ganham o campo do app, com o valor, os hooks e o nome acessível no conteúdo editável.
     const first = valueCell(0) as CodeFieldEl;
     await expect(first.localName).toBe("ark-code-editor");
     await waitFor(() => expect(first.view).not.toBeNull());
@@ -498,13 +498,13 @@ export const ValueField = {
     await expect(valueCell(2).localName).toBe("ark-input");
     await expect(valueCell(2)).toHaveAttribute("type", "password");
 
-    // Edicao no campo do app chega ao modelo e ao `change` do editor.
+    // Edição no campo do app chega ao modelo e ao `change` do editor.
     const view = first.view as EditorView;
     view.dispatch({ changes: { from: view.state.doc.length, insert: "; charset={{enc}}" } });
     await waitFor(() => expect(editor.rows[0].value).toBe("application/json; charset={{enc}}"));
     await expect(published[published.length - 1]?.[0].value).toBe("application/json; charset={{enc}}");
 
-    // Enter no campo de uma linha vira `ark-submit`; na ultima linha acrescenta uma so linha nova.
+    // Enter no campo de uma linha vira `ark-submit`; na última linha acrescenta uma só linha nova.
     editor.delete("h4");
     const last = valueCell(1) as CodeFieldEl;
     await waitFor(() => expect(last.view).not.toBeNull());
@@ -514,7 +514,7 @@ export const ValueField = {
     await expect(editor.rows).toHaveLength(3);
     await expect(document.activeElement?.closest('[data-ark-field="key"]')).not.toBeNull();
 
-    // Tipo e segredo trocados recriam a celula: number volta ao ark-input (null da fabrica), o cadeado tambem.
+    // Tipo e segredo trocados recriam a célula: number volta ao ark-input (null da fábrica), o cadeado também.
     await userEvent.selectOptions(
       within(editor.querySelectorAll('[data-ark-chrome="row"]')[0] as HTMLElement).getByRole("combobox"),
       "number"
@@ -530,7 +530,7 @@ export const ValueField = {
     await expect(valueCell(1).localName).toBe("ark-input");
     await expect(valueCell(1)).toHaveAttribute("type", "password");
 
-    // readonly chega a celula do app; sem a fabrica, tudo volta ao ark-input.
+    // readonly chega à célula do app; sem a fábrica, tudo volta ao ark-input.
     editor.setAttribute("readonly", "");
     await expect(valueCell(0)).toHaveAttribute("readonly");
     editor.removeAttribute("readonly");

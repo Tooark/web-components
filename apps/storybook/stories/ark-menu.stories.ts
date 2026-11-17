@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Menu suspenso e de contexto: o host `ark-menu` e o proprio painel (`role="menu"`), aberto como `popover="auto"` (top layer, light dismiss e Esc nativos), e cada `ark-menu-item` e o proprio item (icone e texto como filhos, `slot="trailing"` ao fim). O gatilho e referenciado por `for`: o menu escreve aria-* nele, alterna no clique e abre com as setas. `align` e `direction` posicionam a partir do gatilho, com flip quando nao cabe; `openAt(x, y)` abre num ponto. Setas, Home, End, Enter/Espaco e Esc; emite `ark-select` com `detail: { value }`, `ark-open` e `ark-close`.'
+          'Menu suspenso e de contexto: o host `ark-menu` é o próprio painel (`role="menu"`), aberto como `popover="auto"` (top layer, light dismiss e Esc nativos), e cada `ark-menu-item` é o próprio item (ícone e texto como filhos, `slot="trailing"` ao fim). O gatilho é referenciado por `for`: o menu escreve aria-* nele, alterna no clique e abre com as setas. `align` e `direction` posicionam a partir do gatilho, com flip quando não cabe; `openAt(x, y)` abre num ponto. Setas, Home, End, Enter/Espaço e Esc; emite `ark-select` com `detail: { value }`, `ark-open` e `ark-close`.'
       }
     }
   },
@@ -75,7 +75,7 @@ function createItem(spec: ItemSpec): HTMLElement {
   if (spec.label) {
     if (spec.static) {
       const name = document.createElement("span");
-      // Conteudo do usuario: cor pelo token, que segue o color-scheme do host (tema escuro incluso).
+      // Conteúdo do usuário: cor pelo token, que segue o color-scheme do host (tema escuro incluso).
       name.className = "font-medium";
       name.style.color = "var(--ark-color-fg)";
       name.textContent = spec.label;
@@ -95,7 +95,7 @@ function createItem(spec: ItemSpec): HTMLElement {
   return item;
 }
 
-function createTrigger(id: string, text = "Acoes"): HTMLElement {
+function createTrigger(id: string, text = "Ações"): HTMLElement {
   const button = document.createElement("ark-button");
   button.id = id;
   button.setAttribute("variant", "outline");
@@ -168,7 +168,7 @@ export const ContextMenu = {
     const area = document.createElement("div");
     area.className =
       "flex h-40 w-80 select-none items-center justify-center rounded-xl border border-dashed border-slate-300 text-sm text-slate-500";
-    area.textContent = "Clique com o botao direito";
+    area.textContent = "Clique com o botão direito";
     area.setAttribute("data-area", "");
     const menu = createMenu({}, null, USER_MENU.slice(2));
     area.addEventListener("contextmenu", (event) => {
@@ -195,7 +195,7 @@ export const ContextMenu = {
     await expect(menu).toHaveAttribute("data-ark-side", "bottom");
     expect(menu.contains(document.activeElement)).toBe(true);
 
-    // Reaberto noutro ponto sem fechar: so reposiciona.
+    // Reaberto noutro ponto sem fechar: só reposiciona.
     menu.openAt(x + 20, y + 10);
     expect(menu.style.left).toBe(`${x + 20}px`);
 
@@ -221,12 +221,12 @@ export const DarkTheme = {
 
 export const OpensSelectsAndCloses = {
   render: () => createScene({}),
-  // Clique no gatilho abre com a semantica de menu e foca o primeiro item; escolher um item emite ark-select,
+  // Clique no gatilho abre com a semântica de menu e foca o primeiro item; escolher um item emite ark-select,
   // fecha e devolve o foco ao gatilho; o gatilho alterna.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const menu = canvasElement.querySelector("ark-menu") as MenuEl;
-    const trigger = canvas.getByText("Acoes");
+    const trigger = canvas.getByText("Ações");
     const events: string[] = [];
     menu.addEventListener("ark-open", () => events.push("open"));
     menu.addEventListener("ark-close", () => events.push("close"));
@@ -269,12 +269,12 @@ export const OpensSelectsAndCloses = {
 
 export const KeyboardNavigation = {
   render: () => createScene({}),
-  // Setas no gatilho abrem com o foco no primeiro/ultimo item; setas ciclam pulando desabilitados, divisores e
-  // estaticos; Home/End; Enter seleciona; Esc fecha e devolve o foco ao gatilho.
+  // Setas no gatilho abrem com o foco no primeiro/último item; setas ciclam pulando desabilitados, divisores e
+  // estáticos; Home/End; Enter seleciona; Esc fecha e devolve o foco ao gatilho.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const menu = canvasElement.querySelector("ark-menu") as MenuEl;
-    const trigger = canvas.getByText("Acoes");
+    const trigger = canvas.getByText("Ações");
     const byValue = (value: string): HTMLElement => menu.querySelector(`[value="${value}"]`) as HTMLElement;
     const selected: string[] = [];
     menu.addEventListener("ark-select", (event) =>
@@ -288,7 +288,7 @@ export const KeyboardNavigation = {
 
     await userEvent.keyboard("{ArrowDown}");
     expect(document.activeElement).toBe(byValue("duplicate"));
-    // "share" esta desabilitado: pulado.
+    // "share" está desabilitado: pulado.
     await userEvent.keyboard("{ArrowDown}");
     expect(document.activeElement).toBe(byValue("pinned"));
     await userEvent.keyboard("{ArrowDown}");
@@ -319,7 +319,7 @@ export const KeyboardNavigation = {
 
 export const ItemKinds = {
   render: () => createScene({}),
-  // Papeis por tipo: menuitem, menuitemcheckbox com aria-checked e check, separator e conteudo estatico sem role.
+  // Papéis por tipo: menuitem, menuitemcheckbox com aria-checked e check, separator e conteúdo estático sem role.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const menu = canvasElement.querySelector("ark-menu") as MenuEl;
     const items = Array.from(menu.querySelectorAll("ark-menu-item"));
@@ -340,7 +340,7 @@ export const ItemKinds = {
     await expect(pinned).toHaveAttribute("aria-checked", "false");
     expect(pinned.querySelector('[data-ark="menu-item-check"]')).toBeNull();
 
-    // Itens desabilitados nao selecionam.
+    // Itens desabilitados não selecionam.
     menu.show();
     const selected: string[] = [];
     menu.addEventListener("ark-select", (event) =>
@@ -358,7 +358,7 @@ export const LateTriggerAndNativeClose = {
     const wrap = document.createElement("div");
     wrap.className = "flex flex-wrap items-center gap-3";
     const menu = createMenu({}, "late-trigger");
-    // O gatilho so entra no DOM ao clicar aqui: o menu ja existe e o encontra quando ele aparece.
+    // O gatilho só entra no DOM ao clicar aqui: o menu já existe e o encontra quando ele aparece.
     const mount = document.createElement("ark-button");
     mount.setAttribute("size", "sm");
     mount.textContent = "Montar gatilho";
@@ -389,7 +389,7 @@ export const LateTriggerAndNativeClose = {
     await expect(trigger).toHaveAttribute("aria-expanded", "false");
     expect(events).toEqual(["open", "close"]);
 
-    // O atributo open tambem abre e fecha.
+    // O atributo open também abre e fecha.
     menu.setAttribute("open", "");
     expect(popoverOpen(menu)).toBe(true);
     menu.removeAttribute("open");
@@ -402,7 +402,7 @@ export const FlipsWhenThereIsNoRoom = {
   render: () => {
     const wrap = document.createElement("div");
     wrap.className = "flex items-center gap-3";
-    // Colado no fundo da viewport: nao ha espaco embaixo, o menu vira para cima.
+    // Colado no fundo da viewport: não há espaço embaixo, o menu vira para cima.
     wrap.style.cssText = "position: fixed; bottom: 8px; left: 8px;";
     const id = `menu-trigger-${++seq}`;
     wrap.append(createTrigger(id, "No fundo"), createMenu({ direction: "down", align: "start" }, id));

@@ -21,7 +21,7 @@ const meta = {
   },
   args: {
     label: "Certificado",
-    helper: "PEM ou PFX de ate 2 MB.",
+    helper: "PEM ou PFX de até 2 MB.",
     errorMessage: "",
     accept: ".pem,.pfx",
     multiple: false,
@@ -87,7 +87,7 @@ function createFileInput(args: Partial<StoryArgs>): FileInputEl {
 
 function fileList(...names: string[]): FileList {
   const transfer = new DataTransfer();
-  for (const name of names) transfer.items.add(new File([`conteudo de ${name}`], name, { type: "text/plain" }));
+  for (const name of names) transfer.items.add(new File([`conteúdo de ${name}`], name, { type: "text/plain" }));
   return transfer.files;
 }
 
@@ -152,7 +152,7 @@ export const States = {
   render: () =>
     column(
       createFileInput({
-        label: "Importar colecao",
+        label: "Importar coleção",
         helper: "JSON exportado do Arkuest ou do Postman.",
         accept: ".json",
         lang: "pt"
@@ -160,7 +160,7 @@ export const States = {
       createFileInput({ label: "Certificado", errorMessage: "O arquivo precisa ser um .pem ou .pfx.", lang: "pt" }),
       createFileInput({ label: "Anexos", multiple: true, lang: "pt" }),
       createFileInput({
-        label: "Pasta da colecao",
+        label: "Pasta da coleção",
         helper: "A pasta inteira, com as subpastas.",
         directory: true,
         lang: "pt"
@@ -178,7 +178,7 @@ export const Sizes = {
     )
 };
 
-// Escolha pelo seletor (simulada no input oculto), soltar na zona com realce, lista, anuncio e change; sem
+// Escolha pelo seletor (simulada no input oculto), soltar na zona com realce, lista, anúncio e change; sem
 // multiple o drop fica com o primeiro; FormData leva o arquivo; disabled ignora o drop; erro no aria.
 export const SelectsAndDrops = {
   render: () => {
@@ -247,15 +247,15 @@ export const SelectsAndDrops = {
     await expect(list.textContent).toBe("Nenhum arquivo selecionado");
     await expect(changes).toHaveLength(3);
 
-    // Erro e helper descrevem o botao, que e o controle focavel.
-    host.setAttribute("error-message", "Arquivo invalido");
+    // Erro e helper descrevem o botão, que e o controle focável.
+    host.setAttribute("error-message", "Arquivo inválido");
     await expect(button).toHaveAttribute("aria-invalid", "true");
-    await expect(button).toHaveAccessibleDescription("Arquivo invalido");
+    await expect(button).toHaveAccessibleDescription("Arquivo inválido");
     await expect(host.querySelector('[data-ark="file-input-error"]')).not.toBeNull();
     host.removeAttribute("error-message");
     await expect(button).toHaveAttribute("aria-invalid", "false");
 
-    // Desabilitado: botao e input nativos; o drop e ignorado.
+    // Desabilitado: botão e input nativos; o drop e ignorado.
     host.setAttribute("disabled", "");
     await expect(button).toBeDisabled();
     await expect(input.disabled).toBe(true);
@@ -325,18 +325,18 @@ export const RejectsDroppedFolder = {
 // uma pasta solta é lida até o fim, com as subpastas, e `change` leva files e paths; a lista é um resumo e o anúncio
 // também. Arquivos soltos entram com o próprio nome. Tirar o atributo devolve o campo de arquivo.
 export const DirectorySelectsAndDrops = {
-  render: () => createFileInput({ label: "Pasta da colecao", directory: true, lang: "pt", testid: "pasta" }),
+  render: () => createFileInput({ label: "Pasta da coleção", directory: true, lang: "pt", testid: "pasta" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const canvas = within(canvasElement);
     const host = canvasElement.querySelector("ark-file-input") as FileInputEl;
     const input = host.inputElement;
     const zone = host.querySelector('[data-ark="file-input-zone"]') as HTMLElement;
     const list = host.querySelector('[data-ark="file-input-list"]') as HTMLElement;
-    const button = canvas.getByRole("button", { name: "Pasta da colecao Escolher pasta" });
+    const button = canvas.getByRole("button", { name: "Pasta da coleção Escolher pasta" });
     const changes: Array<{ files: File[]; paths?: string[] }> = [];
     host.addEventListener("change", (event) => changes.push((event as CustomEvent).detail));
     const announcer = () => document.querySelector('[data-ark="announcer"]')?.textContent ?? "";
-    const file = (name: string) => new File([`conteudo de ${name}`], name, { type: "text/plain" });
+    const file = (name: string) => new File([`conteúdo de ${name}`], name, { type: "text/plain" });
 
     await expect(host.directory).toBe(true);
     await expect(input).toHaveAttribute("webkitdirectory");

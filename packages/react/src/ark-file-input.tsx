@@ -10,11 +10,11 @@ export type ArkFileInputProps = ArkDomProps<
   ArkFileInputStyleOptions & {
     /** Tipos aceitos pelo seletor nativo (accept). */
     accept?: string;
-    /** Aceita varios arquivos; sem ele o drop fica com o primeiro. */
+    /** Aceita vários arquivos; sem ele o drop fica com o primeiro. */
     multiple?: boolean;
-    /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona le as pastas soltas. Padrao: desligado. */
+    /** Escolhe uma pasta inteira: o seletor abre em modo pasta e a zona lê as pastas soltas. Padrão: desligado. */
     directory?: boolean;
-    /** Rotulo do campo (label for o input oculto; nomeia o botao junto do texto dele). */
+    /** Rótulo do campo (label for o input oculto; nomeia o botão junto do texto dele). */
     label?: string;
     helper?: string;
     /** Mensagem de erro; liga aria-invalid e a borda de erro. */
@@ -23,7 +23,7 @@ export type ArkFileInputProps = ArkDomProps<
     error?: boolean;
     disabled?: boolean;
     required?: boolean;
-    /** Nome no formulario (input nativo oculto). */
+    /** Nome no formulário (input nativo oculto). */
     name?: string;
     className?: string;
     /** Arquivos escolhidos ou soltos em detail.files (array de File); com `directory`, detail.paths traz os caminhos. */

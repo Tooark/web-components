@@ -1,5 +1,5 @@
-// Imprime a secao do CHANGELOG.md de uma versao (`## [X.Y.Z] - data` ate o proximo `## `), para virar as notas
-// da GitHub Release. Sem secao, imprime um texto padrao. Uso: node scripts/changelog-section.mjs 1.2.0
+// Imprime a seção do CHANGELOG.md de uma versão (`## [X.Y.Z] - data` até o próximo `## `), para virar as notas
+// da GitHub Release. Sem seção, imprime um texto padrão. Uso: node scripts/changelog-section.mjs 1.2.0
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 const version = process.argv[2];
 if (!version) {
-  console.error("uso: changelog-section.mjs <versao>");
+  console.error("uso: changelog-section.mjs <versão>");
   process.exit(1);
 }
 
@@ -28,7 +28,7 @@ for (let index = start + 1; index < lines.length; index++) {
     break;
   }
 }
-// Os links de referencia ([1.0.0]: https://...) ficam no fim do arquivo e nao fazem parte da secao.
+// Os links de referência ([1.0.0]: https://...) ficam no fim do arquivo e não fazem parte da seção.
 const body = lines
   .slice(start + 1, end)
   .filter((line) => !/^\[[^\]]+\]: /.test(line))

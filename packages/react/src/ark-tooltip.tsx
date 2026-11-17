@@ -7,9 +7,9 @@ import { ensureTooarkComponentsRegistered } from "./register.js";
 export type ArkTooltipProps = PropsWithChildren<
   ArkDomProps<
     ArkTooltipStyleOptions & {
-      /** Texto do balao; para conteudo rico, passe um filho com slot="content". */
+      /** Texto do balão; para conteúdo rico, passe um filho com slot="content". */
       content?: string;
-      /** Aberto; refletido do estado do balao. */
+      /** Aberto; refletido do estado do balão. */
       open?: boolean;
       className?: string;
     }

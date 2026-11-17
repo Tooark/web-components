@@ -13,7 +13,7 @@ export type ArkCopyButtonProps = PropsWithChildren<
       value?: string;
       /** id de um elemento (vira o atributo for): copia o value de inputs/textareas ou o textContent. */
       htmlFor?: string;
-      /** Duracao do feedback "copiado" em ms. Padrao: 1500. */
+      /** Duração do feedback "copiado" em ms. Padrão: 1500. */
       feedbackMs?: number;
       disabled?: boolean;
       className?: string;

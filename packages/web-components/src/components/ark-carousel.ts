@@ -118,9 +118,9 @@ export class ArkCarousel extends HTMLElementBase {
     }
 
     this.currentIndex = this.normalizeIndex(this.getStartIndex());
-    // O offsetLeft dos slides so existe depois do layout, entao o posicionamento inicial espera um frame. Ele parte
-    // do indice ATUAL, nao do start-index: um next()/click no primeiro frame ja mudou o indice e disparou o evento, e
-    // voltar ao inicio aqui deixava a rolagem suave seguir sozinha ate o slide, com um segundo ark-slide-change.
+    // O offsetLeft dos slides só existe depois do layout, então o posicionamento inicial espera um frame. Ele parte
+    // do índice ATUAL, não do start-index: um next()/click no primeiro frame já mudou o índice e disparou o evento, e
+    // voltar ao início aqui deixava a rolagem suave seguir sozinha até o slide, com um segundo ark-slide-change.
     this.mountFrame = requestAnimationFrame(() => {
       this.mountFrame = null;
       this.goTo(this.currentIndex, { behavior: "auto" });

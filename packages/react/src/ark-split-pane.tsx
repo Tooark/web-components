@@ -9,10 +9,10 @@ import { useForwardedRef } from "./use-forwarded-ref.js";
 export type ArkSplitPaneProps = PropsWithChildren<
   ArkDomProps<
     ArkSplitPaneStyleOptions & {
-      /** Tamanhos dos paineis em percentuais, na ordem dos filhos (ex.: [30, 70]); faltantes sao distribuidos. */
+      /** Tamanhos dos painéis em percentuais, na ordem dos filhos (ex.: [30, 70]); faltantes são distribuídos. */
       sizes?: number[];
       className?: string;
-      /** Tamanhos mudaram por arrasto ou teclado: detail.sizes e a lista normalizada. Persistir e do app. */
+      /** Tamanhos mudaram por arrasto ou teclado: detail.sizes é a lista normalizada. Persistir é do app. */
       onResize?: (event: CustomEvent<{ sizes: number[] }>) => void;
     }
   >

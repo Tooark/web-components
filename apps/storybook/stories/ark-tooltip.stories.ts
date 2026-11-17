@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Dica de contexto: o host `ark-tooltip` envolve o gatilho (primeiro filho sem `slot`, que precisa ser focavel) sem move-lo e cria o balao como `popover="manual"` (top layer, escapa de `overflow`). Texto por `content`; conteudo rico num filho `slot="content"`, que passa a ser o proprio balao. `side` com flip quando nao cabe, `delay` no hover (o foco abre na hora), Esc e pointerdown fecham; o gatilho recebe `aria-describedby`.'
+          'Dica de contexto: o host `ark-tooltip` envolve o gatilho (primeiro filho sem `slot`, que precisa ser focável) sem movê-lo e cria o balão como `popover="manual"` (top layer, escapa de `overflow`). Texto por `content`; conteúdo rico num filho `slot="content"`, que passa a ser o próprio balão. `side` com flip quando não cabe, `delay` no hover (o foco abre na hora), Esc e pointerdown fecham; o gatilho recebe `aria-describedby`.'
       }
     }
   },
@@ -19,7 +19,7 @@ const meta = {
     theme: { control: "select", options: ["auto", "light", "dark"] }
   },
   args: {
-    content: "Enviar a requisicao (Ctrl+Enter)",
+    content: "Enviar a requisição (Ctrl+Enter)",
     side: "top",
     delay: 200,
     theme: "auto"
@@ -64,7 +64,7 @@ function createTooltip(args: Partial<StoryArgs>, triggerText?: string, rich?: HT
 function createScene(args: Partial<StoryArgs>, triggerText?: string, rich?: HTMLElement): HTMLElement {
   const wrap = document.createElement("div");
   wrap.className = "flex flex-wrap items-center gap-3";
-  // Espaco em volta inline (nao depende do CSS do preview): a dica precisa caber no lado pedido.
+  // Espaço em volta inline (não depende do CSS do preview): a dica precisa caber no lado pedido.
   wrap.style.padding = "4rem 2rem";
   wrap.appendChild(createTooltip(args, triggerText, rich));
   return wrap;
@@ -124,7 +124,7 @@ export const DarkTheme = {
 };
 
 export const HoverOpensAfterDelay = {
-  render: () => createScene({ content: "Enviar a requisicao", delay: 150 }),
+  render: () => createScene({ content: "Enviar a requisição", delay: 150 }),
   // Hover abre depois do delay com role tooltip no top layer e aria-describedby no gatilho; sair fecha depois da
   // tolerância que deixa o ponteiro chegar ao balão.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -135,7 +135,7 @@ export const HoverOpensAfterDelay = {
     await expect(bubble).toHaveAttribute("role", "tooltip");
     await expect(bubble).toHaveAttribute("popover", "manual");
     await expect(trigger).toHaveAttribute("aria-describedby", bubble.id);
-    expect(bubble.textContent).toBe("Enviar a requisicao");
+    expect(bubble.textContent).toBe("Enviar a requisição");
     expect(popoverOpen(bubble)).toBe(false);
     expect(tooltip.hasAttribute("data-ark-chrome")).toBe(false);
     expect(tooltip.firstElementChild).toBe(trigger);
@@ -193,7 +193,7 @@ export const HoverReachesTheBubble = {
 };
 
 export const FocusOpensAndEscCloses = {
-  render: () => createScene({ content: "Enviar a requisicao" }),
+  render: () => createScene({ content: "Enviar a requisição" }),
   // Foco abre na hora, Esc fecha, perder o foco fecha; pointerdown no gatilho dispensa.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const tooltip = canvasElement.querySelector("ark-tooltip") as TooltipEl;
@@ -217,7 +217,7 @@ export const FocusOpensAndEscCloses = {
     await userEvent.pointer({ keys: "[/MouseLeft]", target: trigger });
     await userEvent.unhover(trigger);
 
-    // O atributo open tambem abre e fecha.
+    // O atributo open também abre e fecha.
     tooltip.setAttribute("open", "");
     expect(popoverOpen(bubble)).toBe(true);
     tooltip.removeAttribute("open");
@@ -227,7 +227,7 @@ export const FocusOpensAndEscCloses = {
 
 export const RichContentIsTheBubble = {
   render: () => createScene({ side: "bottom", delay: 0 }, "Saude", createHealth()),
-  // O filho slot="content" do usuario vira o proprio balao: popover, role, id e hook nele, sem mover nada.
+  // O filho slot="content" do usuário vira o próprio balão: popover, role, id e hook nele, sem mover nada.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const tooltip = canvasElement.querySelector("ark-tooltip") as TooltipEl;
     const trigger = tooltip.querySelector("ark-button") as HTMLElement;
@@ -253,9 +253,9 @@ export const FlipsWhenThereIsNoRoom = {
   render: () => {
     const wrap = document.createElement("div");
     wrap.className = "flex items-center gap-3";
-    // Colado no topo da viewport: nao ha espaco em cima, a dica vira para baixo.
+    // Colado no topo da viewport: não há espaço em cima, a dica vira para baixo.
     wrap.style.cssText = "position: fixed; top: 8px; left: 8px;";
-    wrap.appendChild(createTooltip({ content: "Sem espaco em cima", side: "top", delay: 0 }, "No topo"));
+    wrap.appendChild(createTooltip({ content: "Sem espaço em cima", side: "top", delay: 0 }, "No topo"));
     return wrap;
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

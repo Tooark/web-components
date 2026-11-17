@@ -38,7 +38,7 @@ type StoryArgs = {
 
 type AvatarEl = HTMLElement & { initials: string };
 
-/** Imagem quebrada sem rede: bytes que nao decodificam disparam `error` na hora (uma URL invalida depende de DNS). */
+/** Imagem quebrada sem rede: bytes que não decodificam disparam `error` na hora (uma URL inválida depende de DNS). */
 const BROKEN = "data:image/png;base64,AAAA";
 
 /** Imagem de exemplo inline (SVG em data URI), sem rede. */
@@ -177,7 +177,7 @@ export const Stack = {
   }
 };
 
-// Iniciais por name (primeira letra, ou primeira + ultima com sobrenome), role="img" nomeado; sem nome fica
+// Iniciais por name (primeira letra, ou primeira + última com sobrenome), role="img" nomeado; sem nome fica
 // decorativo com o glifo; a imagem cai para as iniciais em erro de carga e volta quando o src muda.
 export const Semantics = {
   render: () => createAvatar({ name: "Ana Lima" }),
@@ -205,7 +205,7 @@ export const Semantics = {
     avatar.setAttribute("name", "Ana Lima");
     await expect(initials.textContent).toBe("AL");
 
-    // Imagem valida: as iniciais somem; imagem quebrada: voltam.
+    // Imagem válida: as iniciais somem; imagem quebrada: voltam.
     avatar.setAttribute("src", PHOTO);
     const image = avatar.querySelector('[data-ark="avatar-image"]') as HTMLImageElement;
     await expect(image.alt).toBe("Ana Lima");
@@ -217,7 +217,7 @@ export const Semantics = {
     avatar.removeAttribute("src");
     await expect(avatar.querySelector("img")).toBeNull();
 
-    // Cor propria: variaveis inline e classes por variavel.
+    // Cor própria: variáveis inline e classes por variável.
     avatar.setAttribute("color", "rgb(220, 38, 38)");
     await expect(avatar.style.getPropertyValue("--ark-avatar-fg")).toBe("rgb(220, 38, 38)");
     await expect(getComputedStyle(avatar).color).toBe("rgb(220, 38, 38)");

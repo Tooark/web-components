@@ -6,7 +6,7 @@ const meta = {
   parameters: { layout: "padded" },
   argTypes: {
     value: { control: "text" },
-    label: { control: "text", description: "Filhos do usuario; vazio usa o rotulo proprio (copy/copied)" },
+    label: { control: "text", description: "Filhos do usuário; vazio usa o rótulo próprio (copy/copied)" },
     feedbackMs: { control: "number" },
     variant: { control: "select", options: ["primary", "solid", "outline", "ghost", "secondary", "neutral"] },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
@@ -97,7 +97,7 @@ export const Sizes = {
     )
 };
 
-// Painel de resposta: o botao copia o texto do elemento apontado por `for`.
+// Painel de resposta: o botão copia o texto do elemento apontado por `for`.
 export const CopyFromElement = {
   render: () => {
     const wrap = document.createElement("div");
@@ -143,14 +143,14 @@ export const CopyFromInput = {
   }
 };
 
-// Copia, troca icone/rotulo/title por "copiado" durante feedback-ms, anuncia e emite ark-copy com o texto;
-// com filhos so o icone e o title mudam; icon-only leva o rotulo ao aria-label; `for` le value ou texto.
+// Copia, troca ícone/rótulo/title por "copiado" durante feedback-ms, anuncia e emite ark-copy com o texto;
+// com filhos só o ícone e o title mudam; icon-only leva o rótulo ao aria-label; `for` lê value ou texto.
 export const CopiesAndGivesFeedback = {
   render: () => {
     const wrap = row(
       createCopyButton({ value: "texto copiado", feedbackMs: 300, lang: "pt", variant: "outline" }),
-      createCopyButton({ value: "com rotulo", feedbackMs: 300, lang: "pt", label: "Copiar URL", variant: "outline" }),
-      createCopyButton({ value: "so icone", feedbackMs: 300, lang: "pt", iconOnly: true, variant: "outline" })
+      createCopyButton({ value: "com rótulo", feedbackMs: 300, lang: "pt", label: "Copiar URL", variant: "outline" }),
+      createCopyButton({ value: "só ícone", feedbackMs: 300, lang: "pt", iconOnly: true, variant: "outline" })
     );
     const source = document.createElement("span");
     source.id = "fonte-texto";
@@ -170,7 +170,7 @@ export const CopiesAndGivesFeedback = {
     canvasElement.addEventListener("ark-copy", (event) =>
       copies.push((event as CustomEvent<{ value: string }>).detail.value)
     );
-    // Sem permissao de clipboard no runner: registra o que seria escrito.
+    // Sem permissão de clipboard no runner: registra o que seria escrito.
     const written: string[] = [];
     Object.defineProperty(navigator, "clipboard", {
       configurable: true,
@@ -197,7 +197,7 @@ export const CopiesAndGivesFeedback = {
     await waitFor(() => expect(plain).not.toHaveAttribute("data-ark-copied"));
     await expect(plain.textContent?.trim()).toBe("Copiar");
 
-    // Filhos do usuario: rotulo intacto, so icone e title mudam.
+    // Filhos do usuário: rótulo intacto, só ícone e title mudam.
     await expect(labelled.querySelector('[data-ark="copy-button-text"]')).toBeNull();
     await userEvent.click(labelled);
     await waitFor(() => expect(labelled).toHaveAttribute("data-ark-copied"));
@@ -210,12 +210,12 @@ export const CopiesAndGivesFeedback = {
     await userEvent.click(iconOnly);
     await waitFor(() => expect(iconOnly).toHaveAttribute("aria-label", "Copiado"));
 
-    // `for`: texto do elemento; a propriedade value tambem devolve.
+    // `for`: texto do elemento; a propriedade value também devolve.
     await expect(fromEl.value).toBe("texto da fonte");
     await expect(await fromEl.copy()).toBe(true);
     await expect(written.at(-1)).toBe("texto da fonte");
 
-    // Desabilitado nao copia.
+    // Desabilitado não copia.
     plain.setAttribute("disabled", "");
     await expect(await plain.copy()).toBe(false);
   }
@@ -249,10 +249,10 @@ export const PropertiesAndFallbacks = {
     wrap.appendChild(createCopyButton({ htmlFor: "nao-existe", feedbackMs: 300, lang: "en", variant: "outline" }));
     return wrap;
   },
-  // Setters refletem nos atributos; `for` le o value de um input e devolve vazio sem alvo; `locale-json` troca os
-  // rotulos; copiar de novo dentro do feedback reinicia o timer; sem Clipboard API cai no execCommand com um
-  // textarea temporario; icon-only escreve o aria-label proprio sem apagar um do usuario; filhos do usuario
-  // (fora comentarios) tiram o rotulo proprio e o icone volta ao inicio do host.
+  // Setters refletem nos atributos; `for` lê o value de um input e devolve vazio sem alvo; `locale-json` troca os
+  // rótulos; copiar de novo dentro do feedback reinicia o timer; sem Clipboard API cai no execCommand com um
+  // textarea temporário; icon-only escreve o aria-label próprio sem apagar um do usuário; filhos do usuário
+  // (fora comentários) tiram o rótulo próprio e o ícone volta ao início do host.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const [el, fromInput, missing] = Array.from(canvasElement.querySelectorAll("ark-copy-button")) as CopyButtonEl[];
     const written: string[] = [];
@@ -286,14 +286,14 @@ export const PropertiesAndFallbacks = {
       missing.removeAttribute("for");
       expect(missing.value).toBe("");
 
-      // locale-json vale com lang="custom" e e mesclado sobre o en.
+      // locale-json vale com lang="custom" e é mesclado sobre o en.
       el.setAttribute("locale-json", JSON.stringify({ copy: "Copiar link", copied: "Link copiado" }));
       expect(el.textContent?.trim()).toBe("Copy");
       el.setAttribute("lang", "custom");
       expect(el.textContent?.trim()).toBe("Copiar link");
       expect(el.title).toBe("Copiar link");
 
-      // Duas copias dentro do feedback: um so ciclo, timer reiniciado.
+      // Duas cópias dentro do feedback: um só ciclo, timer reiniciado.
       expect(await el.copy()).toBe(true);
       expect(await el.copy()).toBe(true);
       expect(el.textContent?.trim()).toBe("Link copiado");
@@ -307,26 +307,26 @@ export const PropertiesAndFallbacks = {
       expect(document.querySelector("textarea")).toBeNull();
       await waitFor(() => expect(el).not.toHaveAttribute("data-ark-copied"));
       document.execCommand = () => {
-        throw new Error("sem permissao");
+        throw new Error("sem permissão");
       };
       expect(await el.copy()).toBe(false);
       expect(el).not.toHaveAttribute("data-ark-copied");
 
-      // icon-only: aria-label proprio, retirado ao voltar; um aria-label do usuario fica.
+      // icon-only: aria-label próprio, retirado ao voltar; um aria-label do usuário fica.
       el.setAttribute("icon-only", "");
       await expect(el).toHaveAttribute("aria-label", "Copiar link");
       expect(el.querySelector('[data-ark="copy-button-text"]')).toBeNull();
       el.removeAttribute("icon-only");
       expect(el.hasAttribute("aria-label")).toBe(false);
       expect(el.querySelector('[data-ark="copy-button-text"]')).not.toBeNull();
-      el.setAttribute("aria-label", "Meu rotulo");
+      el.setAttribute("aria-label", "Meu rótulo");
       el.setAttribute("icon-only", "");
-      await expect(el).toHaveAttribute("aria-label", "Meu rotulo");
+      await expect(el).toHaveAttribute("aria-label", "Meu rótulo");
       el.removeAttribute("icon-only");
-      await expect(el).toHaveAttribute("aria-label", "Meu rotulo");
+      await expect(el).toHaveAttribute("aria-label", "Meu rótulo");
 
-      // Comentario nao conta como conteudo do usuario; um elemento inserido antes do icone manda o icone de
-      // volta ao inicio e dispensa o rotulo proprio.
+      // Comentário não conta como conteúdo do usuário; um elemento inserido antes do ícone manda o ícone de
+      // volta ao início e dispensa o rótulo próprio.
       el.appendChild(document.createComment("nota"));
       await new Promise((resolve) => setTimeout(resolve, 0));
       expect(el.querySelector('[data-ark="copy-button-text"]')).not.toBeNull();

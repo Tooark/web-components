@@ -19,7 +19,7 @@ export const ArkSplitPane = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    // Evento customizado do DOM: ouvido no elemento, nao pelo h(), que nao mapeia nomes com hifen.
+    // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
     const resizeHandler = (event: Event) => emit("ark-resize", event as CustomEvent<{ sizes: number[] }>);
     onMounted(() => elRef.value?.addEventListener("ark-resize", resizeHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-resize", resizeHandler));

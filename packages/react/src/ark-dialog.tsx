@@ -9,20 +9,20 @@ import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 export type ArkDialogProps = PropsWithChildren<
   ArkDomProps<
     ArkDialogStyleOptions & {
-      /** Aberto; a saida anima antes de sair do top layer. */
+      /** Aberto; a saída anima antes de sair do top layer. */
       open?: boolean;
-      /** Titulo (h2) e nome acessivel. Sem ele, passe aria-label. */
+      /** Título (h2) e nome acessível. Sem ele, passe aria-label. */
       label?: string;
-      /** Esconde o botao de fechar do cabecalho. */
+      /** Esconde o botão de fechar do cabeçalho. */
       noCloseButton?: boolean;
-      /** Esc e clique no scrim nao fecham. */
+      /** Esc e clique no scrim não fecham. */
       persistent?: boolean;
-      /** A pagina continua rolando com o dialogo aberto. */
+      /** A página continua rolando com o diálogo aberto. */
       noScrollLock?: boolean;
       "aria-label"?: string;
       className?: string;
       onOpen?: (event: CustomEvent) => void;
-      /** O fechamento comecou; detail.reason diz por que (escape, backdrop, close-button, api). */
+      /** O fechamento começou; detail.reason diz por que (escape, backdrop, close-button, api). */
       onClose?: (event: CustomEvent<{ reason: ArkDialogCloseReason }>) => void;
     }
   >
@@ -69,7 +69,7 @@ export const ArkDialog = forwardRef<ArkDialogElement, ArkDialogProps>(
       ref: setRef,
       class: className,
       open: open ? "" : undefined,
-      // Numero vira string aqui; o componente acrescenta px a numeros sem unidade.
+      // Número vira string aqui; o componente acrescenta px a números sem unidade.
       width: width === undefined ? undefined : String(width),
       height: height === undefined ? undefined : String(height),
       "no-close-button": noCloseButton ? "" : undefined,

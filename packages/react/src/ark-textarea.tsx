@@ -12,13 +12,13 @@ export type ArkTextareaProps = PropsWithChildren<
       placeholder?: string;
       value?: string;
       name?: string;
-      /** Linhas visiveis iniciais. Padrao: 3. */
+      /** Linhas visíveis iniciais. Padrão: 3. */
       rows?: number;
-      /** Cresce com o conteudo (field-sizing nativo, fallback por JS). */
+      /** Cresce com o conteúdo (field-sizing nativo, fallback por JS). */
       autosize?: boolean;
-      /** Fonte monoespacada, para codigo e dados. */
+      /** Fonte monoespaçada, para código e dados. */
       monospace?: boolean;
-      /** Direcoes de redimensionamento pelo usuario. Padrao: "vertical". */
+      /** Direções de redimensionamento pelo usuário. Padrão: "vertical". */
       resize?: ArkTextareaResize;
       helper?: string;
       error?: boolean;

@@ -9,7 +9,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Motion tokens (--ark-duration-*, --ark-ease-*) e presets de animacao do @tooark/core: classes CSS (.ark-animate-*) e helpers WAAPI (arkEnter/arkExit). Respeita prefers-reduced-motion automaticamente; o skeleton e estatico por padrao (.ark-skeleton-animated pulsa) e o spinner continua girando sob movimento reduzido."
+          "Motion tokens (--ark-duration-*, --ark-ease-*) e presets de animação do @tooark/core: classes CSS (.ark-animate-*) e helpers WAAPI (arkEnter/arkExit). Respeita prefers-reduced-motion automaticamente; o skeleton é estático por padrão (.ark-skeleton-animated pulsa) e o spinner continua girando sob movimento reduzido."
       }
     }
   }
@@ -100,7 +100,7 @@ export const Presets = {
     }
     container.appendChild(waapi.section);
 
-    const loading = createSection("Atencao e loading");
+    const loading = createSection("Atenção e loading");
 
     const shake = createTile(".ark-animate-shake");
     shake.addEventListener("click", () => replayClass(shake, "ark-animate-shake"));
@@ -117,7 +117,7 @@ export const Presets = {
     pulse.classList.add("ark-animate-pulse");
     loading.grid.appendChild(pulse);
 
-    // Skeleton estatico por padrao; o pulso e opt-in.
+    // Skeleton estático por padrão; o pulso é opt-in.
     for (const extra of ["", " ark-skeleton-animated"]) {
       const skeletonTile = createTile("");
       skeletonTile.title = extra ? ".ark-skeleton.ark-skeleton-animated" : ".ark-skeleton";
@@ -143,7 +143,7 @@ export const Tokens = {
     const container = document.createElement("div");
     container.className = "mx-auto max-w-3xl";
 
-    const durations = createSection("Duracoes — clique em uma barra para ver a duracao");
+    const durations = createSection("Durações — clique em uma barra para ver a duração");
     durations.grid.className = "flex flex-col gap-2";
     for (const name of Object.keys(ARK_DURATION_MS) as ArkDuration[]) {
       const row = document.createElement("button");
@@ -245,12 +245,12 @@ export const ReducedMotionOverride = {
     const container = document.createElement("div");
     container.className = "mx-auto max-w-3xl";
 
-    const section = createSection("Movimento reduzido vence os overrides de duracao do app");
+    const section = createSection("Movimento reduzido vence os overrides de duração do app");
     section.grid.className = "flex flex-col gap-2 text-xs text-slate-600";
 
     const text = document.createElement("p");
     text.textContent =
-      "Nem um `:root { --ark-duration-default: 180ms }` escrito depois do CSS da lib, fora de media query, nem um --ark-animate-duration no proprio elemento reativam os presets sob prefers-reduced-motion: os tokens zeram com !important e os presets fixam 0ms. A play desta story reproduz o cenario forcando as media queries a casar.";
+      "Nem um `:root { --ark-duration-default: 180ms }` escrito depois do CSS da lib, fora de media query, nem um --ark-animate-duration no próprio elemento reativam os presets sob prefers-reduced-motion: os tokens zeram com !important e os presets fixam 0ms. A play desta story reproduz o cenário forçando as media queries a casar.";
     section.grid.appendChild(text);
 
     const tile = createTile(".ark-animate-fade-in com --ark-animate-duration: 300ms");
@@ -262,7 +262,7 @@ export const ReducedMotionOverride = {
     container.appendChild(section.section);
     return container;
   },
-  // Os overrides valem sem a preferencia e perdem para o zeramento quando ela esta ativa.
+  // Os overrides valem sem a preferência e perdem para o zeramento quando ela está ativa.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const rules = findReducedMotionRules();
     expect(rules.length).toBeGreaterThan(0);
@@ -295,7 +295,7 @@ export const ReducedMotionOverride = {
       override.remove();
     }
 
-    // O que garante a vitoria do token acima e a prioridade da declaracao, nao a ordem das folhas.
+    // O que garante a vitória do token acima é a prioridade da declaração, não a ordem das folhas.
     const root = rules
       .flatMap((rule) => Array.from(rule.cssRules))
       .find(
@@ -314,12 +314,12 @@ export const ReducedMotionLoaders = {
     const container = document.createElement("div");
     container.className = "mx-auto max-w-3xl";
 
-    const section = createSection("Loaders continuos sao isentos de movimento reduzido; loops de atencao param");
+    const section = createSection("Loaders contínuos são isentos de movimento reduzido; loops de atenção param");
     section.grid.className = "flex flex-col gap-2 text-xs text-slate-600";
 
     const text = document.createElement("p");
     text.textContent =
-      "O spinner e o unico sinal de progresso e uma rotacao de 1em nao causa desconforto vestibular, entao .ark-animate-spin continua girando sob prefers-reduced-motion (1s fixo, nao token). Shake, pulse e .ark-skeleton-animated param; .ark-skeleton ja e estatico por padrao.";
+      "O spinner é o único sinal de progresso e uma rotação de 1em não causa desconforto vestibular, então .ark-animate-spin continua girando sob prefers-reduced-motion (1s fixo, não token). Shake, pulse e .ark-skeleton-animated param; .ark-skeleton já é estático por padrão.";
     section.grid.appendChild(text);
 
     const row = document.createElement("div");
@@ -345,7 +345,7 @@ export const ReducedMotionLoaders = {
     container.appendChild(section.section);
     return container;
   },
-  // Forca as media queries a casar, como na story acima, e compara o que para com o que continua.
+  // Força as media queries a casar, como na story acima, e compara o que para com o que continua.
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const rules = findReducedMotionRules();
     expect(rules.length).toBeGreaterThan(0);

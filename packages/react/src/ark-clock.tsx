@@ -10,7 +10,7 @@ export type ArkClockProps = ArkDomProps<
   ArkClockStyleOptions & {
     value?: string;
     lang?: ArkDatepickerLang;
-    /** JSON com strings proprias (hours, minutes, seconds), mesclado sobre o ingles, quando lang e "custom". */
+    /** JSON com strings próprias (hours, minutes, seconds), mesclado sobre o inglês, quando lang é "custom". */
     localeJson?: string;
     className?: string;
     onChange?: (detail: { value: string }) => void;
