@@ -23,6 +23,8 @@ import {
   ArkKvEditor as ReactArkKvEditor,
   ArkMenu as ReactArkMenu,
   ArkMenuItem as ReactArkMenuItem,
+  ArkNav as ReactArkNav,
+  ArkNavItem as ReactArkNavItem,
   ArkPagination as ReactArkPagination,
   ArkScheduler as ReactArkScheduler,
   ArkShapePicker as ReactArkShapePicker,
@@ -39,6 +41,8 @@ import {
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
+  ArkNav as VueArkNav,
+  ArkNavItem as VueArkNavItem,
   ArkPagination as VueArkPagination,
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
@@ -1048,6 +1052,113 @@ export const VueDataViewCellSlots = {
     cards.value = false;
     await waitFor(() => expect(view.querySelectorAll("td .nome")).toHaveLength(3));
     app.unmount();
+    await expect(problems).toEqual([]);
+  }
+};
+
+// A navegação com os wrappers: `collapsed`/`collapsible` chegam ao elemento, `value` marca o item atual e o
+// `ark-navigate` do item chega ao handler do nav ainda cancelável (listener síncrono), que é como o app roteia.
+export const ReactNavCollapsible = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const navigated: string[] = [];
+    const tree = (value: string, collapsed: boolean): ReactNode =>
+      createElement(
+        ReactArkNav,
+        {
+          label: "Principal",
+          value,
+          collapsed,
+          collapsible: true,
+          onNavigate: (event: CustomEvent<{ value: string }>) => {
+            event.preventDefault();
+            navigated.push(event.detail.value);
+          }
+        },
+        createElement(ReactArkNavItem, { key: "r", href: "/requests", label: "Requisições" }),
+        createElement(ReactArkNavItem, { key: "e", href: "/environments", label: "Ambientes" })
+      );
+
+    render(tree("/requests", false));
+    await expect(errors).toEqual([]);
+    const nav = canvasElement.querySelector("ark-nav") as HTMLElement;
+    const [requests, environments] = Array.from(canvasElement.querySelectorAll("ark-nav-item"));
+    await expect(nav).toHaveAttribute("collapsible", "");
+    await expect(nav).not.toHaveAttribute("collapsed");
+    await expect(requests).toHaveAttribute("current");
+
+    // Rede de segurança: o clique num link de verdade não pode navegar o iframe; registra se o item já cancelou.
+    const prevented: boolean[] = [];
+    canvasElement.addEventListener("click", (event) => {
+      prevented.push(event.defaultPrevented);
+      event.preventDefault();
+    });
+    environments.querySelector("a")?.click();
+    await expect(navigated).toEqual(["/environments"]);
+    await expect(prevented).toEqual([true]);
+
+    render(tree("/environments", true));
+    await expect(environments).toHaveAttribute("current");
+    await expect(requests).not.toHaveAttribute("current");
+    await expect(nav).toHaveAttribute("collapsed", "");
+    await expect(environments).toHaveAttribute("data-ark-rail");
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueNavCollapsible = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const navigated: string[] = [];
+    const value = ref("/requests");
+    const collapsed = ref(false);
+    const app = createApp({
+      setup: () => () =>
+        h(
+          VueArkNav,
+          {
+            label: "Principal",
+            value: value.value,
+            collapsed: collapsed.value,
+            collapsible: "hidden",
+            onArkNavigate: (event: CustomEvent<{ value: string }>) => {
+              event.preventDefault();
+              navigated.push(event.detail.value);
+            }
+          },
+          () => [
+            h(VueArkNavItem, { href: "/requests", label: "Requisições" }),
+            h(VueArkNavItem, { href: "/environments", label: "Ambientes" })
+          ]
+        )
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    const nav = canvasElement.querySelector("ark-nav") as HTMLElement;
+    const [requests, environments] = Array.from(canvasElement.querySelectorAll("ark-nav-item"));
+    await expect(nav).toHaveAttribute("collapsible", "hidden");
+    await expect(requests).toHaveAttribute("current");
+
+    const prevented: boolean[] = [];
+    canvasElement.addEventListener("click", (event) => {
+      prevented.push(event.defaultPrevented);
+      event.preventDefault();
+    });
+    environments.querySelector("a")?.click();
+    await expect(navigated).toEqual(["/environments"]);
+    await expect(prevented).toEqual([true]);
+
+    value.value = "/environments";
+    collapsed.value = true;
+    await nextTick();
+    await expect(environments).toHaveAttribute("current");
+    await expect(nav).toHaveAttribute("collapsed", "");
+    // Recolhida em `hidden`: só o cabeçalho e o botão ficam; os itens somem.
+    await expect(nav).toHaveAttribute("data-ark-hidden");
+    await expect(environments).not.toBeVisible();
     await expect(problems).toEqual([]);
   }
 };
