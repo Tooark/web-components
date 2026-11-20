@@ -111,14 +111,17 @@ const es: ArkWysiwygLabels = {
 const LOCALES: Record<Exclude<ArkWysiwygLang, "custom">, ArkWysiwygLabels> = { en, pt, es };
 
 /**
- * Resolve os rótulos da toolbar: `en`, `pt` ou `es` (desconhecido cai em `en`); `localeJson` (objeto ou JSON)
- * sobrescreve chave a chave, e é a única fonte de `custom`. Só strings entram; JSON inválido é ignorado.
+ * Resolve os rótulos da toolbar: `en`, `pt` ou `es`, também com região (`pt-BR` usa o `pt`; desconhecido cai em
+ * `en`); `localeJson` (objeto ou JSON) sobrescreve chave a chave, e é a única fonte de `custom`. Só strings entram;
+ * JSON inválido é ignorado.
  */
 export function resolveWysiwygLabels(
   lang?: string | null,
   localeJson?: string | Partial<ArkWysiwygLabels> | null
 ): ArkWysiwygLabels {
-  const base = LOCALES[(lang || "en").toLowerCase() as Exclude<ArkWysiwygLang, "custom">] ?? en;
+  // Idioma base da tag (`pt-BR` e `pt_br` viram `pt`), buscado como chave própria do mapa.
+  const key = (lang || "en").trim().toLowerCase().split(/[-_]/)[0] as Exclude<ArkWysiwygLang, "custom">;
+  const base: ArkWysiwygLabels = Object.getOwnPropertyDescriptor(LOCALES, key)?.value ?? en;
   let overrides: Partial<ArkWysiwygLabels> = {};
   if (typeof localeJson === "string" && localeJson.trim()) {
     try {
