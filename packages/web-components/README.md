@@ -65,7 +65,7 @@ registerTooarkComponents(); // idempotent
 
 A JS property your framework assigns to a raw tag before this call is picked up when the element upgrades, so the order does not matter.
 
-Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text.
+Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text; a tag with a region (`pt-BR`, `es-419`) uses its base language.
 
 ---
 
