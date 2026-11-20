@@ -448,9 +448,10 @@ export class ArkRadio extends HTMLElementBase {
     const checked = this.checked;
     const disabled = this.disabled;
 
-    // Com `helper` o host é grid: caixa na primeira coluna, rótulo e dica empilhados na segunda.
+    // Com `helper` o host é grid: caixa na primeira coluna, rótulo e dica empilhados na segunda. content-start
+    // deixa a sobra embaixo quando o host é esticado numa linha alta, em vez de afastar caixa, rótulo e dica.
     const layout = this.hasAttribute("helper")
-      ? "ark:inline-grid ark:grid-cols-[auto_minmax(0,1fr)] ark:gap-x-2 ark:gap-y-0.5"
+      ? "ark:inline-grid ark:grid-cols-[auto_minmax(0,1fr)] ark:content-start ark:gap-x-2 ark:gap-y-0.5"
       : "ark:inline-flex ark:gap-2";
     this.applyOwnClasses(
       [

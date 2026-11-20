@@ -17,6 +17,13 @@
     align-items: center;
   }
 
+  /* Esticado numa linha mais alta (flex com align-items: stretch, grid), o host repartia a sobra entre as três
+     linhas: o rótulo flutuava e o campo descia. Com rótulo ou mensagem visível a sobra fica embaixo da mensagem;
+     sem nenhum dos dois o campo segue centrado na linha, como sempre foi. */
+  ark-input:has(> :is([data-ark="input-label"], [data-ark="input-helper"], [data-ark="input-error"]):not([hidden])) {
+    align-content: start;
+  }
+
   ark-input > [data-ark="input-label"] {
     grid-area: label;
   }
@@ -92,6 +99,22 @@
       "message";
   }
 
+  /* Esticado (linha alta, altura no host) e com rótulo ou mensagem visível, a sobra vai para a linha do campo: o
+     textarea cresce entre o rótulo e a mensagem, em vez de as três linhas repartirem a sobra e o rótulo se afastar
+     da caixa. Com autosize a caixa mede o conteúdo e a sobra fica embaixo, como no ark-input; sem rótulo nem
+     mensagem nada muda. */
+  ark-textarea:not([autosize]):has(
+    > :is([data-ark="textarea-label"], [data-ark="textarea-helper"], [data-ark="textarea-error"]):not([hidden])
+  ) {
+    grid-template-rows: auto 1fr auto;
+  }
+
+  ark-textarea[autosize]:has(
+    > :is([data-ark="textarea-label"], [data-ark="textarea-helper"], [data-ark="textarea-error"]):not([hidden])
+  ) {
+    align-content: start;
+  }
+
   ark-textarea > [data-ark="textarea-label"] {
     grid-area: label;
   }
@@ -114,6 +137,13 @@
       "label"
       "field"
       "message";
+  }
+
+  /* Mesma correção do ark-input para o host esticado. */
+  ark-file-input:has(
+    > :is([data-ark="file-input-label"], [data-ark="file-input-helper"], [data-ark="file-input-error"]):not([hidden])
+  ) {
+    align-content: start;
   }
 
   ark-file-input > [data-ark="file-input-label"] {
@@ -147,6 +177,13 @@
       "field"
       "message";
     align-items: center;
+  }
+
+  /* Mesma correção do ark-input para o host esticado. */
+  ark-select:has(
+    > :is([data-ark="select-label"], [data-ark="select-helper"], [data-ark="select-error"]):not([hidden])
+  ) {
+    align-content: start;
   }
 
   ark-select > [data-ark="select-label"] {
