@@ -74,6 +74,22 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   including the JSDoc of the React and Vue wrappers that reaches the editor tooltip and the published `.d.ts`. Text
   only: no attribute, event, test id or locale string changed.
 
+### Fixed
+
+- `ark-input`, `ark-select`, `ark-file-input`, `ark-textarea`, and `ark-checkbox`/`ark-radio` with `helper`: stretched
+  to a taller row (a flex row with the default `align-items: stretch`, or a grid row), the host split the extra
+  height among label, field and message, so the label floated and the box moved down. With a visible label or
+  message, the extra height now goes below the message, so everything sits where it would on its own, and
+  `ark-textarea` grows between label and message instead (also when the host is given a height; with `autosize` it
+  keeps measuring its content and the extra height goes below, like the others). A field with neither label nor
+  message renders exactly as before (an input next to a taller button stays centered), and fields that are not
+  stretched measure the same. `StretchedRow` story in `Core/Alignment`.
+- `lang` with a region (`pt-BR`, `es-419`, `en_US`, any case) fell back to English, because `resolveLocale` and the
+  wysiwyg toolbar labels only knew `en`, `pt` and `es`. The base language now picks the table, so the values of
+  `<html lang>` and `navigator.language` work without mapping: a page that passed `lang="pt-BR"` and got English now
+  gets Portuguese. A language without a table still falls back to English, `custom` is unchanged and the wrapper props
+  stay typed as `ArkLang`. `Core/I18n` story.
+
 ## [1.6.1] - 2026-10-16
 
 ### Fixed

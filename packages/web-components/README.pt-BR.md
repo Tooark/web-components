@@ -65,7 +65,7 @@ registerTooarkComponents(); // idempotente
 
 Uma propriedade JS que o framework atribui a uma tag crua antes desta chamada é aplicada quando o elemento faz o upgrade, então a ordem não importa.
 
-Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `light dark` para seguir o sistema); `theme="light|dark"` num elemento força um lado, e `lang="en|pt|es"` (ou `lang="custom"` com `locale-json`) nos elementos que mostram texto.
+Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `light dark` para seguir o sistema); `theme="light|dark"` num elemento força um lado, e `lang="en|pt|es"` (ou `lang="custom"` com `locale-json`) nos elementos que mostram texto; uma tag com região (`pt-BR`, `es-419`) usa o idioma base.
 
 ---
 
