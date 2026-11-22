@@ -1,25 +1,27 @@
 import type { ArkSwitchStyleOptions } from "@tooark/core";
 import type { ArkSwitch as ArkSwitchElement } from "@tooark/web-components";
 import type React from "react";
-import { createElement, forwardRef, useEffect } from "react";
+import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
-export type ArkSwitchProps = ArkDomProps<
-  ArkSwitchStyleOptions & {
-    disabled?: boolean;
-    name?: string;
-    value?: string;
-    label?: string;
-    className?: string;
-    onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
-  }
+export type ArkSwitchProps = PropsWithChildren<
+  ArkDomProps<
+    ArkSwitchStyleOptions & {
+      disabled?: boolean;
+      name?: string;
+      value?: string;
+      label?: string;
+      className?: string;
+      onChange?: (event: CustomEvent<{ checked: boolean }>) => void;
+    }
+  >
 >;
 
 export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
   function ArkSwitch(props, forwardedRef): React.JSX.Element {
-    const { className, checked, labels, labelOn, labelOff, icons, disabled, onChange, ...rest } = props;
+    const { children, className, checked, labels, labelOn, labelOff, icons, disabled, onChange, ...rest } = props;
 
     useEffect(() => {
       ensureTooarkComponentsRegistered();
@@ -48,6 +50,7 @@ export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
       "label-off": labelOff
     };
 
-    return createElement("ark-switch", attrs);
+    // Filhos viram o rótulo visível do switch (o host inteiro alterna ao clique).
+    return createElement("ark-switch", attrs, children);
   }
 );

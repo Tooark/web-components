@@ -23,26 +23,30 @@ export const ArkSwitch = defineComponent({
     value: { type: String, default: undefined },
     label: { type: String, default: undefined }
   },
-  setup(props, { attrs, emit }) {
+  setup(props, { attrs, emit, slots }) {
     ensureTooarkComponentsRegistered();
     return () =>
-      h("ark-switch", {
-        ...attrs,
-        testid: props.testid,
-        intent: props.intent,
-        theme: props.theme,
-        size: props.size,
-        color: props.color,
-        name: props.name,
-        value: props.value,
-        label: props.label,
-        "label-on": props.labelOn,
-        "label-off": props.labelOff,
-        checked: props.checked ? "" : undefined,
-        disabled: props.disabled ? "" : undefined,
-        labels: props.labels ? "" : undefined,
-        icons: props.icons ? "" : undefined,
-        onChange: (event: CustomEvent<{ checked: boolean }>) => emit("change", event)
-      });
+      h(
+        "ark-switch",
+        {
+          ...attrs,
+          testid: props.testid,
+          intent: props.intent,
+          theme: props.theme,
+          size: props.size,
+          color: props.color,
+          name: props.name,
+          value: props.value,
+          label: props.label,
+          "label-on": props.labelOn,
+          "label-off": props.labelOff,
+          checked: props.checked ? "" : undefined,
+          disabled: props.disabled ? "" : undefined,
+          labels: props.labels ? "" : undefined,
+          icons: props.icons ? "" : undefined,
+          onChange: (event: CustomEvent<{ checked: boolean }>) => emit("change", event)
+        },
+        slots.default ? slots.default() : []
+      );
   }
 });
