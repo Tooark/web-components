@@ -46,3 +46,5 @@ export * from "./ark-toaster";
 export * from "./ark-toggle";
 export * from "./ark-toggle-group";
 export * from "./ark-tooltip";
+export * from "./ark-tree";
+export * from "./ark-tree-item";

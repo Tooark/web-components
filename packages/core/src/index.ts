@@ -146,5 +146,8 @@ export type {
   ArkToggleGroupStyleOptions,
   ArkToggleStyleOptions,
   ArkTooltipSide,
-  ArkTooltipStyleOptions
+  ArkTooltipStyleOptions,
+  ArkTreeItemStyleOptions,
+  ArkTreeSelection,
+  ArkTreeStyleOptions
 } from "./types/style";

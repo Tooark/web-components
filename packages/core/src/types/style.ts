@@ -873,6 +873,27 @@ export type ArkTimeStyleOptions = {
   lang?: string;
 };
 
+// Exports types específicos do componente tree
+
+/** Seleção do ark-tree: none (só navega e expande), single ou multiple. */
+export type ArkTreeSelection = "none" | "single" | "multiple";
+
+/** Props de estilo do ark-tree, propagadas a cada ark-tree-item. */
+export type ArkTreeStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Escala da linha e do texto. Padrão: "md". */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+/** Props de estilo do ark-tree-item; size e theme chegam propagados do ark-tree. */
+export type ArkTreeItemStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes (`-row`, `-toggle`, `-check`, `-label`, `-group`). */
+  testid?: string;
+};
+
 // Exports types específicos do componente menu
 
 /** Alinhamento do menu em relação ao gatilho. */
