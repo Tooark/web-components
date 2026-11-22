@@ -2,6 +2,9 @@ import { expect } from "storybook/test";
 
 const meta = {
   title: "Core/Headings",
+  // Verificação entre componentes, não um componente: roda na suíte, mas fica fora da barra lateral e das docs
+  // (o comportamento está nos READMEs).
+  tags: ["!dev", "!autodocs"],
   parameters: {
     docs: {
       description: {
