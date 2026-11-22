@@ -8,6 +8,8 @@ import {
   type ArkMarkShape,
   type ArkPageChangeDetail,
   type ArkSchedulerEvent,
+  resolveLocale,
+  setArkLocale,
   toast
 } from "@tooark/core";
 import {
@@ -24,6 +26,7 @@ import {
   ArkInput as ReactArkInput,
   ArkKvEditor as ReactArkKvEditor,
   ArkMenu as ReactArkMenu,
+  ArkMenuGroup as ReactArkMenuGroup,
   ArkMenuItem as ReactArkMenuItem,
   ArkNav as ReactArkNav,
   ArkNavItem as ReactArkNavItem,
@@ -32,11 +35,13 @@ import {
   ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
   ArkTextarea as ReactArkTextarea,
-  ArkToaster as ReactArkToaster
+  ArkToaster as ReactArkToaster,
+  setArkLocale as reactSetArkLocale
 } from "@tooark/react";
 import {
   type ArkDataViewVueColumn,
   ArkButton as VueArkButton,
+  ArkCalendar as VueArkCalendar,
   ArkCard as VueArkCard,
   ArkCheckbox as VueArkCheckbox,
   ArkClock as VueArkClock,
@@ -44,6 +49,7 @@ import {
   ArkEmpty as VueArkEmpty,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
+  ArkMenuGroup as VueArkMenuGroup,
   ArkMenuItem as VueArkMenuItem,
   ArkNav as VueArkNav,
   ArkNavItem as VueArkNavItem,
@@ -51,7 +57,8 @@ import {
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
   ArkSwitch as VueArkSwitch,
-  ArkToaster as VueArkToaster
+  ArkToaster as VueArkToaster,
+  setArkLocale as vueSetArkLocale
 } from "@tooark/vue";
 import type {
   ArkButton as ArkButtonElement,
@@ -1259,6 +1266,83 @@ export const VueNewAttributes = {
       .querySelector("ark-button a")
       ?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
     await expect(navigated).toEqual(["/projetos/42"]);
+    app.unmount();
+  }
+};
+
+/**
+ * Confere o grupo do menu renderizado por um wrapper e o idioma padrão: a reexportação de `setArkLocale` é a do core e
+ * o calendário sem `lang` (o wrapper Vue gravava `lang="en"`) segue a troca e volta ao inglês.
+ */
+async function expectMenuGroupAndLocale(canvasElement: HTMLElement, setLocale: typeof setArkLocale): Promise<void> {
+  await expect(setLocale === setArkLocale).toBe(true);
+  const group = canvasElement.querySelector("ark-menu-group") as HTMLElement;
+  await expect(group).toHaveAttribute("role", "group");
+  await expect(group).toHaveAttribute("data-testid", "export");
+  const label = group.querySelector('[data-ark="menu-group-label"]') as HTMLElement;
+  await expect(label).toHaveTextContent("Exportar");
+  await expect(group).toHaveAttribute("aria-labelledby", label.id);
+  await expect(group.querySelector("ark-menu-item")).toHaveAttribute("value", "pdf");
+
+  const calendar = canvasElement.querySelector("ark-calendar") as HTMLElement;
+  await expect(calendar.hasAttribute("lang")).toBe(false);
+  const english = calendar.textContent;
+  await expect(english).toContain(resolveLocale("en").months[8]);
+  try {
+    setLocale("pt");
+    await expect(calendar.textContent).toContain(resolveLocale("pt").months[8]);
+  } finally {
+    setLocale(null);
+  }
+  await expect(calendar.textContent).toBe(english);
+}
+
+export const ReactMenuGroupAndLocale = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    render(
+      createElement(
+        "div",
+        null,
+        createElement(
+          ReactArkMenu,
+          { "aria-label": "Arquivo" },
+          createElement(
+            ReactArkMenuGroup,
+            { label: "Exportar", testid: "export" },
+            createElement(ReactArkMenuItem, { value: "pdf" }, "PDF")
+          )
+        ),
+        createElement(ReactArkCalendar, { value: "2026-09-15" })
+      )
+    );
+    await expect(errors).toEqual([]);
+    await expectMenuGroupAndLocale(canvasElement, reactSetArkLocale);
+  }
+};
+
+export const VueMenuGroupAndLocale = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(VueArkMenu, { "aria-label": "Arquivo" }, () =>
+            h(VueArkMenuGroup, { label: "Exportar", testid: "export" }, () =>
+              h(VueArkMenuItem, { value: "pdf" }, () => "PDF")
+            )
+          ),
+          h(VueArkCalendar, { value: "2026-09-15" })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectMenuGroupAndLocale(canvasElement, vueSetArkLocale);
     app.unmount();
   }
 };
