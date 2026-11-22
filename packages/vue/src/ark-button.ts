@@ -1,4 +1,5 @@
 import type {
+  ArkButtonNavigateDetail,
   ArkButtonStatus,
   ArkButtonType,
   ArkButtonVariant,
@@ -15,7 +16,9 @@ export const ArkButton = defineComponent({
   inheritAttrs: false,
   emits: {
     // Tipa o @click; o bloqueio de disabled/loading do host impede que o listener dispare.
-    click: (_event: MouseEvent) => true
+    click: (_event: MouseEvent) => true,
+    /** Clique simples no link (`href`), cancelável. */
+    "ark-navigate": (_event: CustomEvent<ArkButtonNavigateDetail>) => true
   },
   props: {
     /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
@@ -35,6 +38,8 @@ export const ArkButton = defineComponent({
     fullWidth: { type: Boolean, default: false },
     href: { type: String, default: undefined },
     target: { type: String, default: undefined },
+    /** Com href, baixa em vez de navegar: true (ou "") usa o nome da URL, uma string define o nome do arquivo. */
+    download: { type: [Boolean, String], default: undefined },
     color: { type: String, default: undefined },
     textColor: { type: String, default: undefined }
   },
@@ -47,6 +52,7 @@ export const ArkButton = defineComponent({
           ...attrs,
           testid: props.testid,
           onClick: (event: MouseEvent) => emit("click", event),
+          onArkNavigate: (event: CustomEvent<ArkButtonNavigateDetail>) => emit("ark-navigate", event),
           variant: props.variant,
           intent: props.intent,
           theme: props.theme,
@@ -55,6 +61,7 @@ export const ArkButton = defineComponent({
           type: props.type,
           href: props.href,
           target: props.target,
+          download: props.download === true ? "" : props.download || undefined,
           color: props.color,
           "text-color": props.textColor,
           disabled: props.disabled ? "" : undefined,

@@ -32,6 +32,9 @@ export type ArkButtonVariant = ArkIntent | ArkStyleVariant;
 /** Feedback do resultado no botão: nada, check de sucesso ou alerta de erro. */
 export type ArkButtonStatus = "idle" | "success" | "error";
 
+/** `detail` de `ark-navigate` do ark-button com `href`: o destino do link. */
+export type ArkButtonNavigateDetail = { href: string };
+
 // Exports types específicos do componente datepicker
 
 /** Idioma dos rótulos dos componentes; "custom" usa as strings fornecidas em locale-json. */
@@ -123,6 +126,8 @@ export type ArkButtonStyleOptions = {
   href?: string;
   /** Alvo do link; "_blank" ganha rel="noopener noreferrer" automaticamente. */
   target?: string;
+  /** Com href, baixa em vez de navegar: true (ou "") usa o nome da URL, uma string define o nome do arquivo. */
+  download?: boolean | string;
   /** Cor de fundo CSS custom, com precedência sobre variant/intent. */
   color?: string;
   /** Cor do texto CSS custom, usada junto de color. */

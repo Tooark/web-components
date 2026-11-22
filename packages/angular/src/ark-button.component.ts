@@ -1,5 +1,6 @@
-import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
+import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type {
+  ArkButtonNavigateDetail,
   ArkButtonStatus,
   ArkButtonType,
   ArkButtonVariant,
@@ -32,9 +33,11 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.rounded]="rounded"
     [attr.href]="href"
     [attr.target]="target"
+    [attr.download]="download === true ? '' : download || null"
     [attr.color]="color"
     [attr.text-color]="textColor"
-    [attr.size]="size">
+    [attr.size]="size"
+    (ark-navigate)="navigateHandler($event)">
     <ng-content></ng-content>
   </ark-button>`
 })
@@ -70,6 +73,12 @@ export class ArkButtonComponent {
   @Input() rounded: ArkRounded = "md";
   @Input() href: string | undefined;
   @Input() target: string | undefined;
+  /** Com href, baixa em vez de navegar: true (ou "") usa o nome da URL, uma string define o nome do arquivo. */
+  @Input() download: boolean | string | undefined;
   @Input() color: string | undefined;
   @Input() textColor: string | undefined;
+  /** Clique simples no link (`href`), cancelável: `event.preventDefault()` e o roteamento da SPA. */
+  @Output() arkNavigate = new EventEmitter<CustomEvent<ArkButtonNavigateDetail>>();
+
+  protected navigateHandler = (event: Event) => this.arkNavigate.emit(event as CustomEvent<ArkButtonNavigateDetail>);
 }
