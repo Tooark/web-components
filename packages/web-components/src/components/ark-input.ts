@@ -1,5 +1,6 @@
 import { type ArkIntent, type ArkLocale, type ArkRounded, type ArkSize, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -87,6 +88,7 @@ export class ArkInput extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.inputEl) {
       this.render();
     }
@@ -101,6 +103,7 @@ export class ArkInput extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
   }
@@ -158,7 +161,7 @@ export class ArkInput extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private render(): void {

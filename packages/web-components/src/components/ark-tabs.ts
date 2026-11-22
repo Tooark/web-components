@@ -1,6 +1,7 @@
 import type { ArkTabsVariant } from "@tooark/core";
 import type { ArkTab } from "./ark-tab";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -55,6 +56,7 @@ export class ArkTabs extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       this.observer = new MutationObserver(() => this.syncTabs());
       this.observer.observe(this, { childList: true, subtree: true });
@@ -64,6 +66,7 @@ export class ArkTabs extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
   }

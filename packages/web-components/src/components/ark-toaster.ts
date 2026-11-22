@@ -1,6 +1,7 @@
 import type { ArkMotionPreset, ArkToastOptions, ArkToastPosition, ArkToastType } from "@tooark/core";
 import { arkEnter, arkExit, isPopoverOpen, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -45,12 +46,14 @@ export class ArkToaster extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     this.build();
     window.addEventListener("ark-toast", this.handleToast as EventListener);
     window.addEventListener("ark-toast-dismiss", this.handleDismiss as EventListener);
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     window.removeEventListener("ark-toast", this.handleToast as EventListener);
     window.removeEventListener("ark-toast-dismiss", this.handleDismiss as EventListener);
 
@@ -161,7 +164,7 @@ export class ArkToaster extends HTMLElementBase {
   }
 
   private getCloseLabel(): string {
-    return resolveLocale(this.getAttribute("lang") || "en", undefined).close;
+    return resolveLocale(this.getAttribute("lang")).close;
   }
 
   private hasCloseButton(): boolean {

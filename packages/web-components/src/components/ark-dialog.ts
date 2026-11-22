@@ -12,6 +12,7 @@ import {
 } from "@tooark/core";
 import { headingTag, retagHeading } from "./heading-level";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -95,6 +96,7 @@ export class ArkDialog extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       // Um footer que chega depois (framework) recebe o hook; o resto do DOM é do usuário.
       this.observer = new MutationObserver(() => this.syncFooter());
@@ -109,6 +111,7 @@ export class ArkDialog extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
     // Saiu do DOM aberto: o navegador já o tirou do top layer; libera o trap, a rolagem e o estado sem animar.
@@ -277,7 +280,7 @@ export class ArkDialog extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private computeClasses(): string[] {

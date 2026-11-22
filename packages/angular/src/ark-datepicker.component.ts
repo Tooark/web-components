@@ -56,7 +56,8 @@ export class ArkDatepickerComponent implements AfterViewInit, OnDestroy {
   }
 
   @Input() testid: string | undefined;
-  @Input() lang: ArkDatepickerLang = "en";
+  /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+  @Input() lang: ArkDatepickerLang | undefined;
   @Input() localeJson: Record<string, unknown> | undefined;
   @Input() theme: ArkTheme = "auto";
   @Input() intent: ArkIntent = "primary";

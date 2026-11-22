@@ -1,6 +1,7 @@
 import { type ArkLocale, type ArkMarkShape, type ArkSize, coerceBooleanAttr, resolveLocale } from "@tooark/core";
 import { ARK_MARK_SHAPES, type ArkMark, normalizeMarkShape } from "./ark-mark";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -61,8 +62,13 @@ export class ArkShapePicker extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     this.rendered = true;
     this.updateAppearance();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string): void {
@@ -155,7 +161,7 @@ export class ArkShapePicker extends HTMLElementBase {
   };
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private getSizing(): { option: string; mark: string } {
