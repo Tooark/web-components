@@ -149,8 +149,9 @@ export function resolveCodeTheme(theme: ArkCodeTheme | undefined, element?: Elem
 
 // --- Tema ---
 
-// Cores de sintaxe por lado; o chrome (fundo, texto, bordas, seleção) vem dos tokens --ark-color-* com fallback,
-// para o editor seguir o tema do app mesmo sem o CSS do @tooark/web-components na página.
+// Cores de sintaxe por lado, fallback dos tokens --ark-syntax-* (os mesmos valores, em light-dark() no tokens.css); o
+// chrome (fundo, texto, bordas, seleção) vem dos tokens --ark-color-* com fallback, para o editor seguir o tema do app
+// mesmo sem o CSS do @tooark/web-components na página.
 const SYNTAX = {
   light: {
     keyword: "#6d28d9",
@@ -405,7 +406,11 @@ function chromeTheme(side: ArkThemeSelected): Extension {
 }
 
 function syntaxTheme(side: ArkThemeSelected): Extension {
-  const c = SYNTAX[side];
+  // Cada papel lê o token do app; sem ele, a cor embutida do lado. O light-dark() do token resolve pelo color-scheme
+  // que o editor declara, então um tema fixo (`theme="dark"` numa página clara) pega o lado certo.
+  const c = Object.fromEntries(
+    Object.entries(SYNTAX[side]).map(([role, color]) => [role, `var(--ark-syntax-${role}, ${color})`])
+  ) as Record<keyof (typeof SYNTAX)["light"], string>;
   return syntaxHighlighting(
     HighlightStyle.define([
       { tag: [tags.keyword, tags.modifier, tags.operatorKeyword, tags.controlKeyword], color: c.keyword },

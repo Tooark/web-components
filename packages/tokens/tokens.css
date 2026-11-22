@@ -169,6 +169,20 @@
 
   /* Deslocamento padrão de slides (enter/exit) */
   --ark-motion-distance: 0.75rem;
+
+  /*
+   * Sintaxe de código, um par claro/escuro por papel: o ark-code-editor (@tooark/code) pinta com eles, e o app pode
+   * colorir um <pre> próprio com os mesmos. O light-dark() resolve pelo color-scheme de quem usa (o editor declara o
+   * do próprio tema). Sem este CSS o editor usa os mesmos valores, embutidos.
+   */
+  --ark-syntax-keyword: light-dark(#6d28d9, #c4b5fd);
+  --ark-syntax-string: light-dark(#15803d, #86efac);
+  --ark-syntax-number: light-dark(#b45309, #fcd34d);
+  --ark-syntax-property: light-dark(#1d4ed8, #93c5fd);
+  --ark-syntax-comment: light-dark(#64748b, #94a3b8);
+  --ark-syntax-atom: light-dark(#0f766e, #5eead4);
+  --ark-syntax-punctuation: light-dark(#475569, #cbd5e1);
+  --ark-syntax-invalid: light-dark(#dc2626, #f87171);
 }
 
 /*
