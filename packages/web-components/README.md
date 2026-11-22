@@ -28,7 +28,7 @@ The native Custom Elements (`ark-*`) of the Tooark design system, styled with Ta
 
 The `@tooark/web-components` package provides:
 
-- 48 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) the calendar/clock/scheduler family and relative time (`ark-time`);
+- 50 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination, tree), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) the calendar/clock/scheduler family and relative time (`ark-time`);
 - light DOM: components never move or wrap your children; the host is the control or container;
 - `styles.css` is the only stylesheet you need: tokens, motion presets and component styles, all prefixed (`ark:*`, `--ark-*`), with no global reset;
 - themes by `color-scheme` (`theme="light|dark"` per element), sizes `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -119,6 +119,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-toggle` — Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.
 - `ark-toggle-group` — Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.
 - `ark-tooltip` — Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.
+- `ark-tree` / `ark-tree-item` — Declarative tree: nested items stay in place; selection none / single / multiple, checkboxes with propagate, lazy loading, WAI-ARIA keyboard and typeahead.
 
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 

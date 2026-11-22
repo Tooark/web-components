@@ -144,6 +144,24 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `extensions`, `variables`, `completions`, `formatter`, `uploadFile`; the wysiwyg `content` stays on the wrapper,
   since React types `content` as the `<meta>` text attribute). `ReactSidePackages`, `VueSidePackages` and the Angular
   `SidePackages` integration stories, and `typecheck/side-packages.tsx` in the React build.
+- `ark-tree` and `ark-tree-item`: new elements, a declarative tree. Nested `ark-tree-item`s stay where the app puts
+  them; each item's own row is the `treeitem`, a flat tree for assistive tech with `aria-level`, `aria-setsize` and
+  `aria-posinset` set explicitly (the host is `role="none"`, so no child is moved or wrapped). Simple by default: no
+  `selection` only navigates, expands and activates; `single` selects and activates on a row click, `multiple` toggles
+  rows, and `checkboxes` (with `multiple`) checks through boxes, with `propagate` to descendants and `mixed` parents
+  (disabled descendants keep their state; children loaded later under a checked parent arrive checked). `value` (one
+  value in `single`, a JSON list in `multiple`) and JS `values` follow the selection both ways. `lazy` and `loading`
+  for on-demand children. WAI-ARIA keyboard: one tab stop, arrows, Home/End, typeahead, `*`, Enter activates, Space
+  selects or checks, and collapsing a branch that holds the focus brings it to the collapsed item. Events on the
+  tree: `ark-toggle`, `ark-selection-change`, `ark-activate`. `ArkTree`/`ArkTreeItem` (React, Vue),
+  `ArkTreeComponent`/`ArkTreeItemComponent` (`ark-tree-wrapper`, `ark-tree-item-wrapper` with `display: contents`,
+  Angular), `ArkTreeSelection` and the style options in core; hooks `tree`, `tree-item` and its parts. Known limit: a
+  control in `slot="trailing"` is a sibling of the treeitem and axe flags `aria-required-children`, so the trailing is
+  meant for badges, and the trailing becomes the row's description (`aria-describedby`) so a badge is read with the
+  row. Measured with about 2,000 open nodes: under a second to mount, about 3.5 s while Chromium's accessibility tree
+  is active (the row chrome is built before it enters the DOM, which halved that). The tree stories run axe as an
+  error. `Core/ArkTree` and the `ReactTree`, `VueTree` and Angular
+  `Tree` integration stories.
 ### Changed
 
 - The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write
