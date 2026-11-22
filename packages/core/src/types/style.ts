@@ -40,6 +40,9 @@ export type ArkLang = "en" | "pt" | "es" | "custom";
 /** Nome anterior de ArkLang, mantido por compatibilidade. */
 export type ArkDatepickerLang = ArkLang;
 
+/** Nível (h1 a h6) do título próprio de ark-card, ark-dialog, ark-drawer e ark-empty. */
+export type ArkHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
+
 // Exports types específicos do componente avatar
 
 /** Forma do ark-avatar. */
@@ -802,6 +805,8 @@ export type ArkDialogStyleOptions = {
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
+  /** Nível do título próprio criado por `label` (h1 a h6). Padrão: 2. */
+  headingLevel?: ArkHeadingLevel;
 };
 
 // Exports types específicos do componente drawer
@@ -831,6 +836,8 @@ export type ArkDrawerStyleOptions = {
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
+  /** Nível do título próprio criado por `label` (h1 a h6). Padrão: 2. */
+  headingLevel?: ArkHeadingLevel;
 };
 
 // Exports types específicos do componente menu
@@ -960,6 +967,8 @@ export type ArkCardStyleOptions = {
   rounded?: ArkRounded;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Nível do título próprio criado por `heading` (h1 a h6). Padrão: 2. */
+  headingLevel?: ArkHeadingLevel;
 };
 
 // Exports types específicos do componente empty
@@ -970,6 +979,8 @@ export type ArkEmptyStyleOptions = {
   testid?: string;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** Nível do título próprio criado por `heading` (h1 a h6). Padrão: 3. */
+  headingLevel?: ArkHeadingLevel;
 };
 
 // Exports types específicos do componente file-input

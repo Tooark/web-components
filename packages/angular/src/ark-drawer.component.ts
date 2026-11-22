@@ -1,5 +1,12 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
-import type { ArkDrawerCloseReason, ArkDrawerMode, ArkDrawerSide, ArkLang, ArkTheme } from "@tooark/core";
+import type {
+  ArkDrawerCloseReason,
+  ArkDrawerMode,
+  ArkDrawerSide,
+  ArkHeadingLevel,
+  ArkLang,
+  ArkTheme
+} from "@tooark/core";
 import type { ArkDrawer as ArkDrawerElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -19,6 +26,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.persistent]="persistent ? '' : null"
     [attr.no-scroll-lock]="noScrollLock ? '' : null"
     [attr.theme]="theme"
+    [attr.heading-level]="headingLevel"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
     [attr.aria-label]="ariaLabel"
@@ -57,6 +65,8 @@ export class ArkDrawerComponent {
   /** A página continua rolando com a gaveta aberta em overlay. */
   @Input() noScrollLock = false;
   @Input() theme: ArkTheme = "auto";
+  /** Nível do título próprio (h1 a h6). Padrão: 2. */
+  @Input() headingLevel: ArkHeadingLevel | undefined;
   @Input() lang: ArkLang | undefined;
   @Input() localeJson: string | undefined;
   @Input() ariaLabel: string | undefined;

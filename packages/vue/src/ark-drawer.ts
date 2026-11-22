@@ -1,4 +1,11 @@
-import type { ArkDrawerCloseReason, ArkDrawerMode, ArkDrawerSide, ArkLang, ArkTheme } from "@tooark/core";
+import type {
+  ArkDrawerCloseReason,
+  ArkDrawerMode,
+  ArkDrawerSide,
+  ArkHeadingLevel,
+  ArkLang,
+  ArkTheme
+} from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
@@ -18,6 +25,8 @@ export const ArkDrawer = defineComponent({
     persistent: { type: Boolean, default: false },
     noScrollLock: { type: Boolean, default: false },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
+    /** Nível do título próprio (h1 a h6). Padrão: 2. */
+    headingLevel: { type: Number as PropType<ArkHeadingLevel>, default: undefined },
     lang: { type: String as PropType<ArkLang>, default: undefined },
     localeJson: { type: String, default: undefined }
   },
@@ -53,6 +62,7 @@ export const ArkDrawer = defineComponent({
           persistent: props.persistent ? "" : undefined,
           "no-scroll-lock": props.noScrollLock ? "" : undefined,
           theme: props.theme,
+          "heading-level": props.headingLevel,
           lang: props.lang,
           "locale-json": props.localeJson
         },

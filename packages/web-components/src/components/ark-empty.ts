@@ -1,3 +1,4 @@
+import { headingTag, retagHeading } from "./heading-level";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -20,7 +21,7 @@ export class ArkEmpty extends HTMLElementBase {
   private descriptionEl: HTMLParagraphElement | null = null;
 
   static get observedAttributes(): string[] {
-    return ["heading", "description", "theme", "class", "testid"];
+    return ["heading", "heading-level", "description", "theme", "class", "testid"];
   }
 
   connectedCallback(): void {
@@ -51,12 +52,14 @@ export class ArkEmpty extends HTMLElementBase {
   private syncText(): void {
     const heading = this.getAttribute("heading");
     if (heading) {
+      const tag = headingTag(this, 3);
       if (!this.headingEl) {
-        const el = document.createElement("h3");
+        const el = document.createElement(tag) as HTMLHeadingElement;
         el.setAttribute("data-ark-chrome", "heading");
         this.appendChild(el);
         this.headingEl = el;
       }
+      this.headingEl = retagHeading(this.headingEl, tag);
       this.headingEl.textContent = heading;
       this.headingEl.className = "ark:-order-2 ark:text-base ark:font-semibold ark:text-fg";
     } else {

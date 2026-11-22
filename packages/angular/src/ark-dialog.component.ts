@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
-import type { ArkDialogCloseReason, ArkDialogSize, ArkLang, ArkTheme } from "@tooark/core";
+import type { ArkDialogCloseReason, ArkDialogSize, ArkHeadingLevel, ArkLang, ArkTheme } from "@tooark/core";
 import type { ArkDialog as ArkDialogElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -19,6 +19,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.width]="width"
     [attr.height]="height"
     [attr.theme]="theme"
+    [attr.heading-level]="headingLevel"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
     [attr.aria-label]="ariaLabel"
@@ -57,6 +58,8 @@ export class ArkDialogComponent {
   /** Altura própria (comprimento CSS; número vira px), limitada à viewport. Padrão: a do conteúdo. */
   @Input() height: string | number | undefined;
   @Input() theme: ArkTheme = "auto";
+  /** Nível do título próprio (h1 a h6). Padrão: 2. */
+  @Input() headingLevel: ArkHeadingLevel | undefined;
   @Input() lang: ArkLang | undefined;
   @Input() localeJson: string | undefined;
   @Input() ariaLabel: string | undefined;
