@@ -62,7 +62,8 @@ const TAGS = [
   "ark-toggle",
   "ark-toggle-group",
   "ark-tooltip",
-  // Pacotes laterais: usados como tag crua nos frameworks, sem wrapper, então a regra vale igual.
+  // Pacotes laterais: os wrappers ficam nas subpaths (@tooark/react/chart...) e a tag crua continua valendo, então a
+  // regra vale igual.
   "ark-chart",
   "ark-code-editor",
   "ark-wysiwyg-editor",

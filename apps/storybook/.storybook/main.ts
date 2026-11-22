@@ -55,10 +55,20 @@ const config: StorybookConfig = {
       "@tooark/chart": path.resolve(rootDir, "packages/chart/src/index.ts"),
       "@tooark/code": path.resolve(rootDir, "packages/code/src/index.ts"),
       "@tooark/wysiwyg": path.resolve(rootDir, "packages/wysiwyg/src/index.ts"),
-      // Wrappers exercitados com react-dom e vue reais (framework-wrappers.stories.ts).
+      // Wrappers exercitados com react-dom e vue reais (framework-wrappers.stories.ts). As subpaths dos pacotes
+      // laterais vêm antes do alias da entrada principal, que casaria com elas como prefixo.
+      "@tooark/react/chart": path.resolve(rootDir, "packages/react/src/chart.tsx"),
+      "@tooark/react/code": path.resolve(rootDir, "packages/react/src/code.tsx"),
+      "@tooark/react/wysiwyg": path.resolve(rootDir, "packages/react/src/wysiwyg.tsx"),
       "@tooark/react": path.resolve(rootDir, "packages/react/src/index.tsx"),
+      "@tooark/vue/chart": path.resolve(rootDir, "packages/vue/src/chart.ts"),
+      "@tooark/vue/code": path.resolve(rootDir, "packages/vue/src/code.ts"),
+      "@tooark/vue/wysiwyg": path.resolve(rootDir, "packages/vue/src/wysiwyg.ts"),
       "@tooark/vue": path.resolve(rootDir, "packages/vue/src/index.ts"),
       // Wrappers Angular compilados em JIT a partir do src (framework-angular.stories.ts).
+      "@tooark/angular/chart": path.resolve(rootDir, "packages/angular/chart/src/index.ts"),
+      "@tooark/angular/code": path.resolve(rootDir, "packages/angular/code/src/index.ts"),
+      "@tooark/angular/wysiwyg": path.resolve(rootDir, "packages/angular/wysiwyg/src/index.ts"),
       "@tooark/angular": path.resolve(rootDir, "packages/angular/src/index.ts")
     };
 
