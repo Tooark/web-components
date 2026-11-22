@@ -33,6 +33,7 @@ type StoryArgs = {
   placeholder: string;
   ariaLabel?: string;
   minHeight: string;
+  maxHeight?: string;
   lineNumbers: boolean;
   fold: boolean;
   wrap: boolean;
@@ -291,6 +292,7 @@ function attributesOf(args: Partial<StoryArgs>): Array<[string, string]> {
   if (args.placeholder) attributes.push(["placeholder", args.placeholder]);
   if (args.ariaLabel) attributes.push(["aria-label", args.ariaLabel]);
   if (args.minHeight && args.minHeight !== "8rem") attributes.push(["min-height", args.minHeight]);
+  if (args.maxHeight) attributes.push(["max-height", args.maxHeight]);
   if (args.lineNumbers === false) attributes.push(["line-numbers", "false"]);
   if (args.fold === false) attributes.push(["fold", "false"]);
   if (args.wrap) attributes.push(["wrap", ""]);
@@ -459,6 +461,13 @@ const meta = {
       control: "text",
       description: "Altura mínima do editor (comprimento CSS); em `single-line` quem manda é `size`.",
       table: row(CONTENT, "string", '"8rem"')
+    },
+    maxHeight: {
+      name: "max-height",
+      control: "text",
+      description:
+        "Altura máxima do editor (comprimento CSS): acima dela o conteúdo rola por dentro. Abaixo de `min-height` a mínima vence; ignorada em `single-line`.",
+      table: row(CONTENT, "string", "sem limite")
     },
     lineNumbers: {
       name: "line-numbers",
@@ -781,6 +790,67 @@ export const WrapWithoutGutters = {
     }
   },
   render: (args: StoryArgs) => createEditor(args)
+};
+
+export const MaxHeight = {
+  args: { language: "javascript", minHeight: "8rem", maxHeight: "12rem" },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`max-height` limita a altura (comprimento CSS) e o conteúdo rola por dentro, com as calhas, como numa visão de arquivo; sem o atributo o editor cresce com o texto. Abaixo de `min-height` a mínima vence, como no CSS, e em `single-line` o atributo é ignorado."
+      }
+    }
+  },
+  render: (args: StoryArgs) => {
+    const editor = createEditor(args);
+    editor.value = Array.from({ length: 60 }, (_, index) => `const linha${index + 1} = ${index + 1};`).join("\n");
+    return editor;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const editor = canvasElement.querySelector("ark-code-editor") as ArkCodeEditor;
+    const root = editor.querySelector(".cm-editor") as HTMLElement;
+    const scroller = editor.querySelector(".cm-scroller") as HTMLElement;
+    const rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const height = (): number => Math.round(root.getBoundingClientRect().height);
+
+    // 60 linhas num teto de 12rem: a caixa para no teto e o scroller rola por dentro.
+    await waitFor(() => expect(height()).toBe(Math.round(12 * rem)));
+    expect(root.style.getPropertyValue("--ark-code-max-height")).toBe("12rem");
+    expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    scroller.scrollTop = 200;
+    await waitFor(() => expect(scroller.scrollTop).toBeGreaterThan(0));
+    // A numeração rola junto com o texto (fica dentro do scroller).
+    expect(scroller.contains(editor.querySelector(".cm-gutters"))).toBe(true);
+
+    // Sem o atributo a variável sai e o editor volta a crescer com o conteúdo.
+    editor.maxHeight = null;
+    expect(editor.hasAttribute("max-height")).toBe(false);
+    expect(editor.maxHeight).toBe("");
+    expect(root.style.getPropertyValue("--ark-code-max-height")).toBe("");
+    expect(getComputedStyle(root).maxHeight).toBe("none");
+    await waitFor(() => expect(height()).toBeGreaterThan(Math.round(30 * rem)));
+
+    // Pela propriedade, e com um teto abaixo da mínima a mínima vence.
+    editor.maxHeight = "10rem";
+    await expect(editor).toHaveAttribute("max-height", "10rem");
+    await waitFor(() => expect(height()).toBe(Math.round(10 * rem)));
+    editor.setAttribute("max-height", "4rem");
+    await waitFor(() => expect(height()).toBe(Math.round(8 * rem)));
+
+    // Em single-line o teto não se aplica: o campo segue a altura do controle.
+    const text = editor.value;
+    editor.setAttribute("single-line", "");
+    await waitFor(() => expect(getComputedStyle(root).maxHeight).toBe("none"));
+    editor.removeAttribute("single-line");
+    await waitFor(() => expect(height()).toBe(Math.round(8 * rem)));
+
+    // Ligar single-line juntou as linhas: a story volta ao texto e ao teto do início para a página de docs.
+    editor.value = text;
+    editor.setAttribute("max-height", "12rem");
+    await waitFor(() => expect(height()).toBe(Math.round(12 * rem)));
+    expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+  }
 };
 
 export const DarkTheme = {

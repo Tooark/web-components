@@ -671,6 +671,7 @@ interface ArkIntrinsicElements {
     readonly?: boolean;
     placeholder?: string;
     "min-height"?: string;
+    "max-height"?: string;
     "line-numbers"?: boolean | "false";
     fold?: boolean | "false";
     wrap?: boolean;
