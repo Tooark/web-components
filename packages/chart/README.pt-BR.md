@@ -28,9 +28,9 @@
 
 O pacote `@tooark/chart` fornece:
 
-- `ark-chart` com o `option` nativo do ECharts como propriedade JS, `theme` (`auto` segue o `color-scheme` da página, inclusive a troca em tempo de execução), `renderer` (`canvas`/`svg`), `height` e `auto-resize`;
+- `ark-chart` com o `option` nativo do ECharts como propriedade JS, `theme` (`auto` segue o `color-scheme` da página, inclusive a troca em tempo de execução), `palette="tokens"` (o tema do ECharts montado a partir dos tokens `--ark-color-*`), `renderer` (`canvas`/`svg`), `height` e `auto-resize`;
 - `ark-chart-click` (`bubbles`, `composed`) com os params nativos do ECharts em `detail`;
-- engine `createChart(container, options)`: `setOption`, `setTheme`, `resize`, `resolvedTheme`, `destroy` e a instância `chart` crua;
+- engine `createChart(container, options)`: `setOption`, `setTheme`, `setPalette`, `resize`, `resolvedTheme`, `resolvedPalette`, `destroy` e a instância `chart` crua;
 - o ECharts é peer dependency: a versão é sua (o engine importa o pacote `echarts` inteiro, então não há tree-shaking).
 
 ---
@@ -61,14 +61,14 @@ Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram 
 
 ### `ark-chart`
 
-- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga), `testid`, `aria-label`/`aria-labelledby` (o host vira `role="img"` com esse nome, a menos que você tenha dado um `role`; sem eles nada muda, e a descrição gerada pelo ECharts, `option.aria`, continua disponível).
-- Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`.
+- Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `palette` (`default` | `tokens`, padrão `default`; `tokens` monta o tema do ECharts a partir dos tokens `--ark-color-*` da página, no lado que o `theme` resolve: séries nos intents primary, info, success, warning, danger e neutral, texto, eixos e legenda em `fg`/`fg-muted`, linhas de grade em `border`, tooltip em `surface-raised`, fundo transparente; cada cor é convertida para sRGB, já que a maioria dos tokens é `oklch()`, que o ECharts não lê; o `option.color` continua vencendo, e sem o CSS dos tokens na página, os estilos do `@tooark/core` ou do `@tooark/web-components`, cai no `default`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga), `testid`, `aria-label`/`aria-labelledby` (o host vira `role="img"` com esse nome, a menos que você tenha dado um `role`; sem eles nada muda, e a descrição gerada pelo ECharts, `option.aria`, continua disponível).
+- Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`, `resolvedPalette` (`tokens` só quando os tokens foram encontrados).
 - Eventos: `ark-chart-click` com os params do ECharts em `detail`.
 - Hooks: o contêiner do gráfico (`[part="canvas"]`) leva `data-ark="chart"` e o `testid` como `data-testid`.
 
 ### Engine
 
-- `createChart(container, { option, theme?, renderer?, autoResize? })` → `{ chart, setOption(option, { notMerge }), setTheme(theme), resize(), resolvedTheme(), destroy() }`; `autoResize` (padrão `true`) redimensiona o gráfico junto com o container.
+- `createChart(container, { option, theme?, palette?, renderer?, autoResize? })` → `{ chart, setOption(option, { notMerge }), setTheme(theme), setPalette(palette), resize(), resolvedTheme(), resolvedPalette(), destroy() }`; `autoResize` (padrão `true`) redimensiona o gráfico junto com o container.
 - `resolveChartTheme(theme, element)`.
 - Tipos: `ArkChartOptions`, `ArkChartTheme`, `ArkChartRenderer`, `ArkChartInstance`, `EChartsOption` (reexportado).
 

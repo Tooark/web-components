@@ -76,6 +76,7 @@ Names as the Tooark stylesheets expose them; in your own Tailwind entry the `@th
 - Colors: `--ark-color-<intent>`, `-fg`, `-hover`, `-soft`, `-soft-fg`, `-border`, `-ring`; neutrals `--ark-color-surface`, `-surface-muted`, `-surface-strong`, `-surface-raised`, `-fg`, `-fg-soft`, `-fg-muted`, `-fg-faint`, `-fg-placeholder`, `-border`, `-border-strong`, `-muted`, `-ring`.
 - Sizes: `--ark-size-xs…xl` (1.5 / 1.75 / 2.25 / 2.75 / 3.25 rem, the min-height of form controls); `--ark-text-2xs` (0.6875 rem) for micro-labels.
 - Motion (plain custom properties outside `@theme`: the same name everywhere, even with `tokens.css` as plain CSS): `--ark-duration-none|instant|quick|default|moderate|gentle|slow|long`, `--ark-ease-*`, `--ark-motion-distance`.
+- Syntax (plain custom properties outside `@theme`, `light-dark()` pairs): `--ark-syntax-keyword|string|number|property|comment|atom|punctuation|invalid`, the code editor's syntax colors (`@tooark/code`), also usable to color a `<pre>` of your own.
 
 ### JavaScript
 
