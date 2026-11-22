@@ -28,7 +28,7 @@ The native Custom Elements (`ark-*`) of the Tooark design system, styled with Ta
 
 The `@tooark/web-components` package provides:
 
-- 47 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) and the calendar/clock/scheduler family;
+- 48 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) the calendar/clock/scheduler family and relative time (`ark-time`);
 - light DOM: components never move or wrap your children; the host is the control or container;
 - `styles.css` is the only stylesheet you need: tokens, motion presets and component styles, all prefixed (`ark:*`, `--ark-*`), with no global reset;
 - themes by `color-scheme` (`theme="light|dark"` per element), sizes `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -114,6 +114,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-tab` — Tab item (`role="tab"`, the host is the control): free children, `disabled`, `controls`, `closable` and `dirty` in the editor variant. Emits `ark-close`.
 - `ark-tabs` — Tab strip (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex with arrows/Home/End, `slot="actions"` at the end, `change` with the active value. Panels stay with the app.
 - `ark-textarea` — Multi-line field with the `ark-input` grid: `rows`, `autosize` (native `field-sizing`, JS fallback), `monospace`, `resize`, helper/error with aria, sizes, intents, `rounded`.
+- `ark-time` — Date and time through `Intl`: relative to now ("3 minutes ago", "yesterday") and updating itself, or absolute (`date`, `time`, `datetime`); a `<time datetime>` with the full date as `title`.
 - `ark-toaster` — Sonner-style toasts: programmatic API, positions, rich colors, actions, animated enter/exit, localized close button.
 - `ark-toggle` — Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.
 - `ark-toggle-group` — Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.

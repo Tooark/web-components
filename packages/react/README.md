@@ -28,7 +28,7 @@ Typed React wrappers for the Tooark Web Components: camelCase props, custom even
 
 The `@tooark/react` package provides:
 
-- one component per element (47 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) with typed props that extend the `Ark*StyleOptions` from `@tooark/core`;
+- one component per element (48 wrappers: `ArkAlert`, `ArkAvatar`, `ArkBadge`, `ArkButton`, `ArkCalendar`, `ArkCard`, …) with typed props that extend the `Ark*StyleOptions` from `@tooark/core`;
 - camelCase props map to attributes; booleans are passed as present/absent; object props (`events`, `rows`, `options`, and `localeJson` on `ArkCalendar`/`ArkDatepicker`) are serialized or assigned as properties for you (on the other wrappers `localeJson` is a JSON string);
 - custom events become handlers receiving the `CustomEvent` (`onChange`, `onClose`, `onSelect`, …) or, on the calendar, datepicker, clock, carousel and scheduler, its `detail`; every props type also takes React's DOM attributes and handlers (`id`, `style`, `title`, `tabIndex`, `aria-*`, `data-*`, `onClick`, `onKeyDown`, `onFocus`, …), typed and forwarded to the element; what the wrapper defines wins over the React prop of the same name (`onChange` is the element's `CustomEvent`), and a `disabled` or `loading` button never fires `onClick`;
 - the elements register themselves on first render (`ensureTooarkComponentsRegistered`), browser only, so SSR frameworks are fine;

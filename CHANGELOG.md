@@ -122,6 +122,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   toggle re-reads them, `option.color` still wins, and without the tokens CSS on the page it falls back to the default
   palette. `resolvedPalette` on the element; the `palette` option, `setPalette()` and `resolvedPalette()` in the
   `createChart` engine; `ArkChartPalette`. `TokensPalette` story.
+- `ark-time`: new element, date and time through `Intl` with no dependency. `datetime` takes an ISO string with a
+  zone, a local time without one (read in the local zone) or a date alone (counted in calendar days); the property also
+  takes a `Date` or milliseconds. `format="relative"` (default: "3 minutes ago", "yesterday") updates itself at the next
+  point the text changes and stops out of the document or with the tab hidden; `date`, `time` and `datetime` are
+  absolute. The content is the component's own `<time datetime>`, with the full date as `title` unless the host has
+  one. The language is `lang` (any tag, `pt-BR` included, straight to `Intl`), else `setArkLocale()`'s, else `en`.
+  `ArkTime` (React, Vue), `ArkTimeComponent` (`ark-time-wrapper`, Angular), whose `datetime` also takes a `Date` or
+  milliseconds; `ArkTimeFormat` and `ArkTimeStyleOptions` in core; hooks `time` and `time-value`. Stories
+  `Core/ArkTime` and the `ReactTime`, `VueTime` and Angular `Time` integration stories.
 ### Changed
 
 - The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write
