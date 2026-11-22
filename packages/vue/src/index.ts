@@ -22,7 +22,7 @@ export { ArkInput } from "./ark-input.js";
 export { ArkKbd } from "./ark-kbd.js";
 export { ArkKvEditor } from "./ark-kv-editor.js";
 export { ArkMark } from "./ark-mark.js";
-export { ArkMenu, ArkMenuItem } from "./ark-menu.js";
+export { ArkMenu, ArkMenuGroup, ArkMenuItem } from "./ark-menu.js";
 export type { ArkNavNavigateDetail } from "./ark-nav.js";
 export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
 export { ArkPagination } from "./ark-pagination.js";

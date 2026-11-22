@@ -24,6 +24,7 @@ import type {
   ArkKvEditor,
   ArkMark,
   ArkMenu,
+  ArkMenuGroup,
   ArkMenuItem,
   ArkNav,
   ArkNavGroup,
@@ -74,6 +75,7 @@ declare global {
     "ark-kv-editor": ArkKvEditor;
     "ark-mark": ArkMark;
     "ark-menu": ArkMenu;
+    "ark-menu-group": ArkMenuGroup;
     "ark-menu-item": ArkMenuItem;
     "ark-nav": ArkNav;
     "ark-nav-group": ArkNavGroup;

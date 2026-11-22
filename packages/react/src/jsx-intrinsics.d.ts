@@ -379,6 +379,12 @@ interface ArkIntrinsicElements {
     size?: ArkSize;
     theme?: ArkTheme;
   };
+  "ark-menu-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    label?: string;
+    size?: ArkSize;
+    theme?: ArkTheme;
+  };
   "ark-menu-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     value?: string;

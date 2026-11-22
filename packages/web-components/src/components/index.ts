@@ -22,6 +22,7 @@ export * from "./ark-kbd";
 export * from "./ark-kv-editor";
 export * from "./ark-mark";
 export * from "./ark-menu";
+export * from "./ark-menu-group";
 export * from "./ark-menu-item";
 export * from "./ark-nav";
 export * from "./ark-nav-group";

@@ -10,6 +10,7 @@ import {
   ArkFileInput,
   ArkInput,
   ArkMenu,
+  ArkMenuGroup,
   ArkMenuItem,
   ArkProgress,
   ArkRadio,
@@ -51,6 +52,9 @@ export const accepted: ReactNode[] = [
     <ArkMenuItem value="copiar" onClick={() => {}}>
       Copiar
     </ArkMenuItem>
+    <ArkMenuGroup label="Exportar" id="exportar" onClick={() => {}}>
+      <ArkMenuItem value="pdf">PDF</ArkMenuItem>
+    </ArkMenuGroup>
   </ArkMenu>,
   <ArkTabs key="tabs" onAuxClick={() => {}} onChange={(event) => event.detail.value}>
     <ArkTab value="a" onDoubleClick={() => {}}>
