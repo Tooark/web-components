@@ -81,3 +81,11 @@ export type { ArkToggleGroupProps, ArkToggleProps } from "./ark-toggle.js";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle.js";
 export type { ArkTooltipProps } from "./ark-tooltip.js";
 export { ArkTooltip } from "./ark-tooltip.js";
+export type {
+  ArkTreeActivateDetail,
+  ArkTreeItemProps,
+  ArkTreeProps,
+  ArkTreeSelectionDetail,
+  ArkTreeToggleDetail
+} from "./ark-tree.js";
+export { ArkTree, ArkTreeItem } from "./ark-tree.js";

@@ -1069,8 +1069,10 @@
     margin-inline: 0.5rem 0.25rem;
   }
 
-  /* Os subitens (ou os wrappers de framework em volta deles) nas linhas de baixo. */
-  ark-tree-item > :not([slot]):not([data-ark-chrome]) {
+  /* Os subitens nas linhas de baixo, de ponta a ponta: diretos ou através de um wrapper de framework com display:
+     contents (o subitem vira item da grid do pai), e o que mais o app puser sem slot. */
+  ark-tree-item > :not([slot]):not([data-ark-chrome]),
+  ark-tree-item ark-tree-item {
     grid-column: 1 / -1;
   }
 
