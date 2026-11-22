@@ -11,10 +11,13 @@ import {
 import { createApplication } from "@angular/platform-browser";
 import {
   ArkButtonComponent,
+  ArkCardComponent,
   ArkDataViewCardDirective,
   ArkDataViewCellDirective,
   ArkDataViewComponent,
-  ArkPaginationComponent
+  ArkEmptyComponent,
+  ArkPaginationComponent,
+  ArkSwitchComponent
 } from "@tooark/angular";
 import type {
   ArkDataViewColumn,
@@ -210,5 +213,51 @@ export const DataViewTemplatesAndPagination = {
     ref.destroy();
     app.destroy();
     await expect(errors).toEqual([]);
+  }
+};
+
+class NewAttributesHost {
+  navigated: string[] = [];
+  onNavigate(event: CustomEvent<{ href: string }>): void {
+    event.preventDefault();
+    this.navigated.push(event.detail.href);
+  }
+}
+
+// Props do 2º passo das lacunas do Arkcode: heading-level, wrap-actions, download e ark-navigate no botão, filhos
+// projetados como rótulo do switch.
+export const NewAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkCardComponent, ArkEmptyComponent, ArkButtonComponent, ArkSwitchComponent],
+      template: `
+        <ark-card-wrapper heading="Relatório" [headingLevel]="3" [wrapActions]="true"></ark-card-wrapper>
+        <ark-empty-wrapper heading="Nada aqui" [headingLevel]="4"></ark-empty-wrapper>
+        <ark-button-wrapper href="/projetos/42" (arkNavigate)="onNavigate($event)">Abrir</ark-button-wrapper>
+        <ark-button-wrapper href="/dados.csv" download="dados.csv">Baixar</ark-button-wrapper>
+        <ark-switch-wrapper>Avisos por e-mail</ark-switch-wrapper>`
+    })(NewAttributesHost);
+
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    const card = canvasElement.querySelector("ark-card") as HTMLElement;
+    await expect(card).toHaveAttribute("wrap-actions", "");
+    await expect((card.querySelector('[data-ark="card-heading"]') as HTMLElement).tagName).toBe("H3");
+    const empty = canvasElement.querySelector("ark-empty") as HTMLElement;
+    await expect((empty.querySelector('[data-ark="empty-heading"]') as HTMLElement).tagName).toBe("H4");
+    const [route, file] = Array.from(canvasElement.querySelectorAll("ark-button")) as HTMLElement[];
+    await expect(file.querySelector("a")).toHaveAttribute("download", "dados.csv");
+    const toggle = canvasElement.querySelector("ark-switch") as HTMLElement;
+    await waitFor(() => expect(toggle.querySelector('[role="switch"]')).toHaveAttribute("aria-labelledby", toggle.id));
+    await expect(toggle.textContent).toContain("Avisos por e-mail");
+
+    canvasElement.addEventListener("click", (event) => event.preventDefault());
+    route.querySelector("a")?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    await expect(host.navigated).toEqual(["/projetos/42"]);
+    ref.destroy();
+    app.destroy();
   }
 };
