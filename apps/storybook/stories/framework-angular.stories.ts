@@ -23,6 +23,8 @@ import {
   ArkPaginationComponent,
   ArkSwitchComponent,
   ArkTimeComponent,
+  ArkTreeComponent,
+  ArkTreeItemComponent,
   setArkLocale as angularSetArkLocale
 } from "@tooark/angular";
 import { ArkChartComponent } from "@tooark/angular/chart";
@@ -37,7 +39,7 @@ import type {
 } from "@tooark/core";
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 // Os wrappers Angular de verdade, compilados em JIT a partir do src (o Vite transforma os decorators legados, ver
 // main.ts) e montados numa aplicação sem zone.js, como o padrão do Angular 21. O preview já registrou os elementos.
@@ -407,6 +409,59 @@ export const SidePackages = {
     const editor = canvasElement.querySelector("ark-wysiwyg-editor") as HTMLElement;
     await type(await waitFor(() => editor.querySelector(".ProseMirror") as HTMLElement));
     await waitFor(() => expect(sideText(host.doc)).toBe("aXYb"));
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+// ark-tree-wrapper e ark-tree-item-wrapper (display: contents entre a árvore, ou o item pai, e o item): a árvore acha
+// os itens por descendência, o subitem ocupa a largura do pai e os eventos chegam aos outputs.
+class TreeHost {
+  log: string[] = [];
+}
+
+export const Tree = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkTreeComponent, ArkTreeItemComponent],
+      template: `
+        <ark-tree-wrapper label="Arquivos" selection="single"
+          (arkToggle)="log.push('toggle ' + $event.detail.value + ' ' + $event.detail.expanded)"
+          (arkSelectionChange)="log.push('selection ' + $any($event.detail.values).join(','))"
+          (arkActivate)="log.push('activate ' + $event.detail.value)">
+          <ark-tree-item-wrapper value="src" label="src" [expanded]="true">
+            <span slot="trailing">2</span>
+            <ark-tree-item-wrapper value="src/index.ts" label="index.ts"></ark-tree-item-wrapper>
+            <ark-tree-item-wrapper value="src/app.ts" label="app.ts"></ark-tree-item-wrapper>
+          </ark-tree-item-wrapper>
+          <ark-tree-item-wrapper value="docs" label="docs">
+            <ark-tree-item-wrapper value="docs/guide.md" label="guide.md"></ark-tree-item-wrapper>
+          </ark-tree-item-wrapper>
+        </ark-tree-wrapper>`
+    })(TreeHost);
+
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    const tree = canvasElement.querySelector("ark-tree") as HTMLElement;
+    const item = (value: string) =>
+      canvasElement.querySelector(`ark-tree-item[value="${value}"]`) as HTMLElement & { rowElement: HTMLElement };
+    await waitFor(() => expect(item("src/index.ts").rowElement).toHaveAttribute("aria-level", "2"));
+    await expect(item("src/index.ts").parentElement?.closest("ark-tree-item")).toBe(item("src"));
+    await expect(item("src").rowElement).toHaveAttribute("aria-setsize", "2");
+    await expect(item("src/index.ts").rowElement).toHaveAttribute("aria-setsize", "2");
+    await expect(Math.round(item("src/index.ts").getBoundingClientRect().width)).toBe(
+      Math.round(item("src").getBoundingClientRect().width)
+    );
+    await expect(item("docs/guide.md")).not.toBeVisible();
+    await userEvent.click(within(item("src/index.ts")).getByText("index.ts"));
+    await expect(tree).toHaveAttribute("value", "src/index.ts");
+    item("docs").rowElement.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(item("docs/guide.md")).toBeVisible();
+    await expect(host.log).toEqual(["selection src/index.ts", "activate src/index.ts", "toggle docs true"]);
     ref.destroy();
     app.destroy();
   }

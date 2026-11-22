@@ -37,6 +37,8 @@ import {
   ArkTextarea as ReactArkTextarea,
   ArkTime as ReactArkTime,
   ArkToaster as ReactArkToaster,
+  ArkTree as ReactArkTree,
+  ArkTreeItem as ReactArkTreeItem,
   setArkLocale as reactSetArkLocale
 } from "@tooark/react";
 import { ArkChart as ReactArkChart } from "@tooark/react/chart";
@@ -63,6 +65,8 @@ import {
   ArkSwitch as VueArkSwitch,
   ArkTime as VueArkTime,
   ArkToaster as VueArkToaster,
+  ArkTree as VueArkTree,
+  ArkTreeItem as VueArkTreeItem,
   setArkLocale as vueSetArkLocale
 } from "@tooark/vue";
 import { ArkChart as VueArkChart } from "@tooark/vue/chart";
@@ -78,7 +82,7 @@ import type {
 import { createElement, createRef, type ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
 
 // Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
@@ -1574,6 +1578,105 @@ export const VueSidePackages = {
       () => code.value,
       () => textOf(doc.value)
     );
+    app.unmount();
+  }
+};
+
+/**
+ * O que os wrappers do ark-tree entregam: a estrutura (níveis pela linha, o filho dentro do pai) e os eventos
+ * consolidados chegando ao handler, com a seleção em single pelo clique e a expansão pela seta.
+ */
+async function expectTreeWrappers(canvasElement: HTMLElement, log: string[]): Promise<void> {
+  const tree = canvasElement.querySelector("ark-tree") as HTMLElement;
+  const item = (value: string) =>
+    canvasElement.querySelector(`ark-tree-item[value="${value}"]`) as HTMLElement & { rowElement: HTMLElement };
+  await waitFor(() => expect(item("src").rowElement).toHaveAttribute("role", "treeitem"));
+  await expect(tree).toHaveAttribute("role", "tree");
+  await expect(item("src").rowElement).toHaveAttribute("aria-level", "1");
+  await expect(item("src/index.ts").rowElement).toHaveAttribute("aria-level", "2");
+  await expect(item("src/index.ts").parentElement?.closest("ark-tree-item")).toBe(item("src"));
+  await expect(item("src").querySelector('[slot="trailing"]')?.textContent).toBe("2");
+  // O subitem ocupa a largura do pai (de ponta a ponta na grid dele), mesmo atrás de um wrapper.
+  await expect(Math.round(item("src/index.ts").getBoundingClientRect().width)).toBe(
+    Math.round(item("src").getBoundingClientRect().width)
+  );
+  await userEvent.click(within(item("src/index.ts")).getByText("index.ts"));
+  await expect(tree).toHaveAttribute("value", "src/index.ts");
+  item("docs").rowElement.focus();
+  await userEvent.keyboard("{ArrowRight}");
+  await expect(log).toEqual(['selection ["src/index.ts"]', "activate src/index.ts", "toggle docs true"]);
+}
+
+export const ReactTree = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const log: string[] = [];
+    const render = reactRoot(canvasElement, errors);
+    render(
+      createElement(
+        ReactArkTree,
+        {
+          label: "Arquivos",
+          selection: "single",
+          onToggle: (event) => log.push(`toggle ${event.detail.value} ${event.detail.expanded}`),
+          onSelectionChange: (event) => log.push(`selection ${JSON.stringify(event.detail.values)}`),
+          onActivate: (event) => log.push(`activate ${event.detail.value}`)
+        },
+        createElement(
+          ReactArkTreeItem,
+          { value: "src", label: "src", expanded: true },
+          createElement("span", { slot: "trailing" }, "2"),
+          createElement(ReactArkTreeItem, { value: "src/index.ts", label: "index.ts" }),
+          createElement(ReactArkTreeItem, { value: "src/app.ts", label: "app.ts" })
+        ),
+        createElement(
+          ReactArkTreeItem,
+          { value: "docs", label: "docs" },
+          createElement(ReactArkTreeItem, { value: "docs/guide.md", label: "guide.md" })
+        )
+      )
+    );
+    await expect(errors).toEqual([]);
+    await expectTreeWrappers(canvasElement, log);
+  }
+};
+
+export const VueTree = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const log: string[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h(
+          VueArkTree,
+          {
+            label: "Arquivos",
+            selection: "single",
+            onArkToggle: (event: CustomEvent<{ value: string; expanded: boolean }>) =>
+              log.push(`toggle ${event.detail.value} ${event.detail.expanded}`),
+            onArkSelectionChange: (event: CustomEvent<{ values: string[] }>) =>
+              log.push(`selection ${JSON.stringify(event.detail.values)}`),
+            onArkActivate: (event: CustomEvent<{ value: string }>) => log.push(`activate ${event.detail.value}`)
+          },
+          () => [
+            h(VueArkTreeItem, { value: "src", label: "src", expanded: true }, () => [
+              h("span", { slot: "trailing" }, "2"),
+              h(VueArkTreeItem, { value: "src/index.ts", label: "index.ts" }),
+              h(VueArkTreeItem, { value: "src/app.ts", label: "app.ts" })
+            ]),
+            h(VueArkTreeItem, { value: "docs", label: "docs" }, () => [
+              h(VueArkTreeItem, { value: "docs/guide.md", label: "guide.md" })
+            ])
+          ]
+        )
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectTreeWrappers(canvasElement, log);
     app.unmount();
   }
 };
