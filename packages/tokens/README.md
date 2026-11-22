@@ -129,7 +129,7 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                        | Version | Description                |
 | ---------------------------------------------- | ------- | -------------------------- |
-| [`tslib`](https://www.npmjs.com/package/tslib) | ^2.8.1  | TypeScript runtime helpers |
+| [`tslib`](https://www.npmjs.com/package/tslib) | ^2.9.1  | TypeScript runtime helpers |
 
 ---
 

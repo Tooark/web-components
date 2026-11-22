@@ -125,12 +125,12 @@ ngOnDestroy(): void {
 
 Installed automatically unless marked as peer; peer dependencies are yours to install (the ranges are what the package declares).
 
-| Package                                                          | Version | Description                                                      |
-| ---------------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.6.1  | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.6.1  | Design tokens (colors, sizes, motion) and primitive types        |
-| [`motion`](https://www.npmjs.com/package/motion)                 | ^14.1.0 | Motion animation library (spring physics, scroll, gestures)      |
-| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1  | TypeScript runtime helpers                                       |
+| Package                                                          | Version  | Description                                                      |
+| ---------------------------------------------------------------- | -------- | ---------------------------------------------------------------- |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.7.0   | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.7.0   | Design tokens (colors, sizes, motion) and primitive types        |
+| [`motion`](https://www.npmjs.com/package/motion)                 | ^14.14.0 | Motion animation library (spring physics, scroll, gestures)      |
+| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.9.1   | TypeScript runtime helpers                                       |
 
 ---
 

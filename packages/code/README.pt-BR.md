@@ -200,8 +200,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                                                     | Versão        | Descrição                                                  |
 | ------------------------------------------------------------------------------------------ | ------------- | ---------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.6.1        | Design tokens (cores, tamanhos, motion) e tipos primitivos |
-| [`tslib`](https://www.npmjs.com/package/tslib)                                             | ^2.8.1        | Helpers de runtime do TypeScript                           |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens)                           | ^1.7.0        | Design tokens (cores, tamanhos, motion) e tipos primitivos |
+| [`tslib`](https://www.npmjs.com/package/tslib)                                             | ^2.9.1        | Helpers de runtime do TypeScript                           |
 | [`@codemirror/autocomplete`](https://www.npmjs.com/package/@codemirror/autocomplete)       | >=6 (peer)    | Completions e fechamento de pares                          |
 | [`@codemirror/commands`](https://www.npmjs.com/package/@codemirror/commands)               | >=6.6 (peer)  | Atalhos, histórico, comandos de recuo                      |
 | [`@codemirror/lang-javascript`](https://www.npmjs.com/package/@codemirror/lang-javascript) | >=6 (peer)    | Linguagem JavaScript e completions                         |

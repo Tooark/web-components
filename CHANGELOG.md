@@ -9,6 +9,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-11-22
+
 ### Added
 
 - `ark-pagination`: new element. The host is the `role="navigation"`; it renders the range summary (`31–40 of 134`),
@@ -48,7 +50,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `sortBy`, `sortAscending`, `sortDescending`, `sortedBy`, `sortCleared`, `selectAll`, `selectRow`, `selectedCount`,
   `clearSelection`, `reorder`, `movedTo`, `moveUp`, `moveDown`, `moveToStart`, `moveToEnd`); a `locale-json` without
   them falls back to English.
-
 - `ark-nav`, `ark-nav-item` and `ark-nav-group`: app navigation in three presentations, `sidebar` (default: a column
   where `slot="header"` for the logo, `slot="footer"` for the avatar and the collapse button stay pinned to the ends
   and only the items scroll between them), `navbar` (a horizontal bar, no visible scrollbar) and `tabbar` (mobile
@@ -64,7 +65,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   Vue and Angular wrappers (`ArkNav`, `ArkNavItem`, `ArkNavGroup`) and hooks `nav`, `nav-toggle`, `nav-header`,
   `nav-footer`, `nav-item`, `nav-item-link`, `nav-item-label`, `nav-item-icon`, `nav-item-trailing`, `nav-divider`,
   `nav-group`, `nav-group-heading`.
-
 - `heading-level` (1–6) on `ark-card`, `ark-dialog`, `ark-drawer` and `ark-empty`: the component's own title
   (`heading`, or the `label` of dialog and drawer) takes that level so it fits the page outline; without it, or outside
   1–6, the defaults stay (`h2`, and `h3` in `ark-empty`). Changing it swaps the node in place, keeping its id (so
@@ -160,8 +160,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   meant for badges, and the trailing becomes the row's description (`aria-describedby`) so a badge is read with the
   row. Measured with about 2,000 open nodes: under a second to mount, about 3.5 s while Chromium's accessibility tree
   is active (the row chrome is built before it enters the DOM, which halved that). The tree stories run axe as an
-  error. `Core/ArkTree` and the `ReactTree`, `VueTree` and Angular
-  `Tree` integration stories.
+  error. `Core/ArkTree` and the `ReactTree`, `VueTree` and Angular `Tree` integration stories.
+
 ### Changed
 
 - The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write
@@ -169,13 +169,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `setArkLocale()`. The strings stay the same English, but the element carries no `lang` attribute, like the raw tag:
   a `[lang="en"]` selector or an E2E assertion on it no longer matches, and screen readers read those strings in the
   language the page declares (pass `lang`, or call `setArkLocale()`, to keep the two in step).
-
 - The Storybook suite now runs the Angular wrappers too (`Integration/Angular Wrappers`): they are JIT-compiled from
   source (the Storybook Vite config turns on legacy decorators for them) and mounted in a zoneless application, next
   to the React and Vue integration stories. `pnpm check:ssr` also renders the React and Vue `ArkDataView`.
 - Portuguese accents fixed in the Storybook stories (docs descriptions and demo texts) and in source comments,
   including the JSDoc of the React and Vue wrappers that reaches the editor tooltip and the published `.d.ts`. Text
   only: no attribute, event, test id or locale string changed.
+- Dependencies: `@tooark/motion` depends on `motion` ^14.14.0 (was ^14.1.0), `@tooark/wysiwyg` on `@tiptap/*`
+  ^3.34.0 (was ^3.31.4), and the packages that use `tslib` on ^2.9.1 (was ^2.8.1). Minor and patch releases of
+  those libraries; the suite passes on them. The dependency tables of the package READMEs match their manifests
+  again.
 
 ### Fixed
 
@@ -522,7 +525,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/Tooark/web-components/compare/v1.6.1...v1.7.0
 [1.6.1]: https://github.com/Tooark/web-components/compare/v1.6.0...v1.6.1
 [1.6.0]: https://github.com/Tooark/web-components/compare/v1.5.0...v1.6.0
 [1.5.0]: https://github.com/Tooark/web-components/compare/v1.4.0...v1.5.0

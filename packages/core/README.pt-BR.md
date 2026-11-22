@@ -136,8 +136,8 @@ Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta
 
 | Pacote                                                           | Versão | Descrição                                                  |
 | ---------------------------------------------------------------- | ------ | ---------------------------------------------------------- |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.6.1 | Design tokens (cores, tamanhos, motion) e tipos primitivos |
-| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.8.1 | Helpers de runtime do TypeScript                           |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.7.0 | Design tokens (cores, tamanhos, motion) e tipos primitivos |
+| [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.9.1 | Helpers de runtime do TypeScript                           |
 
 ---
 
