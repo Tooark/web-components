@@ -11,13 +11,18 @@ import {
 import { createApplication } from "@angular/platform-browser";
 import {
   ArkButtonComponent,
+  ArkCalendarComponent,
   ArkCardComponent,
   ArkDataViewCardDirective,
   ArkDataViewCellDirective,
   ArkDataViewComponent,
   ArkEmptyComponent,
+  ArkMenuComponent,
+  ArkMenuGroupComponent,
+  ArkMenuItemComponent,
   ArkPaginationComponent,
-  ArkSwitchComponent
+  ArkSwitchComponent,
+  setArkLocale as angularSetArkLocale
 } from "@tooark/angular";
 import type {
   ArkDataViewColumn,
@@ -26,6 +31,7 @@ import type {
   ArkDataViewSelectionChangeDetail,
   ArkPageChangeDetail
 } from "@tooark/core";
+import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, waitFor } from "storybook/test";
 
@@ -257,6 +263,50 @@ export const NewAttributes = {
     canvasElement.addEventListener("click", (event) => event.preventDefault());
     route.querySelector("a")?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
     await expect(host.navigated).toEqual(["/projetos/42"]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+// ark-menu-group-wrapper dentro do menu, e o idioma padrão: a reexportação de setArkLocale é a do core e o calendário
+// sem `lang` (o wrapper gravava `lang="en"` por padrão) segue a troca.
+export const MenuGroupAndLocale = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkMenuComponent, ArkMenuGroupComponent, ArkMenuItemComponent, ArkCalendarComponent],
+      template: `
+        <ark-menu-wrapper ariaLabel="Arquivo">
+          <ark-menu-group-wrapper label="Exportar" testid="export">
+            <ark-menu-item-wrapper value="pdf">PDF</ark-menu-item-wrapper>
+          </ark-menu-group-wrapper>
+        </ark-menu-wrapper>
+        <ark-calendar-wrapper value="2026-09-15"></ark-calendar-wrapper>`
+    })(class {});
+
+    const { app, ref } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    await expect(angularSetArkLocale === setArkLocale).toBe(true);
+    const group = canvasElement.querySelector("ark-menu-group") as HTMLElement;
+    await expect(group).toHaveAttribute("role", "group");
+    await expect(group).toHaveAttribute("data-testid", "export");
+    const label = group.querySelector('[data-ark="menu-group-label"]') as HTMLElement;
+    await expect(label).toHaveTextContent("Exportar");
+    await expect(group).toHaveAttribute("aria-labelledby", label.id);
+    await expect(group.querySelector("ark-menu-item")).toHaveAttribute("value", "pdf");
+
+    const calendar = canvasElement.querySelector("ark-calendar") as HTMLElement;
+    await expect(calendar.hasAttribute("lang")).toBe(false);
+    const english = calendar.textContent;
+    try {
+      angularSetArkLocale("pt");
+      await expect(calendar.textContent).toContain(resolveLocale("pt").months[8]);
+    } finally {
+      angularSetArkLocale(null);
+    }
+    await expect(calendar.textContent).toBe(english);
     ref.destroy();
     app.destroy();
   }
