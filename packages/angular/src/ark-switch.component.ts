@@ -25,6 +25,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.label-on]="labelOn"
     [attr.label-off]="labelOff"
     (change)="onChange($event)">
+    <ng-content></ng-content>
   </ark-switch>`
 })
 export class ArkSwitchComponent {

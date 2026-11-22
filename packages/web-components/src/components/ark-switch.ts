@@ -26,11 +26,17 @@ const CHECK_SVG =
 const CROSS_SVG =
   '<svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l6 6M9 3L3 9"></path></svg>';
 
+/** Contador para o id gerado do host, que o `aria-labelledby` do trilho referencia quando os filhos são o rótulo. */
+let nextId = 0;
+
 /**
  * Interruptor liga/desliga com trilho e polegar. O trilho é um <button>
  * `role="switch"`; um checkbox oculto espelha o estado para o formulário,
  * submetendo `name`/`value` apenas quando marcado. Tem tabela de proporções
- * própria, em vez da escala de altura dos demais controles.
+ * própria, em vez da escala de altura dos demais controles. Nome acessível:
+ * `aria-label`, senão `label`, senão os filhos do usuário, que viram rótulo
+ * visível (opt-in por construção): o host passa a ser uma linha com o trilho
+ * antes do texto, e um clique no texto alterna, como num `<label>`.
  */
 export class ArkSwitch extends HTMLElementBase {
   static readonly tagName = "ark-switch";
@@ -40,6 +46,9 @@ export class ArkSwitch extends HTMLElementBase {
   private labelOnEl: HTMLSpanElement | null = null;
   private labelOffEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
+  private observer: MutationObserver | null = null;
+  private ownClasses: string[] = [];
+  private syncingClass = false;
 
   static get observedAttributes(): string[] {
     return [
@@ -57,8 +66,14 @@ export class ArkSwitch extends HTMLElementBase {
       "value",
       "label",
       "aria-label",
+      "class",
       "testid"
     ];
+  }
+
+  constructor() {
+    super();
+    this.addEventListener("click", this.handleHostClick);
   }
 
   connectedCallback(): void {
@@ -66,11 +81,25 @@ export class ArkSwitch extends HTMLElementBase {
     if (!this.trackEl) {
       this.render();
     }
+    if (!this.observer) {
+      // Filhos que chegam depois (frameworks) passam a ser o rótulo, e os que saem deixam de ser.
+      this.observer = new MutationObserver(() => this.updateAppearance());
+      this.observer.observe(this, { childList: true });
+    }
 
     this.updateAppearance();
   }
 
-  attributeChangedCallback(): void {
+  disconnectedCallback(): void {
+    this.observer?.disconnect();
+    this.observer = null;
+  }
+
+  attributeChangedCallback(name: string): void {
+    if (name === "class") {
+      if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      return;
+    }
     if (!this.trackEl) return;
     this.updateAppearance();
   }
@@ -98,6 +127,41 @@ export class ArkSwitch extends HTMLElementBase {
         composed: true
       })
     );
+  }
+
+  // Clique nos filhos do usuário (o rótulo visível) alterna, como um <label>. O trilho já alterna sozinho; um
+  // controle ou link dentro do rótulo fica com o próprio comportamento.
+  private readonly handleHostClick = (event: MouseEvent): void => {
+    if (!this.trackEl) return;
+    const target = event.target as HTMLElement | null;
+    if (!target || target === this.trackEl || this.trackEl.contains(target)) return;
+    if (target.closest("a, button, input, select, textarea, label, [contenteditable]") !== null) return;
+    if (this.hasAttribute("disabled")) return;
+    this.trackEl.focus();
+    this.toggle();
+  };
+
+  /** Filhos do usuário com conteúdo (texto ou elemento), que viram o rótulo visível. */
+  private hasLabelChildren(): boolean {
+    return Array.from(this.childNodes).some(
+      (node) =>
+        node !== this.trackEl &&
+        node !== this.inputEl &&
+        ((node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim() !== "") ||
+          node.nodeType === Node.ELEMENT_NODE)
+    );
+  }
+
+  private applyOwnClasses(next: string[]): void {
+    this.syncingClass = true;
+    for (const cls of this.ownClasses) {
+      if (!next.includes(cls)) this.classList.remove(cls);
+    }
+    for (const cls of next) {
+      if (!this.classList.contains(cls)) this.classList.add(cls);
+    }
+    this.ownClasses = next;
+    this.syncingClass = false;
   }
 
   private getIntent(): ArkIntent {
@@ -280,7 +344,7 @@ export class ArkSwitch extends HTMLElementBase {
     const labelOffColor = "ark:text-fg-muted";
 
     this.trackEl.className = [
-      "ark:relative ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-full ark:border-2 ark:border-transparent ark:transition-colors ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50",
+      "ark:relative ark:order-first ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-full ark:border-2 ark:border-transparent ark:transition-colors ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50",
       palette.focusRing,
       labels ? sizing.trackLabels : sizing.track,
       checked ? palette.onTrack : offTrack
@@ -290,12 +354,34 @@ export class ArkSwitch extends HTMLElementBase {
     this.trackEl.disabled = disabled;
     this.trackEl.style.backgroundColor = checked && color ? color : "";
 
+    // Nome: aria-label, senão label; sem os dois, os filhos do usuário, por aria-labelledby no host (com id gerado).
     const label = this.getAttribute("aria-label") || this.getAttribute("label");
+    const childLabel = this.hasLabelChildren();
     if (label) {
       this.trackEl.setAttribute("aria-label", label);
+      this.trackEl.removeAttribute("aria-labelledby");
+    } else if (childLabel) {
+      if (!this.id) this.id = `ark-switch-${++nextId}-host`;
+      this.trackEl.removeAttribute("aria-label");
+      this.trackEl.setAttribute("aria-labelledby", this.id);
     } else {
       this.trackEl.removeAttribute("aria-label");
+      this.trackEl.removeAttribute("aria-labelledby");
     }
+
+    // Com rótulo visível o host vira uma linha (trilho primeiro, pela ordem do flex, sem mover nós) que responde ao
+    // clique; sem filhos, nenhuma classe no host, como sempre.
+    this.applyOwnClasses(
+      childLabel
+        ? [
+            "ark:inline-flex",
+            "ark:items-center",
+            "ark:gap-2",
+            "ark:select-none",
+            disabled ? "ark:cursor-not-allowed" : "ark:cursor-pointer"
+          ]
+        : []
+    );
 
     this.thumbEl.className = [
       "ark:pointer-events-none ark:inline-flex ark:items-center ark:justify-center ark:rounded-full ark:shadow ark:transition-transform",
