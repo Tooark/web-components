@@ -16,7 +16,7 @@ export type ArkCardProps = PropsWithChildren<
 
 export const ArkCard = forwardRef<ArkCardElement, ArkCardProps>(
   function ArkCard(props, forwardedRef): React.JSX.Element {
-    const { children, className, headingLevel, ...rest } = props;
+    const { children, className, headingLevel, wrapActions, ...rest } = props;
 
     useEffect(() => {
       ensureTooarkComponentsRegistered();
@@ -26,7 +26,8 @@ export const ArkCard = forwardRef<ArkCardElement, ArkCardProps>(
       ...rest,
       ref: forwardedRef,
       class: className,
-      "heading-level": headingLevel
+      "heading-level": headingLevel,
+      "wrap-actions": wrapActions ? "" : undefined
     };
 
     return createElement("ark-card", attrs, children);

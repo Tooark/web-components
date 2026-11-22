@@ -269,6 +269,114 @@ export const Layout = {
   }
 };
 
+/** Largura min-content do nó (a da maior palavra), medida num clone fora do fluxo. */
+function minContentWidth(node: HTMLElement): number {
+  const clone = node.cloneNode(true) as HTMLElement;
+  clone.style.position = "absolute";
+  clone.style.visibility = "hidden";
+  clone.style.width = "min-content";
+  node.parentElement?.appendChild(clone);
+  const width = clone.getBoundingClientRect().width;
+  clone.remove();
+  return width;
+}
+
+function wideActions(withSelect: boolean): HTMLElement {
+  const actions = document.createElement("div");
+  actions.setAttribute("slot", "actions");
+  actions.append(createButton("Exportar", "outline"), createButton("Duplicar", "outline"));
+  actions.appendChild(createButton("Arquivar", "outline"));
+  if (withSelect) {
+    const select = document.createElement("ark-select");
+    select.setAttribute("size", "sm");
+    select.setAttribute("aria-label", "Período");
+    select.setAttribute("options", JSON.stringify([{ value: "30", label: "Últimos 30 dias" }]));
+    actions.appendChild(select);
+  }
+  return actions;
+}
+
+export const WrapActions = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Ações largas num card estreito. Com `wrap-actions` o h2 do `heading` não fica mais estreito que a maior palavra e as ações quebram em linhas, encostadas à direita, em vez de esmagar o título ou transbordar o card. O `slot="header"` do usuário encolhe como sem o atributo (um título truncado continua truncando); `min-width: auto` no próprio elemento dá a ele o mesmo piso. Sem o atributo, o card fica como sempre foi. Limite: uma palavra mais larga que o card (URL, nome de arquivo) alarga a coluna do título; quebre-a no próprio conteúdo.'
+      }
+    }
+  },
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "16px";
+
+    const squeezed = createCard({ heading: "Relatório V2", width: "400px" });
+    squeezed.dataset.case = "squeezed";
+    squeezed.appendChild(wideActions(true));
+
+    const fits = createCard({ heading: "Hoje", width: "400px" });
+    fits.dataset.case = "fits";
+    fits.appendChild(wideActions(false));
+
+    const truncated = createCard({
+      width: "400px",
+      header:
+        '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">Relatório financeiro consolidado do trimestre</span>',
+      withActions: true
+    });
+    truncated.dataset.case = "truncated";
+
+    const optIn = createCard({ width: "400px", header: "<strong>Relatório V2</strong>" });
+    optIn.dataset.case = "opt-in";
+    (optIn.querySelector('[slot="header"]') as HTMLElement).style.minWidth = "auto";
+    optIn.appendChild(wideActions(true));
+
+    for (const card of [squeezed, fits, truncated, optIn]) card.setAttribute("wrap-actions", "");
+
+    const plain = createCard({ heading: "Relatório V2", width: "400px" });
+    plain.dataset.case = "plain";
+    plain.appendChild(wideActions(true));
+
+    wrap.append(squeezed, fits, truncated, optIn, plain);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const card = (id: string) => canvasElement.querySelector(`ark-card[data-case="${id}"]`) as HTMLElement;
+    const actionsOf = (el: HTMLElement) => el.querySelector('[slot="actions"]') as HTMLElement;
+    const innerRight = (el: HTMLElement) => el.getBoundingClientRect().right - 16 - 1;
+
+    for (const id of ["squeezed", "fits", "truncated", "opt-in"]) {
+      // Nada sai do card: nem as ações nem o título.
+      await expect(card(id).scrollWidth).toBeLessThanOrEqual(card(id).clientWidth);
+      await expect(actionsOf(card(id)).getBoundingClientRect().right).toBeLessThanOrEqual(innerRight(card(id)) + 0.5);
+    }
+
+    // O h2 fica pelo menos na largura da maior palavra ("Relatório") e as ações quebram linha.
+    const heading = card("squeezed").querySelector('[data-ark="card-heading"]') as HTMLElement;
+    await expect(heading.getBoundingClientRect().width).toBeGreaterThanOrEqual(minContentWidth(heading) - 0.5);
+    await expect(actionsOf(card("squeezed")).getBoundingClientRect().height).toBeGreaterThan(40);
+
+    // Com espaço, nada muda: ações numa linha só, encostadas à direita, título com o resto.
+    const fitsActions = actionsOf(card("fits"));
+    await expect(Math.round(fitsActions.getBoundingClientRect().height)).toBe(28);
+    await expect(Math.round(fitsActions.getBoundingClientRect().right)).toBe(Math.round(innerRight(card("fits"))));
+
+    // O cabeçalho do usuário continua encolhendo: o título truncado segue truncado e as ações ficam numa linha.
+    const ellipsis = card("truncated").querySelector('[slot="header"] span') as HTMLElement;
+    await expect(ellipsis.scrollWidth).toBeGreaterThan(ellipsis.clientWidth);
+    await expect(Math.round(actionsOf(card("truncated")).getBoundingClientRect().height)).toBe(28);
+
+    // Com min-width: auto no próprio cabeçalho, ele ganha o piso da maior palavra.
+    const header = card("opt-in").querySelector('[slot="header"]') as HTMLElement;
+    await expect(header.getBoundingClientRect().width).toBeGreaterThanOrEqual(minContentWidth(header) - 0.5);
+
+    // Sem o atributo, o layout é o de sempre: ações sem quebra de linha e coluna do título com mínimo 0.
+    await expect(getComputedStyle(actionsOf(card("plain"))).flexWrap).toBe("nowrap");
+    const plainHeading = card("plain").querySelector('[data-ark="card-heading"]') as HTMLElement;
+    await expect(getComputedStyle(plainHeading).minWidth).toBe("0px");
+  }
+};
+
 export const TestHooks = {
   render: () =>
     createCard({

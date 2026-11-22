@@ -14,7 +14,8 @@ import { upgradeProperties } from "./upgrade-properties";
  * com `heading-level`); com ele, o `slot="header"` do usuário vira a linha
  * seguinte do cabeçalho. `padding`
  * escala o espaçamento interno (padding do host e gap entre as linhas) e
- * `rounded` os cantos. Não é interativo e não tem role próprio.
+ * `rounded` os cantos. `wrap-actions` (só CSS) faz as ações quebrarem linha em
+ * vez de esmagar o título. Não é interativo e não tem role próprio.
  */
 export class ArkCard extends HTMLElementBase {
   static readonly tagName = "ark-card";

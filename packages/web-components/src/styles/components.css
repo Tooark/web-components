@@ -657,6 +657,26 @@
     margin-inline-start: var(--ark-card-gap);
   }
 
+  /* wrap-actions (opt-in): ações que não cabem na sobra quebram em mais linhas, encostadas à direita, em vez de
+     esmagar o título ou transbordar o card. A coluna do título passa a ter mínimo auto, então o h2 próprio
+     (min-width automático) não fica mais estreito que a maior palavra; o slot="header" do usuário mantém o
+     min-width: 0 e encolhe como sem o atributo (um título truncado segue truncando), e ganha o mesmo piso com
+     min-width: auto no próprio elemento. Limite: uma palavra mais larga que o card (URL, nome de arquivo) alarga a
+     coluna e leva corpo e rodapé junto; quebre-a no próprio conteúdo. */
+  ark-card[wrap-actions] {
+    grid-template-columns: minmax(auto, 1fr) auto;
+  }
+
+  ark-card[wrap-actions] > [data-ark-chrome="heading"] {
+    min-width: auto;
+  }
+
+  ark-card[wrap-actions] > [slot="actions"] {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
   /* Com heading, o slot="header" do usuário passa a ser a linha seguinte do cabeçalho, na largura toda. */
   ark-card:has(> [data-ark-chrome="heading"]) > [slot="header"] {
     grid-column: 1 / -1;
