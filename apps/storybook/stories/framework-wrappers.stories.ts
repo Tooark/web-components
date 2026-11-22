@@ -13,11 +13,13 @@ import {
 import {
   ArkButton as ReactArkButton,
   ArkCalendar as ReactArkCalendar,
+  ArkCard as ReactArkCard,
   ArkCheckbox as ReactArkCheckbox,
   ArkClock as ReactArkClock,
   ArkDataView as ReactArkDataView,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
+  ArkEmpty as ReactArkEmpty,
   ArkFileInput as ReactArkFileInput,
   ArkInput as ReactArkInput,
   ArkKvEditor as ReactArkKvEditor,
@@ -35,9 +37,11 @@ import {
 import {
   type ArkDataViewVueColumn,
   ArkButton as VueArkButton,
+  ArkCard as VueArkCard,
   ArkCheckbox as VueArkCheckbox,
   ArkClock as VueArkClock,
   ArkDataView as VueArkDataView,
+  ArkEmpty as VueArkEmpty,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuItem as VueArkMenuItem,
@@ -46,6 +50,7 @@ import {
   ArkPagination as VueArkPagination,
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
+  ArkSwitch as VueArkSwitch,
   ArkToaster as VueArkToaster
 } from "@tooark/vue";
 import type {
@@ -1160,5 +1165,100 @@ export const VueNavCollapsible = {
     await expect(nav).toHaveAttribute("data-ark-hidden");
     await expect(environments).not.toBeVisible();
     await expect(problems).toEqual([]);
+  }
+};
+
+/** Confere no DOM o que os wrappers das props do 2º passo das lacunas do Arkcode gravam no elemento. */
+async function expectNewAttributes(canvasElement: HTMLElement): Promise<void> {
+  const card = canvasElement.querySelector("ark-card") as HTMLElement;
+  await expect(card).toHaveAttribute("wrap-actions", "");
+  await expect(card).toHaveAttribute("heading-level", "3");
+  await expect((card.querySelector('[data-ark="card-heading"]') as HTMLElement).tagName).toBe("H3");
+  const empty = canvasElement.querySelector("ark-empty") as HTMLElement;
+  await expect((empty.querySelector('[data-ark="empty-heading"]') as HTMLElement).tagName).toBe("H4");
+  const [route, file] = Array.from(canvasElement.querySelectorAll("ark-button")) as HTMLElement[];
+  await expect(route.querySelector("a")).not.toHaveAttribute("download");
+  await expect(file.querySelector("a")).toHaveAttribute("download", "dados.csv");
+  const toggle = canvasElement.querySelector("ark-switch") as HTMLElement;
+  await expect(toggle.textContent).toContain("Avisos por e-mail");
+  await expect(toggle.querySelector('[role="switch"]')).toHaveAttribute("aria-labelledby", toggle.id);
+}
+
+export const ReactNewAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const navigated: string[] = [];
+    render(
+      createElement(
+        "div",
+        null,
+        createElement(ReactArkCard, { heading: "Relatório", headingLevel: 3, wrapActions: true }),
+        createElement(ReactArkEmpty, { heading: "Nada aqui", headingLevel: 4 }),
+        createElement(
+          ReactArkButton,
+          {
+            href: "/projetos/42",
+            onNavigate: (event: CustomEvent<{ href: string }>) => {
+              event.preventDefault();
+              navigated.push(event.detail.href);
+            }
+          },
+          "Abrir"
+        ),
+        createElement(ReactArkButton, { href: "/dados.csv", download: "dados.csv" }, "Baixar"),
+        createElement(ReactArkSwitch, null, "Avisos por e-mail")
+      )
+    );
+    await expect(errors).toEqual([]);
+    await expectNewAttributes(canvasElement);
+
+    // Rede de segurança: nenhum clique pode navegar o iframe.
+    canvasElement.addEventListener("click", (event) => event.preventDefault());
+    canvasElement
+      .querySelector("ark-button a")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    await expect(navigated).toEqual(["/projetos/42"]);
+  }
+};
+
+export const VueNewAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const navigated: string[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(VueArkCard, { heading: "Relatório", headingLevel: 3, wrapActions: true }),
+          h(VueArkEmpty, { heading: "Nada aqui", headingLevel: 4 }),
+          h(
+            VueArkButton,
+            {
+              href: "/projetos/42",
+              onArkNavigate: (event: CustomEvent<{ href: string }>) => {
+                event.preventDefault();
+                navigated.push(event.detail.href);
+              }
+            },
+            () => "Abrir"
+          ),
+          h(VueArkButton, { href: "/dados.csv", download: "dados.csv" }, () => "Baixar"),
+          h(VueArkSwitch, null, () => "Avisos por e-mail")
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectNewAttributes(canvasElement);
+
+    canvasElement.addEventListener("click", (event) => event.preventDefault());
+    canvasElement
+      .querySelector("ark-button a")
+      ?.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    await expect(navigated).toEqual(["/projetos/42"]);
+    app.unmount();
   }
 };
