@@ -35,6 +35,7 @@ import {
   ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
   ArkTextarea as ReactArkTextarea,
+  ArkTime as ReactArkTime,
   ArkToaster as ReactArkToaster,
   setArkLocale as reactSetArkLocale
 } from "@tooark/react";
@@ -57,6 +58,7 @@ import {
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
   ArkSwitch as VueArkSwitch,
+  ArkTime as VueArkTime,
   ArkToaster as VueArkToaster,
   setArkLocale as vueSetArkLocale
 } from "@tooark/vue";
@@ -1343,6 +1345,61 @@ export const VueMenuGroupAndLocale = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectMenuGroupAndLocale(canvasElement, vueSetArkLocale);
+    app.unmount();
+  }
+};
+
+/** O que os wrappers do ark-time gravam: Date e ms viram ISO, e o texto sai pelo Intl no idioma pedido. */
+async function expectTimeWrappers(canvasElement: HTMLElement, instant: Date): Promise<void> {
+  const [relative, absolute, fromMs] = Array.from(canvasElement.querySelectorAll("ark-time")) as HTMLElement[];
+  await expect(relative).toHaveAttribute("datetime", instant.toISOString());
+  await expect(relative.querySelector("time")?.textContent).toBe("há 2 horas");
+  await expect(relative).toHaveAttribute("data-testid", "updated");
+  await expect(absolute).toHaveAttribute("format", "date");
+  await expect(absolute.querySelector("time")?.textContent).toBe(
+    new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(instant)
+  );
+  await expect(fromMs).toHaveAttribute("datetime", instant.toISOString());
+}
+
+export const ReactTime = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const instant = new Date(Date.now() - 2 * 3600000);
+    render(
+      createElement(
+        "div",
+        null,
+        createElement(ReactArkTime, { datetime: instant, lang: "pt-BR", testid: "updated" }),
+        createElement(ReactArkTime, { datetime: instant.toISOString(), format: "date", lang: "en" }),
+        createElement(ReactArkTime, { datetime: instant.getTime() })
+      )
+    );
+    await expect(errors).toEqual([]);
+    await expectTimeWrappers(canvasElement, instant);
+  }
+};
+
+export const VueTime = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const instant = new Date(Date.now() - 2 * 3600000);
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(VueArkTime, { datetime: instant, lang: "pt-BR", testid: "updated" }),
+          h(VueArkTime, { datetime: instant.toISOString(), format: "date", lang: "en" }),
+          h(VueArkTime, { datetime: instant.getTime() })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectTimeWrappers(canvasElement, instant);
     app.unmount();
   }
 };

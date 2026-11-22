@@ -22,6 +22,7 @@ import {
   ArkMenuItemComponent,
   ArkPaginationComponent,
   ArkSwitchComponent,
+  ArkTimeComponent,
   setArkLocale as angularSetArkLocale
 } from "@tooark/angular";
 import type {
@@ -307,6 +308,43 @@ export const MenuGroupAndLocale = {
       angularSetArkLocale(null);
     }
     await expect(calendar.textContent).toBe(english);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+// ark-time-wrapper: Date e ms viram ISO no atributo, e o texto sai pelo Intl no idioma pedido.
+export const Time = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const instant = new Date(Date.now() - 2 * 3600000);
+    const Host = Component({
+      standalone: true,
+      imports: [ArkTimeComponent],
+      template: `
+        <ark-time-wrapper [datetime]="instant" lang="pt-BR" testid="updated"></ark-time-wrapper>
+        <ark-time-wrapper [datetime]="iso" format="date" lang="en"></ark-time-wrapper>
+        <ark-time-wrapper [datetime]="ms"></ark-time-wrapper>`
+    })(
+      class {
+        instant = instant;
+        iso = instant.toISOString();
+        ms = instant.getTime();
+      }
+    );
+
+    const { app, ref } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    const [relative, absolute, fromMs] = Array.from(canvasElement.querySelectorAll("ark-time")) as HTMLElement[];
+    await expect(relative).toHaveAttribute("datetime", instant.toISOString());
+    await expect(relative.querySelector("time")?.textContent).toBe("há 2 horas");
+    await expect(relative).toHaveAttribute("data-testid", "updated");
+    await expect(absolute).toHaveAttribute("format", "date");
+    await expect(absolute.querySelector("time")?.textContent).toBe(
+      new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(instant)
+    );
+    await expect(fromMs).toHaveAttribute("datetime", instant.toISOString());
     ref.destroy();
     app.destroy();
   }
