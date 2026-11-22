@@ -85,6 +85,10 @@ export function Shortcuts() {
 }
 ```
 
+### Side packages (subpaths)
+
+`@tooark/react/chart` (`ArkChart`), `@tooark/react/code` (`ArkCodeEditor`) and `@tooark/react/wysiwyg` (`ArkWysiwygEditor`, `ArkWysiwygViewer`) wrap the side packages without adding them to the main entry: install `@tooark/chart`, `@tooark/code` or `@tooark/wysiwyg` (optional peers) with their own peers. `option`, `value`, the code editor's lists and functions (`variables`, `completions`, `formatter`, `extensions`: keep them stable with `useMemo`) and the wysiwyg `content`/`uploadFile` go in as properties, only when the reference changes; a controlled editor keeps its cursor. Events: `onChartClick`; `onChange`, `onSubmit`, `onFormatError` on the code editor (`event.detail.value`); `onChange` (the Tiptap JSON in `event.detail`) and `onUploadError` on the wysiwyg editor. Importing a subpath also types the raw tag's JS properties in JSX (`<ark-chart option={…}>`, `<ark-code-editor value="…" extensions={…}>`); the wysiwyg `content` stays on the wrapper or the ref, since React types `content` as the `<meta>` text attribute.
+
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 
 ---
@@ -165,12 +169,15 @@ export function Sales({ option }: { option: object }) {
 
 Installed automatically unless marked as peer; peer dependencies are yours to install (the ranges are what the package declares).
 
-| Package                                                                          | Version     | Description                                                      |
-| -------------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1      | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1      | The `ark-*` Custom Elements and their stylesheet                 |
-| [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer) | React 18 or 19                                                   |
-| [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer) | React DOM renderer                                               |
+| Package                                                                          | Version                 | Description                                                      |
+| -------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1                  | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1                  | The `ark-*` Custom Elements and their stylesheet                 |
+| [`react`](https://www.npmjs.com/package/react)                                   | >=18 (peer)             | React 18 or 19                                                   |
+| [`react-dom`](https://www.npmjs.com/package/react-dom)                           | >=18 (peer)             | React DOM renderer                                               |
+| [`@tooark/chart`](https://www.npmjs.com/package/@tooark/chart)                   | >=1.0.0 (optional peer) | ark-chart, for the `/chart` subpath                              |
+| [`@tooark/code`](https://www.npmjs.com/package/@tooark/code)                     | >=1.6.0 (optional peer) | ark-code-editor, for the `/code` subpath                         |
+| [`@tooark/wysiwyg`](https://www.npmjs.com/package/@tooark/wysiwyg)               | >=1.0.0 (optional peer) | ark-wysiwyg-*, for the `/wysiwyg` subpath                        |
 
 ---
 

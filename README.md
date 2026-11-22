@@ -304,8 +304,8 @@ All `@tooark/*` packages are published together, with one version and TypeScript
 | React 18 / 19                   | `pnpm add @tooark/react @tooark/web-components`                                                                                                                                                                                           | `react`, `react-dom` ≥ 18                                    |
 | Vue 3                           | `pnpm add @tooark/vue @tooark/web-components`                                                                                                                                                                                             | `vue` ≥ 3                                                    |
 | Angular                         | `pnpm add @tooark/angular @tooark/web-components`                                                                                                                                                                                         | `@angular/core`, `@angular/common` ≥ 21.2.19                 |
-| Charts (`ark-chart`)            | `pnpm add @tooark/chart echarts`                                                                                                                                                                                                          | `echarts` ≥ 5                                                |
-| Rich text (`ark-wysiwyg-*`)     | `pnpm add @tooark/wysiwyg`                                                                                                                                                                                                                | — (Tiptap comes as a dependency)                             |
+| Charts (`ark-chart`)            | `pnpm add @tooark/chart echarts` (wrappers: `@tooark/react/chart`, `@tooark/vue/chart`, `@tooark/angular/chart`)                                                                                                                          | `echarts` ≥ 5                                                |
+| Rich text (`ark-wysiwyg-*`)     | `pnpm add @tooark/wysiwyg` (wrappers: the `/wysiwyg` subpath of each wrapper package)                                                                                                                                                     | — (Tiptap comes as a dependency)                             |
 | Code editor (`ark-code-editor`) | `pnpm add @tooark/code @codemirror/state @codemirror/view @codemirror/language @codemirror/commands @codemirror/search @codemirror/autocomplete @codemirror/lang-json @codemirror/lang-javascript @codemirror/lang-yaml @lezer/highlight` | the CodeMirror packages, so your page keeps one copy of each |
 | Advanced motion                 | `pnpm add @tooark/motion`                                                                                                                                                                                                                 | — (the Motion library comes as a dependency)                 |
 
@@ -670,7 +670,7 @@ On `<ark-data-view-wrapper>` the content of a cell is an `ng-template` marked wi
 
 ### Charts, rich text and code
 
-The side packages ship their own Custom Elements, with the same theming (`theme="auto"` follows the page's `color-scheme`, including runtime toggles) and no framework wrapper — use the tag directly in React, Vue or Angular as described above. A JS property assigned before `registerTooark*()` runs (a framework binding `option`, `value` or `content` to the tag before registration) is picked up when the element upgrades, so registering in `main.ts` or in the component's effect both work.
+The side packages ship their own Custom Elements, with the same theming (`theme="auto"` follows the page's `color-scheme`, including runtime toggles) and framework wrappers in subpath entry points, so ECharts, CodeMirror and Tiptap only reach the apps that import them: `@tooark/react/chart`, `/code` and `/wysiwyg` (`ArkChart`, `ArkCodeEditor`, `ArkWysiwygEditor`, `ArkWysiwygViewer`), the same subpaths in `@tooark/vue`, and the Angular secondary entries `@tooark/angular/chart`, `/code` and `/wysiwyg` (`<ark-chart-wrapper>`, `<ark-code-editor-wrapper>`, `<ark-wysiwyg-editor-wrapper>`, `<ark-wysiwyg-viewer-wrapper>`). The side package is an optional peer of the wrapper package, so install it yourself (table above); the main entries never import it. The wrappers pass `option`, `value`, the code editor's lists and functions and the wysiwyg `content`/`uploadFile` as properties, only when the reference changes, and a controlled editor keeps its cursor (the value or JSON the change event just delivered, passed back, does not rewrite the editor). In React, importing a subpath also types the raw tag's JS properties in JSX (`<ark-chart option={…}>`, `<ark-code-editor value="…" extensions={…}>`); the wysiwyg `content` stays on the wrapper or the ref, because React already types `content` as the `<meta>` text attribute on every element. The tags still work directly in any framework, as described above. A JS property assigned before `registerTooark*()` runs (a framework binding `option`, `value` or `content` to the tag before registration) is picked up when the element upgrades, so registering in `main.ts` or in the component's effect both work.
 
 ```ts
 import { registerTooarkChart } from "@tooark/chart"; // ECharts is a peer dependency
@@ -705,6 +705,13 @@ editor.setAttribute("language", "json");
 editor.variableKeys = ["baseUrl", "token"]; // completions after {{
 editor.value = JSON.stringify(body, null, 2);
 editor.addEventListener("change", (event) => save(event.detail.value));
+```
+
+```tsx
+// The same editor through the React subpath (also @tooark/vue/code and @tooark/angular/code).
+import { ArkCodeEditor } from "@tooark/react/code";
+
+<ArkCodeEditor language="json" value={body} maxHeight="24rem" onChange={(event) => setBody(event.detail.value)} />;
 ```
 
 ```ts
