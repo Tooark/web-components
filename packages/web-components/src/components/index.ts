@@ -41,6 +41,7 @@ export * from "./ark-switch";
 export * from "./ark-tab";
 export * from "./ark-tabs";
 export * from "./ark-textarea";
+export * from "./ark-time";
 export * from "./ark-toaster";
 export * from "./ark-toggle";
 export * from "./ark-toggle-group";

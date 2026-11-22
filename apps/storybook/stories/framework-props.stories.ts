@@ -57,6 +57,7 @@ const TAGS = [
   "ark-tab",
   "ark-tabs",
   "ark-textarea",
+  "ark-time",
   "ark-toaster",
   "ark-toggle",
   "ark-toggle-group",

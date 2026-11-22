@@ -42,6 +42,7 @@ import {
   ArkTab,
   ArkTabs,
   ArkTextarea,
+  ArkTime,
   ArkToaster,
   ArkToggle,
   ArkToggleGroup,
@@ -138,6 +139,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkTextarea.tagName)) {
     customElements.define(ArkTextarea.tagName, ArkTextarea);
+  }
+
+  if (!customElements.get(ArkTime.tagName)) {
+    customElements.define(ArkTime.tagName, ArkTime);
   }
 
   // A aba antes da faixa: o ark-tabs coordena abas já upgraded.

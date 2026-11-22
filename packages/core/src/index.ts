@@ -137,6 +137,8 @@ export type {
   ArkTextareaStyleOptions,
   ArkTheme,
   ArkThemeSelected,
+  ArkTimeFormat,
+  ArkTimeStyleOptions,
   ArkToasterStyleOptions,
   ArkToastOptions,
   ArkToastPosition,

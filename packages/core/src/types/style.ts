@@ -860,6 +860,19 @@ export type ArkDrawerStyleOptions = {
   headingLevel?: ArkHeadingLevel;
 };
 
+// Exports types específicos do componente time
+
+/** Formato do ark-time: relativo a agora ("há 3 minutos"), só a data, só a hora ou data e hora. */
+export type ArkTimeFormat = "relative" | "date" | "time" | "datetime";
+
+/** Props de estilo do ark-time. */
+export type ArkTimeStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado no `<time>` (`-value`). */
+  testid?: string;
+  /** Idioma do Intl, qualquer tag (`pt-BR`, `ja`). Padrão: o de `setArkLocale()`, senão "en". */
+  lang?: string;
+};
+
 // Exports types específicos do componente menu
 
 /** Alinhamento do menu em relação ao gatilho. */

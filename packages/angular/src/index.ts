@@ -42,6 +42,7 @@ export { ArkStatusDotComponent } from "./ark-status-dot.component";
 export { ArkSwitchComponent } from "./ark-switch.component";
 export { ArkTabComponent, ArkTabsComponent } from "./ark-tabs.component";
 export { ArkTextareaComponent } from "./ark-textarea.component";
+export { ArkTimeComponent } from "./ark-time.component";
 export { ArkToasterComponent } from "./ark-toaster.component";
 export { ArkToggleComponent, ArkToggleGroupComponent } from "./ark-toggle.component";
 export { ArkTooltipComponent } from "./ark-tooltip.component";

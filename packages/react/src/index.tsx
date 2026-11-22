@@ -73,6 +73,8 @@ export type { ArkTabProps, ArkTabsProps } from "./ark-tabs.js";
 export { ArkTab, ArkTabs } from "./ark-tabs.js";
 export type { ArkTextareaProps } from "./ark-textarea.js";
 export { ArkTextarea } from "./ark-textarea.js";
+export type { ArkTimeProps } from "./ark-time.js";
+export { ArkTime } from "./ark-time.js";
 export type { ArkToasterProps } from "./ark-toaster.js";
 export { ArkToaster } from "./ark-toaster.js";
 export type { ArkToggleGroupProps, ArkToggleProps } from "./ark-toggle.js";

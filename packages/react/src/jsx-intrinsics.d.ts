@@ -31,6 +31,7 @@ import type {
   ArkTabsVariant,
   ArkTextareaResize,
   ArkTheme,
+  ArkTimeFormat,
   ArkToastPosition,
   ArkTooltipSide
 } from "@tooark/core";
@@ -614,6 +615,11 @@ interface ArkIntrinsicElements {
     maxlength?: number | string;
     minlength?: number | string;
     spellcheck?: boolean | "true" | "false";
+  };
+  "ark-time": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    datetime?: string;
+    format?: ArkTimeFormat;
   };
   "ark-carousel": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
