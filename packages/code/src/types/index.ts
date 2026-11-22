@@ -71,6 +71,11 @@ export type ArkCodeEditorOptions = {
   wrap?: boolean;
   /** Altura mínima do editor (comprimento CSS). Padrão: "8rem". */
   minHeight?: string;
+  /**
+   * Altura máxima do editor (comprimento CSS): acima dela o conteúdo rola dentro do editor, com as calhas. Abaixo de
+   * `minHeight` a mínima vence, como no CSS; ignorada em `singleLine`. Padrão: nenhuma (cresce com o conteúdo).
+   */
+  maxHeight?: string;
   /** Recuo com espaços ou tabulação. Padrão: "space". */
   indentStyle?: ArkCodeIndentStyle;
   /** Tamanho do recuo: espaços por nível, ou largura visual da tabulação. Padrão: 2. */

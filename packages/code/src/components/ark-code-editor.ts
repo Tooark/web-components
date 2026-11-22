@@ -32,7 +32,8 @@ const NO_EXTENSIONS: ArkCodeExtension = [];
  * O texto vai pela propriedade `value` (ou pelo atributo `value` como valor
  * inicial) e volta em `change` com `detail: { value }` a cada edição do
  * usuário. Atributos: `language` (json | javascript | yaml | text),
- * `readonly`, `placeholder`, `min-height` (comprimento CSS), `line-numbers`,
+ * `readonly`, `placeholder`, `min-height` e `max-height` (comprimentos CSS;
+ * acima da máxima o conteúdo rola por dentro), `line-numbers`,
  * `fold`, `tab-indent` e `autocomplete` (ligados por padrão; "false"
  * desliga), `wrap`, `indent-style` (space | tab), `indent-size`,
  * `line-ending` (lf | crlf | auto), `theme` (auto | light | dark),
@@ -76,6 +77,7 @@ export class ArkCodeEditor extends HTMLElementBase {
       "readonly",
       "placeholder",
       "min-height",
+      "max-height",
       "line-numbers",
       "fold",
       "wrap",
@@ -321,6 +323,22 @@ export class ArkCodeEditor extends HTMLElementBase {
     }
   }
 
+  /**
+   * Altura máxima do editor (atributo `max-height`, comprimento CSS): acima dela o conteúdo rola dentro do editor.
+   * Ignorada em `single-line`. Padrão: "" (sem limite, cresce com o conteúdo).
+   */
+  get maxHeight(): string {
+    return this.getAttribute("max-height")?.trim() || "";
+  }
+
+  set maxHeight(value: string | null | undefined) {
+    if (value) {
+      this.setAttribute("max-height", value);
+    } else {
+      this.removeAttribute("max-height");
+    }
+  }
+
   get theme(): ArkCodeTheme {
     const value = (this.getAttribute("theme") || "auto").toLowerCase();
     return value === "light" || value === "dark" ? value : "auto";
@@ -361,6 +379,7 @@ export class ArkCodeEditor extends HTMLElementBase {
     if (name === "placeholder") this.instance.setPlaceholder(this.placeholder);
     if (name === "aria-label") this.instance.setLabel(newValue || undefined);
     if (name === "min-height") this.instance.setMinHeight(this.minHeight);
+    if (name === "max-height") this.instance.setMaxHeight(this.maxHeight);
     if (name === "line-numbers") this.instance.setLineNumbers(this.lineNumbers);
     if (name === "fold") this.instance.setFold(this.fold);
     if (name === "wrap") this.instance.setWrap(this.wrap);
@@ -408,6 +427,7 @@ export class ArkCodeEditor extends HTMLElementBase {
       fold: this.fold,
       wrap: this.wrap,
       minHeight: this.minHeight,
+      maxHeight: this.maxHeight || undefined,
       indentStyle: this.indentStyle,
       indentSize: this.indentSize,
       lineEnding: this.lineEnding,

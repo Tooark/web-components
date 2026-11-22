@@ -98,6 +98,8 @@ export type ArkCodeEditorInstance = {
   setWrap(on: boolean): void;
   /** Altura mínima (comprimento CSS). */
   setMinHeight(value: string): void;
+  /** Altura máxima (comprimento CSS), com rolagem interna acima dela; vazio remove o limite. */
+  setMaxHeight(value?: string): void;
   /** Recuo: espaços ou tabulação, e o tamanho (espaços por nível ou largura da tabulação). */
   setIndent(style: ArkCodeIndentStyle, size: number): void;
   /** Fim de linha do valor (`getValue`, `onChange`); "auto" segue o último `setValue`. */
@@ -242,12 +244,16 @@ function chromeTheme(side: ArkThemeSelected): Extension {
         border: `1px solid ${v("border", f.border)}`,
         borderRadius: "0.5rem",
         fontSize: "var(--ark-code-font-size, 0.875rem)",
-        minHeight: "var(--ark-code-min-height, 8rem)"
+        minHeight: "var(--ark-code-min-height, 8rem)",
+        // Sem `max-height` a variável não existe e o editor cresce com o conteúdo; com ela o scroller do CodeMirror
+        // (overflow-x auto, logo também y) rola por dentro.
+        maxHeight: "var(--ark-code-max-height, none)"
       },
       // Uma linha na altura do controle: a borda (2px) e a linha (1.5em) saem da altura, o resto vira respiro
       // vertical do conteúdo, que ocupa a caixa toda (o clique em qualquer ponto posiciona o cursor).
       "&.cm-ark-single-line": {
-        minHeight: "var(--ark-code-control-height, 2.25rem)"
+        minHeight: "var(--ark-code-control-height, 2.25rem)",
+        maxHeight: "none"
       },
       "&.cm-ark-single-line .cm-scroller": {
         minHeight: "0",
@@ -832,6 +838,14 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
 
   const view = new EditorView({ state, parent });
   view.dom.style.setProperty("--ark-code-min-height", options.minHeight ?? "8rem");
+  const applyMaxHeight = (value?: string): void => {
+    if (value?.trim()) {
+      view.dom.style.setProperty("--ark-code-max-height", value.trim());
+    } else {
+      view.dom.style.removeProperty("--ark-code-max-height");
+    }
+  };
+  applyMaxHeight(options.maxHeight);
   applySize(normalizeSize(options.size));
 
   return {
@@ -875,6 +889,7 @@ export function createCodeEditor(parent: HTMLElement, options: ArkCodeEditorOpti
     },
     setWrap: (on) => view.dispatch({ effects: wrapping.reconfigure(on ? EditorView.lineWrapping : []) }),
     setMinHeight: (value) => view.dom.style.setProperty("--ark-code-min-height", value),
+    setMaxHeight: applyMaxHeight,
     setIndent: (style, size) => {
       indentStyle = style;
       indentSize = size;
