@@ -100,6 +100,7 @@ export type {
   ArkMarkStyleOptions,
   ArkMenuAlign,
   ArkMenuDirection,
+  ArkMenuGroupStyleOptions,
   ArkMenuItemStyleOptions,
   ArkMenuStyleOptions,
   ArkNavCollapsible,

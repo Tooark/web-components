@@ -93,3 +93,19 @@ export const ArkMenuItem = defineComponent({
       );
   }
 });
+
+export const ArkMenuGroup = defineComponent({
+  name: "ArkMenuGroup",
+  inheritAttrs: false,
+  props: {
+    /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
+    testid: { type: String, default: undefined },
+    /** Rótulo visível do grupo, que também o nomeia (aria-labelledby). */
+    label: { type: String, default: undefined }
+  },
+  setup(props, { attrs, slots }) {
+    ensureTooarkComponentsRegistered();
+    return () =>
+      h("ark-menu-group", { ...attrs, testid: props.testid, label: props.label }, slots.default ? slots.default() : []);
+  }
+});

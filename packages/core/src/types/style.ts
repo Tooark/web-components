@@ -853,7 +853,7 @@ export type ArkMenuAlign = "start" | "end";
 /** Lado do gatilho onde o menu abre; vira para o outro quando não cabe. */
 export type ArkMenuDirection = "down" | "up";
 
-/** Props de estilo do ark-menu, propagadas a cada ark-menu-item. */
+/** Props de estilo do ark-menu, propagadas a cada ark-menu-item e ark-menu-group. */
 export type ArkMenuStyleOptions = {
   /** Propagado como data-testid ao host. */
   testid?: string;
@@ -861,6 +861,12 @@ export type ArkMenuStyleOptions = {
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+};
+
+/** Props de estilo do ark-menu-group; size e theme chegam propagados do ark-menu. */
+export type ArkMenuGroupStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado no rótulo (`-label`). */
+  testid?: string;
 };
 
 /** Props de estilo do ark-menu-item; size e theme chegam propagados do ark-menu. */

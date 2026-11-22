@@ -8,7 +8,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Menu suspenso e de contexto: o host `ark-menu` é o próprio painel (`role="menu"`), aberto como `popover="auto"` (top layer, light dismiss e Esc nativos), e cada `ark-menu-item` é o próprio item (ícone e texto como filhos, `slot="trailing"` ao fim). O gatilho é referenciado por `for`: o menu escreve aria-* nele, alterna no clique e abre com as setas. `align` e `direction` posicionam a partir do gatilho, com flip quando não cabe; `openAt(x, y)` abre num ponto. Setas, Home, End, Enter/Espaço e Esc; emite `ark-select` com `detail: { value }`, `ark-open` e `ark-close`.'
+          'Menu suspenso e de contexto: o host `ark-menu` é o próprio painel (`role="menu"`), aberto como `popover="auto"` (top layer, light dismiss e Esc nativos), e cada `ark-menu-item` é o próprio item (ícone e texto como filhos, `slot="trailing"` ao fim). `ark-menu-group label` agrupa itens com um rótulo (`role="group"`), e as setas atravessam os grupos. O gatilho é referenciado por `for`: o menu escreve aria-* nele, alterna no clique e abre com as setas. `align` e `direction` posicionam a partir do gatilho, com flip quando não cabe; `openAt(x, y)` abre num ponto. Setas, Home, End, Enter/Espaço e Esc; emite `ark-select` com `detail: { value }`, `ark-open` e `ark-close`.'
       }
     }
   },
@@ -423,8 +423,138 @@ export const FlipsWhenThereIsNoRoom = {
   }
 };
 
+/** Menu com dois grupos rotulados, um divisor entre eles e um item solto ao fim. */
+function createGroupedMenu(forId: string, size?: ArkSize): MenuEl {
+  const menu = createMenu(size ? { size } : {}, forId, []);
+  const file = document.createElement("ark-menu-group");
+  file.setAttribute("label", "Arquivo");
+  file.setAttribute("testid", "group-file");
+  file.append(
+    createItem({ value: "new", label: "Novo", trailing: "Ctrl+N" }),
+    createItem({ value: "open", label: "Abrir…" })
+  );
+  const exporting = document.createElement("ark-menu-group");
+  exporting.setAttribute("label", "Exportar");
+  exporting.append(
+    createItem({ value: "pdf", label: "PDF" }),
+    createItem({ value: "csv", label: "CSV", disabled: true }),
+    createItem({ value: "json", label: "JSON" })
+  );
+  menu.append(
+    file,
+    createItem({ divider: true }),
+    exporting,
+    createItem({ divider: true }),
+    createItem({ value: "close", label: "Fechar" })
+  );
+  return menu;
+}
+
+export const Groups = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-wrap items-center gap-3";
+    const id = `menu-trigger-${++seq}`;
+    wrap.append(createTrigger(id, "Arquivo"), createGroupedMenu(id));
+    return wrap;
+  },
+  // `ark-menu-group` é `role="group"` nomeado pelo rótulo próprio; as setas atravessam os grupos como se os itens
+  // estivessem soltos, e size/theme chegam propagados do menu, também a um grupo inserido depois.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const menu = canvasElement.querySelector("ark-menu") as MenuEl;
+    const trigger = canvasElement.querySelector("ark-button") as HTMLElement;
+    const byValue = (value: string): HTMLElement => menu.querySelector(`[value="${value}"]`) as HTMLElement;
+    const [file, exporting] = Array.from(menu.querySelectorAll("ark-menu-group")) as HTMLElement[];
+    const selected: string[] = [];
+    menu.addEventListener("ark-select", (event) =>
+      selected.push((event as CustomEvent<{ value: string }>).detail.value)
+    );
+
+    const label = file.querySelector('[data-ark-chrome="label"]') as HTMLElement;
+    await expect(file).toHaveAttribute("role", "group");
+    await expect(file).toHaveAttribute("aria-labelledby", label.id);
+    await expect(label).toHaveAttribute("aria-hidden", "true");
+    expect(file.firstElementChild).toBe(label);
+
+    trigger.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(menu).toHaveAttribute("open");
+    expect(within(menu).getByRole("group", { name: "Arquivo" })).toBe(file);
+    expect(within(menu).getByRole("group", { name: "Exportar" })).toBe(exporting);
+    expect(document.activeElement).toBe(byValue("new"));
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(byValue("open"));
+    // Do último item de um grupo ao primeiro do seguinte, pulando o divisor e o rótulo.
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(byValue("pdf"));
+    // "csv" está desabilitado: pulado.
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(byValue("json"));
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(byValue("close"));
+    await userEvent.keyboard("{ArrowDown}");
+    expect(document.activeElement).toBe(byValue("new"));
+    await userEvent.keyboard("{ArrowUp}");
+    expect(document.activeElement).toBe(byValue("close"));
+    await userEvent.keyboard("{ArrowUp}{ArrowUp}");
+    expect(document.activeElement).toBe(byValue("pdf"));
+
+    // A escolha dentro de um grupo sai uma vez só, do menu, que fecha.
+    await userEvent.keyboard("{Enter}");
+    expect(selected).toEqual(["pdf"]);
+    await expect(menu).not.toHaveAttribute("open");
+    expect(document.activeElement).toBe(trigger);
+
+    // size e theme do menu chegam ao grupo, que dimensiona o rótulo, e a um grupo inserido depois.
+    menu.setAttribute("size", "lg");
+    menu.setAttribute("theme", "dark");
+    await expect(file).toHaveAttribute("size", "lg");
+    await expect(file).toHaveAttribute("theme", "dark");
+    expect(label.classList.contains("ark:text-sm")).toBe(true);
+    const late = document.createElement("ark-menu-group");
+    late.setAttribute("label", "Recentes");
+    late.appendChild(createItem({ value: "recent", label: "relatorio.pdf" }));
+    menu.appendChild(late);
+    await waitFor(() => expect(late).toHaveAttribute("size", "lg"));
+    await expect(byValue("recent")).toHaveAttribute("size", "lg");
+
+    // Sem `label` o rótulo sai e o aria-labelledby do componente também; um aria-label no host nomeia.
+    exporting.removeAttribute("label");
+    expect(exporting.querySelector('[data-ark-chrome="label"]')).toBeNull();
+    expect(exporting.hasAttribute("aria-labelledby")).toBe(false);
+    exporting.setAttribute("aria-label", "Formatos");
+    menu.show();
+    expect(within(menu).getByRole("group", { name: "Formatos" })).toBe(exporting);
+    // Trocar o texto reaproveita o mesmo nó.
+    file.setAttribute("label", "Documento");
+    expect(file.querySelector('[data-ark-chrome="label"]')).toBe(label);
+    expect(within(menu).getByRole("group", { name: "Documento" })).toBe(file);
+    menu.hide();
+  }
+};
+
+export const GroupSizes = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-wrap items-center gap-3";
+    for (const size of ["xs", "sm", "md", "lg", "xl"] as ArkSize[]) {
+      const id = `menu-trigger-${++seq}`;
+      wrap.append(createTrigger(id, size), createGroupedMenu(id, size));
+    }
+    return wrap;
+  }
+};
+
 export const TestHooks = {
-  render: () => createScene({ testid: "user-menu" }),
+  render: () => {
+    const scene = createScene({ testid: "user-menu" });
+    const group = document.createElement("ark-menu-group");
+    group.setAttribute("label", "Exportar");
+    group.setAttribute("testid", "group-export");
+    group.appendChild(createItem({ value: "pdf", label: "PDF" }));
+    scene.querySelector("ark-menu")?.appendChild(group);
+    return scene;
+  },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
     const menu = canvasElement.querySelector("ark-menu")!;
 
@@ -439,5 +569,11 @@ export const TestHooks = {
       "data-ark",
       "menu-item-check"
     );
+    const group = menu.querySelector("ark-menu-group")!;
+    await expect(group).toHaveAttribute("data-ark", "menu-group");
+    await expect(group).toHaveAttribute("data-testid", "group-export");
+    const label = group.querySelector('[data-ark-chrome="label"]')!;
+    await expect(label).toHaveAttribute("data-ark", "menu-group-label");
+    await expect(label).toHaveAttribute("data-testid", "group-export-label");
   }
 };

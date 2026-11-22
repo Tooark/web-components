@@ -38,6 +38,7 @@ const TAGS = [
   "ark-kv-editor",
   "ark-mark",
   "ark-menu",
+  "ark-menu-group",
   "ark-menu-item",
   "ark-nav",
   "ark-nav-group",

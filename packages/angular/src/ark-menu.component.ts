@@ -1,6 +1,10 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
 import type { ArkIntent, ArkMenuAlign, ArkMenuDirection, ArkSize, ArkTheme } from "@tooark/core";
-import type { ArkMenu as ArkMenuElement, ArkMenuItem as ArkMenuItemElement } from "@tooark/web-components";
+import type {
+  ArkMenu as ArkMenuElement,
+  ArkMenuGroup as ArkMenuGroupElement,
+  ArkMenuItem as ArkMenuItemElement
+} from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -103,4 +107,32 @@ export class ArkMenuItemComponent {
     if (this.checked === undefined) return null;
     return this.checked ? "" : "false";
   }
+}
+
+@Component({
+  selector: "ark-menu-group-wrapper",
+  standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `
+  <ark-menu-group [attr.testid]="testid" [attr.label]="label" [attr.aria-label]="ariaLabel">
+    <ng-content></ng-content>
+  </ark-menu-group>`
+})
+export class ArkMenuGroupComponent {
+  constructor() {
+    ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-menu-group` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkMenuGroupElement | null {
+    return this.host.nativeElement.querySelector<ArkMenuGroupElement>(":scope > ark-menu-group");
+  }
+
+  @Input() testid: string | undefined;
+  /** Rótulo visível do grupo, que também o nomeia (aria-labelledby). */
+  @Input() label: string | undefined;
+  /** Nome do grupo sem rótulo visível. */
+  @Input() ariaLabel: string | undefined;
 }

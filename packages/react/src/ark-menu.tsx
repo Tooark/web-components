@@ -1,5 +1,15 @@
-import type { ArkMenuAlign, ArkMenuDirection, ArkMenuItemStyleOptions, ArkMenuStyleOptions } from "@tooark/core";
-import type { ArkMenu as ArkMenuElement, ArkMenuItem as ArkMenuItemElement } from "@tooark/web-components";
+import type {
+  ArkMenuAlign,
+  ArkMenuDirection,
+  ArkMenuGroupStyleOptions,
+  ArkMenuItemStyleOptions,
+  ArkMenuStyleOptions
+} from "@tooark/core";
+import type {
+  ArkMenu as ArkMenuElement,
+  ArkMenuGroup as ArkMenuGroupElement,
+  ArkMenuItem as ArkMenuItemElement
+} from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import type { ArkDomProps } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
@@ -100,5 +110,29 @@ export const ArkMenuItem = forwardRef<ArkMenuItemElement, ArkMenuItemProps>(
     };
 
     return createElement("ark-menu-item", attrs, children);
+  }
+);
+
+export type ArkMenuGroupProps = PropsWithChildren<
+  ArkDomProps<
+    ArkMenuGroupStyleOptions & {
+      /** Rótulo visível do grupo, que também o nomeia (aria-labelledby). */
+      label?: string;
+      className?: string;
+    }
+  >
+>;
+
+export const ArkMenuGroup = forwardRef<ArkMenuGroupElement, ArkMenuGroupProps>(
+  function ArkMenuGroup(props, forwardedRef): React.JSX.Element {
+    const { children, className, ...rest } = props;
+
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
+
+    const attrs: Record<string, unknown> = { ...rest, ref: forwardedRef, class: className };
+
+    return createElement("ark-menu-group", attrs, children);
   }
 );

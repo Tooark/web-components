@@ -23,6 +23,7 @@ import {
   ArkKvEditor,
   ArkMark,
   ArkMenu,
+  ArkMenuGroup,
   ArkMenuItem,
   ArkNav,
   ArkNavGroup,
@@ -172,9 +173,13 @@ export function registerTooarkComponents(): void {
     customElements.define(ArkEmpty.tagName, ArkEmpty);
   }
 
-  // O item antes do menu: o ark-menu coordena itens já upgraded.
+  // Item e grupo antes do menu: o ark-menu coordena filhos já upgraded.
   if (!customElements.get(ArkMenuItem.tagName)) {
     customElements.define(ArkMenuItem.tagName, ArkMenuItem);
+  }
+
+  if (!customElements.get(ArkMenuGroup.tagName)) {
+    customElements.define(ArkMenuGroup.tagName, ArkMenuGroup);
   }
 
   if (!customElements.get(ArkMenu.tagName)) {

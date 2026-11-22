@@ -4,7 +4,7 @@ import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
-/** Atributos do menu propagados a cada item. */
+/** Atributos do menu propagados a cada item e a cada grupo. */
 const PROPAGATED_ATTRS = ["size", "theme"];
 
 /** Contador para ids gerados (do menu, para `aria-controls`; do gatilho, para `aria-labelledby`). */
@@ -13,7 +13,8 @@ let menuSeq = 0;
 /**
  * Menu suspenso ou de contexto. O PRÓPRIO host é o painel (`role="menu"`),
  * aberto como `popover="auto"` (top layer, light dismiss e Esc nativos, sem
- * portal nem z-index): os itens `ark-menu-item` do usuário ficam onde estão.
+ * portal nem z-index): os itens `ark-menu-item` do usuário ficam onde estão,
+ * soltos ou dentro de um `ark-menu-group` com rótulo, que as setas atravessam.
  * O gatilho é referenciado por `for="<id>"`: o componente só escreve `aria-*`
  * nele (haspopup, expanded, controls), escuta clique e setas, e nomeia o menu
  * por ele. `openAt(x, y)` abre num ponto (menu de contexto).
@@ -339,9 +340,12 @@ export class ArkMenu extends HTMLElementBase {
     item?.focus();
   }
 
-  /** Propaga size/theme aos itens depois de mudanças nos filhos ou nos atributos. */
+  /** Propaga size/theme aos itens e aos grupos depois de mudanças nos filhos ou nos atributos. */
   private syncItems(): void {
-    for (const item of this.getItems()) {
+    const groups = Array.from(this.querySelectorAll<HTMLElement>("ark-menu-group")).filter(
+      (group) => group.closest("ark-menu") === this
+    );
+    for (const item of [...this.getItems(), ...groups]) {
       for (const name of PROPAGATED_ATTRS) {
         const value = this.getAttribute(name);
         if (value === null) {
