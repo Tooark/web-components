@@ -43,6 +43,7 @@ import type {
   ArkTab,
   ArkTabs,
   ArkTextarea,
+  ArkTime,
   ArkToaster,
   ArkToggle,
   ArkToggleGroup,
@@ -94,6 +95,7 @@ declare global {
     "ark-tab": ArkTab;
     "ark-tabs": ArkTabs;
     "ark-textarea": ArkTextarea;
+    "ark-time": ArkTime;
     "ark-toaster": ArkToaster;
     "ark-toggle": ArkToggle;
     "ark-toggle-group": ArkToggleGroup;

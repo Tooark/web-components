@@ -85,6 +85,7 @@ const SETUP: Record<string, { attrs?: Record<string, string>; children?: () => N
   "ark-calendar": { attrs: { value: "2026-09-15" } },
   "ark-split-pane": { children: () => [document.createElement("div"), document.createElement("div")] },
   "ark-tab": { attrs: { closable: "", dirty: "", value: "a" } },
+  "ark-time": { attrs: { datetime: new Date(Date.now() - 2 * 3600000).toISOString() } },
   "ark-tabs": {
     attrs: { variant: "editor" },
     children: () => {

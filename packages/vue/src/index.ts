@@ -38,6 +38,7 @@ export { ArkStatusDot } from "./ark-status-dot.js";
 export { ArkSwitch } from "./ark-switch.js";
 export { ArkTab, ArkTabs } from "./ark-tabs.js";
 export { ArkTextarea } from "./ark-textarea.js";
+export { ArkTime } from "./ark-time.js";
 export { ArkToaster } from "./ark-toaster.js";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle.js";
 export { ArkTooltip } from "./ark-tooltip.js";
