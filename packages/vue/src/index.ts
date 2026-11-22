@@ -42,3 +42,4 @@ export { ArkTime } from "./ark-time.js";
 export { ArkToaster } from "./ark-toaster.js";
 export { ArkToggle, ArkToggleGroup } from "./ark-toggle.js";
 export { ArkTooltip } from "./ark-tooltip.js";
+export { ArkTree, ArkTreeItem } from "./ark-tree.js";

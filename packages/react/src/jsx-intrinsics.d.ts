@@ -33,7 +33,8 @@ import type {
   ArkTheme,
   ArkTimeFormat,
   ArkToastPosition,
-  ArkTooltipSide
+  ArkTooltipSide,
+  ArkTreeSelection
 } from "@tooark/core";
 import React from "react";
 
@@ -432,6 +433,27 @@ interface ArkIntrinsicElements {
     delay?: number | string;
     open?: boolean;
     theme?: ArkTheme;
+  };
+  "ark-tree": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    selection?: ArkTreeSelection;
+    checkboxes?: boolean;
+    propagate?: boolean;
+    value?: string;
+    label?: string;
+    size?: ArkSize;
+    theme?: ArkTheme;
+  };
+  "ark-tree-item": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    value?: string;
+    label?: string;
+    expanded?: boolean;
+    lazy?: boolean;
+    loading?: boolean;
+    selected?: boolean;
+    checked?: boolean | "mixed" | "false";
+    disabled?: boolean;
   };
   "ark-card": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;

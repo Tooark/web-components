@@ -46,3 +46,4 @@ export { ArkTimeComponent } from "./ark-time.component";
 export { ArkToasterComponent } from "./ark-toaster.component";
 export { ArkToggleComponent, ArkToggleGroupComponent } from "./ark-toggle.component";
 export { ArkTooltipComponent } from "./ark-tooltip.component";
+export { ArkTreeComponent, ArkTreeItemComponent } from "./ark-tree.component";
