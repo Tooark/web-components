@@ -455,6 +455,16 @@ importers:
       react-dom:
         specifier: '>=18'
         version: 19.3.1(react@19.3.1)
+    devDependencies:
+      '@tooark/chart':
+        specifier: workspace:^
+        version: link:../chart
+      '@tooark/code':
+        specifier: workspace:^
+        version: link:../code
+      '@tooark/wysiwyg':
+        specifier: workspace:^
+        version: link:../wysiwyg
 
   packages/tokens:
     dependencies:
