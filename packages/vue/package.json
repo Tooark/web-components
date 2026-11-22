@@ -45,7 +45,32 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./chart": {
+      "types": "./dist/chart.d.ts",
+      "default": "./dist/chart.js"
+    },
+    "./code": {
+      "types": "./dist/code.d.ts",
+      "default": "./dist/code.js"
+    },
+    "./wysiwyg": {
+      "types": "./dist/wysiwyg.d.ts",
+      "default": "./dist/wysiwyg.js"
+    },
     "./package.json": "./package.json"
+  },
+  "typesVersions": {
+    "*": {
+      "chart": [
+        "./dist/chart.d.ts"
+      ],
+      "code": [
+        "./dist/code.d.ts"
+      ],
+      "wysiwyg": [
+        "./dist/wysiwyg.d.ts"
+      ]
+    }
   },
   "files": [
     "NOTICE",
@@ -61,10 +86,29 @@
     "clean": "rimraf dist"
   },
   "peerDependencies": {
+    "@tooark/chart": ">=1.0.0",
+    "@tooark/code": ">=1.6.0",
+    "@tooark/wysiwyg": ">=1.0.0",
     "vue": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "@tooark/chart": {
+      "optional": true
+    },
+    "@tooark/code": {
+      "optional": true
+    },
+    "@tooark/wysiwyg": {
+      "optional": true
+    }
   },
   "dependencies": {
     "@tooark/core": "workspace:^",
     "@tooark/web-components": "workspace:^"
+  },
+  "devDependencies": {
+    "@tooark/chart": "workspace:^",
+    "@tooark/code": "workspace:^",
+    "@tooark/wysiwyg": "workspace:^"
   }
 }

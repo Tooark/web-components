@@ -487,6 +487,16 @@ importers:
       vue:
         specifier: '>=3'
         version: 3.5.45(typescript@6.0.3)
+    devDependencies:
+      '@tooark/chart':
+        specifier: workspace:^
+        version: link:../chart
+      '@tooark/code':
+        specifier: workspace:^
+        version: link:../code
+      '@tooark/wysiwyg':
+        specifier: workspace:^
+        version: link:../wysiwyg
 
   packages/web-components:
     dependencies:
