@@ -28,7 +28,7 @@ Os Custom Elements nativos (`ark-*`) do design system Tooark, estilizados com Ta
 
 O pacote `@tooark/web-components` fornece:
 
-- 47 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) e a família calendário/relógio/agenda;
+- 48 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) a família calendário/relógio/agenda e o tempo relativo (`ark-time`);
 - light DOM: os componentes nunca movem nem envolvem os seus filhos; o host é o controle ou o container;
 - `styles.css` é a única folha de estilo necessária: tokens, presets de motion e estilos dos componentes, tudo com prefixo (`ark:*`, `--ark-*`), sem reset global;
 - temas por `color-scheme` (`theme="light|dark"` por elemento), tamanhos `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -114,6 +114,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-tab` — Aba (`role="tab"`, o host é o controle): filhos livres, `disabled`, `controls`, `closable` e `dirty` na variante editor. Emite `ark-close`.
 - `ark-tabs` — Faixa de abas (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex com setas/Home/End, `slot="actions"` no fim, `change` com o value ativo. Painéis ficam com o app.
 - `ark-textarea` — Campo multilinha com a grid do `ark-input`: `rows`, `autosize` (`field-sizing` nativo, fallback JS), `monospace`, `resize`, helper/erro com aria, tamanhos, intents, `rounded`.
+- `ark-time` — Data e hora pelo `Intl`: relativa a agora ("há 3 minutos", "ontem") e atualizando sozinha, ou absoluta (`date`, `time`, `datetime`); um `<time datetime>` com a data completa no `title`.
 - `ark-toaster` — Toasts no estilo Sonner: API programática, posições, rich colors, ações, entrada/saída animadas, botão de fechar localizado.
 - `ark-toggle` — Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.
 - `ark-toggle-group` — Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.
