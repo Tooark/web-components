@@ -71,6 +71,10 @@ One standalone component per element: `ark-button` → `ArkButtonComponent` (`<a
 - Wrapper host: the wrapper is an element of its own around the `ark-*` one, so only the inputs reach the element. An `id`, `class`, `style` or `data-*` written on the `<ark-*-wrapper>` tag stays on the wrapper (set it through `element`), and `aria-label` goes through the `ariaLabel` input; native events such as `(click)` bubble up to the wrapper.
 - Raw `ark-*` tags (side packages): add `schemas: [CUSTOM_ELEMENTS_SCHEMA]` to your component and call the `registerTooark*()` function in the browser.
 
+### Side packages (secondary entries)
+
+`@tooark/angular/chart` (`ArkChartComponent`, `<ark-chart-wrapper>`), `@tooark/angular/code` (`ArkCodeEditorComponent`, `<ark-code-editor-wrapper>`) and `@tooark/angular/wysiwyg` (`ArkWysiwygEditorComponent`, `ArkWysiwygViewerComponent`) wrap the side packages without adding them to the main entry: install `@tooark/chart`, `@tooark/code` or `@tooark/wysiwyg` (optional peers) with their own peers. `[option]`, `[value]`, the code editor's lists and functions and the wysiwyg `[content]`/`[uploadFile]` are property bindings, reassigned only with a new value; a controlled editor keeps its cursor. Outputs: `(chartClick)`; `(changed)`, `(arkSubmit)`, `(arkFormatError)` on the code editor (`$event.detail.value`); `(changed)` (the Tiptap JSON in `$event.detail`) and `(uploadError)` on the wysiwyg editor. Each wrapper calls its package's `registerTooark*()` and exposes `element`.
+
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 
 ---
@@ -166,13 +170,16 @@ export class SalesComponent implements AfterViewInit {
 
 Installed automatically unless marked as peer; peer dependencies are yours to install (the ranges are what the package declares).
 
-| Package                                                                          | Version          | Description                                                      |
-| -------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1           | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1           | The `ark-*` Custom Elements and their stylesheet                 |
-| [`tslib`](https://www.npmjs.com/package/tslib)                                   | ^2.8.1           | TypeScript runtime helpers                                       |
-| [`@angular/common`](https://www.npmjs.com/package/@angular/common)               | >=21.2.19 (peer) | Angular common                                                   |
-| [`@angular/core`](https://www.npmjs.com/package/@angular/core)                   | >=21.2.19 (peer) | Angular core (security floor of the workspace)                   |
+| Package                                                                          | Version                 | Description                                                      |
+| -------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------- |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1                  | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1                  | The `ark-*` Custom Elements and their stylesheet                 |
+| [`tslib`](https://www.npmjs.com/package/tslib)                                   | ^2.8.1                  | TypeScript runtime helpers                                       |
+| [`@angular/common`](https://www.npmjs.com/package/@angular/common)               | >=21.2.19 (peer)        | Angular common                                                   |
+| [`@angular/core`](https://www.npmjs.com/package/@angular/core)                   | >=21.2.19 (peer)        | Angular core (security floor of the workspace)                   |
+| [`@tooark/chart`](https://www.npmjs.com/package/@tooark/chart)                   | >=1.0.0 (optional peer) | ark-chart, for the `/chart` subpath                              |
+| [`@tooark/code`](https://www.npmjs.com/package/@tooark/code)                     | >=1.6.0 (optional peer) | ark-code-editor, for the `/code` subpath                         |
+| [`@tooark/wysiwyg`](https://www.npmjs.com/package/@tooark/wysiwyg)               | >=1.0.0 (optional peer) | ark-wysiwyg-*, for the `/wysiwyg` subpath                        |
 
 ---
 

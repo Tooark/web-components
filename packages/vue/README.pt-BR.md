@@ -76,6 +76,10 @@ Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-
 - Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, …); `@ark-change` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `@ark-slide-change` em `ArkCarousel` e `@ark-event-click`/`@ark-slot-click`/`@ark-view-change`/`@ark-range-change` em `ArkScheduler` entregam o próprio `detail`; eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
 - Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`).
 
+### Pacotes laterais (subpaths)
+
+`@tooark/vue/chart` (`ArkChart`), `@tooark/vue/code` (`ArkCodeEditor`) e `@tooark/vue/wysiwyg` (`ArkWysiwygEditor`, `ArkWysiwygViewer`) envolvem os pacotes laterais sem trazê-los para a entrada principal: instale `@tooark/chart`, `@tooark/code` ou `@tooark/wysiwyg` (peers opcionais) com os peers deles. `option`, `value`, as listas e funções do editor de código (mantenha `extensions` estável, `markRaw`) e o `content`/`uploadFile` do wysiwyg entram como propriedades, sem o proxy do Vue e só quando a referência muda; um editor controlado mantém o cursor. Eventos: `@ark-chart-click`; `@change`, `@ark-submit`, `@ark-format-error` no editor de código (`$event.detail.value`); `@ark-wysiwyg-change` (o JSON do Tiptap em `$event.detail`) e `@ark-wysiwyg-upload-error` no editor wysiwyg.
+
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 
 ---
@@ -151,11 +155,14 @@ function salvar(valor: string) {
 
 Instaladas automaticamente, salvo as marcadas como peer, que ficam por sua conta (os ranges são os que o pacote declara).
 
-| Pacote                                                                           | Versão     | Descrição                                                            |
-| -------------------------------------------------------------------------------- | ---------- | -------------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1     | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1     | Os Custom Elements `ark-*` e a folha de estilo deles                 |
-| [`vue`](https://www.npmjs.com/package/vue)                                       | >=3 (peer) | Vue 3                                                                |
+| Pacote                                                                           | Versão                  | Descrição                                                            |
+| -------------------------------------------------------------------------------- | ----------------------- | -------------------------------------------------------------------- |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.6.1                  | Tipos, i18n, serviços de toast/announce, motion e helpers de overlay |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.6.1                  | Os Custom Elements `ark-*` e a folha de estilo deles                 |
+| [`vue`](https://www.npmjs.com/package/vue)                                       | >=3 (peer)              | Vue 3                                                                |
+| [`@tooark/chart`](https://www.npmjs.com/package/@tooark/chart)                   | >=1.0.0 (peer opcional) | ark-chart, para a subpath `/chart`                                   |
+| [`@tooark/code`](https://www.npmjs.com/package/@tooark/code)                     | >=1.6.0 (peer opcional) | ark-code-editor, para a subpath `/code`                              |
+| [`@tooark/wysiwyg`](https://www.npmjs.com/package/@tooark/wysiwyg)               | >=1.0.0 (peer opcional) | ark-wysiwyg-*, para a subpath `/wysiwyg`                             |
 
 ---
 

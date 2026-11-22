@@ -131,6 +131,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `ArkTime` (React, Vue), `ArkTimeComponent` (`ark-time-wrapper`, Angular), whose `datetime` also takes a `Date` or
   milliseconds; `ArkTimeFormat` and `ArkTimeStyleOptions` in core; hooks `time` and `time-value`. Stories
   `Core/ArkTime` and the `ReactTime`, `VueTime` and Angular `Time` integration stories.
+- Wrappers for the side packages in subpath entry points, so ECharts, CodeMirror and Tiptap only reach the apps that
+  import them: `@tooark/react/chart`, `/code` and `/wysiwyg` (`ArkChart`, `ArkCodeEditor`, `ArkWysiwygEditor`,
+  `ArkWysiwygViewer`), the same in `@tooark/vue`, and the Angular secondary entries `@tooark/angular/chart`, `/code`
+  and `/wysiwyg` (`ark-chart-wrapper`, `ark-code-editor-wrapper`, `ark-wysiwyg-editor-wrapper`,
+  `ark-wysiwyg-viewer-wrapper`). The side packages are optional peers of the wrapper packages (`@tooark/chart` and
+  `@tooark/wysiwyg` `>=1.0.0`, `@tooark/code` `>=1.6.0`, so upgrading a wrapper package alone raises no peer conflict),
+  and the main entries do not import them (`check:ssr` fails if any other dist file mentions them; `typesVersions`
+  keeps the subpaths resolvable under `node10`). Object and function props go in as properties only when the reference
+  changes, and a controlled code or wysiwyg editor keeps its cursor when the value or JSON its change event delivered
+  comes back. Importing a React subpath also types the raw tag's JS properties in JSX (`option`, `value`,
+  `extensions`, `variables`, `completions`, `formatter`, `uploadFile`; the wysiwyg `content` stays on the wrapper,
+  since React types `content` as the `<meta>` text attribute). `ReactSidePackages`, `VueSidePackages` and the Angular
+  `SidePackages` integration stories, and `typecheck/side-packages.tsx` in the React build.
 ### Changed
 
 - The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write
