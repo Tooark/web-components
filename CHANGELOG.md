@@ -90,7 +90,33 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   it. `aria-label` and `label` still take precedence for the name. A switch without children gets no class and no
   layout, as before. The React, Vue and Angular wrappers now pass children. `ChildrenAsLabel` story; the new wrapper
   props are covered by `ReactNewAttributes`, `VueNewAttributes` and the Angular `NewAttributes` integration stories.
+- `ark-menu-group`: new element. Groups `ark-menu-item`s under a label (`role="group"`): `label` renders the
+  component's own heading at the start of the host and names the group through `aria-labelledby` (without it, an
+  `aria-label` on the host names it). The menu's arrows, Home and End cross groups as if the items were loose, a choice
+  inside a group still comes out once as the menu's `ark-select`, and `size`/`theme` are propagated from the menu, also
+  to a group added later. `ArkMenuGroup` (React, Vue), `ArkMenuGroupComponent` (`ark-menu-group-wrapper`, Angular),
+  `ArkMenuGroupStyleOptions` in core; hooks `menu-group` and `menu-group-label`. `Groups` and `GroupSizes` stories.
+- `ark-code-editor`: `max-height` (CSS length, opt-in). Above it the content scrolls inside the editor with the
+  gutters, as in a file view; without it the editor grows with its content, as before. Below `min-height` the minimum
+  wins, as in CSS, and `single-line` ignores it. `maxHeight` on the element, the `maxHeight` option and
+  `setMaxHeight()` in the `createCodeEditor` engine. `MaxHeight` story.
+- `setArkLocale(lang, localeJson?)` (opt-in): the language of every component without its own `lang`, one call per
+  app instead of a `lang` on each element. Mounted components redraw at once (one that was out of the DOM during the
+  change redraws on its next connect) and an element's own `lang` still wins. It takes the tag as the app has it
+  (`pt-BR`), `custom` with the app's strings as an object or JSON (invalid JSON throws at the call) and `null` to go
+  back to English; `<html lang>` is never read. The `@tooark/wysiwyg` editor follows it too: the setting lives in
+  `@tooark/tokens` on a `globalThis` symbol, so the ESM and CJS builds and the side packages share it. The
+  datepicker's default field format follows the default language as it follows `lang`. `getArkLocale()` and
+  `observeArkLocale(onChange)` read and watch it; core re-exports the three, and so do the React, Vue and Angular
+  packages, next to `toast`. Without the call nothing changes. `DefaultLocale` (every tag that observes `lang`) and
+  `DefaultLocaleRules` stories, plus the `MenuGroupAndLocale` integration stories in the three frameworks.
 ### Changed
+
+- The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write
+  `lang="en"` when the app passes no `lang`, as React and every other wrapper already did, so these components follow
+  `setArkLocale()`. The strings stay the same English, but the element carries no `lang` attribute, like the raw tag:
+  a `[lang="en"]` selector or an E2E assertion on it no longer matches, and screen readers read those strings in the
+  language the page declares (pass `lang`, or call `setArkLocale()`, to keep the two in step).
 
 - The Storybook suite now runs the Angular wrappers too (`Integration/Angular Wrappers`): they are JIT-compiled from
   source (the Storybook Vite config turns on legacy decorators for them) and mounted in a zoneless application, next

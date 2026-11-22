@@ -33,7 +33,7 @@ O pacote `@tooark/angular` fornece:
 - `@Output()` reemitindo os eventos customizados (`arkClose`, `arkSelect`, `changed`, …) como o `CustomEvent` original ou, no calendário, relógio, datepicker, carrossel e agenda (`arkChange`, `arkSlideChange`, `arkEventClick`, …), o `detail` dele;
 - registro no construtor de cada wrapper, pulado sem `customElements` — seguro para SSR e Angular Universal;
 - compilado com ng-packagr em Ivy parcial: funciona em builds AOT de produção;
-- `toast`, `showToast`, `dismissToast` reexportados do `@tooark/core`.
+- `toast`, `showToast`, `dismissToast` e `setArkLocale`, `getArkLocale`, `observeArkLocale` (o idioma padrão do app) reexportados do `@tooark/core`.
 
 ---
 

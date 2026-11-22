@@ -32,6 +32,7 @@ O pacote `@tooark/tokens` fornece:
 - tokens de motion fora do `@theme`: `--ark-duration-*` (oito passos), `--ark-ease-*` (`linear`, `standard`, `in`, `out`, `in-out`, `overshoot`, `sheet`) e `--ark-motion-distance`, zerados sob `prefers-reduced-motion`;
 - espelhos JS dos tokens de motion (`ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`) para fallback em WAAPI, e da escala de tamanhos (`ARK_SIZE_CSS`) e das cores suaves de cada intent (`ARK_INTENT_SOFT_CSS`) para fallback em `var()` quando o CSS dos tokens não está na página;
 - `resolveColorScheme(element)` e `observeColorScheme(element, onChange)` para resolver e acompanhar o tema da página;
+- o armazenamento do idioma padrão do app (`setArkLocale`, `getArkLocale`, `observeArkLocale`), que o `@tooark/core` reexporta e os pacotes laterais leem;
 - os tipos primitivos que todos os pacotes compartilham: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkTheme`, `ArkDuration`, `ArkEasing`.
 
 ---
@@ -80,9 +81,10 @@ Nomes como as folhas de estilo do Tooark os expõem; na sua própria entrada do 
 
 - `resolveColorScheme(element?)` → `"light" | "dark"` pelo `color-scheme` computado do elemento (preferência do sistema quando a página deixa em `light dark`).
 - `observeColorScheme(element, onChange)` → função de dispose; observa `class`, `style`, `data-theme` e `theme` em `<html>`/`<body>` mais a preferência do sistema.
+- `setArkLocale(lang, localeJson?)`, `getArkLocale()` → `{ lang, localeJson? }`, `observeArkLocale(onChange)` → função de dispose: o idioma padrão dos componentes sem `lang` próprio (documentado no `@tooark/core`, que os reexporta), guardado num símbolo de `globalThis` para toda cópia dos pacotes compartilhar.
 - `ARK_DURATION_MS`, `ARK_EASING_CSS`, `ARK_MOTION_DISTANCE`.
 - `ARK_SIZE_CSS` (`{ xs: "1.5rem", … }`, espelho de `--ark-size-*`) e `ARK_INTENT_SOFT_CSS` (`{ primary: { soft, softFg }, … }`, os `light-dark()` de `--ark-color-<intent>-soft`/`-soft-fg`, que resolvem pelo `color-scheme` do elemento que os usa): `var(--ark-color-info-soft, ${ARK_INTENT_SOFT_CSS.info.soft})`.
-- Tipos: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkStyleVariant`, `ArkTheme`, `ArkThemeSelected`, `ArkDuration`, `ArkEasing`.
+- Tipos: `ArkIntent`, `ArkSize`, `ArkRounded`, `ArkStyleVariant`, `ArkTheme`, `ArkThemeSelected`, `ArkDuration`, `ArkEasing`, `ArkLocaleSetting`.
 
 ---
 
