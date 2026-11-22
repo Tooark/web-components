@@ -853,6 +853,77 @@ export const MaxHeight = {
   }
 };
 
+export const SyntaxTokens = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "As cores de sintaxe são os tokens `--ark-syntax-*` (keyword, string, number, property, comment, atom, punctuation, invalid), um par `light-dark()` cada, com os valores de sempre embutidos como fallback. Sobrescreva um token num ancestral para temar o editor, e use os mesmos no seu próprio `<pre>`, como o trecho abaixo dos editores."
+      }
+    }
+  },
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "grid gap-3";
+    const code = 'const total = 42; // "fim"';
+    for (const theme of ["light", "dark"] as const) {
+      const editor = createEditor({ language: "javascript", theme, minHeight: "0", lineNumbers: false, fold: false });
+      editor.value = code;
+      editor.dataset.side = theme;
+      wrap.appendChild(editor);
+    }
+    const themed = document.createElement("div");
+    themed.dataset.role = "themed";
+    themed.style.setProperty("--ark-syntax-keyword", "#e11d48");
+    const editor = createEditor({
+      language: "javascript",
+      theme: "light",
+      minHeight: "0",
+      lineNumbers: false,
+      fold: false
+    });
+    editor.value = code;
+    themed.appendChild(editor);
+    // O app colore um trecho próprio com os mesmos tokens, sem o editor.
+    const pre = document.createElement("pre");
+    pre.className = "text-sm";
+    pre.style.fontFamily = "ui-monospace, monospace";
+    pre.style.colorScheme = "light";
+    for (const [text, role] of [
+      ["const", "keyword"],
+      [" total = ", "punctuation"],
+      ["42", "number"],
+      ["; ", "punctuation"],
+      ['// "fim"', "comment"]
+    ]) {
+      const span = document.createElement("span");
+      span.textContent = text;
+      span.style.color = `var(--ark-syntax-${role})`;
+      span.dataset.role = role;
+      pre.appendChild(span);
+    }
+    wrap.append(themed, pre);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const keyword = (host: Element): HTMLElement =>
+      Array.from(host.querySelectorAll<HTMLElement>(".cm-line span")).find((span) => span.textContent === "const")!;
+    const color = (el: Element): string => getComputedStyle(el).color;
+    const light = canvasElement.querySelector('ark-code-editor[data-side="light"]')!;
+    const dark = canvasElement.querySelector('ark-code-editor[data-side="dark"]')!;
+    const themed = canvasElement.querySelector('[data-role="themed"] ark-code-editor')!;
+
+    // Com os tokens na página as cores são as de antes, e o lado segue o tema do editor, não o da página.
+    await waitFor(() => expect(keyword(light)).toBeDefined());
+    await expect(color(keyword(light))).toBe("rgb(109, 40, 217)");
+    await waitFor(() => expect(color(keyword(dark))).toBe("rgb(196, 181, 253)"));
+    // O token sobrescrito num ancestral vence.
+    await waitFor(() => expect(color(keyword(themed))).toBe("rgb(225, 29, 72)"));
+    // O mesmo token pinta o trecho do app.
+    await expect(color(canvasElement.querySelector('pre [data-role="keyword"]')!)).toBe(color(keyword(light)));
+  }
+};
+
 export const DarkTheme = {
   args: { language: "javascript", theme: "dark" },
   parameters: {
