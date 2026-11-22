@@ -10,6 +10,7 @@ import {
 import { ArkCommandItem } from "./ark-command-item";
 import type { ArkInput } from "./ark-input";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -84,6 +85,7 @@ export class ArkCommandPalette extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.inputEl) this.render();
     if (!this.observer) {
       // Itens que entram ou saem (busca assíncrona, frameworks) reordenam a lista.
@@ -101,6 +103,7 @@ export class ArkCommandPalette extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
     document.removeEventListener("keydown", this.handleHotkey);
@@ -210,7 +213,7 @@ export class ArkCommandPalette extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Filtra, agrupa e ordena: itens visíveis ganham `order` (grupo × 1000 + posição), cabeçalhos próprios

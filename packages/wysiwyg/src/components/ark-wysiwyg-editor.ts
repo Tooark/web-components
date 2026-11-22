@@ -1,5 +1,5 @@
 import type { Editor } from "@tiptap/core";
-import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
+import { type ArkThemeSelected, getArkLocale, observeArkLocale, observeColorScheme } from "@tooark/tokens";
 import { type ArkWysiwygInstance, createWysiwygEditor, DEFAULT_MAX_FILE_SIZE, HEADING_LEVELS } from "../engine";
 import { resolveWysiwygLabels } from "../i18n";
 import { type ArkWysiwygIcon, ICONS } from "../icons";
@@ -203,6 +203,8 @@ export class ArkWysiwygEditor extends HTMLElementBase {
   private syncers: Array<() => void> = [];
   /** Para de observar o tema da página; só existe com `theme="auto"`. */
   private disposeTheme: (() => void) | null = null;
+  /** Para de seguir `setArkLocale()`; existe enquanto conectado. */
+  private disposeLocale: (() => void) | null = null;
 
   static get observedAttributes(): string[] {
     return [
@@ -272,10 +274,16 @@ export class ArkWysiwygEditor extends HTMLElementBase {
     // Gravadas antes do registro: o setter guarda e só a montagem abaixo constrói.
     upgradeProperties(this);
     ensureWysiwygStyles();
+    // Sem `lang` próprio os rótulos seguem setArkLocale(): a troca reconstrói, como a do atributo (o texto fica).
+    this.disposeLocale ??= observeArkLocale(() => {
+      if (!this.hasAttribute("lang") && this.instance) this.build();
+    });
     this.build();
   }
 
   disconnectedCallback(): void {
+    this.disposeLocale?.();
+    this.disposeLocale = null;
     this.teardown();
   }
 
@@ -303,6 +311,28 @@ export class ArkWysiwygEditor extends HTMLElementBase {
   /** Envia um arquivo pelo gancho e insere a mídia na seleção; `false` se recusado (o evento diz por quê). */
   insertFile(file: File): Promise<boolean> {
     return this.instance ? this.instance.insertFile(file) : Promise.resolve(false);
+  }
+
+  /**
+   * Rótulos da toolbar: o `lang` próprio com o `locale-json`; sem `lang`, o padrão de `setArkLocale()` (do
+   * `@tooark/tokens`, que o core reexporta), com as strings dele por baixo do `locale-json` do elemento.
+   */
+  private resolveLabels(): ArkWysiwygLabels {
+    const lang = this.getAttribute("lang");
+    const json = this.getAttribute("locale-json");
+    if (lang) return resolveWysiwygLabels(lang, json);
+
+    const fallback = getArkLocale();
+    let own: Partial<ArkWysiwygLabels> = {};
+    if (json?.trim()) {
+      try {
+        const parsed: unknown = JSON.parse(json);
+        if (parsed && typeof parsed === "object") own = parsed as Partial<ArkWysiwygLabels>;
+      } catch {
+        // JSON inválido é ignorado, como em resolveWysiwygLabels.
+      }
+    }
+    return resolveWysiwygLabels(fallback.lang, { ...(fallback.localeJson as Partial<ArkWysiwygLabels>), ...own });
   }
 
   private getTheme(): ArkWysiwygTheme {
@@ -387,7 +417,7 @@ export class ArkWysiwygEditor extends HTMLElementBase {
 
   private build(): void {
     this.teardown();
-    this.labels = resolveWysiwygLabels(this.getAttribute("lang"), this.getAttribute("locale-json"));
+    this.labels = this.resolveLabels();
 
     const root = document.createElement("div");
     root.className = "ark-wysiwyg";

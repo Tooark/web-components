@@ -8,7 +8,8 @@ export const ArkDatepicker = defineComponent({
   props: {
     /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
     testid: { type: String, default: undefined },
-    lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
+    /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+    lang: { type: String as PropType<ArkDatepickerLang>, default: undefined },
     localeJson: { type: [String, Object], default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },

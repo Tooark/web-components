@@ -1,6 +1,7 @@
-import type { ArkDatepickerLang, ArkIntent } from "@tooark/core";
+import type { ArkIntent } from "@tooark/core";
 import { resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -33,7 +34,12 @@ export class ArkClock extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     this.build();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -197,10 +203,7 @@ export class ArkClock extends HTMLElementBase {
 
   private build(): void {
     const palette = this.getPalette(this.getIntent());
-    const loc = resolveLocale(
-      (this.getAttribute("lang") || "en") as ArkDatepickerLang,
-      this.getAttribute("locale-json") || undefined
-    );
+    const loc = resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
 
     this.root?.remove();
     this.columnEls.clear();

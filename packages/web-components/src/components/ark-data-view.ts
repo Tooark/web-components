@@ -29,6 +29,7 @@ import type { ArkSelect } from "./ark-select";
 import type { ArkToggle } from "./ark-toggle";
 import type { ArkToggleGroup } from "./ark-toggle-group";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -391,6 +392,7 @@ export class ArkDataView extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.contentEl) this.render();
     if (!this.slotObserver) {
       // Slots que chegam depois (frameworks) recebem o hook e o estado vazio próprio passa a valer; os nós do
@@ -425,6 +427,7 @@ export class ArkDataView extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.slotObserver?.disconnect();
     this.slotObserver = null;
     this.resizeObserver?.disconnect();
@@ -704,7 +707,7 @@ export class ArkDataView extends HTMLElementBase {
   // --- Modelo ---
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private getSize(): ArkSize {

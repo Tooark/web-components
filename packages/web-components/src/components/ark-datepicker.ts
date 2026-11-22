@@ -1,9 +1,10 @@
-import type { ArkDatepickerLang, ArkDatepickerMode } from "@tooark/core";
-import { type ArkLocale, closePopover, openPopover, positionAnchored, resolveLocale } from "@tooark/core";
+import type { ArkDatepickerMode } from "@tooark/core";
+import { type ArkLocale, closePopover, getArkLocale, openPopover, positionAnchored, resolveLocale } from "@tooark/core";
 import type { ArkCalendar } from "./ark-calendar";
 import type { ArkClock } from "./ark-clock";
 import type { ArkInput } from "./ark-input";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -81,6 +82,7 @@ export class ArkDatepicker extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.hasRendered()) {
       this.syncFromValue();
       this.render();
@@ -89,6 +91,7 @@ export class ArkDatepicker extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     document.removeEventListener("pointerdown", this.handleOutsidePointer, true);
   }
 
@@ -157,7 +160,7 @@ export class ArkDatepicker extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
+    const lang = this.getAttribute("lang");
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
   }
@@ -239,7 +242,8 @@ export class ArkDatepicker extends HTMLElementBase {
     const custom = this.getAttribute("format");
     if (custom) return custom;
 
-    const lang = (this.getAttribute("lang") || "en").toLowerCase();
+    // O lang próprio, senão o de setArkLocale(): MM/DD só para "en" exato.
+    const lang = (this.getAttribute("lang") || getArkLocale().lang).toLowerCase();
     const datePart = lang === "en" ? "MM/DD/YYYY" : "DD/MM/YYYY";
     const timePart = this.hasAttribute("seconds") ? "HH:mm:ss" : "HH:mm";
 

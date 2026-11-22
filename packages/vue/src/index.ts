@@ -1,4 +1,4 @@
-export { dismissToast, showToast, toast } from "@tooark/core";
+export { dismissToast, getArkLocale, observeArkLocale, setArkLocale, showToast, toast } from "@tooark/core";
 export { ArkAlert } from "./ark-alert.js";
 export { ArkAvatar } from "./ark-avatar.js";
 export { ArkBadge } from "./ark-badge.js";

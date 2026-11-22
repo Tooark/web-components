@@ -14,6 +14,7 @@ import type { ArkInput } from "./ark-input";
 import type { ArkSelect } from "./ark-select";
 import type { ArkTextarea } from "./ark-textarea";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -159,8 +160,13 @@ export class ArkKvEditor extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.listEl) this.render();
     this.updateAppearance();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void {
@@ -320,7 +326,7 @@ export class ArkKvEditor extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Tipo efetivo: com a coluna de tipos, o que o select mostra (o da linha se está na lista, senão o primeiro).

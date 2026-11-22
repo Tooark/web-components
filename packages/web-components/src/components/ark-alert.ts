@@ -9,6 +9,7 @@ import {
 } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -65,6 +66,7 @@ export class ArkAlert extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       // Ícone ou ação que chegam depois (frameworks) recebem o hook.
       this.observer = new MutationObserver(() => this.syncSlots());
@@ -74,6 +76,7 @@ export class ArkAlert extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
   }
@@ -123,7 +126,7 @@ export class ArkAlert extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private getPalette(intent: ArkIntent): ArkAlertPalette {

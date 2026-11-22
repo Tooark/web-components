@@ -52,7 +52,8 @@ export class ArkSchedulerComponent implements AfterViewInit, OnDestroy {
   @Input() view: ArkSchedulerView = "week";
   @Input() date: string | undefined;
   @Input() events: ArkSchedulerEvent[] | undefined;
-  @Input() lang: ArkDatepickerLang = "en";
+  /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+  @Input() lang: ArkDatepickerLang | undefined;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   @Input() localeJson: string | undefined;
   @Input() theme: ArkTheme = "auto";

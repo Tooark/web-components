@@ -12,7 +12,8 @@ export const ArkScheduler = defineComponent({
     view: { type: String as PropType<ArkSchedulerView>, default: "week" },
     date: { type: String, default: undefined },
     events: { type: Array as PropType<ArkSchedulerEvent[]>, default: undefined },
-    lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
+    /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+    lang: { type: String as PropType<ArkDatepickerLang>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     intent: { type: String as PropType<ArkIntent>, default: "primary" },
     hourStart: { type: Number, default: undefined },

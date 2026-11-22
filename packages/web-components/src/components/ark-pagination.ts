@@ -10,6 +10,7 @@ import {
 import type { ArkSelect } from "./ark-select";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -92,8 +93,13 @@ export class ArkPagination extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.listEl) this.render();
     this.updateAppearance();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -168,7 +174,7 @@ export class ArkPagination extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private getSize(): ArkSize {

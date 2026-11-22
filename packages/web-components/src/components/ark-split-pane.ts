@@ -1,5 +1,6 @@
 import { type ArkLocale, type ArkSplitPaneDirection, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -42,6 +43,7 @@ export class ArkSplitPane extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       // Painéis que entram ou saem mudam o número de alças e a distribuição.
       this.observer = new MutationObserver(() => this.updateAppearance());
@@ -51,6 +53,7 @@ export class ArkSplitPane extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
   }
@@ -220,7 +223,7 @@ export class ArkSplitPane extends HTMLElementBase {
   // --- Aparência ---
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Uma alça a menos que painéis, sempre ao fim do host: um painel que o usuário acrescenta depois entra

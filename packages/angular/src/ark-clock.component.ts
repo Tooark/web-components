@@ -46,7 +46,8 @@ export class ArkClockComponent implements AfterViewInit, OnDestroy {
 
   @Input() testid: string | undefined;
   @Input() value: string | undefined;
-  @Input() lang: ArkDatepickerLang = "en";
+  /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+  @Input() lang: ArkDatepickerLang | undefined;
   /** JSON com strings próprias (hours, minutes, seconds), mesclado sobre o inglês, quando lang é "custom". */
   @Input() localeJson: string | undefined;
   @Input() theme: ArkTheme = "auto";

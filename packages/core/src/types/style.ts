@@ -37,7 +37,10 @@ export type ArkButtonNavigateDetail = { href: string };
 
 // Exports types específicos do componente datepicker
 
-/** Idioma dos rótulos dos componentes; "custom" usa as strings fornecidas em locale-json. */
+/**
+ * Idioma dos rótulos dos componentes; "custom" usa as strings fornecidas em locale-json. Um componente sem `lang`
+ * usa o de `setArkLocale()`, senão "en".
+ */
 export type ArkLang = "en" | "pt" | "es" | "custom";
 
 /** Nome anterior de ArkLang, mantido por compatibilidade. */
@@ -142,7 +145,10 @@ export type ArkCommandPaletteStyleOptions = {
   testid?: string;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do placeholder padrão (`search`) e da mensagem de vazio (`noResults`). Padrão: "en". */
+  /**
+   * Idioma do placeholder padrão (`search`) e da mensagem de vazio (`noResults`).
+   * Padrão: o de `setArkLocale()`, senão "en".
+   */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -180,7 +186,7 @@ export type ArkCopyButtonStyleOptions = {
   color?: string;
   /** Cor do texto CSS custom, usada junto de color. */
   textColor?: string;
-  /** Idioma das strings copy/copied. Padrão: "en". */
+  /** Idioma das strings copy/copied. Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -277,7 +283,7 @@ export type ArkShapePickerStyleOptions = {
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos nomes das formas (rótulos acessíveis). Padrão: "en". */
+  /** Idioma dos nomes das formas (rótulos acessíveis). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -330,7 +336,10 @@ export type ArkKvEditorStyleOptions = {
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos (add, bulkEdit, tableEdit, entries, noEntries, deleteRow, type, secret). Padrão: "en". */
+  /**
+   * Idioma dos rótulos (add, bulkEdit, tableEdit, entries, noEntries, deleteRow, type, secret).
+   * Padrão: o de `setArkLocale()`, senão "en".
+   */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -358,7 +367,10 @@ export type ArkPaginationStyleOptions = {
   intent?: ArkIntent;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos (pagination, previousPage, nextPage, pageNumber, pageOf, perPage, rangeOf). Padrão: "en". */
+  /**
+   * Idioma dos rótulos (pagination, previousPage, nextPage, pageNumber, pageOf, perPage, rangeOf).
+   * Padrão: o de `setArkLocale()`, senão "en".
+   */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -516,7 +528,10 @@ export type ArkDataViewStyleOptions = {
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos (busca, ordenação, seleção, reordenar, vazio e os da paginação). Padrão: "en". */
+  /**
+   * Idioma dos rótulos (busca, ordenação, seleção, reordenar, vazio e os da paginação).
+   * Padrão: o de `setArkLocale()`, senão "en".
+   */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -571,7 +586,7 @@ export type ArkSplitPaneStyleOptions = {
   direction?: ArkSplitPaneDirection;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do rótulo acessível das alças (`resize`). Padrão: "en". */
+  /** Idioma do rótulo acessível das alças (`resize`). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -589,7 +604,7 @@ export type ArkSpinnerStyleOptions = {
   intent?: ArkIntent;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do rótulo padrão para leitores de tela (string `loading`). Padrão: "en". */
+  /** Idioma do rótulo para leitores de tela (string `loading`). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -806,7 +821,7 @@ export type ArkDialogStyleOptions = {
   height?: string | number;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do rótulo do botão de fechar. Padrão: "en". */
+  /** Idioma do rótulo do botão de fechar. Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
@@ -837,7 +852,7 @@ export type ArkDrawerStyleOptions = {
   size?: "sm" | "md" | "lg" | (string & {}) | number;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do rótulo do botão de fechar. Padrão: "en". */
+  /** Idioma do rótulo do botão de fechar. Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
@@ -902,7 +917,7 @@ export type ArkNavStyleOptions = {
   intent?: ArkIntent;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos internos (recolher, expandir). Padrão: "en". */
+  /** Idioma dos rótulos internos (recolher, expandir). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
@@ -957,7 +972,7 @@ export type ArkAlertStyleOptions = {
   live?: ArkAlertLive;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma do rótulo do botão de dispensar. Padrão: "en". */
+  /** Idioma do rótulo do botão de dispensar. Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -1010,7 +1025,10 @@ export type ArkFileInputStyleOptions = {
   size?: ArkSize;
   /** Arredondamento da zona de soltar. Padrão: "lg". */
   rounded?: ArkRounded;
-  /** Idioma das strings do campo (chooseFile, dropHint, noFile e as de pasta). Padrão: "en". */
+  /**
+   * Idioma das strings do campo (chooseFile, dropHint, noFile e as de pasta).
+   * Padrão: o de `setArkLocale()`, senão "en".
+   */
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
@@ -1098,7 +1116,7 @@ export type ArkTabsStyleOptions = {
   fill?: ArkTabsFill;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
-  /** Idioma dos rótulos internos (fechar aba, não salvo). Padrão: "en". */
+  /** Idioma dos rótulos internos (fechar aba, não salvo). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
   /** Strings customizadas (JSON) quando lang é "custom". */
   localeJson?: string;
@@ -1196,7 +1214,7 @@ export type ArkToasterStyleOptions = {
   maxVisible?: number;
   /** Tempo em tela em ms; 0 mantém o toast até ser fechado. Padrão: 4000. */
   duration?: number;
-  /** Idioma do rótulo do botão de fechar (`close`). Padrão: "en". */
+  /** Idioma do rótulo do botão de fechar (`close`). Padrão: o de `setArkLocale()`, senão "en". */
   lang?: ArkLang;
 };
 

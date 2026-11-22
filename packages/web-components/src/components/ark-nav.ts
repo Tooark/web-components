@@ -10,6 +10,7 @@ import {
 } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -70,6 +71,7 @@ export class ArkNav extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       // Itens, grupos e slots que chegam depois (frameworks) ganham os atributos propagados e os hooks.
       this.observer = new MutationObserver(() => this.syncChildren());
@@ -80,6 +82,7 @@ export class ArkNav extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
   }
@@ -178,7 +181,7 @@ export class ArkNav extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   private getItems(): HTMLElement[] {

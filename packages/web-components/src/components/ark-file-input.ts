@@ -9,6 +9,7 @@ import {
 } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -90,8 +91,13 @@ export class ArkFileInput extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.inputEl) this.render();
     this.updateAppearance();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(): void {
@@ -156,7 +162,7 @@ export class ArkFileInput extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Cobre o atributo e o <fieldset disabled>, que desabilita o botão e o input nativamente.

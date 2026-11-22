@@ -16,6 +16,7 @@ import {
 } from "@tooark/core";
 import { headingTag, retagHeading } from "./heading-level";
 import { HTMLElementBase } from "./html-element-base";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -99,6 +100,7 @@ export class ArkDrawer extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.observer) {
       // Rodapé e ações que chegam depois (frameworks) ganham o hook; as ações também mudam o cabeçalho.
       this.observer = new MutationObserver(() => this.updateAppearance());
@@ -113,6 +115,7 @@ export class ArkDrawer extends HTMLElementBase {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
     this.actionsObserver?.disconnect();
@@ -304,7 +307,7 @@ export class ArkDrawer extends HTMLElementBase {
   // --- Aparência ---
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Tamanho no eixo da gaveta: preset ou comprimento CSS (número vira px) numa custom property inline.

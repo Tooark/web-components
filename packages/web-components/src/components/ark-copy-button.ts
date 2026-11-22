@@ -1,5 +1,6 @@
 import { type ArkLocale, announce, resolveLocale } from "@tooark/core";
 import { ArkButton } from "./ark-button";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -47,6 +48,7 @@ export class ArkCopyButton extends ArkButton {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     if (!this.childObserver) {
       // Rótulo do usuário que chega ou sai depois decide se o rótulo próprio aparece.
       this.childObserver = new MutationObserver(() => this.updateAppearance());
@@ -56,6 +58,7 @@ export class ArkCopyButton extends ArkButton {
   }
 
   disconnectedCallback(): void {
+    unfollowArkLocale(this);
     this.childObserver?.disconnect();
     this.childObserver = null;
     if (this.feedbackTimer !== null) window.clearTimeout(this.feedbackTimer);
@@ -147,7 +150,7 @@ export class ArkCopyButton extends ArkButton {
   };
 
   private getLocale(): ArkLocale {
-    return resolveLocale(this.getAttribute("lang") || "en", this.getAttribute("locale-json") || undefined);
+    return resolveLocale(this.getAttribute("lang"), this.getAttribute("locale-json") || undefined);
   }
 
   // Filhos que não são chrome (do componente ou do ark-button): o usuário deu o próprio rótulo.

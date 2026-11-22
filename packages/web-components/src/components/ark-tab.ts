@@ -10,6 +10,7 @@ import {
 } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { normalizeIntent } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -75,7 +76,12 @@ export class ArkTab extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     this.updateAppearance();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string): void {
@@ -186,7 +192,7 @@ export class ArkTab extends HTMLElementBase {
 
   private getLocale(): ArkLocale {
     const tabs = this.closest("ark-tabs");
-    const lang = this.getAttribute("lang") || tabs?.getAttribute("lang") || "en";
+    const lang = this.getAttribute("lang") || tabs?.getAttribute("lang") || null;
     const customJson = this.getAttribute("locale-json") || tabs?.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
   }

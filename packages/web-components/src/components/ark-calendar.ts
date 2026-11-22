@@ -1,7 +1,8 @@
-import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkDatepickerLang, ArkIntent } from "@tooark/core";
+import type { ArkCalendarEvent, ArkCalendarEventDisplay, ArkIntent } from "@tooark/core";
 import { type ArkLocale, announce, arkEnter, resolveLocale } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { intentColors } from "./intent-colors";
+import { followArkLocale, unfollowArkLocale } from "./locale-sync";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -64,6 +65,7 @@ export class ArkCalendar extends HTMLElementBase {
 
   connectedCallback(): void {
     upgradeProperties(this);
+    followArkLocale(this);
     this.locale = this.getLocale();
     const parsed = this.parseDate(this.getAttribute("value"));
     if (parsed) {
@@ -71,6 +73,10 @@ export class ArkCalendar extends HTMLElementBase {
       this.viewDate = new Date(parsed);
     }
     this.build();
+  }
+
+  disconnectedCallback(): void {
+    unfollowArkLocale(this);
   }
 
   attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
@@ -158,7 +164,7 @@ export class ArkCalendar extends HTMLElementBase {
   }
 
   private getLocale(): ArkLocale {
-    const lang = (this.getAttribute("lang") || "en") as ArkDatepickerLang;
+    const lang = this.getAttribute("lang");
     const customJson = this.getAttribute("locale-json") || undefined;
     return resolveLocale(lang, customJson);
   }

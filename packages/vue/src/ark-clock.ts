@@ -10,7 +10,8 @@ export const ArkClock = defineComponent({
     /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
     testid: { type: String, default: undefined },
     value: { type: String, default: undefined },
-    lang: { type: String as PropType<ArkDatepickerLang>, default: "en" },
+    /** Idioma das strings; sem ele, o de setArkLocale(), senão "en". */
+    lang: { type: String as PropType<ArkDatepickerLang>, default: undefined },
     /** JSON com strings próprias (hours, minutes, seconds), mesclado sobre o inglês, quando lang é "custom". */
     localeJson: { type: String, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
