@@ -39,6 +39,9 @@ import {
   ArkToaster as ReactArkToaster,
   setArkLocale as reactSetArkLocale
 } from "@tooark/react";
+import { ArkChart as ReactArkChart } from "@tooark/react/chart";
+import { ArkCodeEditor as ReactArkCodeEditor } from "@tooark/react/code";
+import { ArkWysiwygEditor as ReactArkWysiwygEditor } from "@tooark/react/wysiwyg";
 import {
   type ArkDataViewVueColumn,
   ArkButton as VueArkButton,
@@ -62,6 +65,9 @@ import {
   ArkToaster as VueArkToaster,
   setArkLocale as vueSetArkLocale
 } from "@tooark/vue";
+import { ArkChart as VueArkChart } from "@tooark/vue/chart";
+import { ArkCodeEditor as VueArkCodeEditor } from "@tooark/vue/code";
+import { ArkWysiwygEditor as VueArkWysiwygEditor } from "@tooark/vue/wysiwyg";
 import type {
   ArkButton as ArkButtonElement,
   ArkDataView as ArkDataViewElement,
@@ -69,7 +75,7 @@ import type {
   ArkKvEditor as ArkKvEditorElement,
   ArkSwitch as ArkSwitchElement
 } from "@tooark/web-components";
-import { createElement, createRef, type ReactNode } from "react";
+import { createElement, createRef, type ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor } from "storybook/test";
@@ -1400,6 +1406,174 @@ export const VueTime = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectTimeWrappers(canvasElement, instant);
+    app.unmount();
+  }
+};
+
+const SIDE_OPTION = {
+  xAxis: { type: "category" as const, data: ["a", "b"] },
+  yAxis: {},
+  series: [{ type: "bar" as const, data: [1, 2] }]
+};
+
+/**
+ * Digita no meio do texto de um editor controlado: o valor que o change devolve volta pelo wrapper e não pode mover o
+ * cursor (o setValue do editor leva a seleção ao início quando o texto difere).
+ */
+async function typeInTheMiddle(content: HTMLElement): Promise<void> {
+  await userEvent.click(content);
+  await userEvent.keyboard("ab");
+  await userEvent.keyboard("{ArrowLeft}X");
+  // A tecla seguinte mostra onde o cursor ficou depois de o valor devolvido voltar pelo wrapper.
+  await userEvent.keyboard("Y");
+}
+
+/** O que os wrappers das subpaths entregam: option pela propriedade, texto e JSON controlados sem pular o cursor. */
+async function expectSideWrappers(canvasElement: HTMLElement, codeValue: () => string, docText: () => string) {
+  const chart = canvasElement.querySelector("ark-chart") as HTMLElement & { option: unknown; resolvedPalette: string };
+  await waitFor(() => expect(chart.option).toBeTruthy());
+  await expect(chart).toHaveAttribute("palette", "tokens");
+  await expect(chart.hasAttribute("option")).toBe(false);
+
+  const code = canvasElement.querySelector("ark-code-editor") as HTMLElement;
+  const codeContent = await waitFor(() => code.querySelector(".cm-content") as HTMLElement);
+  await expect(code).toHaveAttribute("max-height", "12rem");
+  await typeInTheMiddle(codeContent);
+  await waitFor(() => expect(codeValue()).toBe("aXYb"));
+
+  const editor = canvasElement.querySelector("ark-wysiwyg-editor") as HTMLElement;
+  const prose = await waitFor(() => editor.querySelector(".ProseMirror") as HTMLElement);
+  await typeInTheMiddle(prose);
+  await waitFor(() => expect(docText()).toBe("aXYb"));
+}
+
+/** Texto do JSON do Tiptap. */
+function textOf(doc: unknown): string {
+  const node = doc as { text?: string; content?: unknown[] } | null;
+  if (!node) return "";
+  return (node.text ?? "") + (node.content ?? []).map(textOf).join("");
+}
+
+/** Estado da tela controlada do ReactSidePackages, lido pelo play. */
+const sideState = { code: "", doc: null as unknown, clicks: 0, assigned: 0 };
+
+/** Tela com os três wrappers das subpaths, controlados por estado do React. */
+function SideScreen(): ReactNode {
+  const [code, setCode] = useState("");
+  const [doc, setDoc] = useState<unknown>({ type: "doc", content: [{ type: "paragraph" }] });
+  sideState.code = code;
+  sideState.doc = doc;
+  return createElement(
+    "div",
+    null,
+    createElement(ReactArkChart, {
+      option: SIDE_OPTION,
+      palette: "tokens",
+      height: "160px",
+      onChartClick: () => {
+        sideState.clicks += 1;
+      }
+    }),
+    createElement(ReactArkCodeEditor, {
+      value: code,
+      maxHeight: "12rem",
+      lineNumbers: false,
+      onChange: (event) => setCode(event.detail.value)
+    }),
+    createElement(ReactArkWysiwygEditor, {
+      content: doc as never,
+      toolbar: "none",
+      "aria-label": "Notas",
+      onChange: (event) => setDoc(event.detail)
+    })
+  );
+}
+
+export const ReactSidePackages = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    Object.assign(sideState, { code: "", doc: null, clicks: 0, assigned: 0 });
+    render(createElement(SideScreen));
+    await expect(errors).toEqual([]);
+
+    // A option só é reatribuída com referência nova: um render com a mesma não passa pelo setter.
+    const chart = canvasElement.querySelector("ark-chart") as HTMLElement & { option: unknown };
+    await waitFor(() => expect(chart.option === SIDE_OPTION).toBe(true));
+    const proto = Object.getPrototypeOf(chart);
+    const descriptor = Object.getOwnPropertyDescriptor(proto, "option")!;
+    Object.defineProperty(chart, "option", {
+      configurable: true,
+      get: () => descriptor.get!.call(chart),
+      set: (value) => {
+        sideState.assigned += 1;
+        descriptor.set!.call(chart, value);
+      }
+    });
+    render(createElement(SideScreen));
+    await expect(sideState.assigned).toBe(0);
+    delete (chart as { option?: unknown }).option;
+    chart.dispatchEvent(new CustomEvent("ark-chart-click", { detail: {}, bubbles: true }));
+    await expect(sideState.clicks).toBe(1);
+
+    await expectSideWrappers(
+      canvasElement,
+      () => sideState.code,
+      () => textOf(sideState.doc)
+    );
+  }
+};
+
+export const VueSidePackages = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const code = ref("");
+    const doc = ref<unknown>({ type: "doc", content: [{ type: "paragraph" }] });
+    let clicks = 0;
+    const app = createApp({
+      setup: () => () =>
+        h("div", [
+          h(VueArkChart, {
+            option: SIDE_OPTION,
+            palette: "tokens",
+            height: "160px",
+            onArkChartClick: () => {
+              clicks += 1;
+            }
+          }),
+          h(VueArkCodeEditor, {
+            value: code.value,
+            maxHeight: "12rem",
+            lineNumbers: false,
+            onChange: (event: CustomEvent<{ value: string }>) => {
+              code.value = event.detail.value;
+            }
+          }),
+          h(VueArkWysiwygEditor, {
+            content: doc.value as never,
+            toolbar: "none",
+            "aria-label": "Notas",
+            onArkWysiwygChange: (event: CustomEvent<unknown>) => {
+              doc.value = event.detail;
+            }
+          })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+
+    const chart = canvasElement.querySelector("ark-chart") as HTMLElement;
+    chart.dispatchEvent(new CustomEvent("ark-chart-click", { detail: {}, bubbles: true }));
+    await expect(clicks).toBe(1);
+    await expectSideWrappers(
+      canvasElement,
+      () => code.value,
+      () => textOf(doc.value)
+    );
     app.unmount();
   }
 };

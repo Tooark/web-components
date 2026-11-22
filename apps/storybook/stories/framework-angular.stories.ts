@@ -25,6 +25,9 @@ import {
   ArkTimeComponent,
   setArkLocale as angularSetArkLocale
 } from "@tooark/angular";
+import { ArkChartComponent } from "@tooark/angular/chart";
+import { ArkCodeEditorComponent } from "@tooark/angular/code";
+import { ArkWysiwygEditorComponent } from "@tooark/angular/wysiwyg";
 import type {
   ArkDataViewColumn,
   ArkDataViewLayout,
@@ -34,7 +37,7 @@ import type {
 } from "@tooark/core";
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
-import { expect, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor } from "storybook/test";
 
 // Os wrappers Angular de verdade, compilados em JIT a partir do src (o Vite transforma os decorators legados, ver
 // main.ts) e montados numa aplicação sem zone.js, como o padrão do Angular 21. O preview já registrou os elementos.
@@ -345,6 +348,65 @@ export const Time = {
       new Intl.DateTimeFormat("en", { dateStyle: "medium" }).format(instant)
     );
     await expect(fromMs).toHaveAttribute("datetime", instant.toISOString());
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+// Entradas secundárias @tooark/angular/chart, /code e /wysiwyg: option pela propriedade, e texto e JSON controlados
+// (o valor que o (changed) devolve volta pelo binding sem mover o cursor).
+class SidePackagesHost {
+  option = {
+    xAxis: { type: "category" as const, data: ["a", "b"] },
+    yAxis: {},
+    series: [{ type: "bar" as const, data: [1, 2] }]
+  };
+  code = "";
+  doc: unknown = { type: "doc", content: [{ type: "paragraph" }] };
+  clicks = 0;
+}
+
+function sideText(doc: unknown): string {
+  const node = doc as { text?: string; content?: unknown[] } | null;
+  if (!node) return "";
+  return (node.text ?? "") + (node.content ?? []).map(sideText).join("");
+}
+
+export const SidePackages = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkChartComponent, ArkCodeEditorComponent, ArkWysiwygEditorComponent],
+      template: `
+        <ark-chart-wrapper [option]="option" palette="tokens" height="160px" (chartClick)="clicks = clicks + 1"></ark-chart-wrapper>
+        <ark-code-editor-wrapper [value]="code" maxHeight="12rem" [lineNumbers]="false" (changed)="code = $event.detail.value"></ark-code-editor-wrapper>
+        <ark-wysiwyg-editor-wrapper [content]="doc" toolbar="none" ariaLabel="Notas" (changed)="doc = $event.detail"></ark-wysiwyg-editor-wrapper>`
+    })(SidePackagesHost);
+
+    const { app, ref, host, detect } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    const chart = canvasElement.querySelector("ark-chart") as HTMLElement & { option: unknown };
+    await waitFor(() => expect(chart.option === host.option).toBe(true));
+    await expect(chart).toHaveAttribute("palette", "tokens");
+    chart.dispatchEvent(new CustomEvent("ark-chart-click", { detail: {}, bubbles: true }));
+    await expect(host.clicks).toBe(1);
+
+    const type = async (content: HTMLElement): Promise<void> => {
+      await userEvent.click(content);
+      for (const key of ["a", "b", "{ArrowLeft}", "X", "Y"]) {
+        await userEvent.keyboard(key);
+        detect();
+      }
+    };
+    const code = canvasElement.querySelector("ark-code-editor") as HTMLElement;
+    await expect(code).toHaveAttribute("max-height", "12rem");
+    await type(await waitFor(() => code.querySelector(".cm-content") as HTMLElement));
+    await waitFor(() => expect(host.code).toBe("aXYb"));
+    const editor = canvasElement.querySelector("ark-wysiwyg-editor") as HTMLElement;
+    await type(await waitFor(() => editor.querySelector(".ProseMirror") as HTMLElement));
+    await waitFor(() => expect(sideText(host.doc)).toBe("aXYb"));
     ref.destroy();
     app.destroy();
   }

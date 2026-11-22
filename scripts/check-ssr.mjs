@@ -3,6 +3,7 @@
 // registro não for no-op no servidor ou se o HTML não trouxer as tags ark-*.
 // Uso: node scripts/check-ssr.mjs   (depois do pnpm -r build)
 
+import { readdirSync, readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -74,6 +75,34 @@ await check("react (renderToString)", async () => {
   if (!table.includes('<ark-data-view page-size="10"')) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
 });
 
+// Subpaths dos pacotes laterais (@tooark/react/chart...): importam o próprio pacote lateral e renderizam a tag com os
+// atributos; a propriedade JS (option, value) só é atribuída no navegador.
+await check("react (subpaths dos pacotes laterais)", async () => {
+  const { createElement } = await importFrom("react", "react");
+  const { renderToString } = await importFrom("react", "react-dom/server");
+  const { ArkChart } = await import(distUrl("react", "chart.js"));
+  const { ArkCodeEditor } = await import(distUrl("react", "code.js"));
+  const { ArkWysiwygEditor } = await import(distUrl("react", "wysiwyg.js"));
+  const html = renderToString(
+    createElement(
+      "div",
+      null,
+      createElement(ArkChart, { option: { series: [] }, height: "200px", palette: "tokens" }),
+      createElement(ArkCodeEditor, { value: "{}", language: "json", lineNumbers: false }),
+      createElement(ArkWysiwygEditor, { content: { type: "doc" }, toolbar: "marks", editable: false })
+    )
+  );
+  for (const expected of [
+    'height="200px"',
+    '<ark-code-editor language="json"',
+    'line-numbers="false"',
+    'editable="false"'
+  ]) {
+    if (!html.includes(expected)) throw new Error(`sem ${expected}: ${html.slice(0, 200)}`);
+  }
+  if (html.includes("option=") || html.includes("content=")) throw new Error(`propriedade JS no HTML: ${html}`);
+});
+
 // Vue: o setup roda no servidor e chama o registro, que precisa ser no-op.
 await check("vue (renderToString)", async () => {
   const { createSSRApp, h } = await importFrom("vue", "vue");
@@ -95,6 +124,28 @@ await check("vue (renderToString)", async () => {
   if (!table.includes("<ark-data-view")) throw new Error(`HTML inesperado: ${table.slice(0, 160)}`);
 });
 
+// Subpaths do Vue: o setup chama o registerTooark*() do pacote lateral, no-op no servidor; a propriedade JS (option,
+// value, content) só é atribuída no navegador.
+await check("vue (subpaths dos pacotes laterais)", async () => {
+  const { createSSRApp, h } = await importFrom("vue", "vue");
+  const { renderToString } = await importFrom("vue", "vue/server-renderer");
+  const { ArkChart } = await import(distUrl("vue", "chart.js"));
+  const { ArkCodeEditor } = await import(distUrl("vue", "code.js"));
+  const { ArkWysiwygEditor } = await import(distUrl("vue", "wysiwyg.js"));
+  const html = await renderToString(
+    createSSRApp({
+      render: () => [
+        h(ArkChart, { option: { series: [] }, height: "200px" }),
+        h(ArkCodeEditor, { value: "{}", language: "json", maxHeight: "20rem" }),
+        h(ArkWysiwygEditor, { content: { type: "doc" }, toolbar: "marks" })
+      ]
+    })
+  );
+  for (const expected of ['<ark-chart height="200px"', '<ark-code-editor language="json"', "<ark-wysiwyg-editor"]) {
+    if (!html.includes(expected)) throw new Error(`sem ${expected}: ${html.slice(0, 200)}`);
+  }
+});
+
 // Angular: o bundle parcial (FESM) avaliado com o compilador JIT, como num servidor sem o linker do CLI.
 await check("angular (import + registro)", async () => {
   await importFrom("angular", "@angular/compiler");
@@ -114,9 +165,16 @@ await check("angular (element de cada wrapper)", async () => {
     "angular",
     "@angular/core"
   );
-  const angular = await import(distUrl("angular", "fesm2022/tooark-angular.mjs"));
-  const wrappers = Object.entries(angular).filter(([name]) => name.endsWith("Component"));
+  // A entrada principal e as secundárias dos pacotes laterais (@tooark/angular/chart...).
+  const entries = ["", "-chart", "-code", "-wysiwyg"];
+  const modules = await Promise.all(
+    entries.map((suffix) => import(distUrl("angular", `fesm2022/tooark-angular${suffix}.mjs`)))
+  );
+  const wrappers = modules.flatMap((module) => Object.entries(module).filter(([name]) => name.endsWith("Component")));
   if (wrappers.length === 0) throw new Error("nenhum wrapper exportado");
+  for (const name of ["ArkChartComponent", "ArkCodeEditorComponent", "ArkWysiwygEditorComponent"]) {
+    if (!wrappers.some(([exported]) => exported === name)) throw new Error(`${name} fora das entradas secundárias`);
+  }
   for (const [name, Wrapper] of wrappers) {
     const tag = Wrapper.ɵcmp.selectors[0][0].replace(/-wrapper$/, "");
     const queried = [];
@@ -133,6 +191,34 @@ await check("angular (element de cada wrapper)", async () => {
       throw new Error(`${name}.element procurou ${JSON.stringify(queried[0])}, esperado ":scope > ${tag}"`);
     }
   }
+});
+
+// Isolamento: só os arquivos de uma subpath (o nome tem chart, code ou wysiwyg) podem citar o pacote lateral ou os
+// peers dele; a entrada principal dos wrappers continua sem ECharts, CodeMirror e Tiptap para quem não os usa.
+const SIDE_PACKAGES = {
+  chart: ["@tooark/chart", "echarts"],
+  code: ["@tooark/code", "@codemirror/", "@lezer/"],
+  wysiwyg: ["@tooark/wysiwyg", "@tiptap/"]
+};
+await check("isolamento das subpaths dos wrappers", () => {
+  const files = (dir) =>
+    readdirSync(dir, { withFileTypes: true }).flatMap((entry) =>
+      entry.isDirectory() ? files(path.join(dir, entry.name)) : [path.join(dir, entry.name)]
+    );
+  const leaks = [];
+  for (const pkg of ["react", "vue", "angular"]) {
+    const dist = path.join(packagesDir, pkg, "dist");
+    for (const file of files(dist).filter((name) => /\.(c|m)?js$|\.d\.(c|m)?ts$/.test(name))) {
+      const relative = path.relative(dist, file).replaceAll("\\", "/");
+      const text = readFileSync(file, "utf8");
+      for (const [subpath, specifiers] of Object.entries(SIDE_PACKAGES)) {
+        if (relative.includes(subpath)) continue;
+        const found = specifiers.find((specifier) => text.includes(`"${specifier}`) || text.includes(`'${specifier}`));
+        if (found) leaks.push(`${pkg}/dist/${relative} cita ${found}`);
+      }
+    }
+  }
+  if (leaks.length > 0) throw new Error(leaks.join("; "));
 });
 
 if (failed) process.exit(1);
