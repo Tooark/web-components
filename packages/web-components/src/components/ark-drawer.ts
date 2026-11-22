@@ -14,6 +14,7 @@ import {
   trapFocus,
   unlockScroll
 } from "@tooark/core";
+import { headingTag, retagHeading } from "./heading-level";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
@@ -80,6 +81,7 @@ export class ArkDrawer extends HTMLElementBase {
       "mode",
       "size",
       "label",
+      "heading-level",
       "no-close-button",
       "persistent",
       "theme",
@@ -375,12 +377,14 @@ export class ArkDrawer extends HTMLElementBase {
       .trim();
 
     if (label) {
+      const tag = headingTag(this, 2);
       if (!this.titleEl) {
-        const title = document.createElement("h2");
+        const title = document.createElement(tag) as HTMLHeadingElement;
         title.id = this.titleId;
         this.headerEl.prepend(title);
         this.titleEl = title;
       }
+      this.titleEl = retagHeading(this.titleEl, tag);
       this.titleEl.textContent = label;
       // Com ações, o título deixa livre a largura medida delas mais o espaço entre as duas.
       this.titleEl.className = [

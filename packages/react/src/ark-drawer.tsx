@@ -40,6 +40,7 @@ export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
       persistent,
       noScrollLock,
       localeJson,
+      headingLevel,
       onOpen,
       onClose,
       ...rest
@@ -74,7 +75,8 @@ export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
       "no-close-button": noCloseButton ? "" : undefined,
       persistent: persistent ? "" : undefined,
       "no-scroll-lock": noScrollLock ? "" : undefined,
-      "locale-json": localeJson
+      "locale-json": localeJson,
+      "heading-level": headingLevel
     };
 
     return createElement("ark-drawer", attrs, children);

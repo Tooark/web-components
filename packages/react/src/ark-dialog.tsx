@@ -40,6 +40,7 @@ export const ArkDialog = forwardRef<ArkDialogElement, ArkDialogProps>(
       persistent,
       noScrollLock,
       localeJson,
+      headingLevel,
       onOpen,
       onClose,
       ...rest
@@ -75,7 +76,8 @@ export const ArkDialog = forwardRef<ArkDialogElement, ArkDialogProps>(
       "no-close-button": noCloseButton ? "" : undefined,
       persistent: persistent ? "" : undefined,
       "no-scroll-lock": noScrollLock ? "" : undefined,
-      "locale-json": localeJson
+      "locale-json": localeJson,
+      "heading-level": headingLevel
     };
 
     return createElement("ark-dialog", attrs, children);

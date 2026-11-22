@@ -16,6 +16,7 @@ import type {
   ArkDialogSize,
   ArkDrawerMode,
   ArkDrawerSide,
+  ArkHeadingLevel,
   ArkIntent,
   ArkLang,
   ArkMarkShape,
@@ -283,6 +284,7 @@ interface ArkIntrinsicElements {
     width?: string | number;
     height?: string | number;
     label?: string;
+    "heading-level"?: ArkHeadingLevel;
     "no-close-button"?: boolean;
     persistent?: boolean;
     "no-scroll-lock"?: boolean;
@@ -426,6 +428,7 @@ interface ArkIntrinsicElements {
   "ark-card": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     heading?: string;
+    "heading-level"?: ArkHeadingLevel;
     padding?: ArkCardPadding;
     rounded?: ArkRounded;
     theme?: ArkTheme;
@@ -437,6 +440,7 @@ interface ArkIntrinsicElements {
     mode?: ArkDrawerMode;
     size?: string | number;
     label?: string;
+    "heading-level"?: ArkHeadingLevel;
     "no-close-button"?: boolean;
     persistent?: boolean;
     "no-scroll-lock"?: boolean;
@@ -447,6 +451,7 @@ interface ArkIntrinsicElements {
   "ark-empty": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     heading?: string;
+    "heading-level"?: ArkHeadingLevel;
     description?: string;
     theme?: ArkTheme;
   };

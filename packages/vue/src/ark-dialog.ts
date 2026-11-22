@@ -1,4 +1,4 @@
-import type { ArkDialogCloseReason, ArkDialogSize, ArkLang, ArkTheme } from "@tooark/core";
+import type { ArkDialogCloseReason, ArkDialogSize, ArkHeadingLevel, ArkLang, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
@@ -18,6 +18,8 @@ export const ArkDialog = defineComponent({
     width: { type: [String, Number], default: undefined },
     height: { type: [String, Number], default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
+    /** Nível do título próprio (h1 a h6). Padrão: 2. */
+    headingLevel: { type: Number as PropType<ArkHeadingLevel>, default: undefined },
     lang: { type: String as PropType<ArkLang>, default: undefined },
     localeJson: { type: String, default: undefined }
   },
@@ -53,6 +55,7 @@ export const ArkDialog = defineComponent({
           width: props.width,
           height: props.height,
           theme: props.theme,
+          "heading-level": props.headingLevel,
           lang: props.lang,
           "locale-json": props.localeJson
         },

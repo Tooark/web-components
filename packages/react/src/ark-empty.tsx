@@ -18,7 +18,7 @@ export type ArkEmptyProps = PropsWithChildren<
 
 export const ArkEmpty = forwardRef<ArkEmptyElement, ArkEmptyProps>(
   function ArkEmpty(props, forwardedRef): React.JSX.Element {
-    const { children, className, ...rest } = props;
+    const { children, className, headingLevel, ...rest } = props;
 
     useEffect(() => {
       ensureTooarkComponentsRegistered();
@@ -27,7 +27,8 @@ export const ArkEmpty = forwardRef<ArkEmptyElement, ArkEmptyProps>(
     const attrs: Record<string, unknown> = {
       ...rest,
       ref: forwardedRef,
-      class: className
+      class: className,
+      "heading-level": headingLevel
     };
 
     return createElement("ark-empty", attrs, children);

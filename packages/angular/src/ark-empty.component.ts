@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
-import type { ArkTheme } from "@tooark/core";
+import type { ArkHeadingLevel, ArkTheme } from "@tooark/core";
 import type { ArkEmpty as ArkEmptyElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -12,7 +12,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.testid]="testid"
     [attr.heading]="heading"
     [attr.description]="description"
-    [attr.theme]="theme">
+    [attr.theme]="theme"
+    [attr.heading-level]="headingLevel">
     <ng-content></ng-content>
   </ark-empty>`
 })
@@ -34,4 +35,6 @@ export class ArkEmptyComponent {
   /** Texto abaixo do título. */
   @Input() description: string | undefined;
   @Input() theme: ArkTheme = "auto";
+  /** Nível do título próprio (h1 a h6). Padrão: 3. */
+  @Input() headingLevel: ArkHeadingLevel | undefined;
 }

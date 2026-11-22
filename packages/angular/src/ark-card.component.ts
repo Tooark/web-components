@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, Input, inject } from "@angular/core";
-import type { ArkCardPadding, ArkRounded, ArkTheme } from "@tooark/core";
+import type { ArkCardPadding, ArkHeadingLevel, ArkRounded, ArkTheme } from "@tooark/core";
 import type { ArkCard as ArkCardElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -13,7 +13,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.heading]="heading"
     [attr.padding]="padding"
     [attr.rounded]="rounded"
-    [attr.theme]="theme">
+    [attr.theme]="theme"
+    [attr.heading-level]="headingLevel">
     <ng-content></ng-content>
   </ark-card>`
 })
@@ -37,4 +38,6 @@ export class ArkCardComponent {
   /** Raio dos cantos. Padrão: "lg". */
   @Input() rounded: ArkRounded | undefined;
   @Input() theme: ArkTheme = "auto";
+  /** Nível do título próprio (h1 a h6). Padrão: 2. */
+  @Input() headingLevel: ArkHeadingLevel | undefined;
 }

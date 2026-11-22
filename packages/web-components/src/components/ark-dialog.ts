@@ -10,6 +10,7 @@ import {
   trapFocus,
   unlockScroll
 } from "@tooark/core";
+import { headingTag, retagHeading } from "./heading-level";
 import { HTMLElementBase } from "./html-element-base";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -76,6 +77,7 @@ export class ArkDialog extends HTMLElementBase {
       "width",
       "height",
       "label",
+      "heading-level",
       "no-close-button",
       "persistent",
       "theme",
@@ -331,12 +333,14 @@ export class ArkDialog extends HTMLElementBase {
       "ark:sticky ark:top-0 ark:z-10 ark:-mx-6 ark:flex ark:items-start ark:gap-4 ark:bg-surface ark:px-6 ark:pt-6 ark:pb-4";
 
     if (label) {
+      const tag = headingTag(this, 2);
       if (!this.titleEl) {
-        const title = document.createElement("h2");
+        const title = document.createElement(tag) as HTMLHeadingElement;
         title.id = this.titleId;
         this.headerEl.prepend(title);
         this.titleEl = title;
       }
+      this.titleEl = retagHeading(this.titleEl, tag);
       this.titleEl.textContent = label;
       this.titleEl.className = "ark:min-w-0 ark:flex-1 ark:text-base ark:leading-6 ark:font-semibold ark:text-fg";
     } else {
