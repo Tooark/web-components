@@ -14,7 +14,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.padding]="padding"
     [attr.rounded]="rounded"
     [attr.theme]="theme"
-    [attr.heading-level]="headingLevel">
+    [attr.heading-level]="headingLevel"
+    [attr.wrap-actions]="wrapActions ? '' : null">
     <ng-content></ng-content>
   </ark-card>`
 })
@@ -40,4 +41,6 @@ export class ArkCardComponent {
   @Input() theme: ArkTheme = "auto";
   /** Nível do título próprio (h1 a h6). Padrão: 2. */
   @Input() headingLevel: ArkHeadingLevel | undefined;
+  /** Ações que não cabem quebram em mais linhas, sem esmagar o título. */
+  @Input() wrapActions = false;
 }

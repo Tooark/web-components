@@ -432,6 +432,7 @@ interface ArkIntrinsicElements {
     padding?: ArkCardPadding;
     rounded?: ArkRounded;
     theme?: ArkTheme;
+    "wrap-actions"?: boolean;
   };
   "ark-drawer": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;

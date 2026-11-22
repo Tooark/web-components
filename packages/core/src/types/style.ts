@@ -969,6 +969,8 @@ export type ArkCardStyleOptions = {
   theme?: ArkTheme;
   /** Nível do título próprio criado por `heading` (h1 a h6). Padrão: 2. */
   headingLevel?: ArkHeadingLevel;
+  /** Ações que não cabem quebram em mais linhas em vez de esmagar o título, que não fica mais estreito que a maior palavra. */
+  wrapActions?: boolean;
 };
 
 // Exports types específicos do componente empty

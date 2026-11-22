@@ -13,7 +13,9 @@ export const ArkCard = defineComponent({
     rounded: { type: String as PropType<ArkRounded>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: "auto" },
     /** Nível do título próprio (h1 a h6). Padrão: 2. */
-    headingLevel: { type: Number as PropType<ArkHeadingLevel>, default: undefined }
+    headingLevel: { type: Number as PropType<ArkHeadingLevel>, default: undefined },
+    /** Ações que não cabem quebram em mais linhas, sem esmagar o título. */
+    wrapActions: { type: Boolean, default: false }
   },
   setup(props, { attrs, slots }) {
     ensureTooarkComponentsRegistered();
@@ -27,7 +29,8 @@ export const ArkCard = defineComponent({
           padding: props.padding,
           rounded: props.rounded,
           theme: props.theme,
-          "heading-level": props.headingLevel
+          "heading-level": props.headingLevel,
+          "wrap-actions": props.wrapActions ? "" : undefined
         },
         slots.default ? slots.default() : []
       );
