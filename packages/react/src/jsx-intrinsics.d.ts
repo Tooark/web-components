@@ -644,6 +644,7 @@ interface ArkIntrinsicElements {
   "ark-chart": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     theme?: ArkTheme;
+    palette?: "default" | "tokens";
     renderer?: "canvas" | "svg";
     height?: string;
     "auto-resize"?: boolean | "false";

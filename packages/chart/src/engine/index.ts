@@ -1,7 +1,8 @@
 import { type ArkThemeSelected, resolveColorScheme } from "@tooark/tokens";
 import type { EChartsOption, EChartsType } from "echarts";
 import * as echarts from "echarts";
-import type { ArkChartOptions, ArkChartTheme } from "../types";
+import type { ArkChartOptions, ArkChartPalette, ArkChartTheme } from "../types";
+import { tokensChartTheme } from "./tokens-theme";
 
 export type ArkChartInstance = {
   /** Instância nativa do ECharts (para uso avançado: on/off, dispatchAction, etc.). */
@@ -10,10 +11,14 @@ export type ArkChartInstance = {
   setOption(option: EChartsOption, opts?: { notMerge?: boolean }): void;
   /** Troca o tema (re-inicializa o ECharts preservando a opção atual). */
   setTheme(theme: ArkChartTheme): void;
+  /** Troca a paleta (re-inicializa o ECharts preservando a opção atual). */
+  setPalette(palette: ArkChartPalette): void;
   /** Redimensiona o gráfico ao tamanho atual do container. */
   resize(): void;
   /** Tema efetivamente aplicado (após resolver "auto"). */
   resolvedTheme(): ArkThemeSelected;
+  /** Paleta efetivamente aplicada: "tokens" só com o CSS dos tokens na página. */
+  resolvedPalette(): ArkChartPalette;
   /** Libera a instância do ECharts. */
   destroy(): void;
 };
@@ -35,9 +40,19 @@ export function createChart(container: HTMLElement, options: ArkChartOptions): A
   const renderer = options.renderer ?? "canvas";
   let currentOption = options.option;
   let resolved = resolveChartTheme(options.theme, container);
+  let palette: ArkChartPalette = options.palette === "tokens" ? "tokens" : "default";
+  let applied: ArkChartPalette = "default";
+
+  // Com "tokens" o tema sai das cores da página no lado resolvido (a cada init, então a troca de tema relê); sem os
+  // tokens, ou com "default", o tema dark embutido ou nenhum.
+  const themeFor = (): string | object | undefined => {
+    const tokens = palette === "tokens" ? tokensChartTheme(container, resolved) : null;
+    applied = tokens ? "tokens" : "default";
+    return tokens ?? (resolved === "dark" ? "dark" : undefined);
+  };
 
   const init = (): EChartsType => {
-    const instance = echarts.init(container, resolved === "dark" ? "dark" : undefined, { renderer });
+    const instance = echarts.init(container, themeFor(), { renderer });
     instance.setOption(currentOption);
     return instance;
   };
@@ -68,10 +83,18 @@ export function createChart(container: HTMLElement, options: ArkChartOptions): A
       chart.dispose();
       chart = init();
     },
+    setPalette: (next) => {
+      const value: ArkChartPalette = next === "tokens" ? "tokens" : "default";
+      if (value === palette && !chart.isDisposed()) return;
+      palette = value;
+      chart.dispose();
+      chart = init();
+    },
     resize: () => {
       if (!chart.isDisposed()) chart.resize();
     },
     resolvedTheme: () => resolved,
+    resolvedPalette: () => applied,
     destroy: () => {
       resizeObserver?.disconnect();
       if (!chart.isDisposed()) chart.dispose();

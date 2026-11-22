@@ -11,6 +11,7 @@ export { createChart, resolveChartTheme } from "./engine";
 export { registerTooarkChart } from "./register";
 export type {
   ArkChartOptions,
+  ArkChartPalette,
   ArkChartRenderer,
   ArkChartTheme,
   ArkChartType,

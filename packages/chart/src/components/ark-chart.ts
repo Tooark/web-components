@@ -1,7 +1,7 @@
 import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
 import type { EChartsOption } from "echarts";
 import { type ArkChartInstance, createChart } from "../engine";
-import type { ArkChartRenderer, ArkChartTheme } from "../types";
+import type { ArkChartPalette, ArkChartRenderer, ArkChartTheme } from "../types";
 import { HTMLElementBase } from "./html-element-base";
 import { upgradeProperties } from "./upgrade-properties";
 
@@ -15,7 +15,8 @@ import { upgradeProperties } from "./upgrade-properties";
  *   el.option = { xAxis: { type: "category", data: [...] }, series: [...] };
  *   document.body.appendChild(el);
  *
- * Atributos: `theme` ("auto" | "light" | "dark"), `renderer` ("canvas" | "svg"),
+ * Atributos: `theme` ("auto" | "light" | "dark"), `palette` ("default" | "tokens":
+ * séries, texto, eixos e tooltip nos tokens `--ark-color-*`, fundo transparente), `renderer` ("canvas" | "svg"),
  * `height` (ex.: "320px" | "20rem"), `auto-resize` ("false" desliga) e
  * `testid`. Em `auto` o tema segue o color-scheme da página e acompanha a
  * troca em tempo de execução (`observeColorScheme` de @tooark/tokens). O
@@ -41,7 +42,7 @@ export class ArkChart extends HTMLElementBase {
   private ownsRole = false;
 
   static get observedAttributes(): string[] {
-    return ["theme", "renderer", "height", "auto-resize", "testid", "aria-label", "aria-labelledby"];
+    return ["theme", "palette", "renderer", "height", "auto-resize", "testid", "aria-label", "aria-labelledby"];
   }
 
   /** Opções nativas do ECharts. Atribuir re-renderiza o gráfico. */
@@ -62,6 +63,11 @@ export class ArkChart extends HTMLElementBase {
   /** Tema efetivamente aplicado ao gráfico (depois de resolver `auto`); `null` antes de renderizar. */
   get resolvedTheme(): ArkThemeSelected | null {
     return this.instance?.resolvedTheme() ?? null;
+  }
+
+  /** Paleta efetivamente aplicada: "tokens" só com o CSS dos tokens na página; `null` antes de renderizar. */
+  get resolvedPalette(): ArkChartPalette | null {
+    return this.instance?.resolvedPalette() ?? null;
   }
 
   connectedCallback(): void {
@@ -99,7 +105,7 @@ export class ArkChart extends HTMLElementBase {
       return;
     }
 
-    // theme / renderer exigem reconstrução da instância.
+    // theme / palette / renderer exigem reconstrução da instância.
     this.render();
   }
 
@@ -107,6 +113,10 @@ export class ArkChart extends HTMLElementBase {
     const value = (this.getAttribute("theme") || "auto").toLowerCase();
     if (value === "light" || value === "dark") return value;
     return "auto";
+  }
+
+  private getPalette(): ArkChartPalette {
+    return (this.getAttribute("palette") || "").toLowerCase() === "tokens" ? "tokens" : "default";
   }
 
   private getRenderer(): ArkChartRenderer {
@@ -140,6 +150,7 @@ export class ArkChart extends HTMLElementBase {
     this.instance = createChart(container, {
       option: this.pendingOption,
       theme: this.getTheme(),
+      palette: this.getPalette(),
       renderer: this.getRenderer(),
       // O elemento tem o próprio observer, que o atributo auto-resize liga e desliga em tempo de execução.
       autoResize: false
