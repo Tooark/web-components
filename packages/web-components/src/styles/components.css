@@ -991,6 +991,114 @@
     bottom: calc(-0.375rem - 2.5px);
   }
 
+  /* ---------- ark-tree-item: a linha em grid e os subitens onde estão ---------- */
+
+  /*
+   * O host é o treeitem e também contém os subitens, então nada de utilities
+   * ark:* nele: a grid fica aqui, e o display: none de um ramo recolhido vence
+   * sem !important. Colunas: recuo pela profundidade, chevron, caixa, ícone do
+   * usuário, rótulo e trailing do usuário; os subitens (ou os wrappers de
+   * framework em volta deles) ocupam as linhas seguintes de ponta a ponta. A
+   * faixa da linha (row) fica atrás, de ponta a ponta: é o treeitem (foco,
+   * aria-*) e leva hover, seleção e o anel de foco.
+   */
+  ark-tree-item {
+    display: grid;
+    grid-template-columns:
+      calc(var(--ark-tree-depth, 0) * var(--ark-tree-indent, 1.25rem)) auto auto auto minmax(0, 1fr)
+      auto;
+    align-items: center;
+    position: relative;
+    cursor: default;
+  }
+
+  ark-tree-item > [data-ark-chrome="row"] {
+    grid-row: 1;
+    grid-column: 1 / -1;
+    align-self: stretch;
+    position: relative;
+    z-index: 0;
+    outline: none;
+  }
+
+  ark-tree-item > [data-ark-chrome="toggle"],
+  ark-tree-item > [data-ark-chrome="check"],
+  ark-tree-item > [slot="icon"],
+  ark-tree-item > [data-ark-chrome="label"],
+  ark-tree-item > [slot="trailing"] {
+    grid-row: 1;
+    position: relative;
+    z-index: 1;
+  }
+
+  ark-tree-item > [data-ark-chrome="toggle"] {
+    grid-column: 2;
+    margin-inline: 0.25rem;
+  }
+
+  /* Chevron aberto gira para baixo, na duração dos tokens (zerada com movimento reduzido). */
+  ark-tree-item > [data-ark-chrome="toggle"] > svg {
+    transition: transform var(--ark-duration-quick, 150ms) var(--ark-ease-standard, ease);
+  }
+
+  ark-tree-item[expanded] > [data-ark-chrome="toggle"] > svg:not(.ark-animate-spin) {
+    transform: rotate(90deg);
+  }
+
+  ark-tree-item > [data-ark-chrome="check"] {
+    grid-column: 3;
+    margin-inline-end: 0.375rem;
+  }
+
+  ark-tree-item > [slot="icon"] {
+    grid-column: 4;
+    display: inline-flex;
+    align-items: center;
+    margin-inline-end: 0.375rem;
+  }
+
+  ark-tree-item > [data-ark-chrome="label"] {
+    grid-column: 5;
+  }
+
+  ark-tree-item > [slot="trailing"] {
+    grid-column: 6;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-inline: 0.5rem 0.25rem;
+  }
+
+  /* Os subitens (ou os wrappers de framework em volta deles) nas linhas de baixo. */
+  ark-tree-item > :not([slot]):not([data-ark-chrome]) {
+    grid-column: 1 / -1;
+  }
+
+  ark-tree-item:not([expanded]) ark-tree-item {
+    display: none;
+  }
+
+  ark-tree-item[selected] > [data-ark-chrome="row"] {
+    background: var(--ark-color-primary-soft);
+  }
+
+  ark-tree-item[selected] > [data-ark-chrome="label"] {
+    color: var(--ark-color-primary-soft-fg);
+  }
+
+  ark-tree-item > [data-ark-chrome="row"]:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--ark-color-primary-ring);
+  }
+
+  ark-tree-item[disabled] > [data-ark-chrome="label"] {
+    opacity: 0.5;
+  }
+
+  /* Hover só na linha do item sob o ponteiro (não nos ancestrais que o contêm), e a seleção continua valendo. */
+  ark-tree-item:not([selected]):hover:not(:has(ark-tree-item:hover)) > [data-ark-chrome="row"] {
+    background: var(--ark-color-surface-muted);
+  }
+
   /* ---------- ark-nav: coluna (sidebar), barra (navbar) ou abas (tabbar); cabeçalho e rodapé do usuário ordenados ---------- */
 
   /*

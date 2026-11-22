@@ -46,7 +46,9 @@ import {
   ArkToaster,
   ArkToggle,
   ArkToggleGroup,
-  ArkTooltip
+  ArkTooltip,
+  ArkTree,
+  ArkTreeItem
 } from "./components";
 
 /**
@@ -247,6 +249,15 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkTooltip.tagName)) {
     customElements.define(ArkTooltip.tagName, ArkTooltip);
+  }
+
+  // O item antes da árvore: o ark-tree coordena itens já upgraded.
+  if (!customElements.get(ArkTreeItem.tagName)) {
+    customElements.define(ArkTreeItem.tagName, ArkTreeItem);
+  }
+
+  if (!customElements.get(ArkTree.tagName)) {
+    customElements.define(ArkTree.tagName, ArkTree);
   }
 
   // Por último: compõe checkbox, input, textarea e button, que precisam estar definidos.

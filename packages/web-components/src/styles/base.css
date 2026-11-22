@@ -61,7 +61,9 @@
     ark-toaster,
     ark-toggle,
     ark-toggle-group,
-    ark-tooltip
+    ark-tooltip,
+    ark-tree,
+    ark-tree-item
   ) {
     /*
      * Tema. As cores dos tokens usam light-dark(), então o tema é só a

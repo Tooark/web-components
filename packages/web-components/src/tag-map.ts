@@ -47,7 +47,9 @@ import type {
   ArkToaster,
   ArkToggle,
   ArkToggleGroup,
-  ArkTooltip
+  ArkTooltip,
+  ArkTree,
+  ArkTreeItem
 } from "./components";
 
 declare global {
@@ -100,5 +102,7 @@ declare global {
     "ark-toggle": ArkToggle;
     "ark-toggle-group": ArkToggleGroup;
     "ark-tooltip": ArkTooltip;
+    "ark-tree": ArkTree;
+    "ark-tree-item": ArkTreeItem;
   }
 }
