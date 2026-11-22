@@ -28,7 +28,7 @@ Os Custom Elements nativos (`ark-*`) do design system Tooark, estilizados com Ta
 
 O pacote `@tooark/web-components` fornece:
 
-- 48 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) a família calendário/relógio/agenda e o tempo relativo (`ark-time`);
+- 50 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação, árvore), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) a família calendário/relógio/agenda e o tempo relativo (`ark-time`);
 - light DOM: os componentes nunca movem nem envolvem os seus filhos; o host é o controle ou o container;
 - `styles.css` é a única folha de estilo necessária: tokens, presets de motion e estilos dos componentes, tudo com prefixo (`ark:*`, `--ark-*`), sem reset global;
 - temas por `color-scheme` (`theme="light|dark"` por elemento), tamanhos `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -119,6 +119,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-toggle` — Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.
 - `ark-toggle-group` — Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.
 - `ark-tooltip` — Tooltip sobre a Popover API: envolve o gatilho sem movê-lo, texto por `content` ou `slot="content"` rico, `side` com flip, `delay`, hover/foco/Esc, `aria-describedby` no gatilho.
+- `ark-tree` / `ark-tree-item` — Árvore declarativa: os itens aninhados ficam onde estão; seleção none / single / multiple, caixas com propagate, carga lazy, teclado WAI-ARIA e busca por digitação.
 
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 
