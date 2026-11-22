@@ -65,6 +65,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `nav-footer`, `nav-item`, `nav-item-link`, `nav-item-label`, `nav-item-icon`, `nav-item-trailing`, `nav-divider`,
   `nav-group`, `nav-group-heading`.
 
+- `heading-level` (1–6) on `ark-card`, `ark-dialog`, `ark-drawer` and `ark-empty`: the component's own title
+  (`heading`, or the `label` of dialog and drawer) takes that level so it fits the page outline; without it, or outside
+  1–6, the defaults stay (`h2`, and `h3` in `ark-empty`). Changing it swaps the node in place, keeping its id (so
+  `aria-labelledby` still points at it), classes and test hooks. `headingLevel` on the React, Vue and Angular wrappers,
+  `ArkHeadingLevel` in core. `Core/Headings` story.
+- `ark-card`: `wrap-actions` (opt-in, CSS only). Actions that do not fit beside the title wrap into more lines, flush
+  right, and the card's own `h2` never gets narrower than its longest word, instead of the title being squeezed to
+  nothing or to one letter per line. A `slot="header"` still shrinks as before (a title truncated with an ellipsis
+  keeps truncating) and takes the same floor with `min-width: auto` on the element; a single word wider than the card
+  widens the title column, so break it in the content. Without the attribute the card renders as before.
+  `wrapActions` on the wrappers. `WrapActions` story.
+- `ark-button` with `href`: `download` reaches the stretched `<a>` (empty keeps the URL's file name, a value names
+  the file, a `blob:` URL saves generated content), and a plain click emits a cancelable `ark-navigate`
+  (`detail: { href }`, `ArkButtonNavigateDetail`) before the browser follows the link, as `ark-nav-item` does, so an
+  SPA calls `preventDefault()` and routes. Modifier keys, the middle button, a `target` other than `_self`,
+  `download` and a click the app already cancelled stay with the browser, so code that intercepts the click itself
+  keeps working. `download` and `onNavigate` (React), `download` and `@ark-navigate` (Vue), `download` and
+  `(arkNavigate)` (Angular). `LinkNavigateAndDownload` story.
+- `ark-switch`: children become a visible label, the pattern `ark-checkbox` already has.
+  `<ark-switch>Email alerts</ark-switch>` lays the host out as a row with the track first (flex order, no node moves),
+  names the switch from the text through `aria-labelledby` (the host gets an id when it has none) and toggles on a
+  click on the text, while a link or control inside the label keeps its own behavior and a disabled switch ignores
+  it. `aria-label` and `label` still take precedence for the name. A switch without children gets no class and no
+  layout, as before. The React, Vue and Angular wrappers now pass children. `ChildrenAsLabel` story; the new wrapper
+  props are covered by `ReactNewAttributes`, `VueNewAttributes` and the Angular `NewAttributes` integration stories.
 ### Changed
 
 - The Storybook suite now runs the Angular wrappers too (`Integration/Angular Wrappers`): they are JIT-compiled from
