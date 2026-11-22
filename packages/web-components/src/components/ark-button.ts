@@ -71,7 +71,9 @@ const IMPLICIT_SUBMIT_TYPES = new Set([
  * nos campos do formulário). Nenhum filho do usuário é movido ou envolvido,
  * então frameworks que gerenciam os filhos (React, Vue, Angular) continuam
  * donos deles. Com `href`, um `<a>` "esticado" cobre o host, recebe o foco e
- * é nomeado pelo conteúdo do host (`aria-labelledby`).
+ * é nomeado pelo conteúdo do host (`aria-labelledby`); `download` passa ao
+ * `<a>`, e um clique simples no link emite `ark-navigate` cancelável antes de
+ * o navegador seguir o `href`, para um app SPA rotear, como no ark-nav-item.
  */
 export class ArkButton extends HTMLElementBase {
   // `string`, e não o literal, para subclasses (ark-copy-button) redeclararem o próprio tag.
@@ -113,6 +115,7 @@ export class ArkButton extends HTMLElementBase {
       "full-width",
       "href",
       "target",
+      "download",
       "testid"
     ];
   }
@@ -283,8 +286,13 @@ export class ArkButton extends HTMLElementBase {
    * @param event Evento de clique.
    */
   private readonly handleClick = (event: MouseEvent): void => {
-    // Se o botão é um link ou do tipo "button", não faz nada.
-    if (this.anchorEl || this.type === "button") {
+    if (this.anchorEl) {
+      this.handleLinkClick(event);
+      return;
+    }
+
+    // Se o botão é do tipo "button", não faz nada.
+    if (this.type === "button") {
       return;
     }
 
@@ -358,6 +366,29 @@ export class ArkButton extends HTMLElementBase {
       if (el instanceof ArkButton && el.type === "submit" && !el.hasAttribute("href")) return el;
     }
     return null;
+  }
+
+  /**
+   * Link: um clique simples emite `ark-navigate` (cancelável, `detail: { href }`) antes de o navegador seguir o
+   * `href`; um app SPA cancela e roteia. Modificadores, outro botão do mouse, `target` de outra janela e `download`
+   * são do navegador (nova aba, janela, arquivo): sem evento, como fazem os routers e o ark-nav-item. Um clique já
+   * cancelado também passa direto, então quem ainda intercepta o clique por conta própria não navega duas vezes.
+   */
+  private handleLinkClick(event: MouseEvent): void {
+    const anchor = this.anchorEl;
+    if (!anchor || event.defaultPrevented) return;
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
+    const target = anchor.getAttribute("target");
+    if ((target && target !== "_self") || anchor.hasAttribute("download")) return;
+    const proceed = this.dispatchEvent(
+      new CustomEvent("ark-navigate", {
+        detail: { href: this.getAttribute("href") ?? "" },
+        bubbles: true,
+        composed: true,
+        cancelable: true
+      })
+    );
+    if (!proceed) event.preventDefault();
   }
 
   /**
@@ -698,6 +729,14 @@ export class ArkButton extends HTMLElementBase {
     } else {
       anchor.removeAttribute("target");
       anchor.removeAttribute("rel");
+    }
+
+    // download="" usa o nome da URL; com valor, o nome do arquivo. Para conteúdo gerado: href de um blob: URL.
+    const download = this.getAttribute("download");
+    if (download !== null) {
+      anchor.setAttribute("download", download);
+    } else {
+      anchor.removeAttribute("download");
     }
 
     // Âncora não tem "disabled": remove o href e sinaliza via aria.

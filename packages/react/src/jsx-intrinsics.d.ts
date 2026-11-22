@@ -84,6 +84,7 @@ interface ArkIntrinsicElements {
     "full-width"?: boolean;
     href?: string;
     target?: string;
+    download?: string;
     color?: string;
     "text-color"?: string;
   };

@@ -740,3 +740,99 @@ export const StatusAnnounces = {
     expect(icon()).toBeNull();
   }
 };
+
+export const LinkNavigateAndDownload = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Com `href`, um clique simples emite `ark-navigate` (cancelável, `detail: { href }`) antes de o navegador seguir o link: um app SPA chama `preventDefault()` e roteia. Clique com Ctrl/Cmd/Shift/Alt, outro botão do mouse, `target="_blank"` e `download` ficam com o navegador, sem evento; um clique já cancelado também. `download` passa ao `<a>`: vazio usa o nome da URL, com valor define o nome do arquivo (para conteúdo gerado, `href` de um `blob:` URL).'
+      }
+    }
+  },
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "flex";
+    wrap.style.gap = "12px";
+    const make = (id: string, attrs: Record<string, string>, text: string) => {
+      const el = document.createElement("ark-button");
+      for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, value);
+      el.dataset.case = id;
+      el.textContent = text;
+      wrap.appendChild(el);
+    };
+    make("route", { href: "/projetos/42" }, "Abrir projeto");
+    make("blank", { href: "/ajuda", target: "_blank" }, "Ajuda");
+    make("download", { href: "/relatorio.csv", download: "relatorio-2026.csv", variant: "outline" }, "Baixar");
+    make("disabled", { href: "/bloqueado", disabled: "" }, "Bloqueado");
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const link = (id: string) => canvasElement.querySelector(`[data-case="${id}"] a`) as HTMLAnchorElement;
+    const host = (id: string) => canvasElement.querySelector(`[data-case="${id}"]`) as HTMLElement;
+    const seen: string[] = [];
+    const onNavigate = (event: Event) => {
+      seen.push((event as CustomEvent<{ href: string }>).detail.href);
+      event.preventDefault();
+    };
+    // Nenhum clique da story pode tirar o iframe da página: cancela tudo no fim da propagação.
+    const stay = (event: Event) => event.preventDefault();
+    canvasElement.addEventListener("ark-navigate", onNavigate);
+    window.addEventListener("click", stay);
+    try {
+      // Clique simples: o evento sai com o href e, cancelado, o clique do link também fica cancelado.
+      const plain = new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 });
+      link("route").dispatchEvent(plain);
+      await expect(seen).toEqual(["/projetos/42"]);
+      await expect(plain.defaultPrevented).toBe(true);
+
+      // Sem cancelar o ark-navigate, o navegador seguiria o link: o clique não é cancelado pelo componente.
+      canvasElement.removeEventListener("ark-navigate", onNavigate);
+      const listen = (event: Event) => seen.push((event as CustomEvent<{ href: string }>).detail.href);
+      canvasElement.addEventListener("ark-navigate", listen);
+      let prevented: boolean | null = null;
+      const probe = (event: Event) => {
+        prevented = event.defaultPrevented;
+      };
+      host("route").addEventListener("click", probe);
+      link("route").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      await expect(prevented).toBe(false);
+      host("route").removeEventListener("click", probe);
+      canvasElement.removeEventListener("ark-navigate", listen);
+      canvasElement.addEventListener("ark-navigate", onNavigate);
+      seen.length = 0;
+
+      // Modificadores e botão do meio: com o navegador.
+      for (const init of [{ ctrlKey: true }, { metaKey: true }, { shiftKey: true }, { altKey: true }, { button: 1 }]) {
+        link("route").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0, ...init }));
+      }
+      await expect(seen).toEqual([]);
+
+      // Clique que o app já cancelou antes (o contorno antigo de onClick + navigate) não emite de novo.
+      const early = (event: Event) => event.preventDefault();
+      link("route").addEventListener("click", early);
+      link("route").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      link("route").removeEventListener("click", early);
+      await expect(seen).toEqual([]);
+
+      // target="_blank", download e disabled: sem evento.
+      link("blank").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      link("download").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      host("disabled").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      await expect(seen).toEqual([]);
+
+      // download chega ao <a> com e sem nome, e sai junto com o atributo.
+      await expect(link("download")).toHaveAttribute("download", "relatorio-2026.csv");
+      host("download").setAttribute("download", "");
+      await expect(link("download")).toHaveAttribute("download", "");
+      host("download").removeAttribute("download");
+      await expect(link("download")).not.toHaveAttribute("download");
+      // Sem download, o mesmo link volta a emitir ark-navigate.
+      link("download").dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, button: 0 }));
+      await expect(seen).toEqual(["/relatorio.csv"]);
+    } finally {
+      canvasElement.removeEventListener("ark-navigate", onNavigate);
+      window.removeEventListener("click", stay);
+    }
+  }
+};
