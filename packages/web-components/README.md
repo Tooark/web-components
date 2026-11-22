@@ -28,7 +28,7 @@ The native Custom Elements (`ark-*`) of the Tooark design system, styled with Ta
 
 The `@tooark/web-components` package provides:
 
-- 46 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) and the calendar/clock/scheduler family;
+- 47 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) and the calendar/clock/scheduler family;
 - light DOM: components never move or wrap your children; the host is the control or container;
 - `styles.css` is the only stylesheet you need: tokens, motion presets and component styles, all prefixed (`ark:*`, `--ark-*`), with no global reset;
 - themes by `color-scheme` (`theme="light|dark"` per element), sizes `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -65,7 +65,7 @@ registerTooarkComponents(); // idempotent
 
 A JS property your framework assigns to a raw tag before this call is picked up when the element upgrades, so the order does not matter.
 
-Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text; a tag with a region (`pt-BR`, `es-419`) uses its base language.
+Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light dark` to follow the system); set `theme="light|dark"` on an element to force one side, and `lang="en|pt|es"` (or `lang="custom"` with `locale-json`) on the elements that show text; a tag with a region (`pt-BR`, `es-419`) uses its base language. To set it once for the app, call `setArkLocale("pt-BR")` from `@tooark/core`: every element without its own `lang` follows it, mounted ones included.
 
 ---
 
@@ -96,6 +96,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-mark` — Scope mark: one of ten shapes (`circle`, `square`, `triangle`, `diamond`, `star`, `hexagon`, `cross`, `pentagon`, `moon`, `asterisk`) in a `color`, color and shape together so identity never relies on color alone; `size`, `label`.
 - `ark-menu` — Dropdown/context menu on the Popover API (`role="menu"`, `popover="auto"`): anchored to a trigger by `for`, `align`/`direction` with flip, keyboard, `openAt(x, y)`; items stay as children. Emits `ark-select`.
 - `ark-menu-item` — Menu item (the host is the item): free children, `slot="trailing"`, `disabled`, `intent`, `checked` (checkbox item), `divider`, `static` (non-interactive content).
+- `ark-menu-group` — Labelled group of menu items (`role="group"`, named by its own label); the menu's arrows cross groups.
 - `ark-nav` — App navigation (`role="navigation"`): `sidebar` (collapses to an icon rail or, with `collapsible="hidden"`, to the logo alone), `navbar` or `tabbar` (mobile bottom tabs); `slot="header"`/`slot="footer"` ordered by CSS, `value` marks the current item, `size`/`intent` propagated. Emits `ark-collapse`.
 - `ark-nav-group` — Navigation section (`role="group"` named by `label`): plain heading, or an `expandable` button (`open`, `aria-expanded`) that shows and hides the items; a separated band in the rail, inline items in the bars. Emits `ark-toggle`.
 - `ark-nav-item` — Navigation item (the host is the row): `href` → a real stretched `<a>` (Ctrl+click, new tab), `label`, `slot="icon"`, `slot="trailing"`, `current` (`aria-current`), `disabled`, `divider`; without `href` a `role="button"`. Emits cancelable `ark-navigate`.

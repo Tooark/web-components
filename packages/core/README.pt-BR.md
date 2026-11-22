@@ -29,7 +29,7 @@ Fundação compartilhada dos componentes Tooark: tipos, i18n, os serviços de to
 O pacote `@tooark/core` fornece:
 
 - os tipos `Ark*StyleOptions` de todo componente (o que os wrappers de framework estendem) e as primitivas compartilhadas reexportadas do `@tooark/tokens`;
-- i18n: locales `en`, `pt`, `es` e `resolveLocale(lang, localeJson?)`, que mescla o JSON próprio sobre o inglês com `lang="custom"`;
+- i18n: locales `en`, `pt`, `es` e `resolveLocale(lang, localeJson?)`, que mescla o JSON próprio sobre o inglês com `lang="custom"`, mais `setArkLocale(lang, localeJson?)`, o idioma padrão (opt-in) de todo componente sem `lang` próprio;
 - serviços: `toast()` (alimenta o `ark-toaster` por eventos em window) e `announce()` (uma única live region de leitor de tela para a página);
 - motion: `arkEnter`/`arkExit` (WAAPI sobre os tokens, respeitando reduced-motion) e os presets CSS `.ark-animate-*`;
 - helpers de overlay sobre a Popover API: `trapFocus`, `openPopover`/`closePopover` (com `lockScroll`), `positionAnchored`, `focusableElements`, `isPopoverOpen`;
@@ -78,7 +78,8 @@ import "@tooark/core/styles.css"; // tokens + presets de motion
 
 ### i18n e tipos
 
-- `resolveLocale(lang, localeJson?)`, `en`, `pt`, `es`, `ArkLocale`.
+- `resolveLocale(lang, localeJson?)`, `en`, `pt`, `es`, `ArkLocale`; sem `lang`, usa o padrão abaixo.
+- `setArkLocale(lang, localeJson?)`: o idioma de todo componente sem `lang` próprio (o `lang` do elemento continua valendo), aplicado na hora aos já montados; a tag como foi dada (`pt-BR`), `custom` com objeto ou JSON (JSON inválido lança aqui), `null` volta ao inglês. `getArkLocale()` → `{ lang, localeJson? }` (`{ lang: "en" }` sem a chamada), `observeArkLocale(onChange)` → função de dispose, `ArkLocaleSetting`. O valor fica no `@tooark/tokens`, num símbolo de `globalThis`, então toda cópia dos pacotes na página, e o `@tooark/wysiwyg`, o compartilham. Opt-in: sem a chamada nada muda, e o `<html lang>` nunca é lido.
 - `coerceBooleanAttr(value)`; todos os `Ark*StyleOptions` e tipos de comportamento (`ArkKvRow`, `ArkSelectOption`, `ArkCalendarEvent`, `ArkToastOptions`, …).
 
 ---

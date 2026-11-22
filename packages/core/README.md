@@ -29,7 +29,7 @@ Shared foundation of the Tooark components: types, i18n, the toast and announce 
 The `@tooark/core` package provides:
 
 - the `Ark*StyleOptions` types of every component (what the framework wrappers extend) and the shared primitives re-exported from `@tooark/tokens`;
-- i18n: `en`, `pt`, `es` locales and `resolveLocale(lang, localeJson?)`, which merges custom JSON over English for `lang="custom"`;
+- i18n: `en`, `pt`, `es` locales and `resolveLocale(lang, localeJson?)`, which merges custom JSON over English for `lang="custom"`, plus `setArkLocale(lang, localeJson?)`, the opt-in default language of every component without its own `lang`;
 - services: `toast()` (fed to `ark-toaster` through window events) and `announce()` (one screen-reader live region for the whole page);
 - motion: `arkEnter`/`arkExit` (WAAPI on the design tokens, reduced-motion aware) and the `.ark-animate-*` CSS presets;
 - overlay helpers on the Popover API: `trapFocus`, `openPopover`/`closePopover` (with `lockScroll`), `positionAnchored`, `focusableElements`, `isPopoverOpen`;
@@ -78,7 +78,8 @@ import "@tooark/core/styles.css"; // tokens + motion presets
 
 ### i18n and types
 
-- `resolveLocale(lang, localeJson?)`, `en`, `pt`, `es`, `ArkLocale`.
+- `resolveLocale(lang, localeJson?)`, `en`, `pt`, `es`, `ArkLocale`; without `lang` it uses the default below.
+- `setArkLocale(lang, localeJson?)`: the language of every component without its own `lang` (the element's `lang` still wins), applied to mounted ones at once; the tag as given (`pt-BR`), `custom` with an object or JSON (invalid JSON throws here), `null` back to English. `getArkLocale()` → `{ lang, localeJson? }` (`{ lang: "en" }` without the call), `observeArkLocale(onChange)` → dispose function, `ArkLocaleSetting`. The setting lives in `@tooark/tokens` on a `globalThis` symbol, so every copy of the packages on the page, and `@tooark/wysiwyg`, share it. Opt-in: without the call nothing changes, and `<html lang>` is never read.
 - `coerceBooleanAttr(value)`; every `Ark*StyleOptions` and behavior type (`ArkKvRow`, `ArkSelectOption`, `ArkCalendarEvent`, `ArkToastOptions`, …).
 
 ---

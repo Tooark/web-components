@@ -32,7 +32,7 @@ O pacote `@tooark/vue` fornece:
 - eventos customizados reemitidos com o nome nativo (`@ark-close`, `@ark-select`, `@change` no `ArkSelect`, …) entregando o `CustomEvent` ou, no calendário, datepicker, relógio, carrossel e agenda, o `detail` dele;
 - props de objeto (`events`, `rows`, `options` e o `localeJson` de `ArkCalendar`/`ArkDatepicker`) serializadas ou atribuídas como propriedade para você (nos demais wrappers o `localeJson` é uma string JSON);
 - os elementos se registram no primeiro render, só no navegador (seguro para Nuxt);
-- `toast` reexportado do `@tooark/core`.
+- `toast` e `setArkLocale`, `getArkLocale`, `observeArkLocale` (o idioma padrão do app) reexportados do `@tooark/core`.
 
 ---
 

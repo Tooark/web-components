@@ -28,7 +28,7 @@
 
 O pacote `@tooark/code` fornece:
 
-- `language` json / javascript / yaml / text, numeração, dobra, busca (Ctrl+F), pares de colchetes, linha ativa, placeholder, `readonly`, `wrap`, `min-height`;
+- `language` json / javascript / yaml / text, numeração, dobra, busca (Ctrl+F), pares de colchetes, linha ativa, placeholder, `readonly`, `wrap`, `min-height` e `max-height` (rolagem interna acima dele);
 - Tab recua (Shift+Tab desfaz; Esc e depois Tab sai do editor), `indent-style` espaços ou tabulação, `indent-size`, `line-ending` `auto`/`lf`/`crlf` convertido na fronteira do valor;
 - completions: as da linguagem, `variableKeys` depois de `{{`, `completions` (palavras em qualquer linguagem) e `completionSource`; `autocomplete="false"` desliga;
 - opcionais, desligados até você passá-los: `variables` pinta cada `{{chave}}` pelo intent da variável (escopo livre, tooltip com escopo e valor), `mark-unknown-variables` marca as chaves não definidas, `single-line` faz do editor um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`, e `extensions` soma extensões do CodeMirror suas depois das da biblioteca (uma gramática que ela não traz, uma calha de blame, decorações);
@@ -66,7 +66,7 @@ Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram 
 
 ### `ark-code-editor`
 
-- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, padrão `md`: fonte e recuo lateral, e a altura em `single-line`), `theme`, `aria-label` (nomeia o conteúdo editável, o `role="textbox"` do CodeMirror), `testid`.
+- Atributos: `language` (`json` | `javascript` | `yaml` | `text`), `readonly`, `placeholder`, `min-height` (padrão `8rem`), `max-height` (desligado por padrão; acima dele o conteúdo rola dentro do editor com as calhas; o `min-height` vence quando maior, `single-line` o ignora), `line-numbers` e `fold` (ligados; `"false"` desliga), `wrap`, `indent-style` (`space` | `tab`), `indent-size` (padrão 2), `line-ending` (`auto` | `lf` | `crlf`), `tab-indent` e `autocomplete` (ligados; `"false"` desliga), `mark-unknown-variables`, `single-line`, `size` (`xs` … `xl`, padrão `md`: fonte e recuo lateral, e a altura em `single-line`), `theme`, `aria-label` (nomeia o conteúdo editável, o `role="textbox"` do CodeMirror), `testid`.
 - Propriedades: `value`, `variableKeys`, `variables`, `completions`, `completionSource`, `formatter`, `extensions`, `canFormat`, `resolvedLineEnding`, `resolvedTheme`, `view` (o `EditorView`), e uma por atributo exceto `aria-label` e `testid`; métodos `format()`, `focus()`.
 - Eventos: `change` (`detail: { value }`, só edições do usuário), `ark-format-error` (`detail: { error }`), `ark-submit` (`detail: { value }`, Enter em `single-line`).
 - Teclas: Ctrl/Cmd+F busca, Ctrl/Cmd+Z desfazer, Ctrl+Y refazer (Cmd+Shift+Z no macOS), Ctrl+Espaço completions, Shift+Alt+F formatar, Tab/Shift+Tab recuo, Esc+Tab sair, Ctrl+M (Shift+Alt+M no macOS) alterna o modo tab-focus do CodeMirror.
