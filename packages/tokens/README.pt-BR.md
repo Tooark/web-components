@@ -76,6 +76,7 @@ Nomes como as folhas de estilo do Tooark os expõem; na sua própria entrada do 
 - Cores: `--ark-color-<intent>`, `-fg`, `-hover`, `-soft`, `-soft-fg`, `-border`, `-ring`; neutros `--ark-color-surface`, `-surface-muted`, `-surface-strong`, `-surface-raised`, `-fg`, `-fg-soft`, `-fg-muted`, `-fg-faint`, `-fg-placeholder`, `-border`, `-border-strong`, `-muted`, `-ring`.
 - Tamanhos: `--ark-size-xs…xl` (1,5 / 1,75 / 2,25 / 2,75 / 3,25 rem, a altura mínima dos controles); `--ark-text-2xs` (0,6875 rem) para micro-rótulos.
 - Motion (custom properties puras, fora do `@theme`: o mesmo nome em qualquer lugar, inclusive com o `tokens.css` como CSS puro): `--ark-duration-none|instant|quick|default|moderate|gentle|slow|long`, `--ark-ease-*`, `--ark-motion-distance`.
+- Sintaxe (custom properties puras, fora do `@theme`, pares `light-dark()`): `--ark-syntax-keyword|string|number|property|comment|atom|punctuation|invalid`, as cores de sintaxe do editor de código (`@tooark/code`), também para colorir um `<pre>` seu.
 
 ### JavaScript
 

@@ -110,6 +110,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `observeArkLocale(onChange)` read and watch it; core re-exports the three, and so do the React, Vue and Angular
   packages, next to `toast`. Without the call nothing changes. `DefaultLocale` (every tag that observes `lang`) and
   `DefaultLocaleRules` stories, plus the `MenuGroupAndLocale` integration stories in the three frameworks.
+- `--ark-syntax-*` tokens (`keyword`, `string`, `number`, `property`, `comment`, `atom`, `punctuation`, `invalid`):
+  the code editor's syntax colors as `light-dark()` pairs in `tokens.css`, outside `@theme`, with the values the
+  editor already used. `ark-code-editor` reads them with those values built in as fallbacks, so nothing changes until
+  an app overrides one, and an app can color a `<pre>` of its own with them. `SyntaxTokens` story.
+- `ark-chart`: `palette="tokens"` (opt-in). The ECharts theme is built from the page's `--ark-color-*` tokens on the
+  side `theme` resolves: series in the intents (primary, info, success, warning, danger, neutral), text, axes and
+  legend in `fg`/`fg-muted`, grid lines in `border`, tooltip in `surface-raised`, and a transparent background instead
+  of the built-in dark theme's opaque one. Each color is read through a probe (the tokens are `light-dark()`) and
+  converted to sRGB on a 1×1 canvas, since most tokens compute to `oklch()`, which ECharts does not parse. A theme
+  toggle re-reads them, `option.color` still wins, and without the tokens CSS on the page it falls back to the default
+  palette. `resolvedPalette` on the element; the `palette` option, `setPalette()` and `resolvedPalette()` in the
+  `createChart` engine; `ArkChartPalette`. `TokensPalette` story.
 ### Changed
 
 - The Vue and Angular wrappers of `ark-calendar`, `ark-clock`, `ark-datepicker` and `ark-scheduler` no longer write

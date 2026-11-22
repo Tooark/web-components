@@ -33,7 +33,7 @@ The `@tooark/code` package provides:
 - completions: the language's own, `variableKeys` after `{{`, `completions` (words in any language) and `completionSource`; `autocomplete="false"` turns them off;
 - optional, off until you pass them: `variables` paints each `{{key}}` with its variable's intent (free-form scope, hover tooltip with scope and value), `mark-unknown-variables` flags keys that are not defined, `single-line` turns the editor into a one-line field at control height (`size`), Enter emitting `ark-submit`, and `extensions` adds your own CodeMirror extensions after the library's (a grammar it does not ship, a blame gutter, decorations);
 - `format()` and Shift+Alt+F: JSON built in with the configured indentation, other languages through the `formatter` hook (Prettier stays in the app);
-- chrome on the `--ark-color-*` tokens with fallbacks, `theme="auto"` following the page at runtime; `createCodeEditor` engine without the element;
+- chrome on the `--ark-color-*` tokens and syntax on the `--ark-syntax-*` tokens, both with fallbacks, `theme="auto"` following the page at runtime; `createCodeEditor` engine without the element;
 - CodeMirror packages as peer dependencies, so the page keeps one copy of `@codemirror/state`.
 
 ---
@@ -50,7 +50,7 @@ The CodeMirror packages are peer dependencies: your page keeps a single copy of 
 
 ## ⚙️ Configuration
 
-Register the element once; the editor styles itself through CodeMirror themes that read the `--ark-color-*` tokens (with fallbacks, so it works without `@tooark/web-components`):
+Register the element once; the editor styles itself through CodeMirror themes that read the `--ark-color-*` tokens for the chrome and the `--ark-syntax-*` tokens for the syntax colors (`keyword`, `string`, `number`, `property`, `comment`, `atom`, `punctuation`, `invalid`), with fallbacks, so it works without `@tooark/web-components`; override a `--ark-syntax-*` token on an ancestor to retheme the syntax:
 
 ```ts
 import { registerTooarkCode } from "@tooark/code";

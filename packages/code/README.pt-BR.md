@@ -33,7 +33,7 @@ O pacote `@tooark/code` fornece:
 - completions: as da linguagem, `variableKeys` depois de `{{`, `completions` (palavras em qualquer linguagem) e `completionSource`; `autocomplete="false"` desliga;
 - opcionais, desligados até você passá-los: `variables` pinta cada `{{chave}}` pelo intent da variável (escopo livre, tooltip com escopo e valor), `mark-unknown-variables` marca as chaves não definidas, `single-line` faz do editor um campo de uma linha na altura dos controles (`size`), com Enter emitindo `ark-submit`, e `extensions` soma extensões do CodeMirror suas depois das da biblioteca (uma gramática que ela não traz, uma calha de blame, decorações);
 - `format()` e Shift+Alt+F: JSON de fábrica com o recuo configurado, outras linguagens pelo gancho `formatter` (o Prettier fica no app);
-- chrome sobre os tokens `--ark-color-*` com fallback, `theme="auto"` seguindo a página em tempo de execução; engine `createCodeEditor` sem o elemento;
+- chrome sobre os tokens `--ark-color-*` e sintaxe sobre os tokens `--ark-syntax-*`, ambos com fallback, `theme="auto"` seguindo a página em tempo de execução; engine `createCodeEditor` sem o elemento;
 - pacotes do CodeMirror como peer dependencies, para a página ter uma cópia de `@codemirror/state`.
 
 ---
@@ -50,7 +50,7 @@ Os pacotes do CodeMirror são peer dependencies: a página fica com uma única c
 
 ## ⚙️ Configuração
 
-Registre o elemento uma vez; o editor se estiliza por temas do CodeMirror que leem os tokens `--ark-color-*` (com fallback, então funciona sem o `@tooark/web-components`):
+Registre o elemento uma vez; o editor se estiliza por temas do CodeMirror que leem os tokens `--ark-color-*` no chrome e os tokens `--ark-syntax-*` nas cores de sintaxe (`keyword`, `string`, `number`, `property`, `comment`, `atom`, `punctuation`, `invalid`), com fallback, então funciona sem o `@tooark/web-components`; sobrescreva um token `--ark-syntax-*` num ancestral para tematizar a sintaxe:
 
 ```ts
 import { registerTooarkCode } from "@tooark/code";
