@@ -25,7 +25,11 @@ export const ArkTabs = defineComponent({
     const elRef = ref<HTMLElement | null>(null);
 
     // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
-    const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent<{ value: string }>);
+    // Só o ark-close de uma aba deste host: o evento borbulha e tem o mesmo nome no dialog, no drawer e no menu.
+    const closeHandler = (event: Event) => {
+      const tab = event.target instanceof Element && event.target.localName === "ark-tab" ? event.target : null;
+      if (tab?.closest("ark-tabs") === event.currentTarget) emit("ark-close", event as CustomEvent<{ value: string }>);
+    };
     onMounted(() => elRef.value?.addEventListener("ark-close", closeHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-close", closeHandler));
 

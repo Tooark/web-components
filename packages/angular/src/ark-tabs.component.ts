@@ -69,7 +69,11 @@ export class ArkTabsComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild("tabs", { static: false }) tabsRef!: ElementRef<HTMLElement>;
 
-  private closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent<{ value: string }>);
+  // Só o ark-close de uma aba deste host: o evento borbulha e tem o mesmo nome no dialog, no drawer e no menu.
+  private closeHandler = (event: Event) => {
+    const tab = event.target instanceof Element && event.target.localName === "ark-tab" ? event.target : null;
+    if (tab?.closest("ark-tabs") === event.currentTarget) this.arkClose.emit(event as CustomEvent<{ value: string }>);
+  };
 
   ngAfterViewInit(): void {
     this.tabsRef?.nativeElement?.addEventListener("ark-close", this.closeHandler);

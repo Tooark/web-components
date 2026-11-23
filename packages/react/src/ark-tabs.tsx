@@ -34,7 +34,11 @@ export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
       if (!el) return;
 
       const handleChange = (event: Event): void => onChange?.(event as CustomEvent<{ value: string }>);
-      const handleClose = (event: Event): void => onClose?.(event as CustomEvent<{ value: string }>);
+      // Só o ark-close de uma aba deste host: o evento borbulha e tem o mesmo nome no dialog, no drawer e no menu.
+      const handleClose = (event: Event): void => {
+        const tab = event.target instanceof Element && event.target.localName === "ark-tab" ? event.target : null;
+        if (tab?.closest("ark-tabs") === event.currentTarget) onClose?.(event as CustomEvent<{ value: string }>);
+      };
       el.addEventListener("change", handleChange);
       el.addEventListener("ark-close", handleClose);
       return () => {

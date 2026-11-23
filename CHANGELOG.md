@@ -29,6 +29,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   the one underneath and left the new one open. The trap, the initial focus and `ark-open` now come one microtask
   after `open` changes, after the commit, in `ark-command-palette` as well: the focus goes to the field once.
   `ReactOverlayOpenedByPropFocusesField` and `ReactStackedDialogs` stories.
+- React, Vue and Angular wrappers of dialog, drawer, command palette and menu: `onOpen`/`onClose` (`@ark-open`,
+  `(arkOpen)`...) also fired for the events of any overlay inside the element, because `ark-open` and `ark-close`
+  bubble and the wrapper passed them on without looking at the target. An `ark-menu` that closed inside an
+  `ArkDialog`, or a closable tab asking to close, called the dialog's `onClose`, and an app that answers it with
+  `setOpen(false)` closed the dialog; one dialog inside another closed both. The handlers now only get the events of
+  their own element, and `onClose` of the tabs wrapper only the `ark-close` of its own tabs. The raw tags are
+  unchanged: the events still bubble, so a listener on the element checks `event.target`.
+  `ReactOverlayEventsAreItsOwn`, `VueOverlayEventsAreItsOwn` and `OverlayEventsAreItsOwn` (Angular) stories.
 - `trapFocus`: when the element that gets the focus back can no longer take it (the button of a dialog that
   closed when it opened the next one), the focus goes to the `returnTo` of the trap that contained it instead of
   `<body>`. Closing the second dialog of a swap now lands on the button that opened the first, in both DOM orders.

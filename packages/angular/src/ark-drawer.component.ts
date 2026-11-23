@@ -76,6 +76,13 @@ export class ArkDrawerComponent {
 
   // Ligados no template, e não no ngAfterViewInit: o listener existe desde a criação da view, então o ark-open de um
   // overlay que já nasce aberto (o elemento o emite num microtask) não se perde, nem na hidratação de SSR.
-  protected openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
-  protected closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
+  // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+  // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+  protected openHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkOpen.emit(event as CustomEvent);
+  };
+  protected closeHandler = (event: Event) => {
+    if (event.target === event.currentTarget)
+      this.arkClose.emit(event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
+  };
 }

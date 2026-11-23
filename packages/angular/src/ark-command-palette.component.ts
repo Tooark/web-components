@@ -77,8 +77,14 @@ export class ArkCommandPaletteComponent {
   // overlay que já nasce aberto (o elemento o emite num microtask) não se perde, nem na hidratação de SSR.
   protected selectHandler = (event: Event) => this.arkSelect.emit(event as CustomEvent<{ value: string }>);
   protected queryHandler = (event: Event) => this.arkQuery.emit(event as CustomEvent<{ query: string }>);
-  protected openHandler = (event: Event) => this.arkOpen.emit(event as CustomEvent);
-  protected closeHandler = (event: Event) => this.arkClose.emit(event as CustomEvent);
+  // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+  // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+  protected openHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkOpen.emit(event as CustomEvent);
+  };
+  protected closeHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkClose.emit(event as CustomEvent);
+  };
 }
 
 @Component({

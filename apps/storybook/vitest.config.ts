@@ -37,6 +37,7 @@ export default defineConfig({
         "**/*.d.ts",
         "**/dist/**",
         "**/*.stories.ts",
+        "**/stories/overlay-events.ts",
         "**/.storybook/**",
         "**/vitest.config.ts",
         // Módulos virtuais do Vite (ex.: setup injetado pelo addon-vitest):

@@ -70,8 +70,14 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
 
       const handleSelect = (event: Event): void => onSelect?.(event as CustomEvent<{ value: string }>);
       const handleQuery = (event: Event): void => onQuery?.(event as CustomEvent<{ query: string }>);
-      const handleOpen = (event: Event): void => onOpen?.(event as CustomEvent);
-      const handleClose = (event: Event): void => onClose?.(event as CustomEvent);
+      // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+      // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+      const handleOpen = (event: Event): void => {
+        if (event.target === event.currentTarget) onOpen?.(event as CustomEvent);
+      };
+      const handleClose = (event: Event): void => {
+        if (event.target === event.currentTarget) onClose?.(event as CustomEvent);
+      };
       el.addEventListener("ark-select", handleSelect);
       el.addEventListener("ark-query", handleQuery);
       el.addEventListener("ark-open", handleOpen);

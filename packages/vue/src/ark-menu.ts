@@ -22,8 +22,14 @@ export const ArkMenu = defineComponent({
 
     // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
     const selectHandler = (event: Event) => emit("ark-select", event as CustomEvent<{ value: string }>);
-    const openHandler = (event: Event) => emit("ark-open", event as CustomEvent);
-    const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent);
+    // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+    // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+    const openHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-open", event as CustomEvent);
+    };
+    const closeHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-close", event as CustomEvent);
+    };
     onMounted(() => {
       elRef.value?.addEventListener("ark-select", selectHandler);
       elRef.value?.addEventListener("ark-open", openHandler);

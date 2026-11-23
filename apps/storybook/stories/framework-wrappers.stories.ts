@@ -40,6 +40,8 @@ import {
   ArkScheduler as ReactArkScheduler,
   ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
+  ArkTab as ReactArkTab,
+  ArkTabs as ReactArkTabs,
   ArkTextarea as ReactArkTextarea,
   ArkTime as ReactArkTime,
   ArkToaster as ReactArkToaster,
@@ -58,7 +60,11 @@ import {
   ArkCard as VueArkCard,
   ArkCheckbox as VueArkCheckbox,
   ArkClock as VueArkClock,
+  ArkCommandItem as VueArkCommandItem,
+  ArkCommandPalette as VueArkCommandPalette,
   ArkDataView as VueArkDataView,
+  ArkDialog as VueArkDialog,
+  ArkDrawer as VueArkDrawer,
   ArkEmpty as VueArkEmpty,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
@@ -72,6 +78,8 @@ import {
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
   ArkSwitch as VueArkSwitch,
+  ArkTab as VueArkTab,
+  ArkTabs as VueArkTabs,
   ArkTime as VueArkTime,
   ArkToaster as VueArkToaster,
   ArkTree as VueArkTree,
@@ -93,6 +101,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
+import { expectOwnOverlayEvents } from "./overlay-events";
 
 // Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
 // e os frameworks gravam as props como propriedade: o caminho que o React 19 e o Vue seguem num app real a partir do
@@ -2189,6 +2198,99 @@ export const VueGroups = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectGroupWrappers(canvasElement, log);
+    app.unmount();
+  }
+};
+
+// onOpen e onClose só para os eventos do próprio elemento (ver overlay-events.ts): um ark-menu ou uma aba fechável
+// dentro de um ArkDialog chamava o onClose do diálogo, e o app o fechava.
+export const ReactOverlayEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const log: string[] = [];
+    const on = (tag: string) => ({ onOpen: () => log.push(`${tag}:open`), onClose: () => log.push(`${tag}:close`) });
+    const child = (text: string): ReactNode => createElement("span", { "data-child": "" }, text);
+    const root = reactRoot(
+      canvasElement,
+      errors
+    )([
+      createElement(
+        ReactArkDialog,
+        { key: "dialog", label: "Editar", ...on("ark-dialog") },
+        createElement("span", { key: "child", "data-child": "" }, "Corpo"),
+        createElement("button", { key: "trigger", type: "button", id: "react-events-trigger" }, "Opções"),
+        createElement(
+          ReactArkMenu,
+          { key: "menu", htmlFor: "react-events-trigger", "aria-label": "Opções", ...on("ark-menu") },
+          createElement(ReactArkMenuItem, { value: "copy" }, child("Duplicar"))
+        ),
+        createElement(
+          ReactArkTabs,
+          {
+            key: "tabs",
+            label: "Arquivos",
+            variant: "editor",
+            onClose: (event: CustomEvent<{ value: string }>) => log.push(`ark-tabs:close:${event.detail.value}`)
+          },
+          createElement(ReactArkTab, { value: "t1", closable: true }, child("um.ts"))
+        )
+      ),
+      createElement(ReactArkDrawer, { key: "drawer", label: "Filtros", ...on("ark-drawer") }, child("Corpo")),
+      createElement(
+        ReactArkCommandPalette,
+        { key: "palette", label: "Comandos", ...on("ark-command-palette") },
+        createElement(ReactArkCommandItem, { value: "a" }, child("Alpha"))
+      )
+    ]);
+    await expect(errors).toEqual([]);
+    await expectOwnOverlayEvents(canvasElement.lastElementChild as HTMLElement, log);
+    root.unmount();
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueOverlayEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const log: string[] = [];
+    const on = (tag: string) => ({
+      onArkOpen: () => log.push(`${tag}:open`),
+      onArkClose: () => log.push(`${tag}:close`)
+    });
+    const child = (text: string) => h("span", { "data-child": "" }, text);
+    const app = createApp({
+      render: () =>
+        h("div", [
+          h(VueArkDialog, { label: "Editar", ...on("ark-dialog") }, () => [
+            child("Corpo"),
+            h("button", { type: "button", id: "vue-events-trigger" }, "Opções"),
+            h(VueArkMenu, { for: "vue-events-trigger", "aria-label": "Opções", ...on("ark-menu") }, () => [
+              h(VueArkMenuItem, { value: "copy" }, () => child("Duplicar"))
+            ]),
+            h(
+              VueArkTabs,
+              {
+                label: "Arquivos",
+                variant: "editor",
+                onArkClose: (event: CustomEvent<{ value: string }>) => log.push(`ark-tabs:close:${event.detail.value}`)
+              },
+              () => [h(VueArkTab, { value: "t1", closable: true }, () => child("um.ts"))]
+            )
+          ]),
+          h(VueArkDrawer, { label: "Filtros", ...on("ark-drawer") }, () => child("Corpo")),
+          h(VueArkCommandPalette, { label: "Comandos", ...on("ark-command-palette") }, () => [
+            h(VueArkCommandItem, { value: "a" }, () => child("Alpha"))
+          ])
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    const host = mountPoint(canvasElement);
+    app.mount(host);
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectOwnOverlayEvents(host, log);
     app.unmount();
   }
 };

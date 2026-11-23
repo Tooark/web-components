@@ -30,8 +30,20 @@ export const ArkCommandPalette = defineComponent({
     const handlers: Array<[string, (event: Event) => void]> = [
       ["ark-select", (event) => emit("ark-select", event as CustomEvent<{ value: string }>)],
       ["ark-query", (event) => emit("ark-query", event as CustomEvent<{ query: string }>)],
-      ["ark-open", (event) => emit("ark-open", event as CustomEvent)],
-      ["ark-close", (event) => emit("ark-close", event as CustomEvent)]
+      // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+      // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+      [
+        "ark-open",
+        (event) => {
+          if (event.target === event.currentTarget) emit("ark-open", event as CustomEvent);
+        }
+      ],
+      [
+        "ark-close",
+        (event) => {
+          if (event.target === event.currentTarget) emit("ark-close", event as CustomEvent);
+        }
+      ]
     ];
     onMounted(() => {
       for (const [name, handler] of handlers) elRef.value?.addEventListener(name, handler);
