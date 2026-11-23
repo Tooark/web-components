@@ -2,6 +2,7 @@
 // `inert` ao resto da página: o trap cobre teclado e ponteiro no lugar dele.
 
 import { focusableElements } from "./focusable";
+import { isPopoverClosing } from "./popover";
 
 /** Opções do focus trap. */
 export type ArkFocusTrapOptions = {
@@ -38,9 +39,19 @@ const GESTURE_END = ["click", "auxclick", "contextmenu", "pointercancel"];
 // Traps aninhados (dialog que abre dialog): só o do topo escuta; os de baixo pausam até ele ser liberado.
 const stack: Trap[] = [];
 
-function isInsideOpenPopover(target: Element): boolean {
+/**
+ * O alvo está num popover aberto por cima do container. Com `leaving: false`, um popover na saída do `closePopover`
+ * (ainda `:popover-open` até a animação acabar) não conta: é a regra do foco, que não pode ficar num painel que some.
+ */
+function isInsideOpenPopover(target: Element, leaving = true): boolean {
   try {
-    return target.closest(":popover-open") !== null;
+    let host = target.closest(":popover-open");
+    if (!host) return false;
+    if (leaving) return true;
+    for (; host; host = host.parentElement?.closest(":popover-open") ?? null) {
+      if (isPopoverClosing(host)) return false;
+    }
+    return true;
   } catch {
     // Sem :popover-open no navegador não há top layer para considerar.
     return false;
@@ -50,10 +61,12 @@ function isInsideOpenPopover(target: Element): boolean {
 /**
  * Prende o foco em `container` enquanto um overlay modal está aberto e devolve a função que o libera. A Popover
  * API não aplica `inert` ao resto da página, então o trap cobre o que `inert` cobriria: Tab e Shift+Tab ciclam
- * entre os focáveis do container, foco que escapa volta, e eventos de ponteiro iniciados fora são cancelados na
+ * entre os focáveis do container, foco que escapa volta para onde estava (o último elemento focado no container;
+ * sem ele, `initial`; sem os dois, o primeiro focável), e eventos de ponteiro iniciados fora são cancelados na
  * captura antes de chegar ao alvo (e reportados em `onOutsidePointer`). Popovers abertos por cima (menu, tooltip,
- * toaster) ficam fora do trap: são o próprio overlay em uso. Traps aninhados empilham: só o mais recente escuta.
- * Ao liberar, o foco volta a `returnTo`. No-op sem DOM.
+ * toaster) ficam fora do trap: são o próprio overlay em uso; um que está na saída do `closePopover` ainda recebe o
+ * ponteiro, mas já não segura o foco. Traps aninhados empilham: só o mais recente escuta. Ao liberar, o foco volta a
+ * `returnTo`. No-op sem DOM.
  */
 export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions = {}): () => void {
   if (typeof document === "undefined") return () => undefined;
@@ -61,16 +74,35 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   const doc = container.ownerDocument;
   const returnTo = options.returnTo ?? (doc.activeElement instanceof HTMLElement ? doc.activeElement : null);
 
-  const owns = (target: EventTarget | null): boolean =>
+  // `leaving`: um popover em saída ainda conta como dono do alvo. Vale para o ponteiro (o segundo clique de um duplo
+  // clique no botão de um diálogo que fecha não é um clique no scrim do de baixo) e não vale para o foco.
+  const owns = (target: EventTarget | null, leaving: boolean): boolean =>
     target instanceof Node &&
-    (target === container || container.contains(target) || (target instanceof Element && isInsideOpenPopover(target)));
+    (target === container ||
+      container.contains(target) ||
+      (target instanceof Element && isInsideOpenPopover(target, leaving)));
 
   const focusContainer = (): void => {
     if (!container.hasAttribute("tabindex")) container.setAttribute("tabindex", "-1");
     container.focus();
   };
 
+  // Último elemento do container que teve o foco: é para onde o foco volta quando escapa.
+  let lastFocused: HTMLElement | null = null;
+
+  // Foca um elemento do container e diz se o foco ficou lá dentro: `focus()` não faz nada num elemento desabilitado
+  // ou sem caixa, e nesse caso nenhum focusin avisaria que o foco continua fora.
+  const tryFocus = (el: HTMLElement | null | undefined): boolean => {
+    if (!el || el === container || !container.contains(el)) return false;
+    el.focus();
+    return container.contains(doc.activeElement);
+  };
+
+  // O foco volta para onde estava, e não para o primeiro focável do DOM: quem devolve o foco ao opener depois de o
+  // overlay abrir (o React refoca, ao fim do commit, o elemento focado antes dele; um menu que fecha; o próprio app)
+  // tirava o foco do campo escolhido e ele terminava no botão de fechar do cabeçalho.
   const focusInside = (): void => {
+    if (tryFocus(lastFocused) || tryFocus(options.initial)) return;
     const first = focusableElements(container)[0];
     if (first) {
       first.focus();
@@ -83,7 +115,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key !== "Tab") return;
     const active = doc.activeElement;
-    if (active instanceof Element && !container.contains(active) && isInsideOpenPopover(active)) return;
+    if (active instanceof Element && !container.contains(active) && isInsideOpenPopover(active, false)) return;
 
     const list = focusableElements(container);
     if (list.length === 0) {
@@ -105,7 +137,12 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   };
 
   const handleFocusIn = (event: FocusEvent): void => {
-    if (!owns(event.target)) focusInside();
+    const target = event.target;
+    if (target instanceof HTMLElement && target !== container && container.contains(target)) {
+      lastFocused = target;
+      return;
+    }
+    if (!owns(target, false)) focusInside();
   };
 
   // O ponteiro é solto só no fim do gesto: se o pointerdown fora fechar o overlay (e liberar o trap), o click do
@@ -127,7 +164,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   };
 
   function handlePointer(event: Event): void {
-    if (owns(event.target)) return;
+    if (owns(event.target, true)) return;
     event.preventDefault();
     event.stopPropagation();
     if (event.type === "pointerdown") {
@@ -161,9 +198,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   const initial = options.initial;
   if (initial === container) {
     focusContainer();
-  } else if (initial && container.contains(initial)) {
-    initial.focus();
-  } else {
+  } else if (!tryFocus(initial)) {
     focusInside();
   }
 

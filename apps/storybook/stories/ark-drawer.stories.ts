@@ -426,6 +426,37 @@ export const OpenOnInsertFocusesField = {
   }
 };
 
+// O trap é o mesmo do ark-dialog: foco levado para fora volta para onde estava na gaveta, não para o botão de fechar
+// do cabeçalho (o primeiro focável do painel).
+export const EscapedFocusReturnsWhereItWas = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const drawer = createDrawer({ label: "Filtros", lang: "pt" });
+    wrap.append(createOpener(drawer, "Abrir"), drawer);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const drawer = canvasElement.querySelector("ark-drawer") as DrawerEl;
+    const opener = canvas.getByText("Abrir");
+
+    await userEvent.click(opener);
+    const field = drawer.querySelector("input") as HTMLInputElement;
+    await expect(field).toHaveFocus();
+
+    opener.focus();
+    await expect(field).toHaveFocus();
+
+    const cancel = within(drawer).getByText("Cancelar");
+    cancel.focus();
+    opener.focus();
+    await expect(cancel).toHaveFocus();
+
+    drawer.close();
+    await waitFor(() => expect(drawer).not.toHaveAttribute("data-ark-state"));
+  }
+};
+
 export const TestHooks = {
   render: () => {
     const wrap = document.createElement("div");

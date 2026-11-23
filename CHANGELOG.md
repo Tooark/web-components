@@ -9,6 +9,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `ark-dialog` and `ark-drawer` opened by a prop in React (already mounted, `open` going from `false` to `true`)
+  ended with the focus on the header's close button instead of the field. The overlay opens inside the commit and
+  focuses its field, React then refocuses the element that had the focus before the commit (the opener), and the
+  focus trap answered with the first focusable of the panel. `trapFocus` now brings escaped focus back to where it
+  was: the last element focused inside the container, else `initial`, else the first focusable. The same goes for
+  any other way the focus leaves and comes back (an `ark-menu` that closes, the app calling `focus()`). It only
+  showed with a focused opener (a real click or Enter), so the suite did not catch it.
+  `ReactOverlayOpenedByPropFocusesField` and `EscapedFocusReturnsWhereItWas` stories.
+- `trapFocus`: a popover on its way out through `closePopover` no longer holds the focus as a popover opened on top
+  of the trap (it still matches `:popover-open` during the exit animation). With one dialog closing and another
+  opening in the same step, focus sent back into the closing one (React refocusing the button that made the swap)
+  stayed there and was lost to `<body>` when it disappeared; it now goes to the open dialog. Pointer events on the
+  closing popover still reach it, as before. `ReactDialogSwapKeepsFocus`, `FocusLeavesTheClosingDialog` and
+  `ClosingDialogOnTopKeepsThePointer` stories.
+
 ## [1.9.0] - 2026-11-23
 
 ### Added
