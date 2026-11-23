@@ -157,8 +157,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                                          | Version                 | Description                                                      |
 | -------------------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.8.0                  | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.8.0                  | The `ark-*` Custom Elements and their stylesheet                 |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)                     | ^1.9.0                  | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/web-components`](https://www.npmjs.com/package/@tooark/web-components) | ^1.9.0                  | The `ark-*` Custom Elements and their stylesheet                 |
 | [`vue`](https://www.npmjs.com/package/vue)                                       | >=3 (peer)              | Vue 3                                                            |
 | [`@tooark/chart`](https://www.npmjs.com/package/@tooark/chart)                   | >=1.0.0 (optional peer) | ark-chart, for the `/chart` subpath                              |
 | [`@tooark/code`](https://www.npmjs.com/package/@tooark/code)                     | >=1.6.0 (optional peer) | ark-code-editor, for the `/code` subpath                         |
