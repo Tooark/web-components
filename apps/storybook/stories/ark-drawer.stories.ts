@@ -469,10 +469,58 @@ export const InitialFocusOnDrawnControl = {
     (canvasElement.firstElementChild as HTMLElement).append(drawer);
 
     drawer.show();
-    await expect(box.querySelector("button")).toHaveFocus();
+    await waitFor(() => expect(box.querySelector("button")).toHaveFocus());
 
     drawer.close();
     await waitFor(() => expect(drawer).not.toHaveAttribute("data-ark-state"));
+  }
+};
+
+// Como no ark-dialog: o foco inicial e o `ark-open` saem num microtask depois de `open` mudar. O campo que o app foca
+// logo depois de abrir fica com o foco, o foco volta a quem o tinha antes de abrir, e abrir e fechar no mesmo passo
+// publica o par de eventos inteiro, também no modo inline (que não tem trap).
+export const OpenSettlesAfterTheCurrentStep = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const drawer = createDrawer({ label: "Filtros", lang: "pt" });
+    const inline = createDrawer({ label: "Console", mode: "inline", side: "bottom", lang: "pt" });
+    wrap.append(createOpener(drawer, "Abrir"), drawer, inline);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [drawer, inline] = Array.from(canvasElement.querySelectorAll("ark-drawer")) as DrawerEl[];
+    const opener = canvas.getByText("Abrir");
+    const closed = (el: HTMLElement) => waitFor(() => expect(el).not.toHaveAttribute("data-ark-state"));
+
+    for (const el of [drawer, inline]) {
+      const events: string[] = [];
+      el.addEventListener("ark-open", () => events.push("open"));
+      el.addEventListener("ark-close", () => events.push("close"));
+
+      el.show();
+      el.close();
+      expect(events).toEqual(["open", "close"]);
+      await closed(el);
+      el.show();
+      el.close();
+      el.show();
+      await Promise.resolve();
+      expect(events).toEqual(["open", "close", "open", "close", "open"]);
+      el.close();
+      await closed(el);
+      expect(events).toEqual(["open", "close", "open", "close", "open", "close"]);
+    }
+
+    opener.focus();
+    drawer.show();
+    const cancel = within(drawer).getByText("Cancelar");
+    cancel.focus();
+    await Promise.resolve();
+    await expect(cancel).toHaveFocus();
+    drawer.close();
+    await closed(drawer);
+    await waitFor(() => expect(opener).toHaveFocus());
   }
 };
 

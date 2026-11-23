@@ -66,8 +66,12 @@ export class ArkDrawer extends HTMLElementBase {
   private ownClasses: string[] = [];
   private syncingClass = false;
   private state: ArkDrawerState = "closed";
-  /** A abertura em curso veio do connectedCallback: o ark-open espera um microtask. */
-  private openingOnConnect = false;
+  /** Abriu e o microtask do trap e do `ark-open` ainda não rodou. */
+  private settling = false;
+  /** Conta as aberturas: o microtask de uma abertura que já foi fechada e refeita não roda. */
+  private openSeq = 0;
+  /** Quem tinha o foco quando `open` mudou: é para onde ele volta ao fechar. */
+  private opener: HTMLElement | null = null;
   private releaseTrap: (() => void) | null = null;
   private pendingReason: ArkDrawerCloseReason | null = null;
   private warned = false;
@@ -107,11 +111,7 @@ export class ArkDrawer extends HTMLElementBase {
       this.observer.observe(this, { childList: true });
     }
     this.updateAppearance();
-    if (this.hasAttribute("open")) {
-      this.openingOnConnect = true;
-      this.openNow();
-      this.openingOnConnect = false;
-    }
+    if (this.hasAttribute("open")) this.openNow();
   }
 
   disconnectedCallback(): void {
@@ -121,6 +121,7 @@ export class ArkDrawer extends HTMLElementBase {
     this.actionsObserver?.disconnect();
     this.actionsObserver = null;
     this.observedActions = null;
+    this.settling = false;
     this.releaseTrap?.();
     this.releaseTrap = null;
     unlockScroll(this);
@@ -244,30 +245,45 @@ export class ArkDrawer extends HTMLElementBase {
       void arkEnter(this, this.preset(), { easing: "sheet" });
     }
 
-    const settle = (): void => {
-      if (this.state !== "open") return;
+    // Quem abriu é quem tem o foco agora, antes de qualquer coisa mexer nele. Reaberta com o foco ainda dentro (na
+    // saída), vale quem abriu da primeira vez.
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && !this.contains(focused)) this.opener = focused;
+
+    // O trap, o foco inicial e o ark-open esperam um microtask, sempre, como no ark-dialog. Um framework que grava
+    // `open` dentro da própria atualização ainda mexe no foco antes de terminar (o React refoca, ao fim do commit, o
+    // elemento focado antes dele). Aberta já ao conectar, é também o que deixa os filhos conectarem antes da escolha
+    // do foco (um ark-input do corpo ainda não montou o <input>) e o ark-open chegar a quem se inscreve no mesmo
+    // ciclo em que o nó entrou (os wrappers React e Angular ligam os listeners dos overlays durante a montagem).
+    const seq = ++this.openSeq;
+    this.settling = true;
+    queueMicrotask(() => {
+      if (seq !== this.openSeq || !this.settling) return;
+      this.settling = false;
       if (overlay) {
+        // O foco que já está no painel (o app focou o próprio campo logo depois de abrir) não é movido.
+        const current = document.activeElement;
+        const chosen = current instanceof HTMLElement && current !== this && this.contains(current) ? current : null;
         this.releaseTrap?.();
         this.releaseTrap = trapFocus(this, {
-          initial: this.initialFocus(),
+          initial: chosen ?? this.initialFocus(),
+          returnTo: this.opener,
           onOutsidePointer: () => {
             if (!this.persistent) this.close("backdrop");
           }
         });
       }
       this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
-    };
-    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o trap e
-    // o evento esperam um microtask. O foco inicial só é escolhido depois de os filhos conectarem (um ark-input do
-    // corpo ainda não montou o <input>, e o foco caía no botão de fechar), e o ark-open chega a quem se inscreve no
-    // mesmo ciclo em que o nó entrou (os wrappers React e Angular ligam os listeners dos overlays durante a
-    // montagem) em vez de disparar antes de alguém escutar.
-    if (this.openingOnConnect) queueMicrotask(settle);
-    else settle();
+    });
   }
 
   private closeNow(reason: ArkDrawerCloseReason): void {
     if (this.state !== "open") return;
+    // Fechada antes do microtask da abertura: o ark-open pendente sai agora, para o par não ficar pela metade.
+    if (this.settling) {
+      this.settling = false;
+      this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
+    }
     this.state = "closing";
     this.setAttribute("data-ark-state", "closing");
     this.releaseTrap?.();

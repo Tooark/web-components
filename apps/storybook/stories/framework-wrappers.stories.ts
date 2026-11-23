@@ -88,7 +88,7 @@ import type {
   ArkKvEditor as ArkKvEditorElement,
   ArkSwitch as ArkSwitchElement
 } from "@tooark/web-components";
-import { createElement, createRef, type ReactNode, useState } from "react";
+import { createElement, createRef, type ReactNode, useLayoutEffect, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
@@ -624,9 +624,10 @@ export const ReactDialogOpenOnMount = {
 };
 
 // Overlay montado fechado e aberto pela prop com o abridor focado (clique ou Enter num app real). O React refoca, ao
-// fim do commit, o elemento que tinha o foco antes dele: o diálogo abre dentro do commit e foca o campo, o React
-// devolve o foco ao abridor e o trap o traz de volta. Ele volta para o campo, não para o primeiro focável do painel
-// (o botão de fechar do cabeçalho), que era onde o foco terminava.
+// fim do commit, o elemento que tinha o foco antes dele. O overlay escolhe o foco inicial num microtask, depois do
+// commit: o foco vai ao campo uma vez só. Quando ele era escolhido dentro do commit, o React devolvia o foco ao
+// abridor e o trap o trazia de volta (campo, abridor, campo, com um blur a mais no campo), e antes disso o foco
+// terminava no botão de fechar do cabeçalho.
 function OverlayByProp({ tag }: { tag: "dialog" | "drawer" }): ReactNode {
   const [open, setOpen] = useState(false);
   const field = createElement(ReactArkInput, { label: "Nome" });
@@ -650,13 +651,20 @@ export const ReactOverlayOpenedByPropFocusesField = {
       // Sem o abridor focado o React não tem o que devolver e o defeito não aparece.
       opener.focus();
       await expect(opener).toHaveFocus();
+      let backToOpener = 0;
+      const countFocus = (): void => {
+        backToOpener++;
+      };
+      opener.addEventListener("focusin", countFocus);
       await userEvent.click(opener);
       await waitFor(() => expect(overlay.matches(":popover-open")).toBe(true));
-      await expect(overlay.querySelector("input")).toHaveFocus();
+      await waitFor(() => expect(overlay.querySelector("input")).toHaveFocus());
+      await expect(backToOpener).toBe(0);
+      opener.removeEventListener("focusin", countFocus);
 
       await userEvent.keyboard("{Escape}");
       await waitFor(() => expect(overlay).not.toHaveAttribute("data-ark-state"));
-      await expect(opener).toHaveFocus();
+      await waitFor(() => expect(opener).toHaveFocus());
       root.unmount();
     }
     await expect(errors).toEqual([]);
@@ -801,6 +809,138 @@ export const ReactOverlayClosedByPropReturnsFocus = {
       }
       root.unmount();
     }
+    await expect(errors).toEqual([]);
+  }
+};
+
+// Diálogo aberto por outro, os dois sempre montados e com `open` pela prop. Abrir o de cima leva o foco ao campo dele
+// (antes ficava no botão do de baixo, que o React refocava e o trap aceitava como popover por cima), Esc e o botão
+// dele fecham só ele, e o foco volta ao botão do de baixo que o abriu.
+function StackedDialogs({ closes }: { closes: string[] }): ReactNode {
+  const [below, setBelow] = useState(false);
+  const [above, setAbove] = useState(false);
+  const closeBelow = (): void => {
+    closes.push("below");
+    setBelow(false);
+  };
+  const closeAbove = (): void => {
+    closes.push("above");
+    setAbove(false);
+  };
+  return [
+    createElement("button", { key: "opener", type: "button", onClick: () => setBelow(true) }, "Abrir"),
+    createElement(
+      ReactArkDialog,
+      { key: "below", open: below, label: "Projeto", width: 640, height: 480, onClose: closeBelow },
+      createElement(ReactArkInput, { key: "field", label: "Nome" }),
+      createElement(ReactArkButton, { key: "delete", onClick: () => setAbove(true) }, "Excluir")
+    ),
+    createElement(
+      ReactArkDialog,
+      { key: "above", open: above, label: "Confirmar", size: "sm", onClose: closeAbove },
+      createElement(ReactArkInput, { key: "field", label: "Motivo" }),
+      createElement(
+        "div",
+        { key: "footer", slot: "footer" },
+        createElement(ReactArkButton, { onClick: () => setAbove(false) }, "Manter")
+      )
+    )
+  ];
+}
+
+export const ReactStackedDialogs = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const closes: string[] = [];
+    const root = reactRoot(canvasElement, errors)(createElement(StackedDialogs, { closes }));
+    const scope = canvasElement.lastElementChild as HTMLElement;
+    const opener = within(scope).getByText("Abrir");
+    const below = scope.querySelector('ark-dialog[label="Projeto"]') as HTMLElement;
+    const above = scope.querySelector('ark-dialog[label="Confirmar"]') as HTMLElement;
+    const trigger = within(below).getByText("Excluir");
+    const reason = above.querySelector("input") as HTMLInputElement;
+
+    opener.focus();
+    await userEvent.click(opener);
+    await waitFor(() => expect(below.querySelector("input")).toHaveFocus());
+
+    // O foco vai do botão ao campo do diálogo de cima, sem voltar ao botão no meio.
+    const focused: EventTarget[] = [];
+    const record = (event: FocusEvent): void => {
+      if (event.target) focused.push(event.target);
+    };
+    document.addEventListener("focusin", record, true);
+    await userEvent.click(trigger);
+    await waitFor(() => expect(reason).toHaveFocus());
+    document.removeEventListener("focusin", record, true);
+    await expect(focused.map((el) => (el === trigger ? "trigger" : el === reason ? "reason" : "other"))).toEqual([
+      "trigger",
+      "reason"
+    ]);
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(above).not.toHaveAttribute("data-ark-state"));
+    await expect(below).toHaveAttribute("open");
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await expect(closes).toEqual(["above"]);
+
+    await userEvent.click(trigger);
+    await waitFor(() => expect(reason).toHaveFocus());
+    await userEvent.click(within(above).getByText("Manter"));
+    await waitFor(() => expect(above).not.toHaveAttribute("data-ark-state"));
+    await expect(below).toHaveAttribute("open");
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await expect(closes).toEqual(["above", "above"]);
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(below).not.toHaveAttribute("data-ark-state"));
+    await waitFor(() => expect(opener).toHaveFocus());
+    await expect(closes).toEqual(["above", "above", "below"]);
+    root.unmount();
+    await expect(errors).toEqual([]);
+  }
+};
+
+// O app escolhe o próprio campo ao abrir (um useLayoutEffect que foca o código em vez do primeiro campo). Como o foco
+// inicial do overlay vem num microtask, depois dos efeitos, ele encontra o foco já dentro do painel e não o move; e
+// quem recebe o foco de volta ao fechar é o abridor, guardado quando `open` mudou, não o campo que o app focou.
+function OverlayWithAppFocus(): ReactNode {
+  const [open, setOpen] = useState(false);
+  const own = useRef<HTMLInputElement>(null);
+  useLayoutEffect(() => {
+    if (open) own.current?.focus();
+  }, [open]);
+  return [
+    createElement("button", { key: "opener", type: "button", onClick: () => setOpen(true) }, "Abrir"),
+    createElement(
+      ReactArkDialog,
+      { key: "overlay", open, label: "Editar", onClose: () => setOpen(false) },
+      createElement(ReactArkInput, { key: "first", label: "Nome" }),
+      createElement("input", { key: "own", ref: own, "aria-label": "Código" })
+    )
+  ];
+}
+
+export const ReactOverlayKeepsTheAppFocus = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const root = reactRoot(canvasElement, errors)(createElement(OverlayWithAppFocus));
+    const scope = canvasElement.lastElementChild as HTMLElement;
+    const opener = within(scope).getByText("Abrir");
+    const overlay = scope.querySelector("ark-dialog") as HTMLElement;
+
+    opener.focus();
+    await userEvent.click(opener);
+    await waitFor(() => expect(overlay.matches(":popover-open")).toBe(true));
+    await waitFor(() => expect(overlay.getAnimations().length).toBe(0));
+    await expect(within(overlay).getByLabelText("Código")).toHaveFocus();
+
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(overlay).not.toHaveAttribute("data-ark-state"));
+    await waitFor(() => expect(opener).toHaveFocus());
+    root.unmount();
     await expect(errors).toEqual([]);
   }
 };

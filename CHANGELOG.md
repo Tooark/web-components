@@ -23,6 +23,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of its buttons went through (closing it with the other still open). The container of a trap underneath no longer
   counts, for the focus or the pointer: the focus comes back, and the click is the scrim click of the dialog on
   top. `DialogBelowIsNotOnTop` story.
+- `ark-dialog` and `ark-drawer` opened by a prop in React: the focus went to the field, back to the opener and
+  to the field again (the 1.9.1 fix brought it back), with `focusin`/`focusout` firing twice on both. With one
+  dialog opening another it stayed on the button of the one underneath, behind the new dialog, and Esc then closed
+  the one underneath and left the new one open. The trap, the initial focus and `ark-open` now come one microtask
+  after `open` changes, after the commit, in `ark-command-palette` as well: the focus goes to the field once.
+  `ReactOverlayOpenedByPropFocusesField` and `ReactStackedDialogs` stories.
 - `trapFocus`: when the element that gets the focus back can no longer take it (the button of a dialog that
   closed when it opened the next one), the focus goes to the `returnTo` of the trap that contained it instead of
   `<body>`. Closing the second dialog of a swap now lands on the button that opened the first, in both DOM orders.
@@ -33,6 +39,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   of synchronously, and only when the focus is still inside the container or on `<body>` (an app that moved it
   elsewhere while closing keeps its choice). Code that reads `document.activeElement` right after releasing a trap,
   or right after `close()` on a dialog, drawer or palette, has to wait a microtask (`await Promise.resolve()`).
+- `ark-dialog`, `ark-drawer` and `ark-command-palette`: `ark-open` and the initial focus come one microtask after
+  `open` changes (`show()`, the `open` property or attribute), as they already did for an overlay inserted open.
+  Code that reads the focus or expects the event right after `show()` has to wait a microtask. What does not
+  change: `data-ark-state`, the top layer and `ark-close` are still synchronous, opening and closing in the same
+  step still emits `ark-open` before `ark-close`, a field the app focuses right after opening keeps the focus, and
+  the focus returns on close to the element that had it when `open` changed.
+  `OpenSettlesAfterTheCurrentStep` and `ReactOverlayKeepsTheAppFocus` stories.
 
 ## [1.9.1] - 2026-11-23
 

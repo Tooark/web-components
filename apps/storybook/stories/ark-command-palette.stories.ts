@@ -386,6 +386,38 @@ export const WrappedItems = {
   }
 };
 
+// Como no ark-dialog: o foco no campo de busca e o `ark-open` saem num microtask depois de `open` mudar, o foco volta
+// a quem o tinha antes de abrir, e abrir e fechar no mesmo passo publica o par de eventos inteiro e em ordem.
+export const OpenSettlesAfterTheCurrentStep = {
+  render: () => createScene(createPalette({ lang: "pt" }), "Abre e fecha pela API."),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const palette = canvasElement.querySelector("ark-command-palette") as PaletteEl;
+    const opener = canvas.getByText("Abrir paleta");
+    const closed = () => waitFor(() => expect(palette).not.toHaveAttribute("data-ark-state"));
+    const events: string[] = [];
+    palette.addEventListener("ark-open", () => events.push("open"));
+    palette.addEventListener("ark-close", () => events.push("close"));
+
+    opener.focus();
+    palette.show();
+    palette.close();
+    expect(events).toEqual(["open", "close"]);
+    await closed();
+    await expect(opener).toHaveFocus();
+
+    palette.show();
+    palette.close();
+    palette.show();
+    await Promise.resolve();
+    expect(events).toEqual(["open", "close", "open", "close", "open"]);
+    await waitFor(() => expect(canvas.getByRole("combobox")).toHaveFocus());
+    await userEvent.keyboard("{Escape}");
+    await closed();
+    await waitFor(() => expect(opener).toHaveFocus());
+  }
+};
+
 export const TestHooks = {
   render: () =>
     createScene(createPalette({ lang: "pt", testid: "paleta" }), "Hooks: abra a paleta e inspecione os data-ark."),
