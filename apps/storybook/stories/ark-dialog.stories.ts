@@ -491,6 +491,32 @@ export const WarnsOnceWithoutName = {
   }
 };
 
+// Inserido já aberto (um framework que só renderiza o diálogo enquanto ele está aberto): o foco inicial espera os
+// filhos conectarem. Antes ele era escolhido no connectedCallback do diálogo, quando o ark-input do corpo ainda não
+// tinha montado o <input>, e caía no botão de fechar.
+export const OpenOnInsertFocusesField = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const dialog = document.createElement("ark-dialog") as DialogEl;
+    dialog.setAttribute("label", "Novo projeto");
+    dialog.setAttribute("open", "");
+    const field = document.createElement("ark-input");
+    field.setAttribute("label", "Nome");
+    dialog.append(field);
+    let opened = 0;
+    dialog.addEventListener("ark-open", () => opened++);
+    (canvasElement.firstElementChild as HTMLElement).append(dialog);
+
+    await waitFor(() => expect(document.activeElement === field.querySelector("input")).toBe(true));
+    await expect(opened).toBe(1);
+    // O trap criado no microtask é o mesmo de uma abertura comum: Tab continua dentro do diálogo e Esc fecha.
+    await userEvent.tab();
+    await expect(dialog.contains(document.activeElement)).toBe(true);
+    await userEvent.keyboard("{Escape}");
+    await closed(dialog);
+  }
+};
+
 export const TestHooks = {
   render: () => createScene({ label: "Confirmar", lang: "pt", testid: "confirm" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

@@ -234,30 +234,36 @@ export class ArkDrawer extends HTMLElementBase {
     this.updateAppearance();
     this.warnWithoutName();
 
-    if (this.mode === "overlay") {
+    const overlay = this.mode === "overlay";
+    if (overlay) {
       // Percorre a própria largura/altura: entra de fora da viewport. Overlay é modal: a página para de rolar.
       void openPopover(this, this.preset(), { distance: "100%", easing: "sheet", lockScroll: !this.noScrollLock });
-      this.releaseTrap?.();
-      this.releaseTrap = trapFocus(this, {
-        initial: this.initialFocus(),
-        onOutsidePointer: () => {
-          if (!this.persistent) this.close("backdrop");
-        }
-      });
     } else {
       // No fluxo o espaço já existe: um deslocamento curto (token) basta; a saída anterior fica preenchida.
       for (const animation of this.getAnimations()) animation.cancel();
       void arkEnter(this, this.preset(), { easing: "sheet" });
     }
 
-    const emit = (): void => {
-      if (this.state === "open") this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
+    const settle = (): void => {
+      if (this.state !== "open") return;
+      if (overlay) {
+        this.releaseTrap?.();
+        this.releaseTrap = trapFocus(this, {
+          initial: this.initialFocus(),
+          onOutsidePointer: () => {
+            if (!this.persistent) this.close("backdrop");
+          }
+        });
+      }
+      this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
     };
-    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o evento
-    // sai num microtask, para chegar a quem se inscreve no mesmo ciclo em que o nó entrou (os wrappers React e
-    // Angular ligam os listeners dos overlays durante a montagem) em vez de disparar antes de alguém escutar.
-    if (this.openingOnConnect) queueMicrotask(emit);
-    else emit();
+    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o trap e
+    // o evento esperam um microtask. O foco inicial só é escolhido depois de os filhos conectarem (um ark-input do
+    // corpo ainda não montou o <input>, e o foco caía no botão de fechar), e o ark-open chega a quem se inscreve no
+    // mesmo ciclo em que o nó entrou (os wrappers React e Angular ligam os listeners dos overlays durante a
+    // montagem) em vez de disparar antes de alguém escutar.
+    if (this.openingOnConnect) queueMicrotask(settle);
+    else settle();
   }
 
   private closeNow(reason: ArkDrawerCloseReason): void {

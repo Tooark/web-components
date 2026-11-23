@@ -404,6 +404,28 @@ export const InlineBehavior = {
   }
 };
 
+// Como no ark-dialog: inserida já aberta, a gaveta escolhe o foco inicial depois de os filhos conectarem, e o
+// ark-input do corpo recebe o foco no lugar do botão de fechar.
+export const OpenOnInsertFocusesField = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const drawer = document.createElement("ark-drawer") as DrawerEl;
+    drawer.setAttribute("label", "Filtros");
+    drawer.setAttribute("open", "");
+    const field = document.createElement("ark-input");
+    field.setAttribute("label", "Nome");
+    drawer.append(field);
+    let opened = 0;
+    drawer.addEventListener("ark-open", () => opened++);
+    (canvasElement.firstElementChild as HTMLElement).append(drawer);
+
+    await waitFor(() => expect(document.activeElement === field.querySelector("input")).toBe(true));
+    await expect(opened).toBe(1);
+    drawer.close();
+    await waitFor(() => expect(drawer).not.toHaveAttribute("data-ark-state"));
+  }
+};
+
 export const TestHooks = {
   render: () => {
     const wrap = document.createElement("div");
