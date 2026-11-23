@@ -74,7 +74,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-alert` — Alerta/banner: o host é a caixa na cor suave do intent, os filhos são a mensagem (texto livre ou elementos), `slot="icon"` à esquerda, `slot="action"` à direita, `heading`, `dismissible` com saída animada, `live` region (`status`/`alert`).
 - `ark-avatar` — Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria, `variant` soft/solid.
 - `ark-badge` — Rótulo curto de status/categoria: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, `color` própria via `color-mix`. O host é o badge; ícone e texto ficam como filhos.
-- `ark-button` — Intents, tamanhos, variantes (solid/outline/ghost), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio), modo link (`href`) e formulário (`type="submit"` é o botão padrão do formulário, então Enter nos campos de texto envia).
+- `ark-button` — Intents, tamanhos, variantes (solid/outline/ghost/soft), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio), modo link (`href`) e formulário (`type="submit"` é o botão padrão do formulário, então Enter nos campos de texto envia).
 - `ark-calendar` — Grid de mês inline (no estilo do DateCalendar do MUI): localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).
 - `ark-card` — Cartão: o host é a caixa (`surface`, `border`, `rounded`) e uma grid: `heading` (h2) ou `slot="header"` com `slot="actions"` na linha de cima, filhos sem slot como corpo, `slot="footer"` por último com divisor; `padding` none–lg.
 - `ark-carousel` — CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.
@@ -119,7 +119,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-toggle` — Botão de estado pressionado (`aria-pressed`), standalone (outline/tinted por intent) ou como item de grupo.
 - `ark-toggle-group` — Segmented control: seleção exclusiva (padrão) ou múltipla, `value` sincronizado, propaga `size`/`intent`/`theme`/`disabled` aos itens.
 - `ark-tooltip` — Tooltip sobre a Popover API: envolve o gatilho sem movê-lo, texto por `content` ou `slot="content"` rico, `side` com flip, `delay`, hover/foco/Esc, `aria-describedby` no gatilho.
-- `ark-tree` / `ark-tree-item` — Árvore declarativa: os itens aninhados ficam onde estão; seleção none / single / multiple, caixas com propagate, carga lazy, teclado WAI-ARIA e busca por digitação.
+- `ark-tree` / `ark-tree-item` — Árvore declarativa: os itens aninhados ficam onde estão; seleção none / single / multiple, caixas com propagate, carga lazy, ícones próprios de pasta e arquivo (`icons`, `icon-color`), teclado WAI-ARIA e busca por digitação.
 
 Referência completa de atributos, guia de tema e hooks de E2E: [https://github.com/Tooark/web-components/blob/main/README.pt-BR.md](https://github.com/Tooark/web-components/blob/main/README.pt-BR.md) · exemplos vivos com testes de interação: [Storybook](https://tooark.com/web-components/).
 

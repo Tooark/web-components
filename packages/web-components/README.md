@@ -74,7 +74,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-alert` — Alert/banner: the host is the box in the intent's soft color, your children are the message (free text or elements), `slot="icon"` left, `slot="action"` right, `heading`, `dismissible` with animated exit, `live` region (`status`/`alert`).
 - `ark-avatar` — Avatar (`role="img"` named by `name`): initials from `name`, `src` image that falls back to the initials on load error, `size`, `shape` circle/square, custom `color`, `variant` soft/solid.
 - `ark-badge` — Short status/category label: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, custom `color` via `color-mix`. The host is the badge; icon and text stay as its children.
-- `ark-button` — Intents, sizes, style variants (solid/outline/ghost), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, `status` feedback (success/error glyph + announcement), link mode (`href`), forms (`type="submit"` is the form's default button, so Enter in its text fields submits).
+- `ark-button` — Intents, sizes, style variants (solid/outline/ghost/soft), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, `status` feedback (success/error glyph + announcement), link mode (`href`), forms (`type="submit"` is the form's default button, so Enter in its text fields submits).
 - `ark-calendar` — Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`).
 - `ark-card` — Card: the host is the box (`surface`, `border`, `rounded`) and a grid: `heading` (h2) or `slot="header"` with `slot="actions"` on the top row, unslotted children as the body, `slot="footer"` last with a divider; `padding` none–lg.
 - `ark-carousel` — Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.
@@ -119,7 +119,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-toggle` — Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.
 - `ark-toggle-group` — Segmented control: exclusive (default) or multiple selection, synced `value`, propagates `size`/`intent`/`theme`/`disabled` to items.
 - `ark-tooltip` — Tooltip on the Popover API: wraps your trigger without moving it, text via `content` or rich `slot="content"`, `side` with flip, `delay`, hover/focus/Esc, `aria-describedby` on the trigger.
-- `ark-tree` / `ark-tree-item` — Declarative tree: nested items stay in place; selection none / single / multiple, checkboxes with propagate, lazy loading, WAI-ARIA keyboard and typeahead.
+- `ark-tree` / `ark-tree-item` — Declarative tree: nested items stay in place; selection none / single / multiple, checkboxes with propagate, lazy loading, built-in folder/file icons (`icons`, `icon-color`), WAI-ARIA keyboard and typeahead.
 
 Full attribute reference, theming guide and E2E hooks: [https://github.com/Tooark/web-components#readme](https://github.com/Tooark/web-components#readme) · live examples with interaction tests: [Storybook](https://tooark.com/web-components/).
 

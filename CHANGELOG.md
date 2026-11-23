@@ -11,6 +11,25 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Added
 
+- `ark-button`: `variant="soft"`, the intent's soft background with its text color (the look of the default
+  `ark-badge`). The border is transparent at rest and takes the intent's border color on hover, so the box has the
+  size of the other variants. Before, `soft` was not a variant and the button fell back to `solid`: an app that
+  already wrote `variant="soft"` now gets the soft look. `ArkStyleVariant` (`@tooark/tokens`) gains `"soft"`.
+  `Soft` story, with the contrast of the seven intents in both themes checked by axe.
+- `ark-tree`: `icons` (opt-in). `files` draws the component's own outline icons on the nodes without a
+  `slot="icon"` (a folder on branches, open while expanded, a file on leaves); `none` hides every icon, the app's
+  `slot="icon"` included, and leaves only the names. Without the attribute nothing changes: a node shows only the
+  icon the app gives it, and mounting about 2,200 open nodes takes the same time as before (147 ms, measured
+  without the accessibility tree; 231 ms with `icons="files"`).
+- `ark-tree-item`: `icon` (`folder`, `file`, `none`) names the built-in icon of one node, with or without
+  `icons` on the tree; `iconElement` and the `tree-item-icon` hook (`data-ark-icon` says which icon is drawn).
+- `ark-tree`: `icon-color`, an intent (the token, so it follows the brand override and the theme), `current` (the
+  tree's text color) or a CSS color, written to `--ark-tree-icon-color` on the host. The built-in icons default to
+  `fg-muted`; the app's own `slot="icon"` takes the color only while the attribute is present.
+- `ark-tree-item`: `--ark-tree-icon-size` (14 / 14 / 16 / 18 / 20 px for `xs` … `xl`), so icons follow the tree's
+  `size`: the built-in ones use it and an app icon reads it (`width: var(--ark-tree-icon-size)`).
+- `icons`, `iconColor` and `icon` on the tree wrappers of `@tooark/react`, `@tooark/vue` and `@tooark/angular`, and
+  on the raw tags' JSX typing; `ArkTreeIcons` and `ArkTreeItemIcon` types in `@tooark/core`.
 - `ark-input`: `list` is mirrored onto the inner `<input>`, so a `<datalist>` on the page offers its suggestions.
   `list` prop on `ArkInput` (React, Vue) and `ArkInputComponent` (Angular), and on the raw tag's JSX typing.
 - `ark-button`: `form` (the id of a form the button sits outside of, as on a native `<button form>`) is a prop of
@@ -59,6 +78,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - README: `slot="actions"` of `ark-card` is a single container (two children with that slot share one cell and
   overlap), as the drawer's section already said; `flex-wrap: wrap` on the `ark-toggle-group` host wraps the options
   in a narrow container; `ark-alert` states where the action lands by its place in the DOM.
+- README: why only a single body child of a stretched `ark-card` takes the extra height, with the structure that
+  pins the footer; a "Bundle size" note under Getting started (one registration for every element: a wrapper
+  from `@tooark/react` adds about 415 kB minified in 1.7.0; per-element entry points are a planned, opt-in
+  improvement).
 
 ## [1.7.0] - 2026-11-22
 
