@@ -1,7 +1,7 @@
 import type { ArkInputStyleOptions, ArkLang } from "@tooark/core";
 import type { ArkInput as ArkInputElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -90,7 +90,7 @@ export const ArkInput = forwardRef<ArkInputElement, ArkInputProps>(
     }, [ref, onInput, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       "error-message": errorMessage,

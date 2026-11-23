@@ -2,7 +2,7 @@ import type { ArkSwitchStyleOptions } from "@tooark/core";
 import type { ArkSwitch as ArkSwitchElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -39,7 +39,7 @@ export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
     }, [ref, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       checked: checked ? "" : undefined,

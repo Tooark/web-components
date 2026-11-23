@@ -1,7 +1,7 @@
 import type { ArkTabStyleOptions, ArkTabsStyleOptions } from "@tooark/core";
 import type { ArkTab as ArkTabElement, ArkTabs as ArkTabsElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -44,7 +44,7 @@ export const ArkTabs = forwardRef<ArkTabsElement, ArkTabsProps>(
     }, [ref, onChange, onClose]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       "locale-json": localeJson
@@ -78,7 +78,7 @@ export const ArkTab = forwardRef<ArkTabElement, ArkTabProps>(function ArkTab(pro
   }, []);
 
   const attrs: Record<string, unknown> = {
-    ...rest,
+    ...domAttrs(rest),
     ref: forwardedRef,
     class: className,
     disabled: disabled ? "" : undefined,

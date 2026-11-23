@@ -1,7 +1,7 @@
 import type { ArkBadgeStyleOptions } from "@tooark/core";
 import type { ArkBadge as ArkBadgeElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkBadgeProps = PropsWithChildren<
@@ -21,7 +21,7 @@ export const ArkBadge = forwardRef<ArkBadgeElement, ArkBadgeProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className
     };

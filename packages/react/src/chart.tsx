@@ -3,7 +3,7 @@
 import { type ArkChart as ArkChartElement, type EChartsOption, registerTooarkChart } from "@tooark/chart";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
@@ -81,7 +81,7 @@ export const ArkChart = forwardRef<ArkChartElement, ArkChartProps>(
     }, [ref, onChartClick]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       "auto-resize": autoResize === false ? "false" : undefined

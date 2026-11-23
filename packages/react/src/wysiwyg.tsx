@@ -12,7 +12,7 @@ import {
 } from "@tooark/wysiwyg";
 import type React from "react";
 import { createElement, forwardRef, useEffect, useRef } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
 
@@ -139,7 +139,7 @@ export const ArkWysiwygEditor = forwardRef<ArkWysiwygEditorElement, ArkWysiwygEd
     }, [ref, onChange, onUploadError]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       editable: editable === false ? "false" : undefined,
@@ -176,6 +176,6 @@ export const ArkWysiwygViewer = forwardRef<ArkWysiwygViewerElement, ArkWysiwygVi
       if (el && content !== undefined && el.content !== content) el.content = content;
     }, [ref, content]);
 
-    return createElement("ark-wysiwyg-viewer", { ...rest, ref: setRef, class: className });
+    return createElement("ark-wysiwyg-viewer", { ...domAttrs(rest), ref: setRef, class: className });
   }
 );

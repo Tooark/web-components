@@ -7,3 +7,16 @@ import type React from "react";
  * de fora: só os wrappers de elementos com conteúdo o declaram.
  */
 export type ArkDomProps<Props> = Props & Omit<React.HTMLAttributes<HTMLElement>, keyof Props | "children">;
+
+/**
+ * O `rest` de um wrapper pronto para o elemento, com os `aria-*` booleanos convertidos em texto. Num custom element
+ * o React 19 grava `true` como atributo vazio (`aria-pressed=""`, valor inválido em ARIA), enquanto num elemento
+ * nativo grava `"true"`; os tipos do React aceitam o booleano nos dois, então o wrapper iguala o resultado.
+ */
+export function domAttrs(rest: object): Record<string, unknown> {
+  const attrs: Record<string, unknown> = { ...rest };
+  for (const name of Object.keys(attrs)) {
+    if (typeof attrs[name] === "boolean" && name.startsWith("aria-")) attrs[name] = String(attrs[name]);
+  }
+  return attrs;
+}

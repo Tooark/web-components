@@ -2,7 +2,7 @@ import type { ArkProgressStyleOptions } from "@tooark/core";
 import type { ArkProgress as ArkProgressElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkProgressProps = ArkDomProps<
@@ -30,7 +30,7 @@ export const ArkProgress = forwardRef<ArkProgressElement, ArkProgressProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       value: value === undefined ? undefined : String(value),

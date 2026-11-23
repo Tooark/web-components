@@ -2,7 +2,7 @@ import type { ArkCalendarEvent, ArkCalendarStyleOptions, ArkDatepickerLang, ArkL
 import type { ArkCalendar as ArkCalendarElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useCallback, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -60,7 +60,7 @@ export const ArkCalendar = forwardRef<ArkCalendarElement, ArkCalendarProps>(
 
     // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       lang,
       theme,
       intent,

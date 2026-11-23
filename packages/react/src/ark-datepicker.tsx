@@ -1,7 +1,7 @@
 import type { ArkDatepickerLang, ArkDatepickerStyleOptions, ArkLocale } from "@tooark/core";
 import type { ArkDatepicker as ArkDatepickerElement } from "@tooark/web-components";
 import React, { forwardRef, useCallback, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -69,7 +69,7 @@ export const ArkDatepicker = forwardRef<ArkDatepickerElement, ArkDatepickerProps
 
     // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       lang,
       theme,
       intent,

@@ -11,7 +11,7 @@ import type {
   ArkMenuItem as ArkMenuItemElement
 } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -64,7 +64,7 @@ export const ArkMenu = forwardRef<ArkMenuElement, ArkMenuProps>(
     }, [onSelect, onOpen, onClose]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       for: htmlFor,
@@ -100,7 +100,7 @@ export const ArkMenuItem = forwardRef<ArkMenuItemElement, ArkMenuItemProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       disabled: disabled ? "" : undefined,
@@ -131,7 +131,7 @@ export const ArkMenuGroup = forwardRef<ArkMenuGroupElement, ArkMenuGroupProps>(
       ensureTooarkComponentsRegistered();
     }, []);
 
-    const attrs: Record<string, unknown> = { ...rest, ref: forwardedRef, class: className };
+    const attrs: Record<string, unknown> = { ...domAttrs(rest), ref: forwardedRef, class: className };
 
     return createElement("ark-menu-group", attrs, children);
   }

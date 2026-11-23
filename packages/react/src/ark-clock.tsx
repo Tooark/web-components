@@ -2,7 +2,7 @@ import type { ArkClockStyleOptions, ArkDatepickerLang } from "@tooark/core";
 import type { ArkClock as ArkClockElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -36,7 +36,7 @@ export const ArkClock = forwardRef<ArkClockElement, ArkClockProps>(
     }, [ref, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       seconds: seconds ? "" : undefined,

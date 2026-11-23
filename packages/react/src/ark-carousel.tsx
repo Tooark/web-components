@@ -1,7 +1,7 @@
 import type { ArkCarouselSnap, ArkCarouselStyleOptions } from "@tooark/core";
 import type { ArkCarousel as ArkCarouselElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useCallback, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -63,7 +63,7 @@ export const ArkCarousel = forwardRef<ArkCarouselElement, ArkCarouselProps>(
 
     // O rest leva ao elemento o que o wrapper não mapeia (id, style, data-*, aria-*).
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       theme,
       intent,
       "accent-color": accentColor,

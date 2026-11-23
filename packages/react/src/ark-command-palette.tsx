@@ -5,7 +5,7 @@ import type {
 } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -85,7 +85,7 @@ export const ArkCommandPalette = forwardRef<ArkCommandPaletteElement, ArkCommand
     }, [onSelect, onQuery, onOpen, onClose]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       open: open ? "" : undefined,
@@ -123,7 +123,7 @@ export const ArkCommandItem = forwardRef<ArkCommandItemElement, ArkCommandItemPr
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       disabled: disabled ? "" : undefined

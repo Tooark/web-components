@@ -1,7 +1,7 @@
 import type { ArkTreeItemStyleOptions, ArkTreeSelection, ArkTreeStyleOptions } from "@tooark/core";
 import type { ArkTree as ArkTreeElement, ArkTreeItem as ArkTreeItemElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -61,7 +61,7 @@ export const ArkTree = forwardRef<ArkTreeElement, ArkTreeProps>(
     }, [ref, onToggle, onSelectionChange, onActivate]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       checkboxes: checkboxes ? "" : undefined,
@@ -102,7 +102,7 @@ export const ArkTreeItem = forwardRef<ArkTreeItemElement, ArkTreeItemProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       expanded: expanded ? "" : undefined,

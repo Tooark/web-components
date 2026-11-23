@@ -2,7 +2,7 @@ import type { ArkColorSwatch, ArkColorSwatchesStyleOptions } from "@tooark/core"
 import type { ArkColorSwatches as ArkColorSwatchesElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -40,7 +40,7 @@ export const ArkColorSwatches = forwardRef<ArkColorSwatchesElement, ArkColorSwat
     }, [ref, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       colors: colors ? JSON.stringify(colors) : undefined,

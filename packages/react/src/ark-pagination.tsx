@@ -2,7 +2,7 @@ import type { ArkPageChangeDetail, ArkPaginationStyleOptions } from "@tooark/cor
 import type { ArkPagination as ArkPaginationElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -45,7 +45,7 @@ export const ArkPagination = forwardRef<ArkPaginationElement, ArkPaginationProps
     }, [ref, onPageChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       page: page !== undefined ? String(page) : undefined,

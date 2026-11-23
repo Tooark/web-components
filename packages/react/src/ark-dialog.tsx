@@ -1,7 +1,7 @@
 import type { ArkDialogCloseReason, ArkDialogStyleOptions } from "@tooark/core";
 import type { ArkDialog as ArkDialogElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -66,7 +66,7 @@ export const ArkDialog = forwardRef<ArkDialogElement, ArkDialogProps>(
     }, [onOpen, onClose]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       open: open ? "" : undefined,
