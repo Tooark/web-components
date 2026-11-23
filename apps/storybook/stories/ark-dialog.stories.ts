@@ -381,7 +381,7 @@ export const FocusLeavesTheClosingDialog = {
     first.close();
     second.show();
     const field = second.querySelector("input");
-    await expect(document.activeElement).toBe(field);
+    await waitFor(() => expect(document.activeElement === field).toBe(true));
     await expect(first).toHaveAttribute("data-ark-state", "closing");
     expect(first.matches(":popover-open")).toBe(true);
 
@@ -602,7 +602,7 @@ export const ClosingDialogOnTopKeepsThePointer = {
     const field = form.querySelector("input");
     await expect(document.activeElement).toBe(field);
     confirm.show();
-    await expect(document.activeElement).toBe(cancel);
+    await waitFor(() => expect(document.activeElement === cancel).toBe(true));
 
     await userEvent.click(cancel);
     await expect(confirm).toHaveAttribute("data-ark-state", "closing");
@@ -667,6 +667,54 @@ export const DialogBelowIsNotOnTop = {
   }
 };
 
+// O foco inicial e o `ark-open` saem num microtask depois de `open` mudar, e não na hora: um framework que grava a
+// prop dentro da própria atualização (o React, no commit) ainda mexe no foco antes de terminar. O que isso não pode
+// custar: o campo que o app foca logo depois de abrir continua com o foco, quem o recebe de volta ao fechar é o
+// elemento focado antes de abrir (e não esse campo), e abrir e fechar no mesmo passo ainda publica o par de eventos
+// inteiro e em ordem.
+export const OpenSettlesAfterTheCurrentStep = {
+  render: () => createScene({ label: "Editar", lang: "pt" }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const opener = canvas.getByText("Abrir");
+    const events: string[] = [];
+    dialog.addEventListener("ark-open", () => events.push("open"));
+    dialog.addEventListener("ark-close", () => events.push("close"));
+    opener.focus();
+
+    dialog.show();
+    const [nome, url] = Array.from(dialog.querySelectorAll("input"));
+    url.focus();
+    await Promise.resolve();
+    expect(events).toEqual(["open"]);
+    expect(document.activeElement === url).toBe(true);
+    dialog.close();
+    await closed(dialog);
+    await waitFor(() => expect(document.activeElement === opener).toBe(true));
+
+    events.length = 0;
+    dialog.show();
+    dialog.close();
+    expect(events).toEqual(["open", "close"]);
+    await closed(dialog);
+    expect(events).toEqual(["open", "close"]);
+    expect(document.activeElement === opener).toBe(true);
+
+    events.length = 0;
+    dialog.show();
+    dialog.close();
+    dialog.show();
+    await Promise.resolve();
+    expect(events).toEqual(["open", "close", "open"]);
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+    await userEvent.keyboard("{Escape}");
+    await closed(dialog);
+    expect(events).toEqual(["open", "close", "open", "close"]);
+    await waitFor(() => expect(document.activeElement === opener).toBe(true));
+  }
+};
+
 // Inserido já aberto (um framework que só renderiza o diálogo enquanto ele está aberto): o foco inicial espera os
 // filhos conectarem. Antes ele era escolhido no connectedCallback do diálogo, quando o ark-input do corpo ainda não
 // tinha montado o <input>, e caía no botão de fechar.
@@ -707,7 +755,7 @@ export const InitialFocusOnDrawnControls = {
       (canvasElement.firstElementChild as HTMLElement).append(dialog);
 
       dialog.show();
-      await expect(control.contains(document.activeElement)).toBe(true);
+      await waitFor(() => expect(control.contains(document.activeElement)).toBe(true));
       // O botão de fechar do cabeçalho continua fora da escolha, mesmo sendo o primeiro focável do painel.
       await expect(dialog.querySelector('[data-ark="dialog-header"]')?.contains(document.activeElement)).toBe(false);
 
