@@ -421,8 +421,10 @@ export class ArkMenu extends HTMLElementBase {
 
     // Redefine o que o UA dá a [popover] (inset, margin, border, padding, overflow, color, background); left/top
     // vêm inline do posicionamento e o display, com as transições, do components.css.
+    // text-start: o Chromium trata o atributo `align` de qualquer elemento HTML como dica de apresentação
+    // (text-align), e align="end" alinhava à direita o rótulo dos grupos e o conteúdo livre do menu.
     this.applyOwnClasses(
-      "ark:fixed ark:inset-auto ark:m-0 ark:min-w-40 ark:max-w-xs ark:max-h-[calc(100vh-1rem)] ark:overflow-y-auto ark:overscroll-contain ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-1 ark:text-fg ark:shadow-lg ark:outline-none".split(
+      "ark:fixed ark:inset-auto ark:m-0 ark:min-w-40 ark:max-w-xs ark:max-h-[calc(100vh-1rem)] ark:overflow-y-auto ark:overscroll-contain ark:rounded-lg ark:border ark:border-border ark:bg-surface ark:p-1 ark:text-start ark:text-fg ark:shadow-lg ark:outline-none".split(
         " "
       )
     );

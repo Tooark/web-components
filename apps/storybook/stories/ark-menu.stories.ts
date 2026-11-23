@@ -533,6 +533,33 @@ export const Groups = {
   }
 };
 
+// `align` só posiciona o painel. O Chromium trata o atributo `align` de qualquer elemento HTML como text-align, e
+// com align="end" o rótulo dos grupos e o conteúdo livre iam para a direita.
+export const AlignEndKeepsTextAtStart = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex justify-end";
+    const id = `menu-trigger-${++seq}`;
+    const menu = createGroupedMenu(id);
+    menu.setAttribute("align", "end");
+    wrap.append(createTrigger(id, "Arquivo"), menu);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const menu = canvasElement.querySelector("ark-menu") as MenuEl;
+    menu.show();
+    await waitFor(() => expect(popoverOpen(menu)).toBe(true));
+
+    await expect(getComputedStyle(menu).textAlign).toBe("start");
+    const label = menu.querySelector('[data-ark="menu-group-label"]') as HTMLElement;
+    const range = document.createRange();
+    range.selectNodeContents(label);
+    // O texto do rótulo começa junto da borda esquerda dele (só o padding), e não encostado na direita.
+    await expect(range.getBoundingClientRect().left - label.getBoundingClientRect().left).toBeLessThan(20);
+    menu.hide();
+  }
+};
+
 export const GroupSizes = {
   render: () => {
     const wrap = document.createElement("div");
