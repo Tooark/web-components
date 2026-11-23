@@ -2,7 +2,7 @@ export { dismissToast, getArkLocale, observeArkLocale, setArkLocale, showToast, 
 export { ArkAlert } from "./ark-alert.js";
 export { ArkAvatar } from "./ark-avatar.js";
 export { ArkBadge } from "./ark-badge.js";
-export { ArkButton } from "./ark-button.js";
+export { ArkButton, ArkButtonGroup } from "./ark-button.js";
 export { ArkCalendar } from "./ark-calendar.js";
 export { ArkCard } from "./ark-card.js";
 export { ArkCarousel } from "./ark-carousel.js";
@@ -27,7 +27,7 @@ export type { ArkNavNavigateDetail } from "./ark-nav.js";
 export { ArkNav, ArkNavGroup, ArkNavItem } from "./ark-nav.js";
 export { ArkPagination } from "./ark-pagination.js";
 export { ArkProgress } from "./ark-progress.js";
-export { ArkRadio } from "./ark-radio.js";
+export { ArkRadio, ArkRadioGroup } from "./ark-radio.js";
 export { ArkScheduler } from "./ark-scheduler.js";
 export { ArkSelect } from "./ark-select.js";
 export { ArkShapePicker } from "./ark-shape-picker.js";

@@ -1,5 +1,10 @@
-import type { ArkButtonNavigateDetail, ArkButtonStyleOptions, ArkButtonType } from "@tooark/core";
-import type { ArkButton as ArkButtonElement } from "@tooark/web-components";
+import type {
+  ArkButtonGroupStyleOptions,
+  ArkButtonNavigateDetail,
+  ArkButtonStyleOptions,
+  ArkButtonType
+} from "@tooark/core";
+import type { ArkButton as ArkButtonElement, ArkButtonGroup as ArkButtonGroupElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
 import { type ArkDomProps, domAttrs } from "./dom-props.js";
@@ -66,5 +71,39 @@ export const ArkButton = forwardRef<ArkButtonElement, ArkButtonProps>(
     };
 
     return createElement("ark-button", attrs, children);
+  }
+);
+
+/** Props do ArkButtonGroup: variant, intent, size, rounded e theme valem para todos os botões do grupo. */
+export type ArkButtonGroupProps = PropsWithChildren<
+  ArkDomProps<
+    ArkButtonGroupStyleOptions & {
+      /** Desabilita todos os botões do grupo. */
+      disabled?: boolean;
+      /** Nome do grupo (vira `aria-label`). */
+      label?: string;
+      className?: string;
+    }
+  >
+>;
+
+export const ArkButtonGroup = forwardRef<ArkButtonGroupElement, ArkButtonGroupProps>(
+  function ArkButtonGroup(props, forwardedRef): React.JSX.Element {
+    const { children, className, spaced, fullWidth, disabled, ...rest } = props;
+
+    useEffect(() => {
+      ensureTooarkComponentsRegistered();
+    }, []);
+
+    const attrs: Record<string, unknown> = {
+      ...domAttrs(rest),
+      ref: forwardedRef,
+      class: className,
+      spaced: spaced ? "" : undefined,
+      "full-width": fullWidth ? "" : undefined,
+      disabled: disabled ? "" : undefined
+    };
+
+    return createElement("ark-button-group", attrs, children);
   }
 );

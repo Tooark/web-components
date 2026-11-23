@@ -5,11 +5,12 @@ import type {
   ArkButtonType,
   ArkButtonVariant,
   ArkIntent,
+  ArkOrientation,
   ArkRounded,
   ArkSize,
   ArkTheme
 } from "@tooark/core";
-import type { ArkButton as ArkButtonElement } from "@tooark/web-components";
+import type { ArkButton as ArkButtonElement, ArkButtonGroup as ArkButtonGroupElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
 @Component({
@@ -84,4 +85,58 @@ export class ArkButtonComponent {
   @Output() arkNavigate = new EventEmitter<CustomEvent<ArkButtonNavigateDetail>>();
 
   protected navigateHandler = (event: Event) => this.arkNavigate.emit(event as CustomEvent<ArkButtonNavigateDetail>);
+}
+
+@Component({
+  selector: "ark-button-group-wrapper",
+  standalone: true,
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  template: `
+  <ark-button-group
+    [attr.testid]="testid"
+    [attr.aria-label]="ariaLabel"
+    [attr.label]="label"
+    [attr.orientation]="orientation"
+    [attr.spaced]="spaced ? '' : null"
+    [attr.full-width]="fullWidth ? '' : null"
+    [attr.disabled]="disabled ? '' : null"
+    [attr.variant]="variant"
+    [attr.intent]="intent"
+    [attr.size]="size"
+    [attr.rounded]="rounded"
+    [attr.theme]="theme">
+    <ng-content></ng-content>
+  </ark-button-group>`
+})
+export class ArkButtonGroupComponent {
+  constructor() {
+    ensureTooarkComponentsRegistered();
+  }
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+
+  /** O `ark-button-group` que este wrapper renderiza, com os métodos e propriedades do elemento; `null` antes da view. */
+  get element(): ArkButtonGroupElement | null {
+    return this.host.nativeElement.querySelector<ArkButtonGroupElement>(":scope > ark-button-group");
+  }
+
+  @Input() testid: string | undefined;
+  /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
+  /** Nome do grupo (vira `aria-label`). */
+  @Input() label: string | undefined;
+  /** Direção da fila. Padrão: "horizontal". */
+  @Input() orientation: ArkOrientation | undefined;
+  /** Botões separados pelo gap do size, em vez de colados. */
+  @Input() spaced = false;
+  /** O grupo ocupa a largura disponível e a reparte entre os botões. */
+  @Input() fullWidth = false;
+  /** Desabilita todos os botões do grupo. */
+  @Input() disabled = false;
+  // Sem padrão: só o que o app der ao grupo é gravado nos botões.
+  @Input() variant: ArkButtonVariant | undefined;
+  @Input() intent: ArkIntent | undefined;
+  @Input() size: ArkSize | undefined;
+  @Input() rounded: ArkRounded | undefined;
+  @Input() theme: ArkTheme | undefined;
 }

@@ -11,6 +11,7 @@ import {
 import { createApplication } from "@angular/platform-browser";
 import {
   ArkButtonComponent,
+  ArkButtonGroupComponent,
   ArkCalendarComponent,
   ArkCardComponent,
   ArkDataViewCardDirective,
@@ -21,6 +22,8 @@ import {
   ArkMenuGroupComponent,
   ArkMenuItemComponent,
   ArkPaginationComponent,
+  ArkRadioComponent,
+  ArkRadioGroupComponent,
   ArkSwitchComponent,
   ArkTimeComponent,
   ArkTreeComponent,
@@ -470,6 +473,76 @@ export const Tree = {
     await userEvent.keyboard("{ArrowRight}");
     await expect(item("docs/guide.md")).toBeVisible();
     await expect(host.log).toEqual(["selection src/index.ts", "activate src/index.ts", "toggle docs true"]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+// ark-button-group-wrapper e ark-radio-group-wrapper: os wrappers dos filhos (ark-button-wrapper, ark-radio-wrapper)
+// ficam entre o grupo e o elemento e gravam os próprios padrões, e mesmo assim o atributo do grupo vale, os botões
+// saem colados (o wrapper vira display: contents dentro do grupo) e o output do grupo recebe um `change` só.
+class GroupsHost {
+  log: string[] = [];
+}
+
+export const Groups = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkButtonComponent, ArkButtonGroupComponent, ArkRadioComponent, ArkRadioGroupComponent],
+      template: `
+        <ark-button-group-wrapper label="Período" size="sm" variant="outline" orientation="vertical">
+          <ark-button-wrapper>Dia</ark-button-wrapper>
+          <ark-button-wrapper>Semana inteira</ark-button-wrapper>
+        </ark-button-group-wrapper>
+        <ark-radio-group-wrapper label="Plano" name="plano" value="pro" size="lg" errorMessage="Escolha um plano."
+          (changed)="log.push('group ' + $event.detail.value)">
+          <ark-radio-wrapper value="pro" label="Profissional"></ark-radio-wrapper>
+          <ark-radio-wrapper value="team" label="Equipe"
+            (changed)="log.push('radio ' + $event.detail.value)"></ark-radio-wrapper>
+        </ark-radio-group-wrapper>`
+    })(GroupsHost);
+
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+
+    const buttons = canvasElement.querySelector("ark-button-group") as HTMLElement;
+    const [first, second] = Array.from(buttons.querySelectorAll<HTMLElement>("ark-button"));
+    await waitFor(() => expect(second).toHaveAttribute("data-ark-group-pos", "last"));
+    await expect(buttons).toHaveAttribute("aria-label", "Período");
+    await expect(first).toHaveAttribute("data-ark-group-pos", "first");
+    await expect(first).toHaveAttribute("data-ark-group-dir", "vertical");
+    // O padrão que o wrapper do botão grava (size="md", variant="primary") cede ao do grupo.
+    await expect(first).toHaveAttribute("size", "sm");
+    await expect(first).toHaveAttribute("variant", "outline");
+    // Atrás do wrapper o botão continua sendo o item do grupo: estica na coluna e cola no vizinho.
+    await expect(getComputedStyle(first.parentElement as HTMLElement).display).toBe("contents");
+    await expect(first.getBoundingClientRect().width).toBe(second.getBoundingClientRect().width);
+    await expect(
+      Math.round((first.getBoundingClientRect().bottom - second.getBoundingClientRect().top) * 100) / 100
+    ).toBe(1);
+
+    const radios = canvasElement.querySelector("ark-radio-group") as HTMLElement;
+    const radio = (value: string) => radios.querySelector(`ark-radio[value="${value}"]`) as HTMLElement;
+    await waitFor(() => expect(radio("pro")).toHaveAttribute("checked", ""));
+    await expect(radios).toHaveAccessibleName("Plano");
+    await expect(radios).toHaveAccessibleDescription("Escolha um plano.");
+    await expect(radio("pro")).toHaveAttribute("size", "lg");
+    await expect(radio("pro")).toHaveAttribute("name", "plano");
+    // Os rádios ficam empilhados abaixo da legenda e acima da mensagem, mesmo atrás dos wrappers.
+    const label = (radios.querySelector('[data-ark="radio-group-label"]') as HTMLElement).getBoundingClientRect();
+    const message = (radios.querySelector('[data-ark="radio-group-error"]') as HTMLElement).getBoundingClientRect();
+    await expect(label.bottom).toBeLessThanOrEqual(radio("pro").getBoundingClientRect().top);
+    await expect(radio("pro").getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      radio("team").getBoundingClientRect().top
+    );
+    await expect(radio("team").getBoundingClientRect().bottom).toBeLessThanOrEqual(message.top);
+    await userEvent.click(within(radios).getByRole("radio", { name: "Equipe" }));
+    await expect(radios).toHaveAttribute("value", "team");
+    await expect(radio("pro").hasAttribute("checked")).toBe(false);
+    await expect(host.log).toEqual(["radio team", "group team"]);
     ref.destroy();
     app.destroy();
   }
