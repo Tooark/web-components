@@ -74,7 +74,7 @@ Um wrapper por elemento, com o nome dele: `ark-button` → `ArkButton`, `ark-kv-
 
 - Props: os atributos do elemento em camelCase (`iconOnly`, `stepMinutes`, `localeJson`), `testid` para os hooks de E2E, mais as propriedades JS onde importam (`events`, `rows`, `options`, `sizes`, `valueField` no `ArkKvEditor`, e `columns`, `selected` e `cardRender` no `ArkDataView`). No `ArkDataView` o conteúdo de uma célula é o slot com escopo `#cell-<key>="{ row, column, value, index, view }"` e `#card="{ row, index }"` desenha o corpo de um card, teleportados para as células e reativos como qualquer slot; um `render` de coluna que devolve VNodes também funciona.
 - Eventos: os customizados com o nome nativo (`@ark-close` em `ArkDialog`/`ArkDrawer`, `@ark-select` em `ArkMenu`/`ArkCommandPalette`, `@change` em `ArkSelect`/`ArkKvEditor` com `$event.detail`, …); `@ark-change` em `ArkCalendar`/`ArkDatepicker`/`ArkClock`, `@ark-slide-change` em `ArkCarousel` e `@ark-event-click`/`@ark-slot-click`/`@ark-view-change`/`@ark-range-change` em `ArkScheduler` entregam o próprio `detail`; eventos nativos sobem do controle interno (`@input` em `ArkInput`: leia `$event.target.value`).
-- Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`).
+- Estado: atributos como `open` são a fonte da verdade (`:open="bool"` + `@ark-close`). `@ark-open`/`@ark-close` em `ArkDialog`, `ArkDrawer`, `ArkCommandPalette` e `ArkMenu` só são emitidos para o evento do próprio elemento, e `@ark-close` em `ArkTabs` só para as abas dele: os eventos do DOM borbulham, e os de um overlay de dentro (um `ArkMenu` num diálogo) não são reemitidos pelo componente de fora.
 
 ### Pacotes laterais (subpaths)
 

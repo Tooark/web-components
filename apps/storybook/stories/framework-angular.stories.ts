@@ -14,9 +14,13 @@ import {
   ArkButtonGroupComponent,
   ArkCalendarComponent,
   ArkCardComponent,
+  ArkCommandItemComponent,
+  ArkCommandPaletteComponent,
   ArkDataViewCardDirective,
   ArkDataViewCellDirective,
   ArkDataViewComponent,
+  ArkDialogComponent,
+  ArkDrawerComponent,
   ArkEmptyComponent,
   ArkMenuComponent,
   ArkMenuGroupComponent,
@@ -25,6 +29,8 @@ import {
   ArkRadioComponent,
   ArkRadioGroupComponent,
   ArkSwitchComponent,
+  ArkTabComponent,
+  ArkTabsComponent,
   ArkTimeComponent,
   ArkTreeComponent,
   ArkTreeItemComponent,
@@ -43,6 +49,7 @@ import type {
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expectOwnOverlayEvents } from "./overlay-events";
 
 // Os wrappers Angular de verdade, compilados em JIT a partir do src (o Vite transforma os decorators legados, ver
 // main.ts) e montados numa aplicação sem zone.js, como o padrão do Angular 21. O preview já registrou os elementos.
@@ -543,6 +550,61 @@ export const Groups = {
     await expect(radios).toHaveAttribute("value", "team");
     await expect(radio("pro").hasAttribute("checked")).toBe(false);
     await expect(host.log).toEqual(["radio team", "group team"]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+class OverlayEventsHost {
+  log: string[] = [];
+}
+
+// (arkOpen) e (arkClose) só para os eventos do próprio elemento (ver overlay-events.ts): um ark-menu ou uma aba
+// fechável dentro de um ark-dialog-wrapper disparava o (arkClose) do diálogo, e o app o fechava.
+export const OverlayEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [
+        ArkDialogComponent,
+        ArkDrawerComponent,
+        ArkCommandPaletteComponent,
+        ArkCommandItemComponent,
+        ArkMenuComponent,
+        ArkMenuItemComponent,
+        ArkTabsComponent,
+        ArkTabComponent
+      ],
+      template: `
+        <ark-dialog-wrapper label="Editar"
+          (arkOpen)="log.push('ark-dialog:open')" (arkClose)="log.push('ark-dialog:close')">
+          <span data-child>Corpo</span>
+          <button type="button" id="angular-events-trigger">Opções</button>
+          <ark-menu-wrapper for="angular-events-trigger" ariaLabel="Opções"
+            (arkOpen)="log.push('ark-menu:open')" (arkClose)="log.push('ark-menu:close')">
+            <ark-menu-item-wrapper value="copy"><span data-child>Duplicar</span></ark-menu-item-wrapper>
+          </ark-menu-wrapper>
+          <ark-tabs-wrapper label="Arquivos" variant="editor"
+            (arkClose)="log.push('ark-tabs:close:' + $event.detail.value)">
+            <ark-tab-wrapper value="t1" [closable]="true"><span data-child>um.ts</span></ark-tab-wrapper>
+          </ark-tabs-wrapper>
+        </ark-dialog-wrapper>
+        <ark-drawer-wrapper label="Filtros"
+          (arkOpen)="log.push('ark-drawer:open')" (arkClose)="log.push('ark-drawer:close')">
+          <span data-child>Corpo</span>
+        </ark-drawer-wrapper>
+        <ark-command-palette-wrapper label="Comandos"
+          (arkOpen)="log.push('ark-command-palette:open')" (arkClose)="log.push('ark-command-palette:close')">
+          <ark-command-item-wrapper value="a"><span data-child>Alpha</span></ark-command-item-wrapper>
+        </ark-command-palette-wrapper>`
+    })(OverlayEventsHost);
+
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    await expectOwnOverlayEvents(canvasElement.lastElementChild as HTMLElement, host.log);
+    await expect(errors).toEqual([]);
     ref.destroy();
     app.destroy();
   }

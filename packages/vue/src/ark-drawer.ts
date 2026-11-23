@@ -35,8 +35,15 @@ export const ArkDrawer = defineComponent({
     const elRef = ref<HTMLElement | null>(null);
 
     // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
-    const openHandler = (event: Event) => emit("ark-open", event as CustomEvent);
-    const closeHandler = (event: Event) => emit("ark-close", event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
+    // ark-open e ark-close borbulham: só os deste elemento chegam ao app. Os de um overlay de dentro chegavam também
+    // (um ark-menu que fechava dentro de um diálogo chamava o onClose do diálogo).
+    const openHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-open", event as CustomEvent);
+    };
+    const closeHandler = (event: Event) => {
+      if (event.target === event.currentTarget)
+        emit("ark-close", event as CustomEvent<{ reason: ArkDrawerCloseReason }>);
+    };
     onMounted(() => {
       elRef.value?.addEventListener("ark-open", openHandler);
       elRef.value?.addEventListener("ark-close", closeHandler);
