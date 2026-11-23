@@ -9,6 +9,57 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-input`: `list` is mirrored onto the inner `<input>`, so a `<datalist>` on the page offers its suggestions.
+  `list` prop on `ArkInput` (React, Vue) and `ArkInputComponent` (Angular), and on the raw tag's JSX typing.
+- `ark-button`: `form` (the id of a form the button sits outside of, as on a native `<button form>`) is a prop of
+  `ArkButton` (React, Vue) and `ArkButtonComponent` (Angular), and of the raw tag's JSX typing. The attribute already
+  worked on the element; see the fix below for the property.
+
+### Fixed
+
+- `ark-checkbox`: a mouse click in the middle of a checked box toggled it twice (`change` with `false`, then `true`)
+  and left it checked, and from `indeterminate` it ended unchecked. The click lands on the glyph, the redraw removes
+  that `<svg>` from the DOM, and the host's own click handler no longer found it inside the box. The handler now
+  reads the event path. Clicks on the edge of the box, on the label and the Space key were not affected, nor were
+  `ark-radio` and `ark-switch`, which now read the event path too. `GlyphClickTogglesOnce` story.
+- `ark-button`: `form` only had a getter. React 19 assigns a prop as a property when the element defines it, so
+  `<ArkButton form="id">` threw ("Cannot set property form … which has only a getter") and unmounted the tree. The
+  property now has a setter that writes the attribute (`null`/`undefined` remove it).
+- `ark-dialog`, `ark-drawer`: inserted already open (a framework that renders the overlay only while it is open, with
+  the elements registered), the initial focus went to the close button when the first field of the body was an
+  `ark-input`, `ark-select` or another `ark-*` field. The focus was chosen in the overlay's `connectedCallback`,
+  before its children connected and built their native controls. The focus trap and the initial focus now wait for
+  the same microtask as `ark-open`. Opening after mount was not affected.
+- `ark-card`: stretched to a taller row (a grid of cards, a height on the host), the host split the extra height among
+  its rows, so the title moved down (87 px in a 372 px card) and the footer row grew. A card with a heading, a header,
+  actions or a footer now keeps its title at the top. A body made of a single child takes the extra height (it used
+  to get only a share of it) and the footer sits at the bottom; a body of several children stays together at the top
+  with the extra below. A body-only card renders exactly as before, and so does any card that is not stretched.
+  `Stretched` story.
+- `ark-card` with `wrap-actions`: on a page that sets `overflow-wrap: anywhere`, the inherited value reduced the
+  minimum width of the title to one character, so the own `h2` became one letter per line. The `h2` now sets
+  `overflow-wrap: break-word`, which breaks a word that does not fit without changing the minimum width.
+- `ark-textarea` with `autosize`: `rows` was ignored (`field-sizing: content` drops it), so `rows="4"` rendered one
+  line. An explicit `rows` is now the minimum height. Without the attribute `autosize` still starts at one line.
+  The bulk mode of `ark-kv-editor`, which asks for `rows="4"`, now opens with those four lines.
+- `ark-menu`: `align="end"` right-aligned the group labels and any free content. Chromium maps the `align` attribute
+  of every HTML element to `text-align`; the host now sets `text-align: start`.
+- `ark-alert`: a `slot="action"` that is not on the first line (placed after a paragraph, or after text that wrapped
+  in a narrow alert) kept the negative offset that centers it on the first line and covered 3 px of the line above.
+  The host now measures where the action landed and drops the offset there, so the action moves 4 px down in that
+  case; on the first line nothing changes.
+- `@tooark/react`: a boolean `aria-*` prop (`aria-pressed={true}`) reached the element as an empty attribute, an
+  invalid ARIA value, because React 19 writes booleans on custom elements as present or absent. Every wrapper now
+  passes those as `"true"`/`"false"`, as React does on native elements.
+
+### Changed
+
+- README: `slot="actions"` of `ark-card` is a single container (two children with that slot share one cell and
+  overlap), as the drawer's section already said; `flex-wrap: wrap` on the `ark-toggle-group` host wraps the options
+  in a narrow container; `ark-alert` states where the action lands by its place in the DOM.
+
 ## [1.7.0] - 2026-11-22
 
 ### Added
