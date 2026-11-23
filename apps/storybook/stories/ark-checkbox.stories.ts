@@ -375,6 +375,32 @@ export const FormParticipation = {
   }
 };
 
+// O clique do mouse no meio da caixa cai no glifo (o svg dentro do botão), que o redesenho tira do DOM: a caixa
+// alternava duas vezes e continuava marcada. `userEvent.click(botão)` nunca mira o glifo, por isso o alvo é o svg.
+export const GlyphClickTogglesOnce = {
+  render: () => createCheckbox({ label: "Aceito os termos", checked: true }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-checkbox") as CheckboxEl;
+    const glyph = (): SVGElement => host.querySelector('[data-ark="checkbox"] svg') as SVGElement;
+    const changes: boolean[] = [];
+    host.addEventListener("change", (event) =>
+      changes.push((event as CustomEvent<{ checked: boolean }>).detail.checked)
+    );
+
+    await userEvent.click(glyph());
+    await expect(changes).toEqual([false]);
+    await expect(host.checked).toBe(false);
+
+    // Do estado misto, o clique no traço marca a caixa.
+    host.indeterminate = true;
+    changes.length = 0;
+    await userEvent.click(glyph());
+    await expect(changes).toEqual([true]);
+    await expect(host.checked).toBe(true);
+    await expect(host.indeterminate).toBe(false);
+  }
+};
+
 export const TestHooks = {
   render: () => createCheckbox({ label: "Hooks", testid: "meu-checkbox" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
