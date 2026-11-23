@@ -28,7 +28,7 @@ The native Custom Elements (`ark-*`) of the Tooark design system, styled with Ta
 
 The `@tooark/web-components` package provides:
 
-- 50 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination, tree), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) the calendar/clock/scheduler family and relative time (`ark-time`);
+- 52 elements: buttons and toggles, form fields (input, textarea, select, checkbox, radio, switch, file input, datepicker, key/value editor), overlays on the Popover API (dialog, drawer, menu, tooltip, command palette, toaster), layout (card, tabs, split pane, carousel), data (data view as table or cards, pagination, tree), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) the calendar/clock/scheduler family and relative time (`ark-time`);
 - light DOM: components never move or wrap your children; the host is the control or container;
 - `styles.css` is the only stylesheet you need: tokens, motion presets and component styles, all prefixed (`ark:*`, `--ark-*`), with no global reset;
 - themes by `color-scheme` (`theme="light|dark"` per element), sizes `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -75,6 +75,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-avatar` — Avatar (`role="img"` named by `name`): initials from `name`, `src` image that falls back to the initials on load error, `size`, `shape` circle/square, custom `color`, `variant` soft/solid.
 - `ark-badge` — Short status/category label: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, custom `color` via `color-mix`. The host is the badge; icon and text stay as its children.
 - `ark-button` — Intents, sizes, style variants (solid/outline/ghost/soft), `rounded` (up to `full`), `loading`/`icon-only`/`full-width` states, `status` feedback (success/error glyph + announcement), link mode (`href`), forms (`type="submit"` is the form's default button, so Enter in its text fields submits).
+- `ark-button-group` — Group of `ark-button`s (`role="group"`): joined by default (one outline, a divider between the buttons) or `spaced`; `orientation`, `full-width`; `variant`/`intent`/`size`/`rounded`/`theme`/`disabled` apply to every button. A split button is this group plus an `ark-menu`.
 - `ark-calendar` — Inline month grid (MUI DateCalendar-style): localized, WAI-ARIA keyboard navigation, motion, month/year views from the title and colored events (`dots`/`count`/`list`).
 - `ark-card` — Card: the host is the box (`surface`, `border`, `rounded`) and a grid: `heading` (h2) or `slot="header"` with `slot="actions"` on the top row, unslotted children as the body, `slot="footer"` last with a divider; `padding` none–lg.
 - `ark-carousel` — Native CSS scroll snap (touch/trackpad scroll natively, mouse drag emulated), autoplay, loop, dots and arrows. Slides stay as your direct children.
@@ -103,6 +104,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-pagination` — Pagination (`role="navigation"`): range summary, optional page-size select (`page-sizes`), page strip with ellipses, previous/next; `page`/`page-size`/`total` rewritten on click, localized, announced. Emits `ark-page-change`.
 - `ark-progress` — Progress bar (`role="progressbar"` on the host): `value`/`max` with token-driven width transition, `show-value`, `indeterminate` loop exempt from reduced motion, `label`, sizes, intents.
 - `ark-radio` — Radio drawn by the component (`role="radio"` button + hidden native input): groups by `name` in the same form, one tab stop per group, arrows move and check, `label`/children as the label, `helper` hint. Emits `change` on the one checked.
+- `ark-radio-group` — Group of `ark-radio`s (`role="radiogroup"`): `value` synced with the checked radio, own legend (`label`), `helper`/`error-message`, `orientation`, `required`; `name`/`size`/`intent`/`theme`/`disabled` apply to every radio. Emits one `change`.
 - `ark-scheduler` — Scheduler with `week`/`day` views (time grid with overlap resolved into columns), plus `month` and `agenda`; colored, clickable events.
 - `ark-select` — Native `<select>` styled like `ark-input`: label, helper/error with aria, `placeholder`, options from data (`options` JSON attribute or JS property, `group` → `<optgroup>`), sizes, intents, `rounded`.
 - `ark-shape-picker` — Shape picker as a `radiogroup`: the ten `ark-mark` shapes (or the ones `shapes` lists) drawn in `color`, `value`, arrows navigate, localized shape names, `disabled`, `size`. Emits `change` with the shape.
