@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
-import type { ArkSize, ArkTheme, ArkTreeSelection } from "@tooark/core";
+import type { ArkSize, ArkTheme, ArkTreeIcons, ArkTreeItemIcon, ArkTreeSelection } from "@tooark/core";
 import type { ArkTree as ArkTreeElement, ArkTreeItem as ArkTreeItemElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -16,6 +16,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.value]="valueAttr"
     [attr.label]="label"
     [attr.aria-label]="ariaLabel"
+    [attr.icons]="icons"
+    [attr.icon-color]="iconColor"
     [attr.size]="size"
     [attr.theme]="theme"
     (ark-toggle)="toggleHandler($event)"
@@ -46,6 +48,10 @@ export class ArkTreeComponent {
   /** Nome da árvore (vira `aria-label`). */
   @Input() label: string | undefined;
   @Input() ariaLabel: string | undefined;
+  /** `files` desenha o ícone próprio de pasta ou arquivo; `none` esconde todos. */
+  @Input() icons: ArkTreeIcons | undefined;
+  /** Cor dos ícones: um intent, `current` (a cor do texto) ou uma cor CSS. */
+  @Input() iconColor: string | undefined;
   @Input() size: ArkSize | undefined;
   @Input() theme: ArkTheme | undefined;
   @Output() arkToggle = new EventEmitter<CustomEvent<{ value: string; expanded: boolean; item: ArkTreeItemElement }>>();
@@ -77,6 +83,7 @@ export class ArkTreeComponent {
     [attr.testid]="testid"
     [attr.value]="value"
     [attr.label]="label"
+    [attr.icon]="icon"
     [attr.expanded]="expanded ? '' : null"
     [attr.lazy]="lazy ? '' : null"
     [attr.loading]="loading ? '' : null"
@@ -102,6 +109,8 @@ export class ArkTreeItemComponent {
   @Input() value: string | undefined;
   /** Texto do nó (também usado na busca por digitação). */
   @Input() label: string | undefined;
+  /** Ícone próprio deste nó: folder, file ou none. */
+  @Input() icon: ArkTreeItemIcon | undefined;
   @Input() expanded = false;
   /** Mostra o chevron sem filhos: carregue os filhos no `(arkToggle)` com `expanded: true`. */
   @Input() lazy = false;
