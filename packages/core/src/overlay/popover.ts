@@ -23,6 +23,14 @@ export function isPopoverOpen(host: Element): boolean {
   }
 }
 
+/**
+ * Indica se o host está na saída de um `closePopover`: ainda no top layer, só até a animação acabar. Interno ao
+ * core (o focus trap deixa de tratá-lo como popover aberto por cima).
+ */
+export function isPopoverClosing(host: Element): boolean {
+  return closing.has(host as HTMLElement);
+}
+
 function cancelAnimations(host: HTMLElement): void {
   if (typeof host.getAnimations !== "function") return;
   for (const animation of host.getAnimations()) animation.cancel();

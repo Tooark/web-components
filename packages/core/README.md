@@ -71,7 +71,7 @@ import "@tooark/core/styles.css"; // tokens + motion presets
 
 ### Overlay helpers
 
-- `trapFocus(container, { initial, returnTo, onOutsidePointer })` → release function.
+- `trapFocus(container, { initial, returnTo, onOutsidePointer })` → release function. Focus that escapes comes back to the last element focused inside the container, else `initial`, else the first focusable.
 - `openPopover(host, preset, { ...motion, lockScroll })` / `closePopover(host, preset, options)`; `lockScroll(owner)`, `unlockScroll(owner)`, `isScrollLocked()`.
 - `positionAnchored(panel, anchor, { side, align, offset, padding, onPlace })` → dispose function.
 - `focusableElements(root)`, `isPopoverOpen(host)`.

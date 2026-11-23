@@ -22,6 +22,7 @@ import {
   ArkDataView as ReactArkDataView,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
+  ArkDrawer as ReactArkDrawer,
   ArkEmpty as ReactArkEmpty,
   ArkFileInput as ReactArkFileInput,
   ArkInput as ReactArkInput,
@@ -617,6 +618,97 @@ export const ReactDialogOpenOnMount = {
     root.render(createElement(ReactArkDialog, { label: "Aviso", open: true, onOpen: () => opened++ }, "Oi"));
     await waitFor(() => expect(opened).toBe(1));
     (canvasElement.querySelector("ark-dialog") as HTMLElement & { close: () => void }).close();
+  }
+};
+
+// Overlay montado fechado e aberto pela prop com o abridor focado (clique ou Enter num app real). O React refoca, ao
+// fim do commit, o elemento que tinha o foco antes dele: o diálogo abre dentro do commit e foca o campo, o React
+// devolve o foco ao abridor e o trap o traz de volta. Ele volta para o campo, não para o primeiro focável do painel
+// (o botão de fechar do cabeçalho), que era onde o foco terminava.
+function OverlayByProp({ tag }: { tag: "dialog" | "drawer" }): ReactNode {
+  const [open, setOpen] = useState(false);
+  const field = createElement(ReactArkInput, { label: "Nome" });
+  const props = { key: "overlay", open, label: "Editar", onClose: () => setOpen(false) };
+  return [
+    createElement("button", { key: "opener", type: "button", onClick: () => setOpen(true) }, "Abrir"),
+    tag === "dialog" ? createElement(ReactArkDialog, props, field) : createElement(ReactArkDrawer, props, field)
+  ];
+}
+
+export const ReactOverlayOpenedByPropFocusesField = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    for (const tag of ["dialog", "drawer"] as const) {
+      const root = reactRoot(canvasElement, errors)(createElement(OverlayByProp, { tag }));
+      const scope = canvasElement.lastElementChild as HTMLElement;
+      const opener = within(scope).getByText("Abrir");
+      const overlay = scope.querySelector(`ark-${tag}`) as HTMLElement;
+
+      // Sem o abridor focado o React não tem o que devolver e o defeito não aparece.
+      opener.focus();
+      await expect(opener).toHaveFocus();
+      await userEvent.click(opener);
+      await waitFor(() => expect(overlay.matches(":popover-open")).toBe(true));
+      await expect(overlay.querySelector("input")).toHaveFocus();
+
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() => expect(overlay).not.toHaveAttribute("data-ark-state"));
+      await expect(opener).toHaveFocus();
+      root.unmount();
+    }
+    await expect(errors).toEqual([]);
+  }
+};
+
+// Um diálogo fecha e outro abre no mesmo commit, nas duas ordens do DOM. O React refoca o botão que disparou a troca,
+// dentro do diálogo que está saindo (ainda no top layer durante a animação): o foco fica no campo do que abriu, e não
+// se perde quando o primeiro some.
+function OverlaySwap({ secondFirst }: { secondFirst: boolean }): ReactNode {
+  const [step, setStep] = useState(0);
+  const first = createElement(
+    ReactArkDialog,
+    { key: "first", open: step === 1, label: "Passo 1", onClose: () => setStep((now) => (now === 1 ? 0 : now)) },
+    createElement(ReactArkButton, { onClick: () => setStep(2) }, "Próximo")
+  );
+  const second = createElement(
+    ReactArkDialog,
+    { key: "second", open: step === 2, label: "Passo 2", onClose: () => setStep(0) },
+    createElement(ReactArkInput, { label: "Nome" })
+  );
+  return [
+    createElement("button", { key: "opener", type: "button", onClick: () => setStep(1) }, "Abrir"),
+    ...(secondFirst ? [second, first] : [first, second])
+  ];
+}
+
+export const ReactDialogSwapKeepsFocus = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    for (const secondFirst of [false, true]) {
+      const root = reactRoot(canvasElement, errors)(createElement(OverlaySwap, { secondFirst }));
+      const scope = canvasElement.lastElementChild as HTMLElement;
+      const first = scope.querySelector('ark-dialog[label="Passo 1"]') as HTMLElement;
+      const second = scope.querySelector('ark-dialog[label="Passo 2"]') as HTMLElement;
+
+      await userEvent.click(within(scope).getByText("Abrir"));
+      await waitFor(() => expect(first.matches(":popover-open")).toBe(true));
+      const next = within(first).getByText("Próximo");
+      await expect(next).toHaveFocus();
+
+      await userEvent.click(next);
+      await waitFor(() => expect(second.matches(":popover-open")).toBe(true));
+      const field = second.querySelector("input");
+      await expect(field).toHaveFocus();
+      await waitFor(() => expect(first).not.toHaveAttribute("data-ark-state"));
+      await expect(field).toHaveFocus();
+
+      await userEvent.keyboard("{Escape}");
+      await waitFor(() => expect(second).not.toHaveAttribute("data-ark-state"));
+      root.unmount();
+    }
+    await expect(errors).toEqual([]);
   }
 };
 

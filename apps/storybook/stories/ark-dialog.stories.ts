@@ -308,11 +308,90 @@ export const FocusTrapCycles = {
     await userEvent.tab({ shift: true });
     expect(document.activeElement).toBe(save);
 
+    // Foco levado para fora volta para onde estava, não para o primeiro focável do painel (o botão de fechar).
     opener.focus();
-    expect(dialog.contains(document.activeElement)).toBe(true);
+    expect(document.activeElement).toBe(save);
 
     dialog.close();
     await closed(dialog);
+  }
+};
+
+// Para onde volta o foco que escapa: o último elemento focado no painel; se ele saiu do DOM, o foco inicial; sem
+// nenhum dos dois, o primeiro focável. É o que mantém o campo focado quando um framework devolve o foco ao opener
+// depois de abrir o diálogo (o React refoca, ao fim do commit, o elemento que tinha o foco antes dele).
+export const EscapedFocusReturnsWhereItWas = {
+  render: () => createScene({ label: "Editar", lang: "pt" }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const opener = canvas.getByText("Abrir");
+
+    await userEvent.click(opener);
+    const [nome, url] = Array.from(dialog.querySelectorAll("input"));
+    const close = dialog.querySelector('[data-ark="dialog-close"]');
+    await expect(document.activeElement).toBe(nome);
+
+    // Logo depois de abrir: volta ao campo que recebeu o foco inicial.
+    opener.focus();
+    await expect(document.activeElement).toBe(nome);
+
+    url.focus();
+    opener.focus();
+    await expect(document.activeElement).toBe(url);
+
+    // O último focado saiu do DOM: vale o foco inicial.
+    (url.closest("ark-input") as HTMLElement).remove();
+    opener.focus();
+    await expect(document.activeElement).toBe(nome);
+
+    // Nem ele: o primeiro focável do painel.
+    (nome.closest("ark-input") as HTMLElement).remove();
+    opener.focus();
+    await expect(document.activeElement).toBe(close);
+
+    dialog.close();
+    await closed(dialog);
+  }
+};
+
+// Um diálogo fecha e outro abre no mesmo passo (assistente, confirmação depois do formulário). O que fecha continua
+// no top layer durante a animação de saída, mas já não é um popover "por cima" do novo: foco que volte para dentro
+// dele (o React refoca o botão que disparou a troca) vai para o diálogo aberto, em vez de ficar num painel que some.
+export const FocusLeavesTheClosingDialog = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const first = createDialog({ label: "Passo 1", lang: "pt" }, { footer: false, body: [] });
+    const next = document.createElement("ark-button");
+    next.setAttribute("size", "sm");
+    next.textContent = "Próximo";
+    first.appendChild(next);
+    const second = createDialog({ label: "Passo 2", lang: "pt" }, { footer: false, body: [createField("Nome")] });
+    wrap.append(createOpener(first), first, second);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [first, second] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const next = canvas.getByText("Próximo");
+
+    await userEvent.click(canvas.getByText("Abrir"));
+    await expect(document.activeElement).toBe(next);
+
+    first.close();
+    second.show();
+    const field = second.querySelector("input");
+    await expect(document.activeElement).toBe(field);
+    await expect(first).toHaveAttribute("data-ark-state", "closing");
+    expect(first.matches(":popover-open")).toBe(true);
+
+    next.focus();
+    await expect(document.activeElement).toBe(field);
+
+    await closed(first);
+    await expect(document.activeElement).toBe(field);
+    second.close();
+    await closed(second);
   }
 };
 
@@ -488,6 +567,51 @@ export const WarnsOnceWithoutName = {
     } finally {
       console.warn = original;
     }
+  }
+};
+
+// A regra do foco acima não vale para o ponteiro. Um diálogo aberto por cima de outro e que está fechando ainda recebe
+// os cliques durante a animação de saída: o segundo clique de um duplo clique no "Cancelar" de uma confirmação não
+// pode contar como clique no scrim do diálogo de baixo e fechá-lo.
+export const ClosingDialogOnTopKeepsThePointer = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const form = createDialog({ label: "Formulário", lang: "pt" }, { footer: false });
+    const confirm = createDialog({ label: "Descartar?", lang: "pt" }, { footer: false, body: [] });
+    const cancel = document.createElement("ark-button");
+    cancel.setAttribute("size", "sm");
+    cancel.textContent = "Manter";
+    cancel.addEventListener("click", () => confirm.close());
+    confirm.appendChild(cancel);
+    wrap.append(createOpener(form), form, confirm);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [form, confirm] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const cancel = canvas.getByText("Manter");
+    const reasons: string[] = [];
+    form.addEventListener("ark-close", (event) =>
+      reasons.push((event as CustomEvent<{ reason: string }>).detail.reason)
+    );
+
+    await userEvent.click(canvas.getByText("Abrir"));
+    const field = form.querySelector("input");
+    await expect(document.activeElement).toBe(field);
+    confirm.show();
+    await expect(document.activeElement).toBe(cancel);
+
+    await userEvent.click(cancel);
+    await expect(confirm).toHaveAttribute("data-ark-state", "closing");
+    await userEvent.click(cancel);
+    await expect(form).toHaveAttribute("open");
+    expect(reasons).toEqual([]);
+
+    await closed(confirm);
+    await expect(form).toHaveAttribute("open");
+    await expect(document.activeElement).toBe(field);
+    form.close();
+    await closed(form);
   }
 };
 
