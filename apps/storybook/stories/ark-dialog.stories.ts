@@ -392,6 +392,9 @@ export const FocusLeavesTheClosingDialog = {
     await expect(document.activeElement).toBe(field);
     second.close();
     await closed(second);
+    // Quem abriu o segundo foi um botão do primeiro, que já fechou: o foco sobe para quem abriu o primeiro, em vez
+    // de se perder no body.
+    await waitFor(() => expect(document.activeElement === canvas.getByText("Abrir")).toBe(true));
   }
 };
 
@@ -611,6 +614,55 @@ export const ClosingDialogOnTopKeepsThePointer = {
     await expect(form).toHaveAttribute("open");
     await expect(document.activeElement).toBe(field);
     form.close();
+    await closed(form);
+  }
+};
+
+// Um diálogo aberto por cima de outro. O de baixo também é um popover aberto, mas não está por cima do trap do de
+// cima: foco levado a ele volta, e um clique nele não chega ao alvo e conta como clique no scrim do de cima. Antes o
+// trap tratava qualquer popover aberto como "por cima", e o botão do diálogo de baixo fechava-o com o de cima aberto.
+export const DialogBelowIsNotOnTop = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const form = createDialog({ label: "Formulário", width: "640", height: "480", lang: "pt" });
+    const confirm = createDialog(
+      { label: "Descartar?", size: "sm", lang: "pt" },
+      { footer: false, body: [createField("Motivo")] }
+    );
+    wrap.append(createOpener(form), form, confirm);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [form, confirm] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const reasons: string[] = [];
+    for (const el of [form, confirm]) {
+      el.addEventListener("ark-close", (event) =>
+        reasons.push(`${el.getAttribute("label")}:${(event as CustomEvent<{ reason: string }>).detail.reason}`)
+      );
+    }
+
+    await userEvent.click(canvas.getByText("Abrir"));
+    const nome = form.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+    confirm.show();
+    const motivo = confirm.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(document.activeElement === motivo).toBe(true));
+
+    nome.focus();
+    await expect(document.activeElement === motivo).toBe(true);
+    // Tab com o foco no de cima continua nele.
+    await userEvent.tab();
+    await expect(confirm.contains(document.activeElement)).toBe(true);
+
+    await userEvent.click(within(form).getByText("Cancelar"));
+    expect(reasons).toEqual(["Descartar?:backdrop"]);
+    await expect(form).toHaveAttribute("open");
+    await closed(confirm);
+    // O foco volta a quem o tinha quando o de cima abriu, e o de baixo volta a responder.
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+    await userEvent.click(within(form).getByText("Cancelar"));
+    expect(reasons).toEqual(["Descartar?:backdrop", "Formulário:api"]);
     await closed(form);
   }
 };
