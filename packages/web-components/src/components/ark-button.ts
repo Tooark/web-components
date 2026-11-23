@@ -279,6 +279,15 @@ export class ArkButton extends HTMLElementBase {
     return this.internals?.form ?? this.closest("form");
   }
 
+  /**
+   * Atribuir um id grava o atributo `form`, que associa o botão a um formulário de fora dele, como no
+   * `<button form>` nativo; `null` ou `undefined` o removem. O React 19 atribui a prop como propriedade, e sem setter
+   * a atribuição lançava.
+   */
+  set form(value: string | null | undefined) {
+    reflectAttr(this, "form", value);
+  }
+
   // --- Interação ---
 
   /**

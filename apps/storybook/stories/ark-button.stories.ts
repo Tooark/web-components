@@ -454,6 +454,53 @@ export const SubmitsForm = {
 };
 
 // Espera o setTimeout do handleClick, que adia o requestSubmit() para depois dos listeners do click.
+// `form` associa o botão a um formulário de fora dele, como no `<button form>` nativo. A propriedade tem setter: o
+// React 19 atribui a prop como propriedade, e só com o getter a atribuição lançava e desmontava a árvore.
+export const FormAttribute = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex items-center gap-3";
+    const form = document.createElement("form");
+    form.id = "ark-button-form-attribute";
+    const field = document.createElement("ark-input");
+    field.setAttribute("name", "nome");
+    field.setAttribute("aria-label", "Nome");
+    field.setAttribute("value", "Ana");
+    form.appendChild(field);
+    const button = document.createElement("ark-button");
+    button.setAttribute("type", "submit");
+    button.setAttribute("form", form.id);
+    button.textContent = "Salvar (fora do form)";
+    wrap.append(form, button);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    const button = canvasElement.querySelector("ark-button[type='submit']") as ArkButton;
+    let submits = 0;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submits++;
+    });
+
+    await expect(button.form === form).toBe(true);
+    await userEvent.click(button);
+    await expect(submits).toBe(1);
+
+    button.form = null;
+    await expect(button).not.toHaveAttribute("form");
+    await expect(button.form).toBe(null);
+    await userEvent.click(button);
+    await expect(submits).toBe(1);
+
+    button.form = form.id;
+    await expect(button).toHaveAttribute("form", form.id);
+    await expect(button.form === form).toBe(true);
+    await userEvent.click(button);
+    await expect(submits).toBe(2);
+  }
+};
+
 const settle = (): Promise<void> => new Promise((resolve) => setTimeout(resolve, 30));
 
 export const EnterSubmitsForm = {
