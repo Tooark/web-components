@@ -18,6 +18,7 @@ const PASS_THROUGH_ATTRS = [
   "max",
   "step",
   "spellcheck",
+  "list",
   "aria-label"
 ];
 

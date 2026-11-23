@@ -326,6 +326,37 @@ export const PassThroughAttributes = {
   }
 };
 
+// `list` chega ao <input>, que passa a oferecer as sugestões de um <datalist> da página (o campo é light DOM, então
+// o id é resolvido no mesmo documento).
+export const Datalist = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const el = createInput({ label: "Fruta", placeholder: "Digite ou escolha" });
+    el.setAttribute("list", "ark-input-frutas");
+    const datalist = document.createElement("datalist");
+    datalist.id = "ark-input-frutas";
+    for (const name of ["Abacaxi", "Banana", "Caju"]) {
+      const option = document.createElement("option");
+      option.value = name;
+      datalist.appendChild(option);
+    }
+    wrap.append(el, datalist);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-input")!;
+    const input = host.querySelector<HTMLInputElement>('[data-ark="input"]')!;
+    const datalist = canvasElement.querySelector("datalist")!;
+
+    await expect(input).toHaveAttribute("list", "ark-input-frutas");
+    await expect(input.list === datalist).toBe(true);
+
+    host.removeAttribute("list");
+    await expect(input).not.toHaveAttribute("list");
+    await expect(input.list).toBe(null);
+  }
+};
+
 // Light DOM com atributos como API: `placeholder` e `aria-label` ficam no host (é onde o app escreve) e são
 // espelhados no <input>, então consultas pelo atributo acham os dois. O que acha só o campo: papel + nome (com
 // `label` ou `aria-label`; o Testing Library não usa o placeholder como nome), o `<label for>` do `label`, o testid e
