@@ -377,6 +377,118 @@ export const WrapActions = {
   }
 };
 
+// Uma página com `overflow-wrap: anywhere` (comum em apps que mostram URLs e identificadores) reduz a largura mínima
+// de um texto a um caractere: o piso do título de `wrap-actions` sumia e ele virava uma letra por linha. O h2
+// próprio fixa o `overflow-wrap`, então o piso é o mesmo de uma página sem a regra.
+export const WrapActionsUnderOverflowWrapAnywhere = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "16px";
+    for (const inherited of ["anywhere", "normal"]) {
+      const scope = document.createElement("div");
+      scope.dataset.case = inherited;
+      scope.style.overflowWrap = inherited;
+      const card = createCard({ heading: "Relatório de consumo mensal", width: "360px" });
+      card.setAttribute("wrap-actions", "");
+      card.appendChild(wideActions(true));
+      scope.appendChild(card);
+      wrap.appendChild(scope);
+    }
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const headingOf = (id: string) =>
+      canvasElement.querySelector(`[data-case="${id}"] [data-ark="card-heading"]`) as HTMLElement;
+    const anywhere = headingOf("anywhere").getBoundingClientRect();
+    const normal = headingOf("normal").getBoundingClientRect();
+
+    await expect(getComputedStyle(headingOf("anywhere")).overflowWrap).toBe("break-word");
+    // Mesma caixa nos dois: a largura da maior palavra, e não uma letra por linha.
+    await expect(Math.round(anywhere.width)).toBe(Math.round(normal.width));
+    await expect(Math.round(anywhere.height)).toBe(Math.round(normal.height));
+    await expect(anywhere.width).toBeGreaterThan(40);
+  }
+};
+
+// Esticado numa grade ao lado de um card mais alto, o host repartia a sobra entre as linhas: o título descia e a
+// linha do rodapé inchava. Com cabeçalho, ações ou rodapé o título fica no topo. Um corpo de um filho só fica com
+// a sobra (preenche o card) e o rodapé encosta no fundo; com vários filhos o conteúdo fica junto no topo e a sobra
+// vai para baixo. O card só de corpo mantém o layout de antes.
+export const Stretched = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "grid grid-cols-4 gap-4";
+    const single = createCard({ heading: "Um corpo", body: "<p>Uma linha.</p>", withFooter: true, width: "auto" });
+    single.dataset.case = "single";
+    const tall = createCard({
+      heading: "Alto",
+      body: '<div style="height:18rem">Conteúdo que define a altura da linha.</div>',
+      width: "auto"
+    });
+    tall.dataset.case = "tall";
+    const many = createCard({
+      heading: "Vários",
+      body: "<p>Primeiro parágrafo.</p><p>Segundo parágrafo.</p>",
+      withFooter: true,
+      width: "auto"
+    });
+    many.dataset.case = "many";
+    const bodyOnly = createCard({ body: "<div>Só corpo: ocupa a altura toda.</div>", width: "auto" });
+    bodyOnly.dataset.case = "body-only";
+    wrap.append(single, tall, many, bodyOnly);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const card = (id: string) => canvasElement.querySelector(`ark-card[data-case="${id}"]`) as HTMLElement;
+    const box = (host: HTMLElement, selector: string) =>
+      (host.querySelector(selector) as HTMLElement).getBoundingClientRect();
+    const offset = (host: HTMLElement, selector: string) =>
+      Math.round(box(host, selector).top - host.getBoundingClientRect().top);
+    // Distância do fim do nó até o fim da área de conteúdo do card (padding de 1rem e borda de 1 px).
+    const below = (host: HTMLElement, selector: string) =>
+      Math.round(host.getBoundingClientRect().bottom - 17 - box(host, selector).bottom);
+    const [single, tall, many, bodyOnly] = ["single", "tall", "many", "body-only"].map(card);
+    const height = Math.round(tall.getBoundingClientRect().height);
+
+    // A grade esticou todos na altura do mais alto, e o título de cada um fica onde fica o do card que a define.
+    for (const host of [single, many, bodyOnly]) {
+      await expect(Math.round(host.getBoundingClientRect().height)).toBe(height);
+    }
+    for (const host of [single, many]) {
+      await expect(offset(host, '[data-ark="card-heading"]')).toBe(offset(tall, '[data-ark="card-heading"]'));
+      await expect(offset(host, "p")).toBe(offset(tall, "div"));
+    }
+
+    // Um filho de corpo: ele fica com a sobra e o rodapé, na própria altura, encosta no fundo.
+    await expect(box(single, "p").height).toBeGreaterThan(height - 160);
+    await expect(box(single, '[slot="footer"]').height).toBeLessThan(60);
+    await expect(below(single, '[slot="footer"]')).toBe(0);
+
+    // Vários filhos de corpo: seguem um ao outro com o gap do card, o rodapé logo depois, e a sobra embaixo.
+    const [first, second] = Array.from(many.querySelectorAll("p")).map((p) => p.getBoundingClientRect());
+    await expect(Math.round(second.top - first.bottom)).toBe(16);
+    await expect(Math.round(box(many, '[slot="footer"]').top - second.bottom)).toBe(16);
+    await expect(below(many, '[slot="footer"]')).toBeGreaterThan(100);
+
+    // Só corpo: sem cabeçalho nem rodapé nenhuma regra entra, e o filho segue esticado na altura do card.
+    await expect(getComputedStyle(bodyOnly).alignContent).toBe("normal");
+    await expect(getComputedStyle(bodyOnly).gridTemplateRows).not.toContain(" ");
+    await expect(below(bodyOnly, "div")).toBe(0);
+
+    // Sem sobra (card na própria altura) o 1fr mede o conteúdo: o card de um corpo mede o mesmo fora da grade.
+    const loose = single.cloneNode(true) as HTMLElement;
+    loose.style.width = `${single.getBoundingClientRect().width}px`;
+    const holder = document.createElement("div");
+    holder.style.display = "flex";
+    holder.style.alignItems = "flex-start";
+    holder.appendChild(loose);
+    canvasElement.appendChild(holder);
+    await expect(Math.round(box(loose, "p").height)).toBe(Math.round(second.height));
+    holder.remove();
+  }
+};
+
 export const TestHooks = {
   render: () =>
     createCard({
