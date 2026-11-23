@@ -625,6 +625,50 @@
     padding: var(--ark-card-gap);
   }
 
+  /* Esticado numa linha mais alta (grade de cards, altura no host), o host repartia a sobra entre as linhas: o
+     título descia e a linha do rodapé inchava. Com cabeçalho, ações ou rodapé as linhas ficam na altura do conteúdo
+     e a sobra vai para baixo; um card só de corpo segue como sempre foi, com o conteúdo ocupando a altura toda. */
+  ark-card:has(> :is([data-ark-chrome="heading"], [slot="header"], [slot="actions"], [slot="footer"])) {
+    align-content: start;
+  }
+
+  /* Corpo de um filho só (um gráfico, uma lista, o contêiner do conteúdo): a linha dele fica com a sobra, então ele
+     preenche o card esticado e o rodapé encosta no fundo. A linha do corpo é a primeira depois das do cabeçalho
+     (nenhuma, uma, ou duas quando há heading e slot="header"); com mais de um filho de corpo não há como apontar a
+     última linha pelo CSS, e vale a regra acima. Sem sobra, 1fr mede o conteúdo e nada muda. */
+  ark-card:has(> [slot="footer"]):has(
+    > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+  ):not(
+    :has(
+      > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+        ~ :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+    )
+  ) {
+    grid-template-rows: 1fr;
+  }
+
+  ark-card:has(> :is([data-ark-chrome="heading"], [slot="header"], [slot="actions"])):has(
+    > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+  ):not(
+    :has(
+      > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+        ~ :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+    )
+  ) {
+    grid-template-rows: auto 1fr;
+  }
+
+  ark-card:has(> [data-ark-chrome="heading"]):has(> [slot="header"]):has(
+    > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+  ):not(
+    :has(
+      > :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+        ~ :not([slot="header"]):not([slot="actions"]):not([slot="footer"]):not([data-ark-chrome])
+    )
+  ) {
+    grid-template-rows: auto auto 1fr;
+  }
+
   ark-card[data-ark-padding="none"] {
     --ark-card-gap: 0px;
   }
@@ -662,13 +706,16 @@
      (min-width automático) não fica mais estreito que a maior palavra; o slot="header" do usuário mantém o
      min-width: 0 e encolhe como sem o atributo (um título truncado segue truncando), e ganha o mesmo piso com
      min-width: auto no próprio elemento. Limite: uma palavra mais larga que o card (URL, nome de arquivo) alarga a
-     coluna e leva corpo e rodapé junto; quebre-a no próprio conteúdo. */
+     coluna e leva corpo e rodapé junto; quebre-a no próprio conteúdo. O overflow-wrap do h2 é fixado porque um
+     `anywhere` herdado da página reduz a largura mínima a um caractere, e o título virava uma letra por linha;
+     break-word quebra do mesmo jeito quando a palavra não cabe, sem mexer na largura mínima. */
   ark-card[wrap-actions] {
     grid-template-columns: minmax(auto, 1fr) auto;
   }
 
   ark-card[wrap-actions] > [data-ark-chrome="heading"] {
     min-width: auto;
+    overflow-wrap: break-word;
   }
 
   ark-card[wrap-actions] > [slot="actions"] {
