@@ -25,6 +25,7 @@ import type {
   ArkNavCollapsible,
   ArkNavSide,
   ArkNavVariant,
+  ArkOrientation,
   ArkRounded,
   ArkSize,
   ArkTabsFill,
@@ -113,6 +114,34 @@ interface ArkIntrinsicElements {
     indeterminate?: boolean;
     label?: string;
     "show-value"?: boolean;
+    intent?: ArkIntent;
+    size?: ArkSize;
+    theme?: ArkTheme;
+  };
+  "ark-button-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    orientation?: ArkOrientation;
+    spaced?: boolean;
+    "full-width"?: boolean;
+    disabled?: boolean;
+    label?: string;
+    variant?: ArkButtonVariant;
+    intent?: ArkIntent;
+    size?: ArkSize;
+    rounded?: ArkRounded;
+    theme?: ArkTheme;
+  };
+  "ark-radio-group": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
+    testid?: string;
+    value?: string;
+    name?: string;
+    label?: string;
+    helper?: string;
+    error?: boolean;
+    "error-message"?: string;
+    orientation?: ArkOrientation;
+    required?: boolean;
+    disabled?: boolean;
     intent?: ArkIntent;
     size?: ArkSize;
     theme?: ArkTheme;

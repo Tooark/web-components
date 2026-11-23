@@ -2,7 +2,7 @@ export { dismissToast, getArkLocale, observeArkLocale, setArkLocale, showToast, 
 export { ArkAlertComponent } from "./ark-alert.component";
 export { ArkAvatarComponent } from "./ark-avatar.component";
 export { ArkBadgeComponent } from "./ark-badge.component";
-export { ArkButtonComponent } from "./ark-button.component";
+export { ArkButtonComponent, ArkButtonGroupComponent } from "./ark-button.component";
 export { ArkCalendarComponent } from "./ark-calendar.component";
 export { ArkCardComponent } from "./ark-card.component";
 export { ArkCarouselComponent } from "./ark-carousel.component";
@@ -31,7 +31,7 @@ export type { ArkNavNavigateDetail } from "./ark-nav.component";
 export { ArkNavComponent, ArkNavGroupComponent, ArkNavItemComponent } from "./ark-nav.component";
 export { ArkPaginationComponent } from "./ark-pagination.component";
 export { ArkProgressComponent } from "./ark-progress.component";
-export { ArkRadioComponent } from "./ark-radio.component";
+export { ArkRadioComponent, ArkRadioGroupComponent } from "./ark-radio.component";
 export { ArkSchedulerComponent } from "./ark-scheduler.component";
 export { ArkSelectComponent } from "./ark-select.component";
 export { ArkShapePickerComponent } from "./ark-shape-picker.component";

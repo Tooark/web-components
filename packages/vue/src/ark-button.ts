@@ -4,6 +4,7 @@ import type {
   ArkButtonType,
   ArkButtonVariant,
   ArkIntent,
+  ArkOrientation,
   ArkRounded,
   ArkSize,
   ArkTheme
@@ -73,6 +74,53 @@ export const ArkButton = defineComponent({
           "status-label": props.statusLabel,
           "icon-only": props.iconOnly ? "" : undefined,
           "full-width": props.fullWidth ? "" : undefined
+        },
+        slots.default ? slots.default() : []
+      );
+  }
+});
+
+export const ArkButtonGroup = defineComponent({
+  name: "ArkButtonGroup",
+  inheritAttrs: false,
+  props: {
+    /** Propagado como data-testid ao host. */
+    testid: { type: String, default: undefined },
+    /** Direção da fila. Padrão: "horizontal". */
+    orientation: { type: String as PropType<ArkOrientation>, default: undefined },
+    /** Botões separados pelo gap do size, em vez de colados. */
+    spaced: { type: Boolean, default: false },
+    /** O grupo ocupa a largura disponível e a reparte entre os botões. */
+    fullWidth: { type: Boolean, default: false },
+    /** Desabilita todos os botões do grupo. */
+    disabled: { type: Boolean, default: false },
+    /** Nome do grupo (vira `aria-label`). */
+    label: { type: String, default: undefined },
+    // Sem padrão: só o que o app der ao grupo é gravado nos botões.
+    variant: { type: String as PropType<ArkButtonVariant>, default: undefined },
+    intent: { type: String as PropType<ArkIntent>, default: undefined },
+    size: { type: String as PropType<ArkSize>, default: undefined },
+    rounded: { type: String as PropType<ArkRounded>, default: undefined },
+    theme: { type: String as PropType<ArkTheme>, default: undefined }
+  },
+  setup(props, { attrs, slots }) {
+    ensureTooarkComponentsRegistered();
+    return () =>
+      h(
+        "ark-button-group",
+        {
+          ...attrs,
+          testid: props.testid,
+          orientation: props.orientation,
+          label: props.label,
+          variant: props.variant,
+          intent: props.intent,
+          size: props.size,
+          rounded: props.rounded,
+          theme: props.theme,
+          spaced: props.spaced ? "" : undefined,
+          "full-width": props.fullWidth ? "" : undefined,
+          disabled: props.disabled ? "" : undefined
         },
         slots.default ? slots.default() : []
       );

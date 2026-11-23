@@ -14,6 +14,7 @@ import {
 } from "@tooark/core";
 import {
   ArkButton as ReactArkButton,
+  ArkButtonGroup as ReactArkButtonGroup,
   ArkCalendar as ReactArkCalendar,
   ArkCard as ReactArkCard,
   ArkCheckbox as ReactArkCheckbox,
@@ -31,6 +32,8 @@ import {
   ArkNav as ReactArkNav,
   ArkNavItem as ReactArkNavItem,
   ArkPagination as ReactArkPagination,
+  ArkRadio as ReactArkRadio,
+  ArkRadioGroup as ReactArkRadioGroup,
   ArkScheduler as ReactArkScheduler,
   ArkShapePicker as ReactArkShapePicker,
   ArkSwitch as ReactArkSwitch,
@@ -47,6 +50,7 @@ import { ArkWysiwygEditor as ReactArkWysiwygEditor } from "@tooark/react/wysiwyg
 import {
   type ArkDataViewVueColumn,
   ArkButton as VueArkButton,
+  ArkButtonGroup as VueArkButtonGroup,
   ArkCalendar as VueArkCalendar,
   ArkCard as VueArkCard,
   ArkCheckbox as VueArkCheckbox,
@@ -60,6 +64,8 @@ import {
   ArkNav as VueArkNav,
   ArkNavItem as VueArkNavItem,
   ArkPagination as VueArkPagination,
+  ArkRadio as VueArkRadio,
+  ArkRadioGroup as VueArkRadioGroup,
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
   ArkSwitch as VueArkSwitch,
@@ -1743,6 +1749,121 @@ export const VueTree = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectTreeWrappers(canvasElement, log);
+    app.unmount();
+  }
+};
+
+/**
+ * O que os wrappers dos grupos entregam: o atributo do grupo vale para os filhos mesmo quando o wrapper do filho grava
+ * o próprio padrão (o `size="md"` do Vue), os botões saem colados, o `value` do grupo de rádios marca a opção e o
+ * handler do grupo recebe um `change` só por clique (o do rádio não chega a ele).
+ */
+async function expectGroupWrappers(canvasElement: HTMLElement, log: string[]): Promise<void> {
+  const buttons = canvasElement.querySelector("ark-button-group") as HTMLElement;
+  const [first, second] = Array.from(buttons.querySelectorAll<HTMLElement>("ark-button"));
+  await waitFor(() => expect(second).toHaveAttribute("data-ark-group-pos", "last"));
+  await expect(buttons).toHaveAttribute("role", "group");
+  await expect(buttons).toHaveAttribute("aria-label", "Período");
+  await expect(first).toHaveAttribute("data-ark-group-pos", "first");
+  await expect(first).toHaveAttribute("size", "sm");
+  await expect(first).toHaveAttribute("variant", "outline");
+  await expect(
+    Math.round((first.getBoundingClientRect().right - second.getBoundingClientRect().left) * 100) / 100
+  ).toBe(1);
+
+  const radios = canvasElement.querySelector("ark-radio-group") as HTMLElement;
+  const radio = (value: string) => radios.querySelector(`ark-radio[value="${value}"]`) as HTMLElement;
+  await waitFor(() => expect(radio("pro")).toHaveAttribute("checked", ""));
+  await expect(radios).toHaveAttribute("role", "radiogroup");
+  await expect(radios).toHaveAccessibleName("Plano");
+  await expect(radios).toHaveAccessibleDescription("Escolha um plano.");
+  await expect(radios).toHaveAttribute("aria-invalid", "true");
+  await expect(radio("pro")).toHaveAttribute("size", "lg");
+  await expect(radio("pro")).toHaveAttribute("name", "plano");
+  await userEvent.click(within(radios).getByRole("radio", { name: "Equipe" }));
+  await expect(radios).toHaveAttribute("value", "team");
+  await expect(radio("pro").hasAttribute("checked")).toBe(false);
+  await expect(log).toEqual(["radio team", "group team"]);
+}
+
+export const ReactGroups = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const log: string[] = [];
+    const render = reactRoot(canvasElement, errors);
+    render(
+      createElement(
+        "div",
+        null,
+        createElement(
+          ReactArkButtonGroup,
+          { label: "Período", size: "sm", variant: "outline" },
+          createElement(ReactArkButton, null, "Dia"),
+          createElement(ReactArkButton, null, "Semana")
+        ),
+        createElement(
+          ReactArkRadioGroup,
+          {
+            label: "Plano",
+            name: "plano",
+            value: "pro",
+            size: "lg",
+            errorMessage: "Escolha um plano.",
+            onChange: (event) => log.push(`group ${event.detail.value}`)
+          },
+          createElement(ReactArkRadio, { value: "pro", label: "Profissional" }),
+          createElement(ReactArkRadio, {
+            value: "team",
+            label: "Equipe",
+            onChange: (event) => log.push(`radio ${event.detail.value}`)
+          })
+        )
+      )
+    );
+    await expect(errors).toEqual([]);
+    await expectGroupWrappers(canvasElement, log);
+  }
+};
+
+export const VueGroups = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const log: string[] = [];
+    const app = createApp({
+      setup: () => () =>
+        h("div", null, [
+          h(VueArkButtonGroup, { label: "Período", size: "sm", variant: "outline" }, () => [
+            h(VueArkButton, null, () => "Dia"),
+            h(VueArkButton, null, () => "Semana")
+          ]),
+          h(
+            VueArkRadioGroup,
+            {
+              label: "Plano",
+              name: "plano",
+              value: "pro",
+              size: "lg",
+              errorMessage: "Escolha um plano.",
+              onChange: (event: CustomEvent<{ value: string }>) => log.push(`group ${event.detail.value}`)
+            },
+            () => [
+              h(VueArkRadio, { value: "pro", label: "Profissional" }),
+              h(VueArkRadio, {
+                value: "team",
+                label: "Equipe",
+                onChange: (event: CustomEvent<{ value: string }>) => log.push(`radio ${event.detail.value}`)
+              })
+            ]
+          )
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectGroupWrappers(canvasElement, log);
     app.unmount();
   }
 };
