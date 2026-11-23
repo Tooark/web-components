@@ -1,4 +1,4 @@
-import type { ArkSize, ArkTheme, ArkTreeSelection } from "@tooark/core";
+import type { ArkSize, ArkTheme, ArkTreeIcons, ArkTreeItemIcon, ArkTreeSelection } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
@@ -17,6 +17,10 @@ export const ArkTree = defineComponent({
     value: { type: [String, Array] as PropType<string | string[]>, default: undefined },
     /** Nome da árvore (vira `aria-label`). */
     label: { type: String, default: undefined },
+    /** `files` desenha o ícone próprio de pasta ou arquivo; `none` esconde todos. */
+    icons: { type: String as PropType<ArkTreeIcons>, default: undefined },
+    /** Cor dos ícones: um intent, `current` (a cor do texto) ou uma cor CSS. */
+    iconColor: { type: String, default: undefined },
     size: { type: String as PropType<ArkSize>, default: undefined },
     theme: { type: String as PropType<ArkTheme>, default: undefined }
   },
@@ -55,6 +59,8 @@ export const ArkTree = defineComponent({
               : undefined
             : props.value || undefined,
           label: props.label,
+          icons: props.icons,
+          "icon-color": props.iconColor,
           size: props.size,
           theme: props.theme
         },
@@ -71,6 +77,8 @@ export const ArkTreeItem = defineComponent({
     value: { type: String, default: undefined },
     /** Texto do nó (também usado na busca por digitação). */
     label: { type: String, default: undefined },
+    /** Ícone próprio deste nó: folder, file ou none. */
+    icon: { type: String as PropType<ArkTreeItemIcon>, default: undefined },
     expanded: { type: Boolean, default: false },
     /** Mostra o chevron sem filhos: carregue os filhos no `@ark-toggle` com `expanded: true`. */
     lazy: { type: Boolean, default: false },
@@ -90,6 +98,7 @@ export const ArkTreeItem = defineComponent({
           testid: props.testid,
           value: props.value,
           label: props.label,
+          icon: props.icon,
           expanded: props.expanded ? "" : undefined,
           lazy: props.lazy ? "" : undefined,
           loading: props.loading ? "" : undefined,

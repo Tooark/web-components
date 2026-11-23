@@ -428,7 +428,7 @@ export const Tree = {
       standalone: true,
       imports: [ArkTreeComponent, ArkTreeItemComponent],
       template: `
-        <ark-tree-wrapper label="Arquivos" selection="single"
+        <ark-tree-wrapper label="Arquivos" selection="single" icons="files" iconColor="primary"
           (arkToggle)="log.push('toggle ' + $event.detail.value + ' ' + $event.detail.expanded)"
           (arkSelectionChange)="log.push('selection ' + $any($event.detail.values).join(','))"
           (arkActivate)="log.push('activate ' + $event.detail.value)">
@@ -438,7 +438,7 @@ export const Tree = {
             <ark-tree-item-wrapper value="src/app.ts" label="app.ts"></ark-tree-item-wrapper>
           </ark-tree-item-wrapper>
           <ark-tree-item-wrapper value="docs" label="docs">
-            <ark-tree-item-wrapper value="docs/guide.md" label="guide.md"></ark-tree-item-wrapper>
+            <ark-tree-item-wrapper value="docs/guide.md" label="guide.md" icon="folder"></ark-tree-item-wrapper>
           </ark-tree-item-wrapper>
         </ark-tree-wrapper>`
     })(TreeHost);
@@ -455,6 +455,14 @@ export const Tree = {
     await expect(Math.round(item("src/index.ts").getBoundingClientRect().width)).toBe(
       Math.round(item("src").getBoundingClientRect().width)
     );
+    // As props dos ícones chegam como atributos e desenham o ícone próprio.
+    const kind = (value: string) =>
+      item(value).querySelector(':scope > [data-ark-chrome="icon"]')?.getAttribute("data-ark-icon") ?? null;
+    await expect(tree).toHaveAttribute("icons", "files");
+    await expect(tree.style.getPropertyValue("--ark-tree-icon-color")).toBe("var(--ark-color-primary)");
+    await expect(kind("src")).toBe("folder-open");
+    await expect(kind("src/index.ts")).toBe("file");
+    await expect(kind("docs/guide.md")).toBe("folder");
     await expect(item("docs/guide.md")).not.toBeVisible();
     await userEvent.click(within(item("src/index.ts")).getByText("index.ts"));
     await expect(tree).toHaveAttribute("value", "src/index.ts");

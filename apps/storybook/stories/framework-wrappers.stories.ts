@@ -1637,7 +1637,8 @@ export const VueSidePackages = {
 
 /**
  * O que os wrappers do ark-tree entregam: a estrutura (níveis pela linha, o filho dentro do pai) e os eventos
- * consolidados chegando ao handler, com a seleção em single pelo clique e a expansão pela seta.
+ * consolidados chegando ao handler, com a seleção em single pelo clique e a expansão pela seta. As props dos ícones
+ * (`icons`, `iconColor` e o `icon` do item) chegam como atributos e desenham o ícone próprio.
  */
 async function expectTreeWrappers(canvasElement: HTMLElement, log: string[]): Promise<void> {
   const tree = canvasElement.querySelector("ark-tree") as HTMLElement;
@@ -1649,6 +1650,14 @@ async function expectTreeWrappers(canvasElement: HTMLElement, log: string[]): Pr
   await expect(item("src/index.ts").rowElement).toHaveAttribute("aria-level", "2");
   await expect(item("src/index.ts").parentElement?.closest("ark-tree-item")).toBe(item("src"));
   await expect(item("src").querySelector('[slot="trailing"]')?.textContent).toBe("2");
+  const kind = (value: string) =>
+    item(value).querySelector(':scope > [data-ark-chrome="icon"]')?.getAttribute("data-ark-icon") ?? null;
+  await expect(tree).toHaveAttribute("icons", "files");
+  await expect(tree).toHaveAttribute("icon-color", "primary");
+  await expect(tree.style.getPropertyValue("--ark-tree-icon-color")).toBe("var(--ark-color-primary)");
+  await expect(kind("src")).toBe("folder-open");
+  await expect(kind("src/index.ts")).toBe("file");
+  await expect(kind("docs/guide.md")).toBe("folder");
   // O subitem ocupa a largura do pai (de ponta a ponta na grid dele), mesmo atrás de um wrapper.
   await expect(Math.round(item("src/index.ts").getBoundingClientRect().width)).toBe(
     Math.round(item("src").getBoundingClientRect().width)
@@ -1672,6 +1681,8 @@ export const ReactTree = {
         {
           label: "Arquivos",
           selection: "single",
+          icons: "files",
+          iconColor: "primary",
           onToggle: (event) => log.push(`toggle ${event.detail.value} ${event.detail.expanded}`),
           onSelectionChange: (event) => log.push(`selection ${JSON.stringify(event.detail.values)}`),
           onActivate: (event) => log.push(`activate ${event.detail.value}`)
@@ -1686,7 +1697,7 @@ export const ReactTree = {
         createElement(
           ReactArkTreeItem,
           { value: "docs", label: "docs" },
-          createElement(ReactArkTreeItem, { value: "docs/guide.md", label: "guide.md" })
+          createElement(ReactArkTreeItem, { value: "docs/guide.md", label: "guide.md", icon: "folder" })
         )
       )
     );
@@ -1707,6 +1718,8 @@ export const VueTree = {
           {
             label: "Arquivos",
             selection: "single",
+            icons: "files",
+            iconColor: "primary",
             onArkToggle: (event: CustomEvent<{ value: string; expanded: boolean }>) =>
               log.push(`toggle ${event.detail.value} ${event.detail.expanded}`),
             onArkSelectionChange: (event: CustomEvent<{ values: string[] }>) =>
@@ -1720,7 +1733,7 @@ export const VueTree = {
               h(VueArkTreeItem, { value: "src/app.ts", label: "app.ts" })
             ]),
             h(VueArkTreeItem, { value: "docs", label: "docs" }, () => [
-              h(VueArkTreeItem, { value: "docs/guide.md", label: "guide.md" })
+              h(VueArkTreeItem, { value: "docs/guide.md", label: "guide.md", icon: "folder" })
             ])
           ]
         )

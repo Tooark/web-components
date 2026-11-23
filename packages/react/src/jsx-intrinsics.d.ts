@@ -34,6 +34,8 @@ import type {
   ArkTimeFormat,
   ArkToastPosition,
   ArkTooltipSide,
+  ArkTreeIcons,
+  ArkTreeItemIcon,
   ArkTreeSelection
 } from "@tooark/core";
 import React from "react";
@@ -442,6 +444,8 @@ interface ArkIntrinsicElements {
     propagate?: boolean;
     value?: string;
     label?: string;
+    icons?: ArkTreeIcons;
+    "icon-color"?: string;
     size?: ArkSize;
     theme?: ArkTheme;
   };
@@ -449,6 +453,7 @@ interface ArkIntrinsicElements {
     testid?: string;
     value?: string;
     label?: string;
+    icon?: ArkTreeItemIcon;
     expanded?: boolean;
     lazy?: boolean;
     loading?: boolean;

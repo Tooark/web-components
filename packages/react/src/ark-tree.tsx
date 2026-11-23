@@ -36,8 +36,18 @@ export type ArkTreeProps = PropsWithChildren<
 
 export const ArkTree = forwardRef<ArkTreeElement, ArkTreeProps>(
   function ArkTree(props, forwardedRef): React.JSX.Element {
-    const { children, className, checkboxes, propagate, value, onToggle, onSelectionChange, onActivate, ...rest } =
-      props;
+    const {
+      children,
+      className,
+      checkboxes,
+      propagate,
+      value,
+      iconColor,
+      onToggle,
+      onSelectionChange,
+      onActivate,
+      ...rest
+    } = props;
     const [ref, setRef] = useForwardedRef<ArkTreeElement>(forwardedRef);
 
     useEffect(() => {
@@ -66,6 +76,7 @@ export const ArkTree = forwardRef<ArkTreeElement, ArkTreeProps>(
       class: className,
       checkboxes: checkboxes ? "" : undefined,
       propagate: propagate ? "" : undefined,
+      "icon-color": iconColor || undefined,
       value: Array.isArray(value) ? (value.length ? JSON.stringify(value) : undefined) : value || undefined
     };
 
