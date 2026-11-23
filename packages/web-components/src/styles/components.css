@@ -612,6 +612,13 @@
     margin-block: -0.25rem 0;
   }
 
+  /* A ação que não ficou na primeira linha (veio depois de um parágrafo ou de um texto que quebrou, ou não coube ao
+     lado dele) desce sem o deslocamento negativo, que a fazia cobrir a linha de cima. O host marca o caso depois de
+     medir. */
+  ark-alert[data-ark-action-below] > [slot="action"] {
+    margin-block-start: 0;
+  }
+
   /* ---------- ark-card: grid cabeçalho (título | ações) / corpo / rodapé ---------- */
 
   /* Espaçamento interno numa custom property (padding do host e gap entre as linhas, iguais), escalada pelo
