@@ -13,8 +13,9 @@ let arkTextareaIdCounter = 0;
  * Área de texto padronizada: a mesma grid label / campo / mensagem do
  * ark-input (ver components.css) e os mesmos atributos de label, helper e
  * erro. `rows` dá a altura inicial, `autosize` cresce com o conteúdo
- * (`field-sizing: content` nativo, com fallback por JS), `monospace` e
- * `resize` atendem edição de código e de dados.
+ * (`field-sizing: content` nativo, com fallback por JS) a partir de uma
+ * linha, ou das linhas de um `rows` explícito, `monospace` e `resize`
+ * atendem edição de código e de dados.
  */
 export class ArkTextarea extends HTMLElementBase {
   static readonly tagName = "ark-textarea";
@@ -142,7 +143,8 @@ export class ArkTextarea extends HTMLElementBase {
     this.textareaEl.required = this.hasAttribute("required");
     this.textareaEl.readOnly = this.hasAttribute("readonly");
     const rows = Number.parseInt(this.getAttribute("rows") || "", 10);
-    this.textareaEl.rows = Number.isFinite(rows) && rows > 0 ? rows : 3;
+    const hasRows = Number.isFinite(rows) && rows > 0;
+    this.textareaEl.rows = hasRows ? rows : 3;
 
     for (const name of PASS_THROUGH_ATTRS) {
       const value = this.getAttribute(name);
@@ -156,15 +158,51 @@ export class ArkTextarea extends HTMLElementBase {
     this.autosizeByJs = autosize && !this.supportsFieldSizing();
     if (!this.autosizeByJs) this.textareaEl.style.removeProperty("height");
 
-    // Fonte e padding por size; a altura mínima segue o token para uma linha alinhar com o ark-input.
-    const sizes: Record<ArkSize, { field: string; label: string }> = {
-      xs: { field: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs", label: "ark:text-2xs" },
-      sm: { field: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs", label: "ark:text-2xs" },
-      md: { field: "ark:min-h-(--ark-size-md) ark:px-3 ark:py-1.5 ark:text-sm", label: "ark:text-xs" },
-      lg: { field: "ark:min-h-(--ark-size-lg) ark:px-4 ark:py-2 ark:text-base", label: "ark:text-sm" },
-      xl: { field: "ark:min-h-(--ark-size-xl) ark:px-5 ark:py-2.5 ark:text-lg", label: "ark:text-base" }
+    // Fonte e padding por size; a altura mínima segue o token para uma linha alinhar com o ark-input. `padY` repete
+    // o ark:py-* da mesma linha, em passos da escala de espaçamento, para a altura mínima do autosize com `rows`.
+    const sizes: Record<ArkSize, { field: string; label: string; token: string; padY: number }> = {
+      xs: {
+        field: "ark:min-h-(--ark-size-xs) ark:px-2 ark:py-0.5 ark:text-xs",
+        label: "ark:text-2xs",
+        token: "--ark-size-xs",
+        padY: 0.5
+      },
+      sm: {
+        field: "ark:min-h-(--ark-size-sm) ark:px-2.5 ark:py-1 ark:text-xs",
+        label: "ark:text-2xs",
+        token: "--ark-size-sm",
+        padY: 1
+      },
+      md: {
+        field: "ark:min-h-(--ark-size-md) ark:px-3 ark:py-1.5 ark:text-sm",
+        label: "ark:text-xs",
+        token: "--ark-size-md",
+        padY: 1.5
+      },
+      lg: {
+        field: "ark:min-h-(--ark-size-lg) ark:px-4 ark:py-2 ark:text-base",
+        label: "ark:text-sm",
+        token: "--ark-size-lg",
+        padY: 2
+      },
+      xl: {
+        field: "ark:min-h-(--ark-size-xl) ark:px-5 ark:py-2.5 ark:text-lg",
+        label: "ark:text-base",
+        token: "--ark-size-xl",
+        padY: 2.5
+      }
     };
     const size = sizes[(this.getAttribute("size") || "md").toLowerCase() as ArkSize] ?? sizes.md;
+
+    // Com autosize a caixa mede o conteúdo e o `rows` do <textarea> deixa de contar (field-sizing: content o ignora):
+    // um `rows` explícito vira a altura mínima, em linhas mais o padding e a borda da caixa, sem ficar abaixo do
+    // token. Sem o atributo o autosize segue começando em uma linha, como sempre foi. Inline porque a utility
+    // ark:min-h-* da caixa venceria uma regra de components.css.
+    if (autosize && hasRows) {
+      this.textareaEl.style.minHeight = `max(var(${size.token}), calc(${rows}lh + var(--ark-spacing, 0.25rem) * ${size.padY * 2} + 2px))`;
+    } else {
+      this.textareaEl.style.removeProperty("min-height");
+    }
 
     const roundedMap: Record<ArkRounded, string> = {
       none: "ark:rounded-none",

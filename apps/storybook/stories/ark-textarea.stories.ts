@@ -183,6 +183,46 @@ export const Autosize = {
   }
 };
 
+// Com autosize, `field-sizing: content` ignora o `rows` do <textarea>: o campo de quatro linhas nascia com uma.
+// Um `rows` explícito vira a altura mínima; sem o atributo o autosize continua começando em uma linha.
+export const AutosizeMinRows = {
+  render: () => {
+    const wrap = createStack();
+    const cases: [string, Partial<StoryArgs>][] = [
+      ["auto", { label: "Autosize sem rows", autosize: true }],
+      ["auto-rows", { label: "Autosize com rows=4", autosize: true, rows: 4 }],
+      ["fixed-rows", { label: "rows=4, sem autosize", rows: 4 }]
+    ];
+    for (const [id, args] of cases) {
+      const el = createTextarea(args);
+      el.dataset.case = id;
+      wrap.appendChild(el);
+    }
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const field = (id: string) =>
+      canvasElement.querySelector<HTMLTextAreaElement>(`[data-case="${id}"] [data-ark="textarea"]`)!;
+    const height = (id: string) => Math.round(field(id).getBoundingClientRect().height);
+
+    // Sem `rows`: uma linha, a altura do token (36 px no md), como sempre foi.
+    await expect(height("auto")).toBe(36);
+    await expect(field("auto").style.minHeight).toBe("");
+    // Com `rows`: a mesma altura do campo de quatro linhas sem autosize.
+    await expect(height("auto-rows")).toBe(height("fixed-rows"));
+
+    // E continua crescendo com o conteúdo.
+    const before = height("auto-rows");
+    await userEvent.type(field("auto-rows"), "1{enter}2{enter}3{enter}4{enter}5{enter}6");
+    await waitFor(() => expect(height("auto-rows")).toBeGreaterThan(before + 30));
+
+    // Tirar o `rows` devolve o início em uma linha.
+    const host = canvasElement.querySelector('[data-case="auto-rows"]') as HTMLElement;
+    host.removeAttribute("rows");
+    await expect(field("auto-rows").style.minHeight).toBe("");
+  }
+};
+
 export const TypingUpdatesValue = {
   render: () => {
     const el = createTextarea({ label: "Nota", testid: "campo-nota" });
