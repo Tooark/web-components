@@ -457,6 +457,25 @@ export const EscapedFocusReturnsWhereItWas = {
   }
 };
 
+// Como no ark-dialog: o foco inicial só deixa de fora o cabeçalho da própria gaveta. A caixa de um ark-checkbox no
+// começo do corpo é chrome do checkbox, e era pulada em favor do rodapé.
+export const InitialFocusOnDrawnControl = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const drawer = createDrawer({ label: "Filtros", lang: "pt" });
+    const box = document.createElement("ark-checkbox");
+    box.setAttribute("label", "Só ativos");
+    drawer.insertBefore(box, drawer.firstChild);
+    (canvasElement.firstElementChild as HTMLElement).append(drawer);
+
+    drawer.show();
+    await expect(box.querySelector("button")).toHaveFocus();
+
+    drawer.close();
+    await waitFor(() => expect(drawer).not.toHaveAttribute("data-ark-state"));
+  }
+};
+
 export const TestHooks = {
   render: () => {
     const wrap = document.createElement("div");

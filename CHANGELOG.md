@@ -25,6 +25,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   stayed there and was lost to `<body>` when it disappeared; it now goes to the open dialog. Pointer events on the
   closing popover still reach it, as before. `ReactDialogSwapKeepsFocus`, `FocusLeavesTheClosingDialog` and
   `ClosingDialogOnTopKeepsThePointer` stories.
+- `ark-dialog` and `ark-drawer`: the initial focus skipped an `ark-checkbox`, `ark-radio`, `ark-file-input` or
+  `ark-kv-editor` at the top of the body and went to the footer (to the close button without one). The choice left
+  out every node marked `data-ark-chrome`, meant for the overlay's own header, and the control those components
+  draw carries the same mark. Only the header of the dialog or drawer itself is left out now. A body whose first
+  focusable is some other component's own control (the dismiss button of an `ark-alert` above a form) gets the
+  focus there too: put `autofocus` on the field to choose. `InitialFocusOnDrawnControls` story.
 
 ## [1.9.0] - 2026-11-23
 

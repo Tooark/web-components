@@ -641,6 +641,31 @@ export const OpenOnInsertFocusesField = {
   }
 };
 
+// O foco inicial é o primeiro focável do corpo, e só o cabeçalho do próprio diálogo fica de fora. O controle dos
+// componentes desenhados (a caixa do checkbox e do radio, o botão do file-input, a barra do kv-editor) é chrome
+// deles, marcado `data-ark-chrome` como o cabeçalho: descartar tudo o que tinha essa marca fazia o foco pular o
+// primeiro controle do corpo e cair no rodapé (ou no botão de fechar, sem rodapé).
+export const InitialFocusOnDrawnControls = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    for (const tag of ["ark-checkbox", "ark-radio", "ark-file-input", "ark-kv-editor"]) {
+      const control = document.createElement(tag);
+      control.setAttribute("label", "Opção");
+      const dialog = createDialog({ label: "Preferências", lang: "pt" }, { body: [control] });
+      (canvasElement.firstElementChild as HTMLElement).append(dialog);
+
+      dialog.show();
+      await expect(control.contains(document.activeElement)).toBe(true);
+      // O botão de fechar do cabeçalho continua fora da escolha, mesmo sendo o primeiro focável do painel.
+      await expect(dialog.querySelector('[data-ark="dialog-header"]')?.contains(document.activeElement)).toBe(false);
+
+      dialog.close();
+      await closed(dialog);
+      dialog.remove();
+    }
+  }
+};
+
 export const TestHooks = {
   render: () => createScene({ label: "Confirmar", lang: "pt", testid: "confirm" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
