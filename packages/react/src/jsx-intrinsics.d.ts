@@ -73,6 +73,7 @@ interface ArkIntrinsicElements {
   "ark-button": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
     type?: ArkButtonType;
+    form?: string;
     disabled?: boolean;
     variant?: ArkButtonVariant;
     intent?: ArkIntent;
@@ -582,6 +583,7 @@ interface ArkIntrinsicElements {
     autocomplete?: string;
     autofocus?: boolean;
     inputmode?: string;
+    list?: string;
     maxlength?: number | string;
     minlength?: number | string;
     pattern?: string;

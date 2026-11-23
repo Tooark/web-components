@@ -31,6 +31,8 @@ export const ArkButton = defineComponent({
     rounded: { type: String as PropType<ArkRounded>, default: "md" },
     type: { type: String as PropType<ArkButtonType>, default: "button" },
     disabled: { type: Boolean, default: false },
+    /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
+    form: { type: String, default: undefined },
     loading: { type: Boolean, default: false },
     status: { type: String as PropType<ArkButtonStatus>, default: undefined },
     statusLabel: { type: String, default: undefined },
@@ -59,6 +61,7 @@ export const ArkButton = defineComponent({
           size: props.size,
           rounded: props.rounded,
           type: props.type,
+          form: props.form,
           href: props.href,
           target: props.target,
           download: props.download === true ? "" : props.download || undefined,

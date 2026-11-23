@@ -31,6 +31,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.autocomplete]="autocomplete"
     [attr.autofocus]="autofocus ? '' : null"
     [attr.inputmode]="inputmode"
+    [attr.list]="list"
     [attr.maxlength]="maxlength"
     [attr.minlength]="minlength"
     [attr.pattern]="pattern"
@@ -77,6 +78,8 @@ export class ArkInputComponent {
   @Input() autocomplete: string | undefined;
   @Input() autofocus = false;
   @Input() inputmode: string | undefined;
+  /** Id de um `<datalist>` da página com as sugestões do campo. */
+  @Input() list: string | undefined;
   @Input() maxlength: number | undefined;
   @Input() minlength: number | undefined;
   @Input() pattern: string | undefined;

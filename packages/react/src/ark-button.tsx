@@ -12,6 +12,8 @@ export type ArkButtonProps = PropsWithChildren<
     ArkButtonStyleOptions & {
       type?: ArkButtonType;
       disabled?: boolean;
+      /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
+      form?: string;
       /** Clique simples no link (`href`), cancelável: `event.preventDefault()` e o roteamento da SPA. */
       onNavigate?: (event: CustomEvent<ArkButtonNavigateDetail>) => void;
     }
