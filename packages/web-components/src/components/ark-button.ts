@@ -22,6 +22,7 @@ type ArkButtonPalette = {
   solid: string;
   outline: string;
   ghost: string;
+  soft: string;
 };
 
 /** SVG do spinner de carregamento: usa o preset `.ark-animate-spin` do core, isento de movimento reduzido. */
@@ -472,14 +473,14 @@ export class ArkButton extends HTMLElementBase {
     const attrIntent = this.getAttribute("intent");
 
     // Normaliza o intent antes de resolver a variante e o intent.
-    if (variant === "outline" || variant === "ghost" || variant === "solid") {
+    if (variant === "outline" || variant === "ghost" || variant === "soft" || variant === "solid") {
       return {
         styleVariant: variant,
         intent: this.normalizeIntent(attrIntent)
       };
     }
 
-    // Se a variante não é "outline", "ghost" ou "solid", verifica se é uma variante de estilo baseada no intent.
+    // Se a variante não é "outline", "ghost", "soft" ou "solid", verifica se é uma variante de estilo baseada no intent.
     if (
       variant === "primary" ||
       variant === "secondary" ||
@@ -514,7 +515,8 @@ export class ArkButton extends HTMLElementBase {
         focusRing: "ark:ring-primary-ring",
         solid: "ark:bg-primary ark:text-primary-fg ark:border-transparent ark:hover:bg-primary-hover",
         outline: "ark:bg-transparent ark:text-primary-soft-fg ark:border-primary-border ark:hover:bg-primary-soft",
-        ghost: "ark:bg-transparent ark:text-primary-soft-fg ark:border-transparent ark:hover:bg-primary-soft"
+        ghost: "ark:bg-transparent ark:text-primary-soft-fg ark:border-transparent ark:hover:bg-primary-soft",
+        soft: "ark:bg-primary-soft ark:text-primary-soft-fg ark:border-transparent ark:hover:border-primary-border"
       },
       secondary: {
         focusRing: "ark:ring-secondary-ring",
@@ -522,37 +524,43 @@ export class ArkButton extends HTMLElementBase {
         solid: "ark:bg-surface ark:text-fg ark:border-border-strong ark:hover:bg-surface-muted",
         outline:
           "ark:bg-transparent ark:text-secondary-soft-fg ark:border-secondary-border ark:hover:bg-secondary-soft",
-        ghost: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-transparent ark:hover:bg-secondary-soft"
+        ghost: "ark:bg-transparent ark:text-secondary-soft-fg ark:border-transparent ark:hover:bg-secondary-soft",
+        soft: "ark:bg-secondary-soft ark:text-secondary-soft-fg ark:border-transparent ark:hover:border-secondary-border"
       },
       success: {
         focusRing: "ark:ring-success-ring",
         solid: "ark:bg-success ark:text-success-fg ark:border-transparent ark:hover:bg-success-hover",
         outline: "ark:bg-transparent ark:text-success-soft-fg ark:border-success-border ark:hover:bg-success-soft",
-        ghost: "ark:bg-transparent ark:text-success-soft-fg ark:border-transparent ark:hover:bg-success-soft"
+        ghost: "ark:bg-transparent ark:text-success-soft-fg ark:border-transparent ark:hover:bg-success-soft",
+        soft: "ark:bg-success-soft ark:text-success-soft-fg ark:border-transparent ark:hover:border-success-border"
       },
       warning: {
         focusRing: "ark:ring-warning-ring",
         solid: "ark:bg-warning ark:text-warning-fg ark:border-transparent ark:hover:bg-warning-hover",
         outline: "ark:bg-transparent ark:text-warning-soft-fg ark:border-warning-border ark:hover:bg-warning-soft",
-        ghost: "ark:bg-transparent ark:text-warning-soft-fg ark:border-transparent ark:hover:bg-warning-soft"
+        ghost: "ark:bg-transparent ark:text-warning-soft-fg ark:border-transparent ark:hover:bg-warning-soft",
+        soft: "ark:bg-warning-soft ark:text-warning-soft-fg ark:border-transparent ark:hover:border-warning-border"
       },
       danger: {
         focusRing: "ark:ring-danger-ring",
         solid: "ark:bg-danger ark:text-danger-fg ark:border-transparent ark:hover:bg-danger-hover",
         outline: "ark:bg-transparent ark:text-danger-soft-fg ark:border-danger-border ark:hover:bg-danger-soft",
-        ghost: "ark:bg-transparent ark:text-danger-soft-fg ark:border-transparent ark:hover:bg-danger-soft"
+        ghost: "ark:bg-transparent ark:text-danger-soft-fg ark:border-transparent ark:hover:bg-danger-soft",
+        soft: "ark:bg-danger-soft ark:text-danger-soft-fg ark:border-transparent ark:hover:border-danger-border"
       },
       info: {
         focusRing: "ark:ring-info-ring",
         solid: "ark:bg-info ark:text-info-fg ark:border-transparent ark:hover:bg-info-hover",
         outline: "ark:bg-transparent ark:text-info-soft-fg ark:border-info-border ark:hover:bg-info-soft",
-        ghost: "ark:bg-transparent ark:text-info-soft-fg ark:border-transparent ark:hover:bg-info-soft"
+        ghost: "ark:bg-transparent ark:text-info-soft-fg ark:border-transparent ark:hover:bg-info-soft",
+        soft: "ark:bg-info-soft ark:text-info-soft-fg ark:border-transparent ark:hover:border-info-border"
       },
       neutral: {
         focusRing: "ark:ring-neutral-ring",
         solid: "ark:bg-neutral ark:text-neutral-fg ark:border-transparent ark:hover:bg-neutral-hover",
         outline: "ark:bg-transparent ark:text-neutral-soft-fg ark:border-neutral-border ark:hover:bg-neutral-soft",
-        ghost: "ark:bg-transparent ark:text-neutral-soft-fg ark:border-transparent ark:hover:bg-neutral-soft"
+        ghost: "ark:bg-transparent ark:text-neutral-soft-fg ark:border-transparent ark:hover:bg-neutral-soft",
+        soft: "ark:bg-neutral-soft ark:text-neutral-soft-fg ark:border-transparent ark:hover:border-neutral-border"
       }
     };
 
@@ -581,7 +589,8 @@ export class ArkButton extends HTMLElementBase {
     const variantClasses: Record<ArkStyleVariant, string> = {
       solid: palette.solid,
       outline: palette.outline,
-      ghost: palette.ghost
+      ghost: palette.ghost,
+      soft: palette.soft
     };
 
     // A altura vem do token --ark-size-* (min-height); o padding vertical fica

@@ -5,7 +5,7 @@ import { expect, userEvent, waitFor, within } from "storybook/test";
 const meta = {
   title: "Core/ArkButton",
   argTypes: {
-    variant: { control: "select", options: ["solid", "outline", "ghost"] },
+    variant: { control: "select", options: ["solid", "outline", "ghost", "soft"] },
     intent: { control: "select", options: ["primary", "secondary", "success", "warning", "danger", "info", "neutral"] },
     theme: { control: "select", options: ["auto", "light", "dark"] },
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg", "xl"] },
@@ -108,14 +108,16 @@ export const Variants = {
     wrap.style.flexWrap = "wrap";
     wrap.style.gap = "12px";
 
-    ["primary", "secondary", "success", "warning", "danger", "info", "neutral", "outline", "ghost"].forEach((v) => {
-      const el = document.createElement("ark-button");
-      el.setAttribute("variant", v);
-      el.setAttribute("theme", theme);
-      if (disabled) el.setAttribute("disabled", "");
-      el.textContent = v;
-      wrap.appendChild(el);
-    });
+    ["primary", "secondary", "success", "warning", "danger", "info", "neutral", "outline", "ghost", "soft"].forEach(
+      (v) => {
+        const el = document.createElement("ark-button");
+        el.setAttribute("variant", v);
+        el.setAttribute("theme", theme);
+        if (disabled) el.setAttribute("disabled", "");
+        el.textContent = v;
+        wrap.appendChild(el);
+      }
+    );
 
     return wrap;
   },
@@ -166,6 +168,61 @@ export const IntentsDark = {
     });
 
     return wrap;
+  }
+};
+
+export const Soft = {
+  // Fundo suave com o texto do intent: o contraste dos sete intents nos dois temas é o que o axe confere aqui.
+  parameters: { a11y: { test: "error" } },
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "12px";
+
+    (["light", "dark"] as const).forEach((theme) => {
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.flexWrap = "wrap";
+      row.style.gap = "12px";
+      row.style.padding = "16px";
+      row.style.borderRadius = "12px";
+      row.style.background = theme === "dark" ? "#0f172a" : "#ffffff";
+      ["primary", "secondary", "success", "warning", "danger", "info", "neutral"].forEach((intent) => {
+        const el = document.createElement("ark-button");
+        el.setAttribute("variant", "soft");
+        el.setAttribute("intent", intent);
+        el.setAttribute("theme", theme);
+        el.textContent = intent;
+        row.appendChild(el);
+      });
+      wrap.appendChild(row);
+    });
+
+    return wrap;
+  },
+  // Soft é o fundo -soft com o texto -soft-fg; a borda existe transparente no repouso (aparece no hover), então a
+  // caixa tem o mesmo tamanho das outras variantes e não se mexe ao passar o ponteiro.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const soft = canvasElement.querySelector('ark-button[intent="primary"]') as HTMLElement;
+    await expect(soft.classList.contains("ark:bg-primary-soft")).toBe(true);
+    await expect(soft.classList.contains("ark:text-primary-soft-fg")).toBe(true);
+    await expect(soft.classList.contains("ark:hover:border-primary-border")).toBe(true);
+    const style = getComputedStyle(soft);
+    await expect(style.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(style.borderTopWidth).toBe("1px");
+    await expect(style.borderTopColor).toBe("rgba(0, 0, 0, 0)");
+
+    const height = soft.getBoundingClientRect().height;
+    for (const variant of ["solid", "outline", "ghost"]) {
+      soft.setAttribute("variant", variant);
+      await expect(soft.getBoundingClientRect().height).toBe(height);
+    }
+    soft.setAttribute("variant", "soft");
+
+    // Um intent como variant continua sólido, e o intent explícito escolhe a cor do soft.
+    const danger = canvasElement.querySelector('ark-button[intent="danger"]') as HTMLElement;
+    await expect(danger.classList.contains("ark:bg-danger-soft")).toBe(true);
+    await expect(danger.classList.contains("ark:bg-danger")).toBe(false);
   }
 };
 
@@ -281,7 +338,7 @@ export const Loading = {
     wrap.style.alignItems = "center";
     wrap.style.gap = "12px";
 
-    ["solid", "outline", "ghost"].forEach((variant) => {
+    ["solid", "outline", "ghost", "soft"].forEach((variant) => {
       const el = document.createElement("ark-button");
       el.setAttribute("variant", variant);
       el.setAttribute("loading", "");
