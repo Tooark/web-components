@@ -9,6 +9,35 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-button-group`: new element. The host is the `role="group"` and the app's `ark-button` children stay in
+  place. Joined by default (one outline: the outer corners follow `rounded`, each button overlaps the previous one
+  by 1 px, and the variants without a border get a divider in the text color), `spaced` separates them by the gap of
+  the `size`; `orientation` (`horizontal`/`vertical`), `full-width`, `label` (the `aria-label`). `variant`,
+  `intent`, `size`, `rounded`, `theme` and `disabled` on the group apply to every button and win over the
+  button's own attribute while the group has them (the Vue and Angular wrappers always write a default on the
+  button); what a button had comes back when the group loses the attribute or the button leaves. No event of its
+  own. A split button is this group plus an `ark-menu` (`SplitButton` story, README example). Hook `button-group`.
+- `ark-radio-group`: new element. The host is the `role="radiogroup"` and the app's `ark-radio` children stay in
+  place, forming one group by being in that host, with or without `name`. `value` is synced with the checked radio
+  (setting it checks without emitting `change`), and the group emits a single `change` with `detail: { value }`.
+  `label` (own legend, `aria-labelledby`), `helper`, `error` and `error-message` (`aria-describedby`,
+  `aria-invalid`), `orientation` (`vertical`/`horizontal`), `required` (`aria-required`), and `name`, `size`,
+  `intent`, `theme` and `disabled` for every radio. Hooks `radio-group`, `radio-group-label`,
+  `radio-group-helper` and `radio-group-error`.
+- `ArkButtonGroup` and `ArkRadioGroup` in `@tooark/react` and `@tooark/vue`, `ArkButtonGroupComponent`
+  (`ark-button-group-wrapper`) and `ArkRadioGroupComponent` (`ark-radio-group-wrapper`) in `@tooark/angular`, the
+  raw tags' JSX typing, and the types `ArkOrientation`, `ArkButtonGroupStyleOptions` and
+  `ArkRadioGroupStyleOptions` in `@tooark/core`.
+
+### Changed
+
+- `ark-radio`: inside an `ark-radio-group` the siblings are the radios of that host instead of the radios with the
+  same `name`. Outside a group nothing changes.
+- `ark-button`: reads `data-ark-group-pos` and `data-ark-group-dir`, written by `ark-button-group`, to square its
+  inner corners and draw the divider. Without them it renders as before.
+
 ## [1.8.0] - 2026-11-23
 
 ### Added

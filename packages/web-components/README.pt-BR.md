@@ -28,7 +28,7 @@ Os Custom Elements nativos (`ark-*`) do design system Tooark, estilizados com Ta
 
 O pacote `@tooark/web-components` fornece:
 
-- 50 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação, árvore), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) a família calendário/relógio/agenda e o tempo relativo (`ark-time`);
+- 52 elementos: botões e toggles, campos de formulário (input, textarea, select, checkbox, radio, switch, file input, datepicker, editor chave/valor), overlays sobre a Popover API (dialog, drawer, menu, tooltip, paleta de comandos, toaster), layout (card, tabs, split pane, carousel), dados (data view em tabela ou cards, paginação, árvore), feedback (alert, badge, progress, spinner, skeleton, empty, status dot) a família calendário/relógio/agenda e o tempo relativo (`ark-time`);
 - light DOM: os componentes nunca movem nem envolvem os seus filhos; o host é o controle ou o container;
 - `styles.css` é a única folha de estilo necessária: tokens, presets de motion e estilos dos componentes, tudo com prefixo (`ark:*`, `--ark-*`), sem reset global;
 - temas por `color-scheme` (`theme="light|dark"` por elemento), tamanhos `xs…xl`, intents `primary…neutral`, `rounded`;
@@ -75,6 +75,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-avatar` — Avatar (`role="img"` nomeado por `name`): iniciais de `name`, imagem `src` que cai para as iniciais em erro de carga, `size`, `shape` circle/square, `color` própria, `variant` soft/solid.
 - `ark-badge` — Rótulo curto de status/categoria: intents, `soft`/`solid`/`outline`, `xs`–`md`, `rounded`, `color` própria via `color-mix`. O host é o badge; ícone e texto ficam como filhos.
 - `ark-button` — Intents, tamanhos, variantes (solid/outline/ghost/soft), `rounded` (até `full`), estados `loading`/`icon-only`/`full-width`, feedback `status` (glifo de sucesso/erro + anúncio), modo link (`href`) e formulário (`type="submit"` é o botão padrão do formulário, então Enter nos campos de texto envia).
+- `ark-button-group` — Grupo de `ark-button` (`role="group"`): colados por padrão (um contorno só, com divisa entre os botões) ou `spaced`; `orientation`, `full-width`; `variant`/`intent`/`size`/`rounded`/`theme`/`disabled` valem para todos os botões. O botão dividido é este grupo mais um `ark-menu`.
 - `ark-calendar` — Grid de mês inline (no estilo do DateCalendar do MUI): localizado, teclado WAI-ARIA, motion, views de mês/ano no título e eventos com cor (`dots`/`count`/`list`).
 - `ark-card` — Cartão: o host é a caixa (`surface`, `border`, `rounded`) e uma grid: `heading` (h2) ou `slot="header"` com `slot="actions"` na linha de cima, filhos sem slot como corpo, `slot="footer"` por último com divisor; `padding` none–lg.
 - `ark-carousel` — CSS scroll snap nativo (touch/trackpad rolam nativamente, arrasto com mouse emulado), autoplay, loop, dots e setas. Os slides continuam sendo seus filhos diretos.
@@ -103,6 +104,7 @@ Declare o `color-scheme` da página para escolher o tema (`light`, `dark` ou `li
 - `ark-pagination` — Paginação (`role="navigation"`): resumo do intervalo, seletor opcional de itens por página (`page-sizes`), faixa de páginas com reticências, anterior/próxima; `page`/`page-size`/`total` reescritos no clique, localizada, anunciada. Emite `ark-page-change`.
 - `ark-progress` — Barra de progresso (`role="progressbar"` no host): `value`/`max` com transição de largura pelos tokens, `show-value`, `indeterminate` em loop isento de movimento reduzido, `label`, tamanhos, intents.
 - `ark-radio` — Radio desenhado pelo componente (botão `role="radio"` + input nativo oculto): agrupa por `name` no mesmo form, um tab stop por grupo, setas movem e marcam, `label`/filhos como rótulo, dica `helper`. Emite `change` na que marcou.
+- `ark-radio-group` — Grupo de `ark-radio` (`role="radiogroup"`): `value` sincronizado com o rádio marcado, legenda própria (`label`), `helper`/`error-message`, `orientation`, `required`; `name`/`size`/`intent`/`theme`/`disabled` valem para todos os rádios. Emite um `change` só.
 - `ark-scheduler` — Agenda com views `week`/`day` (timeline por horário e sobreposição em colunas), `month` e `agenda`; eventos coloridos e clicáveis.
 - `ark-select` — `<select>` nativo estilizado como o `ark-input`: label, helper/erro com aria, `placeholder`, opções por dados (atributo `options` em JSON ou propriedade JS, `group` → `<optgroup>`), tamanhos, intents, `rounded`.
 - `ark-shape-picker` — Seletor de forma como `radiogroup`: as dez formas do `ark-mark` (ou as que `shapes` listar) desenhadas em `color`, `value`, setas navegam, nomes das formas localizados, `disabled`, `size`. Emite `change` com a forma.
