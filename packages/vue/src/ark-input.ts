@@ -29,6 +29,8 @@ export const ArkInput = defineComponent({
     autocomplete: { type: String, default: undefined },
     autofocus: { type: Boolean, default: false },
     inputmode: { type: String, default: undefined },
+    /** Id de um `<datalist>` da página com as sugestões do campo. */
+    list: { type: String, default: undefined },
     maxlength: { type: Number, default: undefined },
     minlength: { type: Number, default: undefined },
     pattern: { type: String, default: undefined },
@@ -67,6 +69,7 @@ export const ArkInput = defineComponent({
           autocomplete: props.autocomplete,
           autofocus: props.autofocus ? "" : undefined,
           inputmode: props.inputmode,
+          list: props.list,
           maxlength: props.maxlength,
           minlength: props.minlength,
           pattern: props.pattern,

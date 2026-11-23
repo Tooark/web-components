@@ -26,6 +26,8 @@ export type ArkInputProps = PropsWithChildren<
       autocomplete?: string;
       autofocus?: boolean;
       inputmode?: string;
+      /** Id de um `<datalist>` da página com as sugestões do campo. */
+      list?: string;
       maxlength?: number;
       minlength?: number;
       pattern?: string;

@@ -21,6 +21,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.testid]="testid"
     [attr.aria-label]="ariaLabel"
     [attr.type]="type"
+    [attr.form]="form"
     [attr.disabled]="disabled ? '' : null"
     [attr.loading]="loading ? '' : null"
     [attr.status]="status"
@@ -57,6 +58,8 @@ export class ArkButtonComponent {
   /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
   @Input() ariaLabel: string | undefined;
   @Input() type: ArkButtonType = "button";
+  /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
+  @Input() form: string | undefined;
   @Input() disabled = false;
   @Input() loading = false;
   /** Feedback do resultado: "success" ou "error" trocam o glifo (loading vence). */
