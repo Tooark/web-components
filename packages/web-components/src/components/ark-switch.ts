@@ -134,7 +134,8 @@ export class ArkSwitch extends HTMLElementBase {
   private readonly handleHostClick = (event: MouseEvent): void => {
     if (!this.trackEl) return;
     const target = event.target as HTMLElement | null;
-    if (!target || target === this.trackEl || this.trackEl.contains(target)) return;
+    // Pelo caminho do evento, como no ark-checkbox: um nó clicado que o redesenho tira do DOM continua nele.
+    if (!target || event.composedPath().includes(this.trackEl)) return;
     if (target.closest("a, button, input, select, textarea, label, [contenteditable]") !== null) return;
     if (this.hasAttribute("disabled")) return;
     this.trackEl.focus();

@@ -213,8 +213,10 @@ export class ArkRadio extends HTMLElementBase {
   private readonly handleHostClick = (event: MouseEvent): void => {
     if (!this.boxEl) return;
     const target = event.target as HTMLElement | null;
-    if (!target || target === this.boxEl || this.boxEl.contains(target)) return;
-    if (this.labelEl && (target === this.labelEl || this.labelEl.contains(target))) return;
+    if (!target) return;
+    // Pelo caminho do evento, como no ark-checkbox: um nó clicado que o redesenho tira do DOM continua nele.
+    const path = event.composedPath();
+    if (path.includes(this.boxEl) || (this.labelEl !== null && path.includes(this.labelEl))) return;
     if (target.closest("a, button, input, select, textarea, label, [contenteditable]") !== null) return;
     if (this.isDisabled()) return;
     this.boxEl.focus();

@@ -167,8 +167,11 @@ export class ArkCheckbox extends HTMLElementBase {
   private readonly handleHostClick = (event: MouseEvent): void => {
     if (!this.boxEl) return;
     const target = event.target as HTMLElement | null;
-    if (!target || target === this.boxEl || this.boxEl.contains(target)) return;
-    if (this.labelEl && (target === this.labelEl || this.labelEl.contains(target))) return;
+    if (!target) return;
+    // Pelo caminho do evento, e não por contains(): o clique no glifo já alternou a caixa pelo botão, e o redesenho
+    // tirou do DOM o svg clicado, que então não está mais dentro dela (a caixa alternava duas vezes).
+    const path = event.composedPath();
+    if (path.includes(this.boxEl) || (this.labelEl !== null && path.includes(this.labelEl))) return;
     if (target.closest("a, button, input, select, textarea, label, [contenteditable]") !== null) return;
     if (this.isDisabled()) return;
     this.boxEl.focus();
