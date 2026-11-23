@@ -650,6 +650,45 @@ export type ArkToggleStyleOptions = {
   value?: string;
 };
 
+/** Direção de um grupo de controles (ark-button-group, ark-radio-group). */
+export type ArkOrientation = "horizontal" | "vertical";
+
+/** Props de estilo do ark-button-group; variant, intent, size, rounded e theme valem para todos os botões dele. */
+export type ArkButtonGroupStyleOptions = {
+  /** Propagado como data-testid ao host. */
+  testid?: string;
+  /** Direção da fila. Padrão: "horizontal". */
+  orientation?: ArkOrientation;
+  /** Botões separados pelo gap do size, em vez de colados num contorno só. Padrão: colados. */
+  spaced?: boolean;
+  /** O grupo ocupa a largura disponível e a reparte entre os botões. */
+  fullWidth?: boolean;
+  /** Aparência gravada em todos os botões. Padrão: cada botão fica com a sua. */
+  variant?: ArkButtonVariant;
+  /** Intenção de cor gravada em todos os botões. Padrão: cada botão fica com a sua. */
+  intent?: ArkIntent;
+  /** Altura gravada em todos os botões, e o gap de `spaced`. Padrão: cada botão fica com a sua. */
+  size?: ArkSize;
+  /** Arredondamento dos cantos de fora do grupo. Padrão: o de cada botão ("md"). */
+  rounded?: ArkRounded;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
+/** Props de estilo do ark-radio-group; size, intent e theme valem para todos os rádios dele. */
+export type ArkRadioGroupStyleOptions = {
+  /** Propagado como data-testid ao host e sufixado nas partes (`-label`, `-helper`, `-error`). */
+  testid?: string;
+  /** Direção da lista. Padrão: "vertical". */
+  orientation?: ArkOrientation;
+  /** Intenção de cor gravada em todos os rádios. Padrão: cada rádio fica com a sua. */
+  intent?: ArkIntent;
+  /** Tamanho gravado em todos os rádios, e o da legenda. Padrão: cada rádio fica com o seu. */
+  size?: ArkSize;
+  /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
+  theme?: ArkTheme;
+};
+
 /** Props de estilo e comportamento do ark-toggle-group. */
 export type ArkToggleGroupStyleOptions = {
   /** Propagado como data-testid ao elemento principal e sufixado nas partes internas. */
