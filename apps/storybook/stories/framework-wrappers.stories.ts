@@ -475,6 +475,59 @@ export const ReactDomProps = {
   }
 };
 
+// Num custom element o React 19 grava `aria-pressed={true}` como atributo vazio, valor inválido em ARIA (num
+// <button> nativo ele grava "true"). Os wrappers convertem os `aria-*` booleanos em texto. `form` é propriedade do
+// ark-button: sem setter, o React lançava ao atribuí-la e a árvore desmontava.
+export const ReactAriaBooleansAndForm = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    let submitted = 0;
+    const screen = (pressed: boolean): ReactNode =>
+      createElement(
+        "div",
+        null,
+        createElement("form", {
+          id: "react-form-fora",
+          onSubmit: (event: SubmitEvent) => {
+            event.preventDefault();
+            submitted++;
+          }
+        }),
+        createElement(
+          ReactArkButton,
+          { id: "alterna", "aria-pressed": pressed, "aria-expanded": !pressed, "aria-label": "Negrito" },
+          "B"
+        ),
+        createElement(ReactArkButton, { id: "envia", type: "submit", form: "react-form-fora" }, "Enviar"),
+        createElement(ReactArkInput, { label: "Fruta", list: "react-frutas" }),
+        createElement("datalist", { id: "react-frutas" }, createElement("option", { value: "Caju" }))
+      );
+
+    render(screen(true));
+    await expect(errors).toEqual([]);
+    const toggle = canvasElement.querySelector("#alterna") as HTMLElement;
+    await expect(toggle).toHaveAttribute("aria-pressed", "true");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(toggle).toHaveAttribute("aria-label", "Negrito");
+
+    render(screen(false));
+    await expect(errors).toEqual([]);
+    await expect(toggle).toHaveAttribute("aria-pressed", "false");
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+
+    const submit = canvasElement.querySelector("#envia") as HTMLElement & { form: HTMLFormElement | null };
+    await expect(submit).toHaveAttribute("form", "react-form-fora");
+    await expect(submit.form === canvasElement.querySelector("form")).toBe(true);
+    submit.click();
+    await waitFor(() => expect(submitted).toBe(1));
+
+    const input = canvasElement.querySelector('ark-input [data-ark="input"]') as HTMLInputElement;
+    await expect(input.list === canvasElement.querySelector("datalist")).toBe(true);
+  }
+};
+
 // No Vue os wrappers têm inheritAttrs: false e espalham os attrs no elemento: id, class, style, aria-*, data-* e os
 // listeners nativos (onClick) chegam ao ark-*, sem tipagem a mais. O localeJson do relógio é prop do wrapper.
 export const VueFallthroughAttrs = {
