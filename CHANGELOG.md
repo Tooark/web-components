@@ -9,6 +9,31 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `ark-dialog`, `ark-drawer` and `ark-command-palette` kept mounted and closed through a prop in React lost the
+  focus to `<body>` instead of returning it to the opener: a footer button with a synchronous `onClick`, a save
+  that closes after an `await`, the form's submit (Enter in a field), a state change outside an event. `open`
+  changes inside the commit, the trap returned the focus to the opener right there, and React, at the end of the
+  commit, refocused the element that had the focus before it (the button inside the overlay on its way out), which
+  then disappeared. `trapFocus` now returns the focus in a microtask, after the commit.
+  `ReactOverlayClosedByPropReturnsFocus` story.
+- `trapFocus`: a dialog opened on top of another left the one underneath usable. The trap treated every open
+  popover as a popover on top of it, the dialog below included, so focus sent there stayed there and a click on one
+  of its buttons went through (closing it with the other still open). The container of a trap underneath no longer
+  counts, for the focus or the pointer: the focus comes back, and the click is the scrim click of the dialog on
+  top. `DialogBelowIsNotOnTop` story.
+- `trapFocus`: when the element that gets the focus back can no longer take it (the button of a dialog that
+  closed when it opened the next one), the focus goes to the `returnTo` of the trap that contained it instead of
+  `<body>`. Closing the second dialog of a swap now lands on the button that opened the first, in both DOM orders.
+
+### Changed
+
+- `trapFocus` (`@tooark/core`): the release function returns the focus to `returnTo` one microtask later instead
+  of synchronously, and only when the focus is still inside the container or on `<body>` (an app that moved it
+  elsewhere while closing keeps its choice). Code that reads `document.activeElement` right after releasing a trap,
+  or right after `close()` on a dialog, drawer or palette, has to wait a microtask (`await Promise.resolve()`).
+
 ## [1.9.1] - 2026-11-23
 
 ### Fixed

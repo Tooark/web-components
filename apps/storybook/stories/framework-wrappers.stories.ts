@@ -19,6 +19,8 @@ import {
   ArkCard as ReactArkCard,
   ArkCheckbox as ReactArkCheckbox,
   ArkClock as ReactArkClock,
+  ArkCommandItem as ReactArkCommandItem,
+  ArkCommandPalette as ReactArkCommandPalette,
   ArkDataView as ReactArkDataView,
   ArkDatepicker as ReactArkDatepicker,
   ArkDialog as ReactArkDialog,
@@ -706,6 +708,97 @@ export const ReactDialogSwapKeepsFocus = {
 
       await userEvent.keyboard("{Escape}");
       await waitFor(() => expect(second).not.toHaveAttribute("data-ark-state"));
+      // Quem abriu o segundo foi o botão do primeiro, já fechado: o foco sobe para quem abriu o primeiro.
+      await waitFor(() => expect(within(scope).getByText("Abrir")).toHaveFocus());
+      root.unmount();
+    }
+    await expect(errors).toEqual([]);
+  }
+};
+
+// Overlay sempre montado e fechado pela prop, de dentro dele: um botão do rodapé com onClick síncrono, outro que fecha
+// depois de um await, e o submit do form (Enter no campo). O `open` muda dentro do commit do React, e o React refoca,
+// ao fim do commit, o elemento que tinha o foco antes dele: se o trap devolve o foco ao abridor na hora, o React o
+// leva de volta ao botão do overlay que está saindo, e o foco se perde no body quando o painel some. O trap devolve o
+// foco num microtask, depois do commit.
+let closeOverlayFromOutside: () => void = () => undefined;
+
+function OverlayClosedByProp({ tag }: { tag: "dialog" | "drawer" | "palette" }): ReactNode {
+  const [open, setOpen] = useState(false);
+  const close = (): void => setOpen(false);
+  closeOverlayFromOutside = close;
+  const opener = createElement("button", { key: "opener", type: "button", onClick: () => setOpen(true) }, "Abrir");
+  const props = { key: "overlay", open, label: "Editar", onClose: close };
+  if (tag === "palette") {
+    return [
+      opener,
+      createElement(ReactArkCommandPalette, props, createElement(ReactArkCommandItem, { value: "a" }, "Alpha"))
+    ];
+  }
+  const form = createElement(
+    "form",
+    {
+      key: "form",
+      onSubmit: (event: { preventDefault(): void }) => {
+        event.preventDefault();
+        close();
+      }
+    },
+    createElement(ReactArkInput, { label: "Nome" }),
+    createElement(ReactArkButton, { type: "submit" }, "Enviar")
+  );
+  const footer = createElement(
+    "div",
+    { key: "footer", slot: "footer" },
+    createElement(ReactArkButton, { onClick: close }, "Cancelar"),
+    createElement(
+      ReactArkButton,
+      {
+        onClick: async () => {
+          await new Promise((resolve) => setTimeout(resolve, 30));
+          close();
+        }
+      },
+      "Salvar"
+    )
+  );
+  return [
+    opener,
+    tag === "dialog"
+      ? createElement(ReactArkDialog, props, form, footer)
+      : createElement(ReactArkDrawer, props, form, footer)
+  ];
+}
+
+export const ReactOverlayClosedByPropReturnsFocus = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    for (const tag of ["dialog", "drawer", "palette"] as const) {
+      const root = reactRoot(canvasElement, errors)(createElement(OverlayClosedByProp, { tag }));
+      const scope = canvasElement.lastElementChild as HTMLElement;
+      const opener = within(scope).getByText("Abrir");
+      const overlay = scope.querySelector(tag === "palette" ? "ark-command-palette" : `ark-${tag}`) as HTMLElement;
+      const ways = tag === "palette" ? ["prop"] : ["Cancelar", "Salvar", "enter", "prop"];
+
+      for (const way of ways) {
+        opener.focus();
+        await userEvent.click(opener);
+        await waitFor(() => expect(overlay.matches(":popover-open")).toBe(true));
+        const field = overlay.querySelector("input") as HTMLInputElement;
+        await waitFor(() => expect(field).toHaveFocus());
+
+        if (way === "enter") {
+          await userEvent.keyboard("{Enter}");
+        } else if (way === "prop") {
+          // Fora de um evento, com o foco no campo (uma resposta do servidor que fecha a tela).
+          closeOverlayFromOutside();
+        } else {
+          await userEvent.click(within(overlay).getByText(way));
+        }
+        await waitFor(() => expect(overlay).not.toHaveAttribute("data-ark-state"));
+        await expect(opener, `${tag}: ${way}`).toHaveFocus();
+      }
       root.unmount();
     }
     await expect(errors).toEqual([]);

@@ -15,6 +15,7 @@ export type ArkFocusTrapOptions = {
 };
 
 type Trap = {
+  container: HTMLElement;
   activate(): void;
   pause(): void;
 };
@@ -39,23 +40,41 @@ const GESTURE_END = ["click", "auxclick", "contextmenu", "pointercancel"];
 // Traps aninhados (dialog que abre dialog): só o do topo escuta; os de baixo pausam até ele ser liberado.
 const stack: Trap[] = [];
 
+// Para onde o foco de cada container volta. O `returnTo` de um overlay pode estar em outro que fechou antes dele (um
+// diálogo trocado por outro): a devolução sobe por aqui até achar um elemento que ainda aceite o foco.
+const returns = new WeakMap<HTMLElement, HTMLElement | null>();
+
+/** Limite da subida pela cadeia de `returnTo`, contra um ciclo entre dois overlays que se abrem um ao outro. */
+const MAX_RETURN_HOPS = 8;
+
+/** O alvo está num popover na saída do `closePopover`: ainda `:popover-open`, só até a animação acabar. */
+function isInsideClosingPopover(target: Element): boolean {
+  try {
+    for (
+      let host = target.closest(":popover-open");
+      host;
+      host = host.parentElement?.closest(":popover-open") ?? null
+    ) {
+      if (isPopoverClosing(host)) return true;
+    }
+  } catch {
+    // Sem :popover-open no navegador não há saída em curso para considerar.
+  }
+  return false;
+}
+
 /**
  * O alvo está num popover aberto por cima do container. Com `leaving: false`, um popover na saída do `closePopover`
  * (ainda `:popover-open` até a animação acabar) não conta: é a regra do foco, que não pode ficar num painel que some.
  */
 function isInsideOpenPopover(target: Element, leaving = true): boolean {
   try {
-    let host = target.closest(":popover-open");
-    if (!host) return false;
-    if (leaving) return true;
-    for (; host; host = host.parentElement?.closest(":popover-open") ?? null) {
-      if (isPopoverClosing(host)) return false;
-    }
-    return true;
+    if (!target.closest(":popover-open")) return false;
   } catch {
     // Sem :popover-open no navegador não há top layer para considerar.
     return false;
   }
+  return leaving || !isInsideClosingPopover(target);
 }
 
 /**
@@ -65,8 +84,14 @@ function isInsideOpenPopover(target: Element, leaving = true): boolean {
  * sem ele, `initial`; sem os dois, o primeiro focável), e eventos de ponteiro iniciados fora são cancelados na
  * captura antes de chegar ao alvo (e reportados em `onOutsidePointer`). Popovers abertos por cima (menu, tooltip,
  * toaster) ficam fora do trap: são o próprio overlay em uso; um que está na saída do `closePopover` ainda recebe o
- * ponteiro, mas já não segura o foco. Traps aninhados empilham: só o mais recente escuta. Ao liberar, o foco volta a
- * `returnTo`. No-op sem DOM.
+ * ponteiro, mas já não segura o foco. Traps aninhados empilham: só o mais recente escuta, e o container de um trap
+ * de baixo (o diálogo que abriu este) não conta como popover por cima, nem para o foco nem para o ponteiro.
+ *
+ * Ao liberar, o foco volta a `returnTo` num microtask, e só se ainda estiver no container ou sem dono (`body`): um
+ * framework que refoca ao fim da própria atualização o elemento focado antes dela (o React, a cada commit) desfaria
+ * uma devolução síncrona, e o app que levou o foco a outro lugar de propósito fica com a escolha dele. Se `returnTo`
+ * já não aceita o foco (está num overlay que fechou, ou saiu da página), vale o `returnTo` do trap que o continha.
+ * No-op sem DOM.
  */
 export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions = {}): () => void {
   if (typeof document === "undefined") return () => undefined;
@@ -74,13 +99,17 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   const doc = container.ownerDocument;
   const returnTo = options.returnTo ?? (doc.activeElement instanceof HTMLElement ? doc.activeElement : null);
 
+  // O container de outro trap da pilha é um popover aberto, mas está embaixo deste: sem esta regra o diálogo que
+  // abriu outro continuava recebendo o foco e os cliques com o de cima aberto.
+  const isBelow = (target: Node): boolean => stack.some((other) => other !== trap && other.container.contains(target));
+
   // `leaving`: um popover em saída ainda conta como dono do alvo. Vale para o ponteiro (o segundo clique de um duplo
   // clique no botão de um diálogo que fecha não é um clique no scrim do de baixo) e não vale para o foco.
   const owns = (target: EventTarget | null, leaving: boolean): boolean =>
     target instanceof Node &&
     (target === container ||
       container.contains(target) ||
-      (target instanceof Element && isInsideOpenPopover(target, leaving)));
+      (target instanceof Element && !isBelow(target) && isInsideOpenPopover(target, leaving)));
 
   const focusContainer = (): void => {
     if (!container.hasAttribute("tabindex")) container.setAttribute("tabindex", "-1");
@@ -115,7 +144,8 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   const handleKeydown = (event: KeyboardEvent): void => {
     if (event.key !== "Tab") return;
     const active = doc.activeElement;
-    if (active instanceof Element && !container.contains(active) && isInsideOpenPopover(active, false)) return;
+    // Foco num popover aberto por cima (um menu do próprio overlay): o Tab é dele.
+    if (active instanceof Element && !container.contains(active) && owns(active, false)) return;
 
     const list = focusableElements(container);
     if (list.length === 0) {
@@ -177,6 +207,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   }
 
   const trap: Trap = {
+    container,
     activate(): void {
       listening = true;
       doc.addEventListener("keydown", handleKeydown, true);
@@ -191,6 +222,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
     }
   };
 
+  returns.set(container, returnTo);
   stack[stack.length - 1]?.pause();
   stack.push(trap);
   trap.activate();
@@ -213,6 +245,23 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
     if (index >= 0) stack.splice(index, 1);
     if (wasTop) stack[stack.length - 1]?.activate();
 
-    if (returnTo?.isConnected) returnTo.focus();
+    // Depois da atualização em curso do framework, e só se o foco não foi levado a outro lugar nesse meio tempo.
+    queueMicrotask(() => {
+      const active = doc.activeElement;
+      if (active && active !== doc.body && !container.contains(active)) return;
+      // O container voltou a ter um trap (reaberto no mesmo passo): o foco é dele.
+      if (stack.some((other) => other.container === container)) return;
+      let target: HTMLElement | null = returnTo;
+      for (let hops = 0; target && hops < MAX_RETURN_HOPS; hops++) {
+        if (target.isConnected && !isInsideClosingPopover(target)) {
+          target.focus();
+          // `contains`: um elemento pode delegar o foco a um filho.
+          if (target.contains(doc.activeElement)) return;
+        }
+        let owner: HTMLElement | null = target.parentElement;
+        while (owner && !returns.has(owner)) owner = owner.parentElement;
+        target = owner ? (returns.get(owner) ?? null) : null;
+      }
+    });
   };
 }
