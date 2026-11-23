@@ -200,22 +200,25 @@ export class ArkDialog extends HTMLElementBase {
 
     // showPopover() antes do foco: os focáveis só têm caixas com o painel visível.
     void openPopover(this, "scale", { lockScroll: !this.noScrollLock });
-    this.releaseTrap?.();
-    this.releaseTrap = trapFocus(this, {
-      initial: this.initialFocus(),
-      onOutsidePointer: () => {
-        if (!this.persistent) this.close("backdrop");
-      }
-    });
 
-    const emit = (): void => {
-      if (this.state === "open") this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
+    const settle = (): void => {
+      if (this.state !== "open") return;
+      this.releaseTrap?.();
+      this.releaseTrap = trapFocus(this, {
+        initial: this.initialFocus(),
+        onOutsidePointer: () => {
+          if (!this.persistent) this.close("backdrop");
+        }
+      });
+      this.dispatchEvent(new CustomEvent("ark-open", { bubbles: true, composed: true }));
     };
-    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o evento
-    // sai num microtask, para chegar a quem se inscreve no mesmo ciclo em que o nó entrou (os wrappers React e
-    // Angular ligam os listeners dos overlays durante a montagem) em vez de disparar antes de alguém escutar.
-    if (this.openingOnConnect) queueMicrotask(emit);
-    else emit();
+    // Aberto já ao conectar (open no HTML, hidratação de SSR, framework que grava a prop antes de inserir): o trap e
+    // o evento esperam um microtask. O foco inicial só é escolhido depois de os filhos conectarem (um ark-input do
+    // corpo ainda não montou o <input>, e o foco caía no botão de fechar), e o ark-open chega a quem se inscreve no
+    // mesmo ciclo em que o nó entrou (os wrappers React e Angular ligam os listeners dos overlays durante a
+    // montagem) em vez de disparar antes de alguém escutar.
+    if (this.openingOnConnect) queueMicrotask(settle);
+    else settle();
   }
 
   private closeNow(reason: ArkDialogCloseReason): void {
