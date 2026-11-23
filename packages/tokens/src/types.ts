@@ -8,7 +8,7 @@ export type ArkIntent = "primary" | "secondary" | "success" | "warning" | "dange
 export type ArkSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 /** Variantes de estilo visual. */
-export type ArkStyleVariant = "solid" | "outline" | "ghost";
+export type ArkStyleVariant = "solid" | "outline" | "ghost" | "soft";
 
 /** Escala de arredondamento de borda ("full" transforma quadrados em círculos). */
 export type ArkRounded = "none" | "xs" | "sm" | "md" | "lg" | "xl" | "full";
