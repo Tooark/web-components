@@ -1078,6 +1078,7 @@
   ark-tree-item > [data-ark-chrome="toggle"],
   ark-tree-item > [data-ark-chrome="check"],
   ark-tree-item > [slot="icon"],
+  ark-tree-item > [data-ark-chrome="icon"],
   ark-tree-item > [data-ark-chrome="label"],
   ark-tree-item > [slot="trailing"] {
     grid-row: 1;
@@ -1104,11 +1105,55 @@
     margin-inline-end: 0.375rem;
   }
 
-  ark-tree-item > [slot="icon"] {
+  ark-tree-item > [slot="icon"],
+  ark-tree-item > [data-ark-chrome="icon"] {
     grid-column: 4;
     display: inline-flex;
     align-items: center;
     margin-inline-end: 0.375rem;
+  }
+
+  /*
+   * Lado do ícone por size (a árvore propaga o atributo a cada item). O ícone
+   * próprio o usa direto; o do app o lê em `width: var(--ark-tree-icon-size)`,
+   * porque o componente não dimensiona nó que não é dele.
+   */
+  ark-tree-item {
+    --ark-tree-icon-size: 1rem;
+  }
+
+  ark-tree-item:is([size="xs"], [size="sm"]) {
+    --ark-tree-icon-size: 0.875rem;
+  }
+
+  ark-tree-item[size="lg"] {
+    --ark-tree-icon-size: 1.125rem;
+  }
+
+  ark-tree-item[size="xl"] {
+    --ark-tree-icon-size: 1.25rem;
+  }
+
+  /* Ícone próprio (pasta, arquivo): cor de --ark-tree-icon-color, que o `icon-color` da árvore grava no host. */
+  ark-tree-item > [data-ark-chrome="icon"] {
+    width: var(--ark-tree-icon-size);
+    height: var(--ark-tree-icon-size);
+    color: var(--ark-tree-icon-color, var(--ark-color-fg-muted));
+  }
+
+  ark-tree-item[disabled] > [data-ark-chrome="icon"] {
+    opacity: 0.5;
+  }
+
+  /* Com `icon-color` o ícone do app segue a mesma cor; sem o atributo ele fica como o app o pintou. */
+  ark-tree-item:where([data-ark-icon-color]) > [slot="icon"] {
+    color: var(--ark-tree-icon-color);
+  }
+
+  /* icons="none": some também o ícone do app, que pode trazer um display próprio (uma utility do Tailwind dele). */
+  ark-tree-item:where([data-ark-icons="none"]) > [slot="icon"] {
+    /* biome-ignore lint/complexity/noImportantStyles: precisa vencer o display que o app deu ao próprio ícone */
+    display: none !important;
   }
 
   ark-tree-item > [data-ark-chrome="label"] {

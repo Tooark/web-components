@@ -1,4 +1,4 @@
-import { type ArkSize, coerceBooleanAttr } from "@tooark/core";
+import { type ArkSize, type ArkTreeItemIcon, coerceBooleanAttr } from "@tooark/core";
 import { HTMLElementBase } from "./html-element-base";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
@@ -12,6 +12,15 @@ const CHECK_SVG = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" st
 const DASH_SVG = `<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true" class="ark:h-full ark:w-full"><path d="M5 10h10"></path></svg>`;
 /** Spinner de `loading` (o mesmo giro contínuo do botão). */
 const SPINNER_SVG = `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="ark:h-full ark:w-full ark-animate-spin"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="3" opacity="0.25"></circle><path d="M21 12a9 9 0 0 0-9-9" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path></svg>`;
+/**
+ * Ícones próprios de pasta e arquivo (`icons="files"` na árvore ou `icon` no item): contorno na grade de 16, o lado do
+ * ícone no tamanho padrão, com a cor de `--ark-tree-icon-color` e o corpo da pasta num preenchimento leve.
+ */
+const ICON_SVGS: Record<string, string> = {
+  folder: `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ark:h-full ark:w-full"><path d="M1.75 4.25a1.5 1.5 0 0 1 1.5-1.5h2.8a1 1 0 0 1 .76.35L7.9 4.4h4.85a1.5 1.5 0 0 1 1.5 1.5v5.85a1.5 1.5 0 0 1-1.5 1.5h-9.5a1.5 1.5 0 0 1-1.5-1.5z" fill="currentColor" fill-opacity="0.14"></path></svg>`,
+  "folder-open": `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ark:h-full ark:w-full"><path d="M1.75 11.5V4.25a1.5 1.5 0 0 1 1.5-1.5h2.8a1 1 0 0 1 .76.35L7.9 4.4h3.85a1.5 1.5 0 0 1 1.5 1.5v.85"></path><path d="M4.02 6.75h9.9a.9.9 0 0 1 .86 1.16l-1.3 4.27a1.5 1.5 0 0 1-1.43 1.07H2.9a1.15 1.15 0 0 1-1.1-1.49l1.26-4.3a1 1 0 0 1 .96-.71z" fill="currentColor" fill-opacity="0.14"></path></svg>`,
+  file: `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" class="ark:h-full ark:w-full"><path d="M4.25 1.75h4.4a1 1 0 0 1 .7.3l2.6 2.6a1 1 0 0 1 .3.7v7.4a1.5 1.5 0 0 1-1.5 1.5h-6.5a1.5 1.5 0 0 1-1.5-1.5v-9.5a1.5 1.5 0 0 1 1.5-1.5z"></path><path d="M8.75 2v2.25a1 1 0 0 0 1 1H12"></path></svg>`
+};
 
 let itemSeq = 0;
 
@@ -26,8 +35,10 @@ export type ArkTreeItemChecked = "true" | "false" | "mixed";
  * tem a própria linha. O chevron, a caixa e o rótulo são chrome próprio; o
  * `slot="icon"` e o `slot="trailing"` do usuário entram na linha pela grid do
  * components.css (e ficam fora do treeitem, então um botão no trailing é um
- * controle à parte). Seleção, foco, teclado e a estrutura são coordenados pelo
- * ark-tree.
+ * controle à parte). O ícone próprio de pasta ou arquivo só existe quando a
+ * árvore pede (`icons="files"`) ou o item o nomeia (`icon`), e cede o lugar
+ * ao `slot="icon"` do usuário. Seleção, foco, teclado e a estrutura são
+ * coordenados pelo ark-tree.
  */
 export class ArkTreeItem extends HTMLElementBase {
   static readonly tagName = "ark-tree-item";
@@ -36,12 +47,27 @@ export class ArkTreeItem extends HTMLElementBase {
   private toggleEl: HTMLSpanElement | null = null;
   private checkEl: HTMLSpanElement | null = null;
   private labelEl: HTMLSpanElement | null = null;
+  /** Ícone próprio de pasta ou arquivo: criado só quando a árvore ou o item o pedem. */
+  private iconEl: HTMLSpanElement | null = null;
   /** Ícones em uso no chevron e na caixa: trocar o innerHTML sem mudança geraria mutações sem fim no observer da árvore. */
   private toggleIcon = "";
   private checkIcon = "";
+  private ownIcon = "";
 
   static get observedAttributes(): string[] {
-    return ["value", "label", "expanded", "lazy", "loading", "selected", "checked", "disabled", "size", "testid"];
+    return [
+      "value",
+      "label",
+      "icon",
+      "expanded",
+      "lazy",
+      "loading",
+      "selected",
+      "checked",
+      "disabled",
+      "size",
+      "testid"
+    ];
   }
 
   connectedCallback(): void {
@@ -72,6 +98,19 @@ export class ArkTreeItem extends HTMLElementBase {
 
   set label(value: string | null | undefined) {
     reflectAttr(this, "label", value);
+  }
+
+  /**
+   * Ícone próprio deste nó: folder, file ou none. Sem o atributo vale o da árvore (`icons="files"`: pasta nos ramos,
+   * arquivo nas folhas). Um `slot="icon"` do usuário tem precedência sobre os dois.
+   */
+  get icon(): ArkTreeItemIcon | "" {
+    const value = (this.getAttribute("icon") || "").toLowerCase();
+    return value === "folder" || value === "file" || value === "none" ? value : "";
+  }
+
+  set icon(value: string | null | undefined) {
+    reflectAttr(this, "icon", value || null);
   }
 
   /** Aberto; refletido quando o usuário expande ou recolhe. */
@@ -163,6 +202,11 @@ export class ArkTreeItem extends HTMLElementBase {
     return this.toggleEl;
   }
 
+  /** O ícone próprio de pasta ou arquivo, ou `null` quando o nó não tem um. */
+  get iconElement(): HTMLSpanElement | null {
+    return this.iconEl;
+  }
+
   /** A caixa própria, para a árvore distinguir o clique que só marca. */
   get checkElement(): HTMLSpanElement | null {
     return this.checkEl;
@@ -196,7 +240,60 @@ export class ArkTreeItem extends HTMLElementBase {
     this.setAttribute("role", "none");
     this.updateAppearance();
     // Chrome no início, antes dos filhos do usuário: a grid do components.css posiciona cada parte.
-    this.prepend(row, toggle, check, label);
+    if (this.iconEl) {
+      this.prepend(row, toggle, check, this.iconEl, label);
+    } else {
+      this.prepend(row, toggle, check, label);
+    }
+  }
+
+  // Qual ícone próprio desenhar ("" para nenhum). A árvore manda em `none` (esconde até o do usuário, pelo CSS); o
+  // `slot="icon"` do usuário vence o próprio; o `icon` do item vence a escolha automática de `icons="files"`.
+  private resolveOwnIcon(branch: boolean): string {
+    // O modo chega propagado pela árvore; na primeira montagem, antes dela passar, vem do atributo da própria árvore.
+    const mode = (
+      this.getAttribute("data-ark-icons") ??
+      this.closest("ark-tree")?.getAttribute("icons") ??
+      ""
+    ).toLowerCase();
+    const own = this.icon;
+    if (mode === "none" || own === "none" || (mode !== "files" && own === "")) return "";
+    for (const child of Array.from(this.children)) {
+      if (child.getAttribute("slot") === "icon") return "";
+    }
+    const kind = own || (branch ? "folder" : "file");
+    return kind === "folder" && branch && this.expanded ? "folder-open" : kind;
+  }
+
+  // Cria, troca ou remove o ícone próprio, só quando muda: cada escrita aqui passa pelo observer da árvore.
+  private syncOwnIcon(branch: boolean): void {
+    const kind = this.resolveOwnIcon(branch);
+    if (kind === "") {
+      if (this.iconEl) {
+        this.iconEl.remove();
+        this.iconEl = null;
+        this.ownIcon = "";
+      }
+      return;
+    }
+    if (!this.iconEl) {
+      const icon = document.createElement("span");
+      icon.setAttribute("data-ark-chrome", "icon");
+      icon.setAttribute("aria-hidden", "true");
+      icon.className = "ark:inline-flex ark:shrink-0 ark:items-center ark:justify-center";
+      this.iconEl = icon;
+      this.ownIcon = "";
+    }
+    if (this.ownIcon !== kind) {
+      this.iconEl.innerHTML = ICON_SVGS[kind];
+      this.iconEl.setAttribute("data-ark-icon", kind);
+      this.ownIcon = kind;
+    }
+    // Na primeira montagem o chrome ainda está fora do DOM: o render() insere o ícone junto com o resto.
+    if (this.labelEl?.parentNode === this && this.iconEl.parentNode !== this) {
+      this.insertBefore(this.iconEl, this.labelEl);
+    }
+    applyTestHooks(this, "tree-item", this.iconEl, "icon");
   }
 
   private sizeClasses(): { text: string; toggle: string; check: string } {
@@ -246,6 +343,8 @@ export class ArkTreeItem extends HTMLElementBase {
       this.toggleEl.innerHTML = toggleIcon;
       this.toggleIcon = toggleIcon;
     }
+
+    this.syncOwnIcon(branch);
 
     // A caixa só aparece com `checkboxes`; o estado vai em aria-checked na linha.
     this.checkEl.hidden = !checkable;

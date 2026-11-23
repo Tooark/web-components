@@ -1,6 +1,7 @@
-import { type ArkTreeSelection, coerceBooleanAttr } from "@tooark/core";
+import { type ArkTreeIcons, type ArkTreeSelection, coerceBooleanAttr } from "@tooark/core";
 import type { ArkTreeItem } from "./ark-tree-item";
 import { HTMLElementBase } from "./html-element-base";
+import { normalizeIntent } from "./intent-colors";
 import { reflectAttr } from "./reflect-attr";
 import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
@@ -21,7 +22,8 @@ const OWN_CONTROLS = "a[href], button, input, select, textarea, [contenteditable
  * nível e posição explícitos). A árvore calcula a estrutura, coordena foco (um
  * tab stop só), teclado do padrão WAI-ARIA, seleção e caixas, e publica os
  * eventos consolidados: `ark-toggle`, `ark-selection-change` e `ark-activate`.
- * Simples por padrão: sem `selection` só navega, expande e ativa.
+ * Simples por padrão: sem `selection` só navega, expande e ativa, e sem
+ * `icons` o único ícone de um nó é o `slot="icon"` que o app puser.
  */
 export class ArkTree extends HTMLElementBase {
   static readonly tagName = "ark-tree";
@@ -37,9 +39,23 @@ export class ArkTree extends HTMLElementBase {
   private known = new WeakSet<ArkTreeItem>();
   private typeahead = "";
   private typeaheadTimer: number | null = null;
+  /** Cor que o `icon-color` gravou em `--ark-tree-icon-color` no host ("" quando não gravou nada). */
+  private iconColorSet = "";
 
   static get observedAttributes(): string[] {
-    return ["selection", "checkboxes", "propagate", "value", "label", "size", "theme", "class", "testid"];
+    return [
+      "selection",
+      "checkboxes",
+      "propagate",
+      "value",
+      "label",
+      "icons",
+      "icon-color",
+      "size",
+      "theme",
+      "class",
+      "testid"
+    ];
   }
 
   constructor() {
@@ -113,6 +129,31 @@ export class ArkTree extends HTMLElementBase {
 
   set propagate(value: boolean | string | null | undefined) {
     this.toggleAttribute("propagate", coerceBooleanAttr(value));
+  }
+
+  /**
+   * Ícones dos nós: sem o atributo cada nó mostra só o `slot="icon"` que o app puser; `files` desenha o ícone próprio
+   * de pasta (ramos) ou de arquivo (folhas) nos nós sem `slot="icon"`; `none` esconde todos, os do app inclusive.
+   */
+  get icons(): ArkTreeIcons | "" {
+    const value = (this.getAttribute("icons") || "").toLowerCase();
+    return value === "files" || value === "none" ? value : "";
+  }
+
+  set icons(value: string | null | undefined) {
+    reflectAttr(this, "icons", value || null);
+  }
+
+  /**
+   * Cor dos ícones: um intent (o token da marca), `current` (a cor do texto da árvore) ou uma cor CSS. Vale para os
+   * ícones próprios e, só com o atributo, também para o `slot="icon"` do app. Padrão: o token `fg-muted`.
+   */
+  get iconColor(): string {
+    return this.getAttribute("icon-color") || "";
+  }
+
+  set iconColor(value: string | null | undefined) {
+    reflectAttr(this, "icon-color", value || null);
   }
 
   /**
@@ -191,6 +232,8 @@ export class ArkTree extends HTMLElementBase {
     const items = this.items;
     const checkMode = this.checkMode();
     const selectMode = this.selection !== "none" && !checkMode;
+    const icons = this.icons || null;
+    const iconColor = this.iconColorSet ? "" : null;
     let inherited = false;
     for (const item of items) {
       const parent = item.parentItem;
@@ -210,6 +253,8 @@ export class ArkTree extends HTMLElementBase {
       for (const name of PROPAGATED_ATTRS) setAttr(item, name, this.getAttribute(name));
       setAttr(item, "data-ark-select", selectMode ? "" : null);
       setAttr(item, "data-ark-checkboxes", checkMode ? "" : null);
+      setAttr(item, "data-ark-icons", icons);
+      setAttr(item, "data-ark-icon-color", iconColor);
       // Um filho que chega depois sob um pai todo marcado (a carga de um `lazy`) chega marcado, com `propagate`.
       if (!this.known.has(item)) {
         this.known.add(item);
@@ -494,8 +539,32 @@ export class ArkTree extends HTMLElementBase {
     this.syncingClass = false;
   }
 
+  // `icon-color` vira o valor de --ark-tree-icon-color no host: intent aponta para o token, `current` para a cor do
+  // texto, e o resto só entra se for uma cor CSS. Sem o atributo o host fica sem a propriedade (a do app, se houver,
+  // continua valendo), e só a que o componente gravou é removida.
+  private syncIconColor(): void {
+    const raw = this.iconColor.trim();
+    const lower = raw.toLowerCase();
+    let color = "";
+    if (lower === "current") {
+      color = "currentColor";
+    } else if (raw && normalizeIntent(lower, "primary") === lower) {
+      color = `var(--ark-color-${lower})`;
+    } else if (raw && typeof CSS !== "undefined" && typeof CSS.supports === "function" && CSS.supports("color", raw)) {
+      color = raw;
+    }
+    if (color === this.iconColorSet) return;
+    if (color) {
+      this.style.setProperty("--ark-tree-icon-color", color);
+    } else {
+      this.style.removeProperty("--ark-tree-icon-color");
+    }
+    this.iconColorSet = color;
+  }
+
   private updateAppearance(): void {
     this.setAttribute("role", "tree");
+    this.syncIconColor();
     setAttr(this, "aria-multiselectable", this.selection === "multiple" ? "true" : null);
     const label = this.getAttribute("label");
     if (label && !this.hasAttribute("aria-labelledby")) setAttr(this, "aria-label", label);

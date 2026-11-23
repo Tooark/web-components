@@ -878,20 +878,32 @@ export type ArkTimeStyleOptions = {
 /** Seleção do ark-tree: none (só navega e expande), single ou multiple. */
 export type ArkTreeSelection = "none" | "single" | "multiple";
 
+/** Ícones dos nós do ark-tree: `files` desenha os próprios (pasta e arquivo), `none` esconde todos. */
+export type ArkTreeIcons = "files" | "none";
+
+/** Ícone próprio de um nó do ark-tree, no lugar da escolha automática de `icons="files"`. */
+export type ArkTreeItemIcon = "folder" | "file" | "none";
+
 /** Props de estilo do ark-tree, propagadas a cada ark-tree-item. */
 export type ArkTreeStyleOptions = {
   /** Propagado como data-testid ao host. */
   testid?: string;
-  /** Escala da linha e do texto. Padrão: "md". */
+  /** Escala da linha, do texto e dos ícones. Padrão: "md". */
   size?: ArkSize;
   /** Força claro/escuro neste elemento e nos descendentes. Padrão: herda o color-scheme da página. */
   theme?: ArkTheme;
+  /** `files` desenha o ícone próprio de pasta ou arquivo; `none` esconde todos. Padrão: só o `slot="icon"` do app. */
+  icons?: ArkTreeIcons;
+  /** Cor dos ícones: um intent, `current` (a cor do texto) ou uma cor CSS. Padrão: o token fg-muted. */
+  iconColor?: ArkIntent | "current" | (string & {});
 };
 
 /** Props de estilo do ark-tree-item; size e theme chegam propagados do ark-tree. */
 export type ArkTreeItemStyleOptions = {
-  /** Propagado como data-testid ao host e sufixado nas partes (`-row`, `-toggle`, `-check`, `-label`, `-group`). */
+  /** Propagado como data-testid ao host e sufixado nas partes (`-row`, `-toggle`, `-check`, `-icon`, `-label`). */
   testid?: string;
+  /** Ícone próprio deste nó: folder, file ou none. Padrão: o que o `icons` da árvore escolher. */
+  icon?: ArkTreeItemIcon;
 };
 
 // Exports types específicos do componente menu
