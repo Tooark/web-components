@@ -254,6 +254,56 @@ export const Layout = {
   }
 };
 
+// A ação depois de um texto que quebra não fica na primeira linha: o float desce para a última, e o deslocamento
+// que a centra na primeira linha a fazia cobrir a linha de cima. O host mede e zera a margem; com espaço, a ação
+// volta à primeira linha e ao deslocamento.
+export const ActionBelowWrappedText = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.width = "280px";
+    wrap.appendChild(
+      createAlert({
+        intent: "info",
+        message: "As alterações foram salvas, mas a sincronização com o servidor ainda não terminou.",
+        bareText: true,
+        withIcon: false,
+        withAction: true,
+        actionLabel: "Desfazer"
+      })
+    );
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const alert = canvasElement.querySelector("ark-alert") as AlertEl;
+    const action = alert.querySelector('[slot="action"]') as HTMLElement;
+    const range = document.createRange();
+    range.selectNodeContents(Array.from(alert.childNodes).find((node) => node.nodeType === Node.TEXT_NODE) as Node);
+    // Maior sobreposição vertical entre a ação e uma linha do texto que passa por baixo dela.
+    const overlap = (): number => {
+      const box = action.getBoundingClientRect();
+      let max = 0;
+      for (const line of range.getClientRects()) {
+        const x = Math.min(line.right, box.right) - Math.max(line.left, box.left);
+        const y = Math.min(line.bottom, box.bottom) - Math.max(line.top, box.top);
+        if (x > 0 && y > 0) max = Math.max(max, y);
+      }
+      return max;
+    };
+
+    await waitFor(() => expect(alert).toHaveAttribute("data-ark-action-below"));
+    await expect(range.getClientRects().length).toBeGreaterThan(1);
+    await expect(overlap()).toBeLessThan(0.5);
+    await expect(action.getBoundingClientRect().bottom).toBeLessThanOrEqual(alert.getBoundingClientRect().bottom);
+
+    // Com largura para o texto e a ação na mesma linha, ela volta a ficar centrada na primeira linha.
+    (alert.parentElement as HTMLElement).style.width = "900px";
+    await waitFor(() => expect(alert).not.toHaveAttribute("data-ark-action-below"));
+    const text = range.getBoundingClientRect();
+    const box = action.getBoundingClientRect();
+    await expect(Math.abs(box.top + box.height / 2 - (text.top + text.height / 2))).toBeLessThan(3);
+  }
+};
+
 export const TestHooks = {
   render: () => createAlert({ heading: "Hooks", dismissible: true, withAction: true, testid: "meu-alerta" }),
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {

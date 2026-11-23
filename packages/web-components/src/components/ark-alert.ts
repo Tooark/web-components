@@ -30,7 +30,8 @@ type ArkAlertPalette = {
  * normalmente. `slot="icon"` fica à esquerda e `slot="action"` à direita,
  * posicionados por components.css sem sair do lugar (o ícone e o botão de
  * dispensar por posição absoluta na área reservada pelo padding; a ação por
- * float, então o texto contorna). `heading` cria um título próprio no início
+ * float, então o texto contorna; a que não fica na primeira linha desce sem
+ * cobrir a de cima). `heading` cria um título próprio no início
  * do host; `dismissible` põe o botão de dispensar no fim (chrome). `variant`
  * box (caixa arredondada) ou banner (largura toda, só borda inferior). `live`
  * define a live region: polite (role="status") ou assertive (role="alert"),
@@ -46,6 +47,9 @@ export class ArkAlert extends HTMLElementBase {
   private headingEl: HTMLParagraphElement | null = null;
   private dismissEl: HTMLButtonElement | null = null;
   private observer: MutationObserver | null = null;
+  /** Só existe com um `slot="action"`: a largura do host decide se a ação fica na primeira linha. */
+  private actionObserver: ResizeObserver | null = null;
+  private actionFrame = 0;
   private dismissing = false;
 
   static get observedAttributes(): string[] {
@@ -79,6 +83,7 @@ export class ArkAlert extends HTMLElementBase {
     unfollowArkLocale(this);
     this.observer?.disconnect();
     this.observer = null;
+    this.unwatchAction();
   }
 
   attributeChangedCallback(name: string, _oldValue: string | null, newValue: string | null): void {
@@ -208,7 +213,60 @@ export class ArkAlert extends HTMLElementBase {
     const icon = this.querySelector<HTMLElement>(':scope > [slot="icon"]');
     if (icon) applyTestHooks(this, "alert", icon, "icon");
     const action = this.querySelector<HTMLElement>(':scope > [slot="action"]');
-    if (action) applyTestHooks(this, "alert", action, "action");
+    if (action) {
+      applyTestHooks(this, "alert", action, "action");
+      this.watchAction();
+    } else {
+      this.unwatchAction();
+    }
+  }
+
+  // --- Linha da ação ---
+
+  // A ação flutua na primeira linha, deslocada para cima para centrar um botão mais alto que a linha. Quando ela
+  // vem depois de um parágrafo ou de um texto que quebrou, ou não cabe ao lado dele, o float desce, e o mesmo
+  // deslocamento a fazia cobrir a linha de cima: o host mede onde ela ficou e components.css zera a margem
+  // (data-ark-action-below).
+  private watchAction(): void {
+    if (!this.actionObserver && typeof ResizeObserver !== "undefined") {
+      // A reação espera o próximo frame: trocar a margem dentro do callback muda a altura do host, e o Chromium
+      // acusaria um laço de ResizeObserver.
+      this.actionObserver = new ResizeObserver(() => this.scheduleActionLine());
+      this.actionObserver.observe(this);
+    }
+    this.scheduleActionLine();
+  }
+
+  private unwatchAction(): void {
+    this.actionObserver?.disconnect();
+    this.actionObserver = null;
+    cancelAnimationFrame(this.actionFrame);
+    this.actionFrame = 0;
+    this.removeAttribute("data-ark-action-below");
+  }
+
+  private scheduleActionLine(): void {
+    if (this.actionFrame) return;
+    this.actionFrame = requestAnimationFrame(() => {
+      this.actionFrame = 0;
+      this.syncActionLine();
+    });
+  }
+
+  private syncActionLine(): void {
+    const action = this.querySelector<HTMLElement>(':scope > [slot="action"]');
+    if (!action || !this.isConnected || this.hidden) return;
+
+    // Topo da ação sem a margem (que muda com o próprio estado), contra o início da primeira linha da mensagem:
+    // o fim do título próprio quando ele existe, senão o início da área de conteúdo do host.
+    const style = getComputedStyle(this);
+    const top = action.getBoundingClientRect().top - (Number.parseFloat(getComputedStyle(action).marginTop) || 0);
+    const firstLine = this.headingEl
+      ? this.headingEl.getBoundingClientRect().bottom
+      : this.getBoundingClientRect().top +
+        (Number.parseFloat(style.borderTopWidth) || 0) +
+        (Number.parseFloat(style.paddingTop) || 0);
+    this.toggleAttribute("data-ark-action-below", top - firstLine > 2);
   }
 
   private applyOwnClasses(next: string[]): void {
