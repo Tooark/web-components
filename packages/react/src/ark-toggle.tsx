@@ -1,7 +1,7 @@
 import type { ArkToggleGroupStyleOptions, ArkToggleStyleOptions } from "@tooark/core";
 import type { ArkToggle as ArkToggleElement, ArkToggleGroup as ArkToggleGroupElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -35,7 +35,7 @@ export const ArkToggle = forwardRef<ArkToggleElement, ArkToggleProps>(
     }, [ref, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       pressed: pressed ? "" : undefined,
@@ -76,7 +76,7 @@ export const ArkToggleGroup = forwardRef<ArkToggleGroupElement, ArkToggleGroupPr
     }, [ref, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       multiple: multiple ? "" : undefined,

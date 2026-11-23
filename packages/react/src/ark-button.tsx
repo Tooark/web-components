@@ -2,7 +2,7 @@ import type { ArkButtonNavigateDetail, ArkButtonStyleOptions, ArkButtonType } fr
 import type { ArkButton as ArkButtonElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -51,7 +51,7 @@ export const ArkButton = forwardRef<ArkButtonElement, ArkButtonProps>(
     // Handlers (onClick...) seguem no rest: o React os delega a partir da raiz, e o bloqueio
     // de disabled/loading do host (captura + stopImmediatePropagation) impede que disparem.
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       "text-color": textColor,

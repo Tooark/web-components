@@ -1,7 +1,7 @@
 import type { ArkTooltipStyleOptions } from "@tooark/core";
 import type { ArkTooltip as ArkTooltipElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkTooltipProps = PropsWithChildren<
@@ -25,7 +25,7 @@ export const ArkTooltip = forwardRef<ArkTooltipElement, ArkTooltipProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       open: open ? "" : undefined,

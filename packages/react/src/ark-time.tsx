@@ -2,7 +2,7 @@ import type { ArkTimeFormat, ArkTimeStyleOptions } from "@tooark/core";
 import type { ArkTime as ArkTimeElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkTimeProps = ArkDomProps<
@@ -31,7 +31,7 @@ export const ArkTime = forwardRef<ArkTimeElement, ArkTimeProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       datetime: isoOf(datetime)

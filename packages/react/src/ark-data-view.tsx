@@ -17,7 +17,7 @@ import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, Fragment, forwardRef, type PropsWithChildren, useEffect, useReducer, useRef } from "react";
 import { createPortal, flushSync } from "react-dom";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -292,7 +292,7 @@ const ArkDataViewBase = forwardRef<ArkDataViewElement, ArkDataViewProps>(
     }, [ref, onQueryChange, onViewChange, onRowClick, onSelectionChange, onReorder]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       "row-key": rowKey,

@@ -1,7 +1,7 @@
 import type { ArkCardStyleOptions } from "@tooark/core";
 import type { ArkCard as ArkCardElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkCardProps = PropsWithChildren<
@@ -23,7 +23,7 @@ export const ArkCard = forwardRef<ArkCardElement, ArkCardProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       "heading-level": headingLevel,

@@ -2,7 +2,7 @@ import type { ArkDrawerCloseReason, ArkDrawerStyleOptions } from "@tooark/core";
 import type { ArkDrawer as ArkDrawerElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 import { useIsomorphicLayoutEffect } from "./use-isomorphic-layout-effect.js";
@@ -66,7 +66,7 @@ export const ArkDrawer = forwardRef<ArkDrawerElement, ArkDrawerProps>(
     }, [onOpen, onClose]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       open: open ? "" : undefined,

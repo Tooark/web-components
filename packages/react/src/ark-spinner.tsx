@@ -2,7 +2,7 @@ import type { ArkSpinnerStyleOptions } from "@tooark/core";
 import type { ArkSpinner as ArkSpinnerElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkSpinnerProps = ArkDomProps<
@@ -22,7 +22,7 @@ export const ArkSpinner = forwardRef<ArkSpinnerElement, ArkSpinnerProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       "locale-json": localeJson

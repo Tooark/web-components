@@ -1,7 +1,7 @@
 import type { ArkSelectOption, ArkSelectStyleOptions } from "@tooark/core";
 import type { ArkSelect as ArkSelectElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -49,7 +49,7 @@ export const ArkSelect = forwardRef<ArkSelectElement, ArkSelectProps>(
     }, [ref, onInput, onChange]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       options: options ? JSON.stringify(options) : undefined,

@@ -10,7 +10,7 @@ import type {
   ArkNavItem as ArkNavItemElement
 } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -60,7 +60,7 @@ export const ArkNav = forwardRef<ArkNavElement, ArkNavProps>(function ArkNav(pro
   }, [ref, onCollapse, onNavigate]);
 
   const attrs: Record<string, unknown> = {
-    ...rest,
+    ...domAttrs(rest),
     ref: setRef,
     class: className,
     collapsed: collapsed ? "" : undefined,
@@ -113,7 +113,7 @@ export const ArkNavItem = forwardRef<ArkNavItemElement, ArkNavItemProps>(
     }, [ref, onNavigate]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       current: current ? "" : undefined,
@@ -160,7 +160,7 @@ export const ArkNavGroup = forwardRef<ArkNavGroupElement, ArkNavGroupProps>(
     }, [ref, onToggle]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       expandable: expandable ? "" : undefined,

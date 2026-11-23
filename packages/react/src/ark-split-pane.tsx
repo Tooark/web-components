@@ -2,7 +2,7 @@ import type { ArkSplitPaneStyleOptions } from "@tooark/core";
 import type { ArkSplitPane as ArkSplitPaneElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { useForwardedRef } from "./use-forwarded-ref.js";
 
@@ -37,7 +37,7 @@ export const ArkSplitPane = forwardRef<ArkSplitPaneElement, ArkSplitPaneProps>(
     }, [ref, onResize]);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: setRef,
       class: className,
       sizes: sizes ? sizes.join(",") : undefined,

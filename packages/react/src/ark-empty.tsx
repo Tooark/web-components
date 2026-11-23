@@ -1,7 +1,7 @@
 import type { ArkEmptyStyleOptions } from "@tooark/core";
 import type { ArkEmpty as ArkEmptyElement } from "@tooark/web-components";
 import React, { createElement, forwardRef, type PropsWithChildren, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkEmptyProps = PropsWithChildren<
@@ -25,7 +25,7 @@ export const ArkEmpty = forwardRef<ArkEmptyElement, ArkEmptyProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className,
       "heading-level": headingLevel

@@ -2,7 +2,7 @@ import type { ArkAvatarStyleOptions } from "@tooark/core";
 import type { ArkAvatar as ArkAvatarElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
-import type { ArkDomProps } from "./dom-props.js";
+import { type ArkDomProps, domAttrs } from "./dom-props.js";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 
 export type ArkAvatarProps = ArkDomProps<
@@ -24,7 +24,7 @@ export const ArkAvatar = forwardRef<ArkAvatarElement, ArkAvatarProps>(
     }, []);
 
     const attrs: Record<string, unknown> = {
-      ...rest,
+      ...domAttrs(rest),
       ref: forwardedRef,
       class: className
     };
