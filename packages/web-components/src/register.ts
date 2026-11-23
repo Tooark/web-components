@@ -3,6 +3,7 @@ import {
   ArkAvatar,
   ArkBadge,
   ArkButton,
+  ArkButtonGroup,
   ArkCalendar,
   ArkCard,
   ArkCarousel,
@@ -31,6 +32,7 @@ import {
   ArkPagination,
   ArkProgress,
   ArkRadio,
+  ArkRadioGroup,
   ArkScheduler,
   ArkSelect,
   ArkShapePicker,
@@ -75,6 +77,10 @@ export function registerTooarkComponents(): void {
     customElements.define(ArkButton.tagName, ArkButton);
   }
 
+  if (!customElements.get(ArkButtonGroup.tagName)) {
+    customElements.define(ArkButtonGroup.tagName, ArkButtonGroup);
+  }
+
   // Depois do botão: herda dele.
   if (!customElements.get(ArkCopyButton.tagName)) {
     customElements.define(ArkCopyButton.tagName, ArkCopyButton);
@@ -90,6 +96,10 @@ export function registerTooarkComponents(): void {
 
   if (!customElements.get(ArkRadio.tagName)) {
     customElements.define(ArkRadio.tagName, ArkRadio);
+  }
+
+  if (!customElements.get(ArkRadioGroup.tagName)) {
+    customElements.define(ArkRadioGroup.tagName, ArkRadioGroup);
   }
 
   if (!customElements.get(ArkInput.tagName)) {

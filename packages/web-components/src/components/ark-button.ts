@@ -117,7 +117,10 @@ export class ArkButton extends HTMLElementBase {
       "href",
       "target",
       "download",
-      "testid"
+      "testid",
+      // Gravados pelo ark-button-group nos botões colados (ver computeClasses).
+      "data-ark-group-pos",
+      "data-ark-group-dir"
     ];
   }
 
@@ -626,7 +629,32 @@ export class ArkButton extends HTMLElementBase {
     const iconOnly = this.hasAttribute("icon-only");
     const sizeClasses = iconOnly ? (iconOnlySizes[size] ?? iconOnlySizes.md) : (sizes[size] ?? sizes.md);
 
-    return [base, roundedMap[rounded] ?? roundedMap.md, palette.focusRing, variantClasses[styleVariant], sizeClasses]
+    // Colado num ark-button-group: o grupo grava a posição e a direção e o botão troca os próprios cantos e desenha a
+    // divisa, porque uma regra do components.css perderia para o ark:rounded-* daqui. Os cantos de fora seguem o
+    // `rounded`; os de dentro ficam retos. Cada botão depois do primeiro sobrepõe 1 px o anterior: com borda própria
+    // (outline, e o solid secundário) as duas bordas viram uma linha só; sem borda, a divisa é uma linha na cor do
+    // texto a 25%. Hover e foco sobem o botão (z local, o grupo isola) para o vizinho não cobrir a borda nem o anel.
+    const position = this.getAttribute("data-ark-group-pos");
+    const vertical = this.getAttribute("data-ark-group-dir") === "vertical";
+    const corners: Record<string, { horizontal: string; vertical: string }> = {
+      first: { horizontal: "ark:rounded-e-none", vertical: "ark:rounded-b-none" },
+      middle: { horizontal: "ark:rounded-none", vertical: "ark:rounded-none" },
+      last: { horizontal: "ark:rounded-s-none", vertical: "ark:rounded-t-none" }
+    };
+    const corner = position ? corners[position] : undefined;
+    const bordered = styleVariant === "outline" || (styleVariant === "solid" && intent === "secondary");
+    const groupClasses = corner
+      ? [
+          vertical ? corner.vertical : corner.horizontal,
+          "ark:hover:z-10 ark:focus-visible:z-10 ark:focus-within:z-10",
+          position === "first" ? "" : vertical ? "ark:-mt-px" : "ark:-ms-px",
+          position === "first" || bordered ? "" : vertical ? "ark:border-t-current/25" : "ark:border-s-current/25"
+        ].join(" ")
+      : "";
+    // No meio os quatro cantos ficam retos: o `rounded` sai em vez de disputar com o rounded-none.
+    const roundedClass = position === "middle" && corner ? "" : (roundedMap[rounded] ?? roundedMap.md);
+
+    return [base, roundedClass, groupClasses, palette.focusRing, variantClasses[styleVariant], sizeClasses]
       .join(" ")
       .split(/\s+/)
       .filter(Boolean);

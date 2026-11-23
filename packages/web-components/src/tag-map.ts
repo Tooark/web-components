@@ -4,6 +4,7 @@ import type {
   ArkAvatar,
   ArkBadge,
   ArkButton,
+  ArkButtonGroup,
   ArkCalendar,
   ArkCard,
   ArkCarousel,
@@ -32,6 +33,7 @@ import type {
   ArkPagination,
   ArkProgress,
   ArkRadio,
+  ArkRadioGroup,
   ArkScheduler,
   ArkSelect,
   ArkShapePicker,
@@ -58,6 +60,7 @@ declare global {
     "ark-avatar": ArkAvatar;
     "ark-badge": ArkBadge;
     "ark-button": ArkButton;
+    "ark-button-group": ArkButtonGroup;
     "ark-calendar": ArkCalendar;
     "ark-card": ArkCard;
     "ark-carousel": ArkCarousel;
@@ -86,6 +89,7 @@ declare global {
     "ark-pagination": ArkPagination;
     "ark-progress": ArkProgress;
     "ark-radio": ArkRadio;
+    "ark-radio-group": ArkRadioGroup;
     "ark-scheduler": ArkScheduler;
     "ark-select": ArkSelect;
     "ark-shape-picker": ArkShapePicker;

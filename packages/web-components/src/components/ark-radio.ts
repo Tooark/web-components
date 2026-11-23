@@ -26,8 +26,9 @@ let nextId = 0;
  * mesmo <form> (ou na mesma raiz, sem form): marcar um desmarca os outros em
  * silêncio e `change` dispara só no que ganhou a marca; as setas movem o foco
  * e marcam, Espaço marca o focado, e um único deles fica na ordem de Tab (o
- * marcado, ou o primeiro habilitado). `label`, aria-label e filhos nomeiam a
- * opção e `helper` a descreve, como no ark-checkbox.
+ * marcado, ou o primeiro habilitado). Dentro de um ark-radio-group o grupo são
+ * os rádios desse host, com ou sem `name`. `label`, aria-label e filhos
+ * nomeiam a opção e `helper` a descreve, como no ark-checkbox.
  */
 export class ArkRadio extends HTMLElementBase {
   static readonly tagName = "ark-radio";
@@ -40,7 +41,7 @@ export class ArkRadio extends HTMLElementBase {
   private helperEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
   private observer: MutationObserver | null = null;
-  /** Raiz do grupo no último connect, para ressincronizar os que ficam quando este sai. */
+  /** Raiz do grupo no último connect (o ark-radio-group, o form ou o documento), para ressincronizar os que ficam. */
   private groupRoot: ParentNode | null = null;
   /** Se o ponto já apareceu; a marcação depois do primeiro render entra com scale-in. */
   private dotShown: boolean | null = null;
@@ -86,7 +87,7 @@ export class ArkRadio extends HTMLElementBase {
     // Quem fica precisa de um novo tab stop se este era o marcado.
     const root = this.groupRoot;
     this.groupRoot = null;
-    if (root) ArkRadio.syncGroup(ArkRadio.membersIn(root, this.name, root instanceof HTMLFormElement ? root : null));
+    if (root) ArkRadio.syncGroup(ArkRadio.membersOf(root, this.name));
   }
 
   attributeChangedCallback(name: string): void {
@@ -157,25 +158,39 @@ export class ArkRadio extends HTMLElementBase {
 
   // --- Grupo ---
 
-  // O <form> do input oculto, ou a raiz (documento ou shadow root) quando não há form.
+  // O ark-radio-group que contém o rádio; fora de um, o <form> do input oculto, ou a raiz (documento ou shadow
+  // root) quando não há form.
   private resolveGroupRoot(): ParentNode | null {
+    const group = this.closest("ark-radio-group");
+    if (group) return group;
     const form = this.inputEl?.form ?? null;
     if (form) return form;
     const root = this.getRootNode();
     return root instanceof Document || root instanceof DocumentFragment ? root : null;
   }
 
-  private static membersIn(root: ParentNode, name: string, form: HTMLFormElement | null): ArkRadio[] {
-    return Array.from(root.querySelectorAll<ArkRadio>("ark-radio")).filter(
-      (radio) => radio instanceof ArkRadio && radio.name === name && (radio.inputEl?.form ?? null) === form
+  // Num ark-radio-group o grupo é o host: vale a presença nele, não o `name` (o grupo grava o `name` um microtask
+  // depois, e dois grupos sem `name` desmarcariam os rádios um do outro). Fora de um, o mesmo `name` no mesmo form
+  // (ou na mesma raiz, sem form), sem contar os rádios que estão dentro de algum ark-radio-group.
+  private static membersOf(root: ParentNode, name: string): ArkRadio[] {
+    const radios = Array.from(root.querySelectorAll<ArkRadio>("ark-radio")).filter(
+      (radio) => radio instanceof ArkRadio
+    );
+    if (root instanceof Element && root.localName === "ark-radio-group") {
+      return radios.filter((radio) => radio.closest("ark-radio-group") === root);
+    }
+    const form = root instanceof HTMLFormElement ? root : null;
+    return radios.filter(
+      (radio) =>
+        radio.name === name && (radio.inputEl?.form ?? null) === form && radio.closest("ark-radio-group") === null
     );
   }
 
-  /** Os ark-radio do mesmo grupo (mesmo `name` no mesmo form, ou na mesma raiz sem form), este incluído. */
+  /** Os ark-radio do mesmo grupo (o ark-radio-group, ou o mesmo `name` no mesmo form ou raiz), este incluído. */
   private members(): ArkRadio[] {
     const root = this.resolveGroupRoot();
     if (!root) return [this];
-    return ArkRadio.membersIn(root, this.name, root instanceof HTMLFormElement ? root : null);
+    return ArkRadio.membersOf(root, this.name);
   }
 
   private uncheckSiblings(): void {

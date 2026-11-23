@@ -1045,6 +1045,22 @@
     bottom: calc(-0.375rem - 2.5px);
   }
 
+  /* ---------- ark-button-group: os botões do usuário repartem a largura e os wrappers saem do caminho ---------- */
+
+  /* full-width: a largura do grupo é repartida entre os botões (o botão não tem utility de flex que dispute). */
+  ark-button-group[full-width] :is(ark-button, ark-copy-button) {
+    flex: 1 1 0;
+  }
+
+  /*
+   * O wrapper Angular fica entre o grupo e o botão: sem caixa própria, o botão volta a ser o item do flex (estica na
+   * coluna, reparte a largura). Só dentro do grupo: fora dele o wrapper continua como sempre foi.
+   */
+  ark-button-group > :is(ark-button-wrapper, ark-copy-button-wrapper),
+  ark-radio-group > ark-radio-wrapper {
+    display: contents;
+  }
+
   /* ---------- ark-tree-item: a linha em grid e os subitens onde estão ---------- */
 
   /*
