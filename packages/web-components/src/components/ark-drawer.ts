@@ -286,10 +286,13 @@ export class ArkDrawer extends HTMLElementBase {
     });
   }
 
+  /** Foco inicial: `autofocus`, senão o primeiro focável fora do cabeçalho, senão o botão de fechar, senão o painel. */
   private initialFocus(): HTMLElement {
     const auto = this.querySelector<HTMLElement>("[autofocus]");
     if (auto) return auto;
-    const first = focusableElements(this).find((el) => !el.closest("[data-ark-chrome]"));
+    // Só o cabeçalho deste host fica de fora. O controle de um ark-checkbox, ark-radio ou ark-file-input do corpo
+    // também é `data-ark-chrome` (do componente dele), e descartar toda a marca pulava o primeiro controle do corpo.
+    const first = focusableElements(this).find((el) => !this.headerEl?.contains(el));
     return first ?? this.closeEl ?? this;
   }
 
