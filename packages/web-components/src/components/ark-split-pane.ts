@@ -81,7 +81,12 @@ export class ArkSplitPane extends HTMLElementBase {
     return this.normalizedSizes(this.panels().length);
   }
 
-  set sizes(value: number[] | string) {
+  set sizes(value: number[] | string | null | undefined) {
+    // Prop ausente: o Vue grava undefined aqui a cada render, e o React grava null quando a prop deixa de existir.
+    if (value === null || value === undefined) {
+      this.removeAttribute("sizes");
+      return;
+    }
     // React 19 e Vue entregam aqui a string do atributo ("30,70") quando a prop vem do wrapper.
     this.setAttribute("sizes", typeof value === "string" ? value : value.map((size) => String(size)).join(","));
   }

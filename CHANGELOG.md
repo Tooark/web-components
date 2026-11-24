@@ -37,6 +37,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   their own element, and `onClose` of the tabs wrapper only the `ark-close` of its own tabs. The raw tags are
   unchanged: the events still bubble, so a listener on the element checks `event.target`.
   `ReactOverlayEventsAreItsOwn`, `VueOverlayEventsAreItsOwn` and `OverlayEventsAreItsOwn` (Angular) stories.
+- `ark-split-pane`: the `sizes` setter threw with `undefined` or `null` (`value.map`). `ArkSplitPane` from
+  `@tooark/vue` without the `sizes` prop logged "Failed setting prop" on every mount, and in React taking the prop
+  away after it had a value raised an error. Both values now remove the attribute.
+  `EverySetterTakesAnAbsentProp` story, which checks every setter of every element.
 - `trapFocus`: when the element that gets the focus back can no longer take it (the button of a dialog that
   closed when it opened the next one), the focus goes to the `returnTo` of the trap that contained it instead of
   `<body>`. Closing the second dialog of a swap now lands on the button that opened the first, in both DOM orders.

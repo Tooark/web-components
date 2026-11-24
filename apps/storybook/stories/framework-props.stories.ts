@@ -256,6 +256,45 @@ function setterNames(ctor: CustomElementConstructor): string[] {
   return names;
 }
 
+// Uma prop ausente chega ao setter: o Vue grava `undefined` a cada render quando a prop do wrapper não foi passada, e
+// o React 19 grava `null` quando ela deixa de existir. Nenhum setter pode lançar com esses dois valores (o `sizes` do
+// ark-split-pane fazia `value.map` e deixava um aviso do Vue a cada montagem, e um erro no React ao tirar a prop).
+export const EverySetterTakesAnAbsentProp = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.firstElementChild as HTMLElement;
+    const thrown: string[] = [];
+    for (const tag of TAGS) {
+      const ctor = customElements.get(tag) as CustomElementConstructor;
+      for (const name of setterNames(ctor)) {
+        for (const value of [undefined, null]) {
+          const el = document.createElement(tag);
+          host.append(el);
+          try {
+            (el as unknown as Record<string, unknown>)[name] = value;
+          } catch (error) {
+            thrown.push(`${tag}.${name} = ${value}: ${String(error)}`);
+          }
+          el.remove();
+        }
+      }
+    }
+    await expect(thrown).toEqual([]);
+
+    const pane = document.createElement("ark-split-pane") as HTMLElement & { sizes: number[] | null | undefined };
+    pane.append(document.createElement("div"), document.createElement("div"));
+    host.append(pane);
+    pane.sizes = [30, 70];
+    await expect(pane).toHaveAttribute("sizes", "30,70");
+    pane.sizes = undefined;
+    await expect(pane).not.toHaveAttribute("sizes");
+    pane.sizes = [30, 70];
+    pane.sizes = null;
+    await expect(pane).not.toHaveAttribute("sizes");
+    pane.remove();
+  }
+};
+
 // Toda propriedade com setter, gravada na tag ainda sem registro, tem de chegar ao elemento como chegaria gravada num
 // elemento já registrado (o caminho do React 19 e do Vue): o upgrade tira a propriedade própria e passa pelo setter.
 export const EveryPropertySetBeforeRegistration = {
