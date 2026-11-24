@@ -202,7 +202,17 @@ export const ArkDataView = defineComponent({
     };
 
     // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
-    const handlers = EVENTS.map((name) => [name, (event: Event) => emit(name, event as CustomEvent)] as const);
+    // Só os eventos deste data-view: os ark-* borbulham, e os de um componente dentro de uma célula ou de um slot
+    // (outro data-view, um ark-tree com o mesmo ark-selection-change) chegariam aqui com o detail do outro.
+    const handlers = EVENTS.map(
+      (name) =>
+        [
+          name,
+          (event: Event) => {
+            if (event.target === event.currentTarget) emit(name, event as CustomEvent);
+          }
+        ] as const
+    );
     onMounted(() => {
       elRef.value?.addEventListener("ark-render", renderHandler);
       syncColumns();

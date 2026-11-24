@@ -37,6 +37,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   their own element, and `onClose` of the tabs wrapper only the `ark-close` of its own tabs. The raw tags are
   unchanged: the events still bubble, so a listener on the element checks `event.target`.
   `ReactOverlayEventsAreItsOwn`, `VueOverlayEventsAreItsOwn` and `OverlayEventsAreItsOwn` (Angular) stories.
+- React, Vue and Angular wrappers of split pane, carousel, nav, nav group, tree and data view: the same defect as
+  the overlays above, in the other elements that hold app content. `onResize` of an `ArkSplitPane` was called by
+  the `ark-resize` of another split pane inside one of its panels, with the inner sizes (an app that saves
+  `detail.sizes` saved the wrong ones); `onSlideChange` by a carousel inside a slide; `onToggle` of an
+  `ArkNavGroup` by the `ark-toggle` of an `ArkTree` inside the group. `onResize`, `onSlideChange`, `onCollapse`,
+  `onToggle` of the nav group, and the handlers of the tree and the data view now only get the events of their own
+  element. `onNavigate` of the nav still receives the items' events, by design, and `onInput`/`onChange` of
+  `ArkInput` are still the native events, which a control of your own in `slot="prefix"`/`slot="suffix"` also
+  sends (the READMEs now say so). `ReactContainerEventsAreItsOwn`, `VueContainerEventsAreItsOwn` and
+  `ContainerEventsAreItsOwn` (Angular) stories.
 - `ark-split-pane`: the `sizes` setter threw with `undefined` or `null` (`value.map`). `ArkSplitPane` from
   `@tooark/vue` without the `sizes` prop logged "Failed setting prop" on every mount, and in React taking the prop
   away after it had a value raised an error. Both values now remove the attribute.

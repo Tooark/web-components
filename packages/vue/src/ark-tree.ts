@@ -29,9 +29,17 @@ export const ArkTree = defineComponent({
     const elRef = ref<HTMLElement | null>(null);
 
     // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen.
-    const toggleHandler = (event: Event) => emit("ark-toggle", event as CustomEvent);
-    const selectionHandler = (event: Event) => emit("ark-selection-change", event as CustomEvent);
-    const activateHandler = (event: Event) => emit("ark-activate", event as CustomEvent);
+    // Só os eventos desta árvore: os ark-* borbulham, e ark-toggle e ark-selection-change também são de outros
+    // componentes (ark-nav-group, ark-data-view).
+    const toggleHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-toggle", event as CustomEvent);
+    };
+    const selectionHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-selection-change", event as CustomEvent);
+    };
+    const activateHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-activate", event as CustomEvent);
+    };
     onMounted(() => {
       elRef.value?.addEventListener("ark-toggle", toggleHandler);
       elRef.value?.addEventListener("ark-selection-change", selectionHandler);

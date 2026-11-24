@@ -45,8 +45,9 @@ export const ArkCarousel = forwardRef<ArkCarouselElement, ArkCarouselProps>(
     }, []);
 
     const handleSlideChange = useCallback(
+      // Só o ark-slide-change deste carrossel: o evento borbulha, e o de outro dentro de um slide chegava aqui.
       (event: Event) => {
-        if (onSlideChange) {
+        if (onSlideChange && event.target === event.currentTarget) {
           onSlideChange((event as CustomEvent).detail);
         }
       },

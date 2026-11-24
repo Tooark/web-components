@@ -31,7 +31,11 @@ export const ArkSplitPane = forwardRef<ArkSplitPaneElement, ArkSplitPaneProps>(
       const el = ref.current;
       if (!el || !onResize) return;
 
-      const handler = (event: Event) => onResize(event as CustomEvent<{ sizes: number[] }>);
+      // Só o ark-resize deste elemento: o evento borbulha, e o de outro split-pane dentro de um painel chegava aqui com
+      // os tamanhos do de dentro.
+      const handler = (event: Event) => {
+        if (event.target === event.currentTarget) onResize(event as CustomEvent<{ sizes: number[] }>);
+      };
       el.addEventListener("ark-resize", handler);
       return () => el.removeEventListener("ark-resize", handler);
     }, [ref, onResize]);

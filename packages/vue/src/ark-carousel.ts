@@ -27,8 +27,9 @@ export const ArkCarousel = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    const handler = (e: Event) => {
-      emit("ark-slide-change", (e as CustomEvent).detail);
+    // Só o ark-slide-change deste carrossel: o evento borbulha, e o de outro dentro de um slide chegava aqui.
+    const handler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-slide-change", (event as CustomEvent).detail);
     };
 
     onMounted(() => elRef.value?.addEventListener("ark-slide-change", handler));

@@ -69,7 +69,10 @@ export class ArkCarouselComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild("carousel", { static: false }) carouselRef!: ElementRef<HTMLElement>;
 
-  private handler = (e: Event) => this.arkSlideChange.emit((e as CustomEvent).detail);
+  // Só o ark-slide-change deste carrossel: o evento borbulha, e o de outro dentro de um slide chegava aqui.
+  private handler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkSlideChange.emit((event as CustomEvent).detail);
+  };
 
   ngAfterViewInit(): void {
     this.carouselRef?.nativeElement?.addEventListener("ark-slide-change", this.handler);

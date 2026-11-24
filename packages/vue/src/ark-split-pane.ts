@@ -20,7 +20,11 @@ export const ArkSplitPane = defineComponent({
     const elRef = ref<HTMLElement | null>(null);
 
     // Evento customizado do DOM: ouvido no elemento, não pelo h(), que não mapeia nomes com hífen.
-    const resizeHandler = (event: Event) => emit("ark-resize", event as CustomEvent<{ sizes: number[] }>);
+    // Só o ark-resize deste elemento: o evento borbulha, e o de outro split-pane dentro de um painel chegava aqui com
+    // os tamanhos do de dentro.
+    const resizeHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-resize", event as CustomEvent<{ sizes: number[] }>);
+    };
     onMounted(() => elRef.value?.addEventListener("ark-resize", resizeHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-resize", resizeHandler));
 

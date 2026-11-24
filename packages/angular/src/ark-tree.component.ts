@@ -63,12 +63,22 @@ export class ArkTreeComponent {
     return this.value || null;
   }
 
-  protected toggleHandler = (event: Event) =>
-    this.arkToggle.emit(event as CustomEvent<{ value: string; expanded: boolean; item: ArkTreeItemElement }>);
-  protected selectionHandler = (event: Event) =>
-    this.arkSelectionChange.emit(event as CustomEvent<{ values: string[]; value?: string | null }>);
-  protected activateHandler = (event: Event) =>
-    this.arkActivate.emit(event as CustomEvent<{ value: string; item: ArkTreeItemElement }>);
+  // Só os eventos desta árvore: os ark-* borbulham, e ark-toggle e ark-selection-change também são de outros
+  // componentes (ark-nav-group, ark-data-view).
+  protected toggleHandler = (event: Event) => {
+    if (event.target === event.currentTarget) {
+      this.arkToggle.emit(event as CustomEvent<{ value: string; expanded: boolean; item: ArkTreeItemElement }>);
+    }
+  };
+  protected selectionHandler = (event: Event) => {
+    if (event.target === event.currentTarget) {
+      this.arkSelectionChange.emit(event as CustomEvent<{ values: string[]; value?: string | null }>);
+    }
+  };
+  protected activateHandler = (event: Event) => {
+    if (event.target === event.currentTarget)
+      this.arkActivate.emit(event as CustomEvent<{ value: string; item: ArkTreeItemElement }>);
+  };
 }
 
 // Entre a árvore (ou o item pai) e o item: display: contents, para a grid do item pai e a coluna da árvore verem o
