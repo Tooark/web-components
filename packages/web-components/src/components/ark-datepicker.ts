@@ -678,7 +678,14 @@ export class ArkDatepicker extends HTMLElementBase {
     // A saída anima antes de sair do top layer; reabrir no meio a abandona.
     void closePopover(this.popupEl, "fade", { duration: "quick" });
 
-    if (focusInput) this.inputComp?.focus();
+    // Num microtask: ao escolher um dia, o ark-calendar ainda redesenha depois de emitir o ark-change e devolve o
+    // foco ao dia escolhido. Com o campo focado antes disso o foco voltava para o popup que está saindo, e caía no
+    // body quando ele sumia.
+    if (focusInput) {
+      queueMicrotask(() => {
+        if (!this.popupOpen) this.inputComp?.focus();
+      });
+    }
   }
 
   private readonly handleOutsidePointer = (event: Event): void => {
