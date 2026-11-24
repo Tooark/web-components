@@ -292,6 +292,9 @@ export const InputMode = {
     // A saída anima antes de sair do top layer.
     await waitFor(() => expect(popup.matches(":popover-open")).toBe(false));
     expect(getComputedStyle(popup).display).toBe("none");
+    // O foco volta ao campo. O calendário redesenha depois de emitir a escolha e devolve o foco ao dia escolhido:
+    // com o campo focado antes disso, o foco ficava no popup que estava saindo e caía no body quando ele sumia.
+    await expect(input).toHaveFocus();
   }
 };
 

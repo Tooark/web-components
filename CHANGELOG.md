@@ -52,6 +52,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   brought it back, but Esc never reached the dialog. The focus now goes into the overlay underneath (where it was
   before, else its initial focus). With no overlay underneath it still ends on `<body>`, like a native `<dialog>`;
   the READMEs say where the app picks the destination. `OpenerGoneFocusGoesToTheDialogBelow` story.
+- `ark-datepicker` with `input` and `mode="date"`: after picking a day the focus was lost to `<body>` instead of
+  returning to the field. The picker focused the field while handling the calendar's `ark-change`, and the
+  calendar, which redraws right after emitting it, took the focus back to the chosen day inside the popup on its
+  way out. The field is now focused after the calendar is done. `InputMode` story.
 - `ark-split-pane`: the `sizes` setter threw with `undefined` or `null` (`value.map`). `ArkSplitPane` from
   `@tooark/vue` without the `sizes` prop logged "Failed setting prop" on every mount, and in React taking the prop
   away after it had a value raised an error. Both values now remove the attribute.
