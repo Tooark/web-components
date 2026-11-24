@@ -720,6 +720,47 @@ export const OpenerGoneFocusGoesToTheDialogBelow = {
   }
 };
 
+// O elemento focado sai da página com o diálogo aberto (o botão "remover" de uma linha, que some com ela). O
+// navegador deixa o foco no body, e ali o Esc não chega ao diálogo: o trap traz o foco de volta para dentro. Só
+// nesse caso: um blur() do app, com o elemento ainda na página, é escolha dele e fica como está.
+export const FocusedElementRemovedStaysInTheDialog = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const dialog = createDialog({ label: "Itens", lang: "pt" });
+    const remove = document.createElement("ark-button");
+    remove.setAttribute("size", "sm");
+    remove.textContent = "Remover linha";
+    remove.addEventListener("click", () => remove.remove());
+    (dialog.querySelector("div") as HTMLElement).append(remove);
+    wrap.append(createOpener(dialog), dialog);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const opener = canvas.getByText("Abrir");
+
+    await userEvent.click(opener);
+    const nome = dialog.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+
+    const remove = canvas.getByText("Remover linha");
+    await userEvent.click(remove);
+    await expect(remove.isConnected).toBe(false);
+    // O último focado saiu: vale o foco inicial do diálogo.
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+
+    nome.blur();
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await expect(document.activeElement === document.body).toBe(true);
+
+    nome.focus();
+    await userEvent.keyboard("{Escape}");
+    await closed(dialog);
+    await waitFor(() => expect(document.activeElement === opener).toBe(true));
+  }
+};
+
 // O foco inicial e o `ark-open` saem num microtask depois de `open` mudar, e não na hora: um framework que grava a
 // prop dentro da própria atualização (o React, no commit) ainda mexe no foco antes de terminar. O que isso não pode
 // custar: o campo que o app foca logo depois de abrir continua com o foco, quem o recebe de volta ao fechar é o

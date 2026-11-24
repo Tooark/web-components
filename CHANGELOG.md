@@ -52,6 +52,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   brought it back, but Esc never reached the dialog. The focus now goes into the overlay underneath (where it was
   before, else its initial focus). With no overlay underneath it still ends on `<body>`, like a native `<dialog>`;
   the READMEs say where the app picks the destination. `OpenerGoneFocusGoesToTheDialogBelow` story.
+- `trapFocus`: removing the focused element from an open dialog, drawer or palette (the "remove" button of a
+  row, gone with the row) left the focus on `<body>`, and Esc no longer closed the overlay until a Tab brought the
+  focus back. The active trap now brings it back inside (its initial focus, else the first focusable). An element
+  still on the page that the app blurred is left alone. `FocusedElementRemovedStaysInTheDialog` story.
 - `ark-datepicker` with `input` and `mode="date"`: after picking a day the focus was lost to `<body>` instead of
   returning to the field. The picker focused the field while handling the calendar's `ark-change`, and the
   calendar, which redraws right after emitting it, took the focus back to the chosen day inside the popup on its

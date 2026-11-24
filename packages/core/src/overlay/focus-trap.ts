@@ -177,6 +177,22 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
     if (!owns(target, false)) focusInside();
   };
 
+  // O elemento focado saiu da página, ou deixou de ser desenhado, com o trap ativo (o botão "remover" de uma linha
+  // que some com ela): o navegador põe o foco no body, onde o teclado fica sem dono e o Esc não chega ao overlay.
+  // Nenhum focusin avisa, então a conferência vem do focusout, um microtask depois. Um blur() do app, com o
+  // elemento ainda na página, é escolha dele; a janela perdendo o foco não muda o `activeElement`.
+  const handleFocusOut = (event: FocusEvent): void => {
+    const target = event.target;
+    if (event.relatedTarget || !(target instanceof HTMLElement)) return;
+    queueMicrotask(() => {
+      if (!listening) return;
+      const active = doc.activeElement;
+      if (active && active !== doc.body) return;
+      if (target.isConnected && target.getClientRects().length > 0) return;
+      focusInside();
+    });
+  };
+
   // O ponteiro é solto só no fim do gesto: se o pointerdown fora fechar o overlay (e liberar o trap), o click do
   // mesmo gesto ainda seria entregue ao que está atrás do scrim.
   let listening = false;
@@ -214,12 +230,14 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
       listening = true;
       doc.addEventListener("keydown", handleKeydown, true);
       doc.addEventListener("focusin", handleFocusIn, true);
+      doc.addEventListener("focusout", handleFocusOut, true);
       bindPointer();
     },
     pause(): void {
       listening = false;
       doc.removeEventListener("keydown", handleKeydown, true);
       doc.removeEventListener("focusin", handleFocusIn, true);
+      doc.removeEventListener("focusout", handleFocusOut, true);
       if (!gesture) unbindPointer();
     },
     restore: focusInside
