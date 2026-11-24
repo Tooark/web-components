@@ -9,6 +9,34 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `trapFocus`: a focused control that becomes `disabled` while a dialog, drawer or palette is open (a field during a
+  submit, a `<fieldset disabled>`, a control a component disables on its own such as the carousel arrow on the last
+  slide), or that goes `inert`, hidden or loses what made it focusable, dropped the focus on `<body>`, where Esc no
+  longer reached the overlay until a Tab. The focus now goes to the panel. `LostFocusGoesToThePanel` and
+  `DisabledFocusedFieldKeepsTheDialogUsable` stories.
+- `trapFocus`: the 1.9.2 recovery of a focused element that left the page had two defects. It went to a control (the
+  initial focus, else the first focusable), and an Enter repeated during a submit activated it: it closed the dialog
+  through the header button, cancelled the confirmation or submitted the form. The focus now goes to the panel, and
+  only an element lost in a popover on top (the button of a toast) gives it back to the control it came from. And it
+  relied on `focusout`, which Firefox and WebKit do not fire when the focused element leaves the page, so it only
+  worked in Chromium; the trap now also observes the removal. `FocusedElementRemovedStaysInTheDialog` now expects the
+  panel.
+- `trapFocus`: focus coming back to an overlay whose last focused element is still there but cannot take it (a
+  confirmation closing over a dialog whose field is `disabled`) went to the header's close button, where the next
+  Enter closed the dialog. It now stays on the panel, and so does escaped focus with neither that element nor the
+  initial focus left, instead of going to the first focusable (the same close button).
+  `ConfirmationOverADisabledFieldKeepsTheDialogOpen` story; `EscapedFocusReturnsWhereItWas` now expects the panel.
+
+### Changed
+
+- `trapFocus` (`@tooark/core`): focus that loses its element inside the container (removed, `disabled`, hidden) goes to
+  the container, where 1.9.2 took a removed one to the initial focus. Focus that escapes no longer falls back to the
+  first focusable: it comes back to the last element focused inside, to `initial` only when that one left the
+  container, else to the container. A test that expects a field to have the focus after removing the focused element
+  gets the dialog, drawer or palette itself.
+
 ## [1.9.2] - 2026-11-24
 
 ### Fixed

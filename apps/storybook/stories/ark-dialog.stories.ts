@@ -329,7 +329,6 @@ export const EscapedFocusReturnsWhereItWas = {
 
     await userEvent.click(opener);
     const [nome, url] = Array.from(dialog.querySelectorAll("input"));
-    const close = dialog.querySelector('[data-ark="dialog-close"]');
     await expect(document.activeElement).toBe(nome);
 
     // Logo depois de abrir: volta ao campo que recebeu o foco inicial.
@@ -345,10 +344,10 @@ export const EscapedFocusReturnsWhereItWas = {
     opener.focus();
     await expect(document.activeElement).toBe(nome);
 
-    // Nem ele: o primeiro focável do painel.
+    // Nem ele: o painel, e não o botão de fechar, que é o primeiro focável.
     (nome.closest("ark-input") as HTMLElement).remove();
     opener.focus();
-    await expect(document.activeElement).toBe(close);
+    await expect(document.activeElement).toBe(dialog);
 
     dialog.close();
     await closed(dialog);
@@ -721,8 +720,9 @@ export const OpenerGoneFocusGoesToTheDialogBelow = {
 };
 
 // O elemento focado sai da página com o diálogo aberto (o botão "remover" de uma linha, que some com ela). O
-// navegador deixa o foco no body, e ali o Esc não chega ao diálogo: o trap traz o foco de volta para dentro. Só
-// nesse caso: um blur() do app, com o elemento ainda na página, é escolha dele e fica como está.
+// navegador deixa o foco no body, e ali o Esc não chega ao diálogo: o trap leva o foco ao painel. Se o botão que some
+// estava num popover por cima (um toast), o foco volta ao campo onde estava. Um blur() do app, com o elemento ainda
+// focável, é escolha dele e fica como está.
 export const FocusedElementRemovedStaysInTheDialog = {
   render: () => {
     const wrap = document.createElement("div");
@@ -732,7 +732,14 @@ export const FocusedElementRemovedStaysInTheDialog = {
     remove.textContent = "Remover linha";
     remove.addEventListener("click", () => remove.remove());
     (dialog.querySelector("div") as HTMLElement).append(remove);
-    wrap.append(createOpener(dialog), dialog);
+    const above = document.createElement("div");
+    above.setAttribute("popover", "manual");
+    const undo = document.createElement("button");
+    undo.type = "button";
+    undo.textContent = "Desfazer";
+    undo.addEventListener("click", () => undo.remove());
+    above.append(undo);
+    wrap.append(createOpener(dialog), dialog, above);
     return wrap;
   },
   play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
@@ -747,9 +754,25 @@ export const FocusedElementRemovedStaysInTheDialog = {
     const remove = canvas.getByText("Remover linha");
     await userEvent.click(remove);
     await expect(remove.isConnected).toBe(false);
-    // O último focado saiu: vale o foco inicial do diálogo.
-    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+    // O último focado saiu: o foco vai ao painel, e não a um controle que um segundo Enter acionaria.
+    await waitFor(() => expect(dialog).toHaveFocus());
+    await userEvent.keyboard("{Enter}");
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
 
+    // O botão que some estava num popover por cima: o foco volta ao campo.
+    nome.focus();
+    const above = canvasElement.querySelector<HTMLElement>("div[popover]") as HTMLElement;
+    above.showPopover();
+    const undo = canvas.getByText("Desfazer");
+    undo.focus();
+    await expect(undo).toHaveFocus();
+    await userEvent.click(undo);
+    await expect(undo.isConnected).toBe(false);
+    await waitFor(() => expect(nome).toHaveFocus());
+    above.hidePopover();
+
+    // Um blur() do app, com o campo ainda focável, fica como está.
+    nome.focus();
     nome.blur();
     await new Promise((resolve) => setTimeout(resolve, 50));
     await expect(document.activeElement === document.body).toBe(true);
@@ -758,6 +781,170 @@ export const FocusedElementRemovedStaysInTheDialog = {
     await userEvent.keyboard("{Escape}");
     await closed(dialog);
     await waitFor(() => expect(document.activeElement === opener).toBe(true));
+  }
+};
+
+// Cada jeito de o elemento focado deixar de aceitar o foco com o diálogo aberto: o foco vai ao painel. A última volta
+// barra o focusout antes do trap, como no Firefox e no WebKit, que não o disparam quando o elemento focado sai da
+// página: ali quem avisa é a remoção observada no DOM.
+export const LostFocusGoesToThePanel = {
+  render: () => createScene({ label: "Editar", lang: "pt" }, { footer: false, body: [] }),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const body = dialog.querySelector<HTMLElement>(":scope > div:not([data-ark-chrome])") as HTMLElement;
+    const field = '<input data-lost aria-label="Campo">';
+    const ways: Array<[string, string, (lost: HTMLElement) => void]> = [
+      ["disabled", field, (lost) => lost.setAttribute("disabled", "")],
+      ["ark-button disabled", "<ark-button data-lost>Ok</ark-button>", (lost) => lost.setAttribute("disabled", "")],
+      [
+        "fieldset disabled",
+        `<fieldset>${field}</fieldset>`,
+        (lost) => lost.closest("fieldset")?.setAttribute("disabled", "")
+      ],
+      ["inert", `<div>${field}</div>`, (lost) => lost.parentElement?.setAttribute("inert", "")],
+      ["visibility", `<div>${field}</div>`, (lost) => lost.parentElement?.style.setProperty("visibility", "hidden")],
+      ["display", `<div>${field}</div>`, (lost) => lost.parentElement?.style.setProperty("display", "none")],
+      [
+        "details",
+        `<details open><summary>Mais</summary>${field}</details>`,
+        (lost) => lost.closest("details")?.removeAttribute("open")
+      ],
+      ["tabindex", '<div data-lost tabindex="0">Texto</div>', (lost) => lost.removeAttribute("tabindex")],
+      ["href", '<a data-lost href="#lost">Texto</a>', (lost) => lost.removeAttribute("href")],
+      ["removed", field, (lost) => lost.remove()]
+    ];
+
+    await userEvent.click(canvas.getByText("Abrir"));
+    await waitFor(() => expect(dialog.matches(":popover-open")).toBe(true));
+    const focusLost = async (html: string): Promise<HTMLElement> => {
+      body.innerHTML = html;
+      const lost = body.querySelector<HTMLElement>("[data-lost]") as HTMLElement;
+      lost.focus();
+      await expect(lost).toHaveFocus();
+      return lost;
+    };
+    for (const [name, html, lose] of ways) {
+      lose(await focusLost(html));
+      await waitFor(() => expect(dialog, name).toHaveFocus());
+    }
+
+    const lost = await focusLost(field);
+    const swallow = (event: Event): void => event.stopImmediatePropagation();
+    window.addEventListener("focusout", swallow, true);
+    try {
+      lost.remove();
+      await waitFor(() => expect(dialog).toHaveFocus());
+    } finally {
+      window.removeEventListener("focusout", swallow, true);
+    }
+
+    await userEvent.keyboard("{Escape}");
+    await closed(dialog);
+  }
+};
+
+// O campo focado fica `disabled` com o diálogo aberto (o formulário durante o envio; o mesmo com um controle que um
+// componente desabilita sozinho, como a seta do ark-carousel no último slide): o navegador larga o foco no body, onde o
+// Esc não chega ao diálogo. O trap leva o foco ao painel, e não a outro controle: no botão de fechar, o Enter que o
+// usuário repete durante o envio fechava o diálogo; num campo, enviava de novo.
+export const DisabledFocusedFieldKeepsTheDialogUsable = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const dialog = createDialog({ label: "Editar", lang: "pt" }, { footer: false, body: [] });
+    const form = document.createElement("form");
+    const nome = createField("Nome");
+    const salvar = document.createElement("ark-button");
+    salvar.setAttribute("type", "submit");
+    salvar.setAttribute("size", "sm");
+    salvar.textContent = "Salvar";
+    form.className = "flex flex-col gap-3";
+    form.append(nome, salvar);
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      // Envio em curso: o campo e o botão ficam bloqueados até a resposta.
+      nome.setAttribute("disabled", "");
+      salvar.setAttribute("loading", "");
+    });
+    (dialog.querySelector("div") as HTMLElement).append(form);
+    wrap.append(createOpener(dialog), dialog);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const opener = canvas.getByText("Abrir");
+    const form = dialog.querySelector("form") as HTMLFormElement;
+    let submits = 0;
+    form.addEventListener("submit", () => submits++);
+    const reasons: string[] = [];
+    dialog.addEventListener("ark-close", (event) => {
+      reasons.push((event as CustomEvent<{ reason: string }>).detail.reason);
+    });
+
+    await userEvent.click(opener);
+    const nome = dialog.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(nome).toHaveFocus());
+
+    // Enter envia; o campo fica desabilitado e o foco vai ao painel, não ao botão de fechar nem a outro controle.
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(submits).toBe(1));
+    await expect(nome).toBeDisabled();
+    await waitFor(() => expect(dialog).toHaveFocus());
+
+    // Enter repetido durante o envio: nada acontece.
+    await userEvent.keyboard("{Enter}");
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    await expect(submits).toBe(1);
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
+
+    // O envio falhou e o campo voltou: o Esc fecha, e o foco volta a quem abriu.
+    (nome.closest("ark-input") as HTMLElement).removeAttribute("disabled");
+    await userEvent.keyboard("{Escape}");
+    expect(reasons).toEqual(["escape"]);
+    await closed(dialog);
+    await waitFor(() => expect(opener).toHaveFocus());
+  }
+};
+
+// Uma confirmação aberta pelo campo que ficou `disabled` fecha com ele ainda assim: o foco não tem a quem voltar, e ia
+// ao botão de fechar do diálogo de baixo, onde o Enter seguinte o fechava. Fica no painel.
+export const ConfirmationOverADisabledFieldKeepsTheDialogOpen = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const form = createDialog({ label: "Editar", width: "640", height: "480", lang: "pt" }, { footer: false });
+    const confirm = createDialog({ label: "Enviar?", size: "sm", lang: "pt" }, { footer: false, body: [] });
+    const keep = document.createElement("ark-button");
+    keep.setAttribute("size", "sm");
+    keep.textContent = "Voltar";
+    keep.addEventListener("click", () => confirm.close());
+    confirm.append(keep);
+    wrap.append(createOpener(form), form, confirm);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [form, confirm] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const opener = canvas.getByText("Abrir");
+
+    await userEvent.click(opener);
+    const nome = form.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(nome).toHaveFocus());
+
+    // O campo é quem tem o foco quando a confirmação abre, e fica desabilitado até a resposta.
+    confirm.show();
+    (nome.closest("ark-input") as HTMLElement).setAttribute("disabled", "");
+    await waitFor(() => expect(canvas.getByText("Voltar")).toHaveFocus());
+
+    await userEvent.keyboard("{Escape}");
+    await closed(confirm);
+    await waitFor(() => expect(form).toHaveFocus());
+    await userEvent.keyboard("{Enter}");
+    await expect(form).toHaveAttribute("data-ark-state", "open");
+
+    await userEvent.keyboard("{Escape}");
+    await closed(form);
+    await waitFor(() => expect(opener).toHaveFocus());
   }
 };
 
