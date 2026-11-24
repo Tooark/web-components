@@ -57,9 +57,17 @@ export const ArkTree = forwardRef<ArkTreeElement, ArkTreeProps>(
     useIsomorphicLayoutEffect(() => {
       const el = ref.current;
       if (!el) return;
-      const handleToggle = (event: Event): void => onToggle?.(event as CustomEvent<ArkTreeToggleDetail>);
-      const handleSelection = (event: Event): void => onSelectionChange?.(event as CustomEvent<ArkTreeSelectionDetail>);
-      const handleActivate = (event: Event): void => onActivate?.(event as CustomEvent<ArkTreeActivateDetail>);
+      // Só os eventos desta árvore: os ark-* borbulham, e ark-toggle e ark-selection-change também são de outros
+      // componentes (ark-nav-group, ark-data-view).
+      const handleToggle = (event: Event): void => {
+        if (event.target === event.currentTarget) onToggle?.(event as CustomEvent<ArkTreeToggleDetail>);
+      };
+      const handleSelection = (event: Event): void => {
+        if (event.target === event.currentTarget) onSelectionChange?.(event as CustomEvent<ArkTreeSelectionDetail>);
+      };
+      const handleActivate = (event: Event): void => {
+        if (event.target === event.currentTarget) onActivate?.(event as CustomEvent<ArkTreeActivateDetail>);
+      };
       el.addEventListener("ark-toggle", handleToggle);
       el.addEventListener("ark-selection-change", handleSelection);
       el.addEventListener("ark-activate", handleActivate);

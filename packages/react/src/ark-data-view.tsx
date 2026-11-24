@@ -273,7 +273,11 @@ const ArkDataViewBase = forwardRef<ArkDataViewElement, ArkDataViewProps>(
       const handlers: Array<[string, EventListener]> = [];
       function bind<T>(name: string, handler?: (event: CustomEvent<T>) => void): void {
         if (!handler) return;
-        const listener: EventListener = (event) => handler(event as CustomEvent<T>);
+        // Só os eventos deste data-view: os ark-* borbulham, e os de um componente dentro de uma célula ou de um slot
+        // (outro data-view, um ark-tree com o mesmo ark-selection-change) chegariam aqui com o detail do outro.
+        const listener: EventListener = (event) => {
+          if (event.target === event.currentTarget) handler(event as CustomEvent<T>);
+        };
         el!.addEventListener(name, listener);
         handlers.push([name, listener]);
       }

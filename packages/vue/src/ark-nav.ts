@@ -33,7 +33,10 @@ export const ArkNav = defineComponent({
 
     // Eventos customizados do DOM: ouvidos no elemento, não pelo h(), que não mapeia nomes com hífen. O emit é
     // síncrono, então um preventDefault() no handler do app ainda cancela a navegação.
-    const collapseHandler = (event: Event) => emit("ark-collapse", event as CustomEvent<{ collapsed: boolean }>);
+    // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+    const collapseHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-collapse", event as CustomEvent<{ collapsed: boolean }>);
+    };
     const navigateHandler = (event: Event) => emit("ark-navigate", event as CustomEvent<ArkNavNavigateDetail>);
     onMounted(() => {
       elRef.value?.addEventListener("ark-collapse", collapseHandler);
@@ -132,7 +135,10 @@ export const ArkNavGroup = defineComponent({
     ensureTooarkComponentsRegistered();
     const elRef = ref<HTMLElement | null>(null);
 
-    const toggleHandler = (event: Event) => emit("ark-toggle", event as CustomEvent<{ open: boolean }>);
+    // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+    const toggleHandler = (event: Event) => {
+      if (event.target === event.currentTarget) emit("ark-toggle", event as CustomEvent<{ open: boolean }>);
+    };
     onMounted(() => elRef.value?.addEventListener("ark-toggle", toggleHandler));
     onBeforeUnmount(() => elRef.value?.removeEventListener("ark-toggle", toggleHandler));
 

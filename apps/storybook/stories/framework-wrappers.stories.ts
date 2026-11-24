@@ -17,6 +17,7 @@ import {
   ArkButtonGroup as ReactArkButtonGroup,
   ArkCalendar as ReactArkCalendar,
   ArkCard as ReactArkCard,
+  ArkCarousel as ReactArkCarousel,
   ArkCheckbox as ReactArkCheckbox,
   ArkClock as ReactArkClock,
   ArkCommandItem as ReactArkCommandItem,
@@ -33,12 +34,14 @@ import {
   ArkMenuGroup as ReactArkMenuGroup,
   ArkMenuItem as ReactArkMenuItem,
   ArkNav as ReactArkNav,
+  ArkNavGroup as ReactArkNavGroup,
   ArkNavItem as ReactArkNavItem,
   ArkPagination as ReactArkPagination,
   ArkRadio as ReactArkRadio,
   ArkRadioGroup as ReactArkRadioGroup,
   ArkScheduler as ReactArkScheduler,
   ArkShapePicker as ReactArkShapePicker,
+  ArkSplitPane as ReactArkSplitPane,
   ArkSwitch as ReactArkSwitch,
   ArkTab as ReactArkTab,
   ArkTabs as ReactArkTabs,
@@ -58,6 +61,7 @@ import {
   ArkButtonGroup as VueArkButtonGroup,
   ArkCalendar as VueArkCalendar,
   ArkCard as VueArkCard,
+  ArkCarousel as VueArkCarousel,
   ArkCheckbox as VueArkCheckbox,
   ArkClock as VueArkClock,
   ArkCommandItem as VueArkCommandItem,
@@ -71,12 +75,14 @@ import {
   ArkMenuGroup as VueArkMenuGroup,
   ArkMenuItem as VueArkMenuItem,
   ArkNav as VueArkNav,
+  ArkNavGroup as VueArkNavGroup,
   ArkNavItem as VueArkNavItem,
   ArkPagination as VueArkPagination,
   ArkRadio as VueArkRadio,
   ArkRadioGroup as VueArkRadioGroup,
   ArkScheduler as VueArkScheduler,
   ArkShapePicker as VueArkShapePicker,
+  ArkSplitPane as VueArkSplitPane,
   ArkSwitch as VueArkSwitch,
   ArkTab as VueArkTab,
   ArkTabs as VueArkTabs,
@@ -101,7 +107,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
-import { expectOwnOverlayEvents } from "./overlay-events";
+import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 
 // Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
 // e os frameworks gravam as props como propriedade: o caminho que o React 19 e o Vue seguem num app real a partir do
@@ -2291,6 +2297,159 @@ export const VueOverlayEventsAreItsOwn = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectOwnOverlayEvents(host, log);
+    app.unmount();
+  }
+};
+
+const EVENT_ROWS = [{ id: 1, name: "Ana" }];
+const EVENT_COLUMNS: ArkDataViewColumn<{ id: number; name: string }>[] = [{ key: "name", label: "Nome" }];
+const VIEW_EVENTS = ["ark-query-change", "ark-view-change", "ark-row-click", "ark-selection-change", "ark-reorder"];
+
+// Os outros wrappers cujo elemento recebe conteúdo do app (ver overlay-events.ts): o onResize de um ArkSplitPane
+// recebia o `ark-resize` de outro split-pane dentro de um painel dele, com os tamanhos do de dentro.
+export const ReactContainerEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const log: string[] = [];
+    const on = (label: string, type: string) => (): void => {
+      log.push(`${label}:${type}`);
+    };
+    const child = (text: string, slot?: string): ReactNode => createElement("span", { "data-child": "", slot }, text);
+    const root = reactRoot(
+      canvasElement,
+      errors
+    )([
+      createElement(
+        ReactArkSplitPane,
+        { key: "split", style: { height: 200 }, onResize: on("ark-split-pane", "ark-resize") },
+        createElement("div", { key: "side" }, child("Lateral")),
+        createElement(
+          ReactArkSplitPane,
+          { key: "inner", direction: "vertical", onResize: on("inner", "ark-resize") },
+          createElement("div", { key: "editor" }, "Editor"),
+          createElement("div", { key: "console" }, "Console")
+        )
+      ),
+      createElement(
+        ReactArkCarousel,
+        { key: "carousel", onSlideChange: on("ark-carousel", "ark-slide-change") },
+        createElement("div", { key: "one" }, child("Um")),
+        createElement("div", { key: "two" }, "Dois")
+      ),
+      createElement(
+        ReactArkNav,
+        { key: "nav", label: "Principal", onCollapse: on("ark-nav", "ark-collapse") },
+        createElement(
+          ReactArkNavGroup,
+          { label: "Explorador", expandable: true, open: true, onToggle: on("ark-nav-group", "ark-toggle") },
+          createElement(
+            ReactArkTree,
+            {
+              label: "Arquivos",
+              onToggle: on("ark-tree", "ark-toggle"),
+              onSelectionChange: on("ark-tree", "ark-selection-change"),
+              onActivate: on("ark-tree", "ark-activate")
+            },
+            createElement(
+              ReactArkTreeItem,
+              { value: "src", label: "src" },
+              child("2", "trailing"),
+              createElement(ReactArkTreeItem, { value: "a", label: "a.ts" })
+            )
+          )
+        )
+      ),
+      createElement(
+        ReactArkDataView,
+        {
+          key: "view",
+          rows: EVENT_ROWS,
+          columns: EVENT_COLUMNS,
+          onQueryChange: on("ark-data-view", "ark-query-change"),
+          onViewChange: on("ark-data-view", "ark-view-change"),
+          onRowClick: on("ark-data-view", "ark-row-click"),
+          onSelectionChange: on("ark-data-view", "ark-selection-change"),
+          onReorder: on("ark-data-view", "ark-reorder")
+        },
+        child("Filtros", "toolbar")
+      )
+    ]);
+    await expect(errors).toEqual([]);
+    await expectOwnContainerEvents(canvasElement.lastElementChild as HTMLElement, log);
+    root.unmount();
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueContainerEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const log: string[] = [];
+    const on = (label: string, type: string) => (): void => {
+      log.push(`${label}:${type}`);
+    };
+    const child = (text: string, slot?: string) => h("span", { "data-child": "", slot }, text);
+    const app = createApp({
+      render: () =>
+        h("div", [
+          h(VueArkSplitPane, { style: { height: "200px" }, onArkResize: on("ark-split-pane", "ark-resize") }, () => [
+            h("div", [child("Lateral")]),
+            h(VueArkSplitPane, { direction: "vertical", onArkResize: on("inner", "ark-resize") }, () => [
+              h("div", "Editor"),
+              h("div", "Console")
+            ])
+          ]),
+          h(VueArkCarousel, { onArkSlideChange: on("ark-carousel", "ark-slide-change") }, () => [
+            h("div", [child("Um")]),
+            h("div", "Dois")
+          ]),
+          h(VueArkNav, { label: "Principal", onArkCollapse: on("ark-nav", "ark-collapse") }, () => [
+            h(
+              VueArkNavGroup,
+              { label: "Explorador", expandable: true, open: true, onArkToggle: on("ark-nav-group", "ark-toggle") },
+              () => [
+                h(
+                  VueArkTree,
+                  {
+                    label: "Arquivos",
+                    onArkToggle: on("ark-tree", "ark-toggle"),
+                    onArkSelectionChange: on("ark-tree", "ark-selection-change"),
+                    onArkActivate: on("ark-tree", "ark-activate")
+                  },
+                  () => [
+                    h(VueArkTreeItem, { value: "src", label: "src" }, () => [
+                      child("2", "trailing"),
+                      h(VueArkTreeItem, { value: "a", label: "a.ts" })
+                    ])
+                  ]
+                )
+              ]
+            )
+          ]),
+          h(
+            VueArkDataView,
+            {
+              rows: EVENT_ROWS,
+              columns: EVENT_COLUMNS as ArkDataViewVueColumn[],
+              ...Object.fromEntries(
+                VIEW_EVENTS.map((type) => [
+                  `on${type.replace(/(^|-)(\w)/g, (_, _dash, letter: string) => letter.toUpperCase())}`,
+                  on("ark-data-view", type)
+                ])
+              )
+            },
+            () => [child("Filtros", "toolbar")]
+          )
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    const host = mountPoint(canvasElement);
+    app.mount(host);
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectOwnContainerEvents(host, log);
     app.unmount();
   }
 };

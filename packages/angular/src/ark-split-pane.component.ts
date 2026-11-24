@@ -59,7 +59,11 @@ export class ArkSplitPaneComponent implements AfterViewInit, OnDestroy {
     return this.sizes ? this.sizes.join(",") : null;
   }
 
-  private resizeHandler = (event: Event) => this.arkResize.emit(event as CustomEvent<{ sizes: number[] }>);
+  // Só o ark-resize deste elemento: o evento borbulha, e o de outro split-pane dentro de um painel chegava aqui com
+  // os tamanhos do de dentro.
+  private resizeHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkResize.emit(event as CustomEvent<{ sizes: number[] }>);
+  };
 
   ngAfterViewInit(): void {
     this.paneRef?.nativeElement?.addEventListener("ark-resize", this.resizeHandler);

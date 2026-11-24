@@ -49,7 +49,10 @@ export const ArkNav = forwardRef<ArkNavElement, ArkNavProps>(function ArkNav(pro
     const el = ref.current;
     if (!el) return;
 
-    const handleCollapse = (event: Event): void => onCollapse?.(event as CustomEvent<{ collapsed: boolean }>);
+    // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+    const handleCollapse = (event: Event): void => {
+      if (event.target === event.currentTarget) onCollapse?.(event as CustomEvent<{ collapsed: boolean }>);
+    };
     const handleNavigate = (event: Event): void => onNavigate?.(event as CustomEvent<ArkNavNavigateDetail>);
     el.addEventListener("ark-collapse", handleCollapse);
     el.addEventListener("ark-navigate", handleNavigate);
@@ -154,7 +157,10 @@ export const ArkNavGroup = forwardRef<ArkNavGroupElement, ArkNavGroupProps>(
       const el = ref.current;
       if (!el) return;
 
-      const handleToggle = (event: Event): void => onToggle?.(event as CustomEvent<{ open: boolean }>);
+      // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+      const handleToggle = (event: Event): void => {
+        if (event.target === event.currentTarget) onToggle?.(event as CustomEvent<{ open: boolean }>);
+      };
       el.addEventListener("ark-toggle", handleToggle);
       return () => el.removeEventListener("ark-toggle", handleToggle);
     }, [ref, onToggle]);

@@ -14,6 +14,7 @@ import {
   ArkButtonGroupComponent,
   ArkCalendarComponent,
   ArkCardComponent,
+  ArkCarouselComponent,
   ArkCommandItemComponent,
   ArkCommandPaletteComponent,
   ArkDataViewCardDirective,
@@ -25,9 +26,12 @@ import {
   ArkMenuComponent,
   ArkMenuGroupComponent,
   ArkMenuItemComponent,
+  ArkNavComponent,
+  ArkNavGroupComponent,
   ArkPaginationComponent,
   ArkRadioComponent,
   ArkRadioGroupComponent,
+  ArkSplitPaneComponent,
   ArkSwitchComponent,
   ArkTabComponent,
   ArkTabsComponent,
@@ -49,7 +53,7 @@ import type {
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { expectOwnOverlayEvents } from "./overlay-events";
+import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 
 // Os wrappers Angular de verdade, compilados em JIT a partir do src (o Vite transforma os decorators legados, ver
 // main.ts) e montados numa aplicação sem zone.js, como o padrão do Angular 21. O preview já registrou os elementos.
@@ -604,6 +608,75 @@ export const OverlayEventsAreItsOwn = {
     const { app, ref, host } = await mount(canvasElement, Host, errors);
     await expect(errors).toEqual([]);
     await expectOwnOverlayEvents(canvasElement.lastElementChild as HTMLElement, host.log);
+    await expect(errors).toEqual([]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+class ContainerEventsHost {
+  log: string[] = [];
+  rows = [{ id: 1, name: "Ana" }];
+  columns: ArkDataViewColumn<{ id: number; name: string }>[] = [{ key: "name", label: "Nome" }];
+}
+
+// Os outros wrappers cujo elemento recebe conteúdo do app (ver overlay-events.ts): o (arkResize) de um
+// ark-split-pane-wrapper recebia o `ark-resize` de outro split-pane dentro de um painel dele.
+export const ContainerEventsAreItsOwn = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [
+        ArkSplitPaneComponent,
+        ArkCarouselComponent,
+        ArkNavComponent,
+        ArkNavGroupComponent,
+        ArkTreeComponent,
+        ArkTreeItemComponent,
+        ArkDataViewComponent
+      ],
+      template: `
+        <ark-split-pane-wrapper style="display: block; height: 200px"
+          (arkResize)="log.push('ark-split-pane:ark-resize')">
+          <div><span data-child>Lateral</span></div>
+          <ark-split-pane-wrapper direction="vertical" (arkResize)="log.push('inner:ark-resize')">
+            <div>Editor</div>
+            <div>Console</div>
+          </ark-split-pane-wrapper>
+        </ark-split-pane-wrapper>
+        <ark-carousel-wrapper (arkSlideChange)="log.push('ark-carousel:ark-slide-change')">
+          <div><span data-child>Um</span></div>
+          <div>Dois</div>
+        </ark-carousel-wrapper>
+        <ark-nav-wrapper label="Principal" (arkCollapse)="log.push('ark-nav:ark-collapse')">
+          <ark-nav-group-wrapper label="Explorador" [expandable]="true" [open]="true"
+            (arkToggle)="log.push('ark-nav-group:ark-toggle')">
+            <ark-tree-wrapper label="Arquivos"
+              (arkToggle)="log.push('ark-tree:ark-toggle')"
+              (arkSelectionChange)="log.push('ark-tree:ark-selection-change')"
+              (arkActivate)="log.push('ark-tree:ark-activate')">
+              <ark-tree-item-wrapper value="src" label="src">
+                <span slot="trailing" data-child>2</span>
+                <ark-tree-item-wrapper value="a" label="a.ts"></ark-tree-item-wrapper>
+              </ark-tree-item-wrapper>
+            </ark-tree-wrapper>
+          </ark-nav-group-wrapper>
+        </ark-nav-wrapper>
+        <ark-data-view-wrapper [rows]="rows" [columns]="columns"
+          (arkQueryChange)="log.push('ark-data-view:ark-query-change')"
+          (arkViewChange)="log.push('ark-data-view:ark-view-change')"
+          (arkRowClick)="log.push('ark-data-view:ark-row-click')"
+          (arkSelectionChange)="log.push('ark-data-view:ark-selection-change')"
+          (arkReorder)="log.push('ark-data-view:ark-reorder')">
+          <span slot="toolbar" data-child>Filtros</span>
+        </ark-data-view-wrapper>`
+    })(ContainerEventsHost);
+
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    await expectOwnContainerEvents(canvasElement.lastElementChild as HTMLElement, host.log);
     await expect(errors).toEqual([]);
     ref.destroy();
     app.destroy();

@@ -68,7 +68,10 @@ export class ArkNavComponent {
   /** Um item foi acionado (sobe dos itens); preventDefault() cancela a navegação do navegador para o app rotear. */
   @Output() arkNavigate = new EventEmitter<CustomEvent<ArkNavNavigateDetail>>();
 
-  protected collapseHandler = (event: Event) => this.arkCollapse.emit(event as CustomEvent<{ collapsed: boolean }>);
+  // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+  protected collapseHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkCollapse.emit(event as CustomEvent<{ collapsed: boolean }>);
+  };
   protected navigateHandler = (event: Event) => this.arkNavigate.emit(event as CustomEvent<ArkNavNavigateDetail>);
 }
 
@@ -162,5 +165,8 @@ export class ArkNavGroupComponent {
   /** O cabeçalho expansível foi acionado; detail.open é o novo estado. */
   @Output() arkToggle = new EventEmitter<CustomEvent<{ open: boolean }>>();
 
-  protected toggleHandler = (event: Event) => this.arkToggle.emit(event as CustomEvent<{ open: boolean }>);
+  // Só o evento deste elemento: os ark-* borbulham, e o ark-toggle de um ark-tree dentro do grupo chegava aqui.
+  protected toggleHandler = (event: Event) => {
+    if (event.target === event.currentTarget) this.arkToggle.emit(event as CustomEvent<{ open: boolean }>);
+  };
 }

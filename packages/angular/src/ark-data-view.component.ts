@@ -90,6 +90,17 @@ export class ArkDataViewCardDirective {
   }
 }
 
+// Só os eventos deste data-view: os ark-* borbulham, e os de um componente dentro de uma célula ou de um slot
+// (outro data-view, um ark-tree com o mesmo ark-selection-change) chegariam aqui com o detail do outro.
+function ownEvents(handlers: Array<[string, EventListener]>): Array<[string, EventListener]> {
+  return handlers.map(([name, handler]) => [
+    name,
+    (event) => {
+      if (event.target === event.currentTarget) handler(event);
+    }
+  ]);
+}
+
 @Component({
   selector: "ark-data-view-wrapper",
   standalone: true,
@@ -215,7 +226,7 @@ export class ArkDataViewComponent
     return sort && typeof sort === "object" ? `${sort.key}:${sort.direction}` : sort || null;
   }
 
-  private readonly handlers: Array<[string, EventListener]> = [
+  private readonly handlers: Array<[string, EventListener]> = ownEvents([
     // A cada redesenho do conteúdo o elemento troca os nós de célula: as views dos que saíram do DOM são destruídas.
     ["ark-render", () => this.pruneViews()],
     ["ark-query-change", (event) => this.arkQueryChange.emit(event as CustomEvent<ArkDataViewQueryChangeDetail>)],
@@ -226,7 +237,7 @@ export class ArkDataViewComponent
       (event) => this.arkSelectionChange.emit(event as CustomEvent<ArkDataViewSelectionChangeDetail>)
     ],
     ["ark-reorder", (event) => this.arkReorder.emit(event as CustomEvent<ArkDataViewReorderDetail>)]
-  ];
+  ]);
 
   ngAfterContentInit(): void {
     // Um template de célula que entra ou sai depois (um @if em volta dele) muda o que o elemento desenha.
