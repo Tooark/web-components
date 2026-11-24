@@ -1,6 +1,6 @@
 {
   "name": "@tooark/vue",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "description": "Tooark Vue — ark-* component wrappers for Vue 3",
   "keywords": [
     "tooark",
