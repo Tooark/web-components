@@ -28,6 +28,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   Enter closed the dialog. It now stays on the panel, and so does escaped focus with neither that element nor the
   initial focus left, instead of going to the first focusable (the same close button).
   `ConfirmationOverADisabledFieldKeepsTheDialogOpen` story; `EscapedFocusReturnsWhereItWas` now expects the panel.
+- `trapFocus`: with one overlay swapped for another, closing the second lost the focus to `<body>` when its opener was
+  the panel of the first (a click on its text focuses the host, and in WebKit a click on a native `<button>` does
+  too): the search for who opened the first started at the parent of that panel and skipped it. It now starts at the
+  panel. The same happened when the button that swapped them became `disabled` in the same step, which in Chromium
+  drops the focus of an `ark-button` on `<body>` before the second opens: a `returnTo` on `<body>` now counts as none,
+  and the element focused when the trap activates is used. `SwappedDialogReturnsFocusToTheOpener` story;
+  `ReactDialogSwapKeepsFocus` now also disables the button.
 
 ### Changed
 
