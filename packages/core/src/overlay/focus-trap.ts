@@ -18,6 +18,8 @@ type Trap = {
   container: HTMLElement;
   activate(): void;
   pause(): void;
+  /** Traz o foco para dentro: o último elemento focado, senão `initial`, senão o primeiro focável. */
+  restore(): void;
 };
 
 /** Eventos de ponteiro cancelados na captura quando começam fora do container. */
@@ -219,7 +221,8 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
       doc.removeEventListener("keydown", handleKeydown, true);
       doc.removeEventListener("focusin", handleFocusIn, true);
       if (!gesture) unbindPointer();
-    }
+    },
+    restore: focusInside
   };
 
   returns.set(container, returnTo);
@@ -253,7 +256,8 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
       if (stack.some((other) => other.container === container)) return;
       let target: HTMLElement | null = returnTo;
       for (let hops = 0; target && hops < MAX_RETURN_HOPS; hops++) {
-        if (target.isConnected && !isInsideClosingPopover(target)) {
+        // O body não é destino: é onde o foco estava quando nada tinha o foco.
+        if (target !== doc.body && target.isConnected && !isInsideClosingPopover(target)) {
           target.focus();
           // `contains`: um elemento pode delegar o foco a um filho.
           if (target.contains(doc.activeElement)) return;
@@ -262,6 +266,10 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
         while (owner && !returns.has(owner)) owner = owner.parentElement;
         target = owner ? (returns.get(owner) ?? null) : null;
       }
+      // Ninguém aceitou o foco (quem abriu saiu da página junto com o fechamento). Com outro overlay embaixo o foco
+      // vai para ele: no body, com um modal aberto, o teclado ficava sem dono e o Esc não chegava ao diálogo. Sem
+      // overlay embaixo fica como no <dialog> nativo, e o app escolhe o destino.
+      stack[stack.length - 1]?.restore();
     });
   };
 }

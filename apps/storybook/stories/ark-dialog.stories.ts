@@ -667,6 +667,59 @@ export const DialogBelowIsNotOnTop = {
   }
 };
 
+// Quem abriu a confirmação sai da página junto com o fechamento dela (excluir a linha que tinha o botão). Com outro
+// diálogo embaixo, o foco vai para ele: para onde estava antes, senão para o foco inicial dele. Ficava no body com um
+// modal aberto, e o teclado ficava sem dono: o Esc não chegava ao diálogo. Sem overlay embaixo o foco termina no
+// body, como no <dialog> nativo, e o app escolhe o destino no próprio handler.
+export const OpenerGoneFocusGoesToTheDialogBelow = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const list = createDialog({ label: "Itens", width: "640", height: "480", lang: "pt" });
+    const remove = document.createElement("ark-button");
+    remove.setAttribute("size", "sm");
+    remove.textContent = "Excluir item";
+    (list.querySelector("div") as HTMLElement).append(remove);
+    const confirm = createDialog({ label: "Excluir?", size: "sm", lang: "pt" }, { footer: false, body: [] });
+    const yes = document.createElement("ark-button");
+    yes.setAttribute("size", "sm");
+    yes.textContent = "Sim";
+    yes.addEventListener("click", () => {
+      remove.remove();
+      confirm.close();
+    });
+    confirm.append(yes);
+    remove.addEventListener("click", () => confirm.show());
+    wrap.append(createOpener(list), list, confirm);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [list, confirm] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const opener = canvas.getByText("Abrir");
+    const reasons: string[] = [];
+    list.addEventListener("ark-close", (event) => {
+      if (event.target === list) reasons.push((event as CustomEvent<{ reason: string }>).detail.reason);
+    });
+
+    await userEvent.click(opener);
+    const nome = list.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+    await userEvent.click(canvas.getByText("Excluir item"));
+    const yes = canvas.getByText("Sim");
+    await waitFor(() => expect(document.activeElement === yes).toBe(true));
+
+    await userEvent.click(yes);
+    await closed(confirm);
+    await expect(canvas.queryByText("Excluir item")).toBeNull();
+    await waitFor(() => expect(document.activeElement === nome).toBe(true));
+
+    await userEvent.keyboard("{Escape}");
+    expect(reasons).toEqual(["escape"]);
+    await closed(list);
+    await waitFor(() => expect(document.activeElement === opener).toBe(true));
+  }
+};
+
 // O foco inicial e o `ark-open` saem num microtask depois de `open` mudar, e não na hora: um framework que grava a
 // prop dentro da própria atualização (o React, no commit) ainda mexe no foco antes de terminar. O que isso não pode
 // custar: o campo que o app foca logo depois de abrir continua com o foco, quem o recebe de volta ao fechar é o

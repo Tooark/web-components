@@ -47,6 +47,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `ArkInput` are still the native events, which a control of your own in `slot="prefix"`/`slot="suffix"` also
   sends (the READMEs now say so). `ReactContainerEventsAreItsOwn`, `VueContainerEventsAreItsOwn` and
   `ContainerEventsAreItsOwn` (Angular) stories.
+- `trapFocus`: an overlay closing over another one whose opener left the page with the close (a confirmation that
+  deletes the row its button was in) left the focus on `<body>` with the overlay underneath still open: Tab
+  brought it back, but Esc never reached the dialog. The focus now goes into the overlay underneath (where it was
+  before, else its initial focus). With no overlay underneath it still ends on `<body>`, like a native `<dialog>`;
+  the READMEs say where the app picks the destination. `OpenerGoneFocusGoesToTheDialogBelow` story.
 - `ark-split-pane`: the `sizes` setter threw with `undefined` or `null` (`value.map`). `ArkSplitPane` from
   `@tooark/vue` without the `sizes` prop logged "Failed setting prop" on every mount, and in React taking the prop
   away after it had a value raised an error. Both values now remove the attribute.
