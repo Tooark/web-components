@@ -46,6 +46,16 @@ const stack: Trap[] = [];
 // diálogo trocado por outro): a devolução sobe por aqui até achar um elemento que ainda aceite o foco.
 const returns = new WeakMap<HTMLElement, HTMLElement | null>();
 
+/** Há um popover de light dismiss aberto (`auto`, `hint` ou `popover=""`): o navegador o fecha com o próprio Esc. */
+function hasLightDismissOpen(doc: Document): boolean {
+  try {
+    return doc.querySelector(':is([popover=""], [popover="auto" i], [popover="hint" i]):popover-open') !== null;
+  } catch {
+    // Sem :popover-open no navegador não há popover aberto para considerar.
+    return false;
+  }
+}
+
 /** Limite da subida pela cadeia de `returnTo`, contra um ciclo entre dois overlays que se abrem um ao outro. */
 const MAX_RETURN_HOPS = 8;
 
@@ -90,7 +100,9 @@ function isInsideOpenPopover(target: Element, leaving = true): boolean {
  * recente escuta, e o container de um trap de baixo (o diálogo que abriu este) não conta como popover por cima, nem
  * para o foco nem para o ponteiro. O foco que cai no body porque o elemento focado deixou de aceitá-lo (saiu da
  * página, ficou `disabled`, entrou em `inert`, deixou de ser desenhado) vai para o container, nunca para outro
- * controle; se o elemento estava num popover por cima (um botão de toast), volta para onde estava.
+ * controle; se o elemento estava num popover por cima (um botão de toast), volta para onde estava. Um Esc com o foco no
+ * body (depois de um blur() do app, de um clique no texto de um toast) é entregue ao container, salvo se o app já o
+ * cancelou ou com um popover `auto` aberto, que o navegador fecha com ele.
  *
  * Ao liberar, o foco volta a `returnTo` num microtask, e só se ainda estiver no container ou sem dono (`body`): um
  * framework que refoca ao fim da própria atualização o elemento focado antes dela (o React, a cada commit) desfaria
@@ -148,8 +160,24 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
     focusContainer();
   };
 
+  // Um Esc com o foco no body (um blur() do app, um clique no texto de um toast) não passa pelo container, que é quem o
+  // trata: o trap o entrega como se a tecla fosse dele, e os listeners do app no host valem igual. Fica de fora o que o
+  // app já cancelou e o de um popover `auto` aberto (um menu), que o navegador fecha com esse mesmo Esc. O evento
+  // entregue passa por aqui de novo, com o container como alvo, e segue.
+  const handleEscape = (event: KeyboardEvent): void => {
+    const active = doc.activeElement;
+    if (event.target === container || (active && active !== doc.body)) return;
+    if (event.defaultPrevented || event.isComposing || hasLightDismissOpen(doc)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    container.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", code: "Escape", bubbles: true, cancelable: true, composed: true })
+    );
+  };
+
   // Tab e Shift+Tab ciclam; com o foco no container (ou fora) Tab vai ao primeiro e Shift+Tab ao último.
   const handleKeydown = (event: KeyboardEvent): void => {
+    if (event.key === "Escape") handleEscape(event);
     if (event.key !== "Tab") return;
     const active = doc.activeElement;
     // Foco num popover aberto por cima (um menu do próprio overlay): o Tab é dele.
