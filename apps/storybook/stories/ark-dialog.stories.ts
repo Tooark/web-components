@@ -1,4 +1,4 @@
-import { type ArkDialogSize, type ArkTheme, isScrollLocked } from "@tooark/core";
+import { type ArkDialogSize, type ArkTheme, isScrollLocked, toast } from "@tooark/core";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -1003,6 +1003,117 @@ export const ConfirmationOverADisabledFieldKeepsTheDialogOpen = {
     await userEvent.keyboard("{Escape}");
     await closed(form);
     await waitFor(() => expect(opener).toHaveFocus());
+  }
+};
+
+// Foco no body com um overlay aberto e nada para o trap trazer de volta: um blur() do app, ou um clique no texto de um
+// toast (o toaster é um popover por cima, fora do trap). O Esc morria ali até um Tab; o trap do topo o entrega ao
+// overlay. Ficam de fora o Esc que o app já cancelou, o de um diálogo `persistent` (entregue, mas ele não fecha) e o de
+// um popover `auto` aberto (um menu), que é do navegador.
+export const EscapeReachesTheOverlayWithFocusOnBody = {
+  render: () => {
+    const wrap = createScene({ label: "Editar", lang: "pt" });
+    const dialog = wrap.querySelector("ark-dialog") as DialogEl;
+    const trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.id = "escape-menu-trigger";
+    trigger.textContent = "Mais";
+    const menu = document.createElement("ark-menu");
+    menu.setAttribute("for", trigger.id);
+    const item = document.createElement("ark-menu-item");
+    item.textContent = "Duplicar";
+    menu.append(item);
+    (dialog.querySelector("div") as HTMLElement).append(trigger, menu);
+
+    const drawer = document.createElement("ark-drawer");
+    drawer.setAttribute("label", "Filtros");
+    drawer.append(createField("Busca"));
+    const palette = document.createElement("ark-command-palette");
+    palette.setAttribute("label", "Comandos");
+    wrap.append(drawer, palette, document.createElement("ark-toaster"));
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
+    const menu = canvasElement.querySelector("ark-menu") as HTMLElement & { hide(): void };
+    const opener = canvas.getByText("Abrir");
+    const nome = dialog.querySelector("input") as HTMLInputElement;
+    const reasons: string[] = [];
+    dialog.addEventListener("ark-close", (event) => {
+      if (event.target === dialog) reasons.push((event as CustomEvent<{ reason: string }>).detail.reason);
+    });
+    const open = async (): Promise<void> => {
+      await userEvent.click(opener);
+      await waitFor(() => expect(nome).toHaveFocus());
+    };
+    const blur = async (): Promise<void> => {
+      (document.activeElement as HTMLElement).blur();
+      await expect(document.body).toHaveFocus();
+    };
+
+    // blur() do app. O listener do app no host recebe uma tecla só.
+    await open();
+    await blur();
+    const keys: string[] = [];
+    const record = (event: KeyboardEvent): void => {
+      keys.push(event.key);
+    };
+    dialog.addEventListener("keydown", record, true);
+    await userEvent.keyboard("{Escape}");
+    dialog.removeEventListener("keydown", record, true);
+    expect(keys).toEqual(["Escape"]);
+    expect(reasons).toEqual(["escape"]);
+    await closed(dialog);
+    await waitFor(() => expect(opener).toHaveFocus());
+
+    // Clique no texto de um toast.
+    await open();
+    const id = toast("Rascunho salvo", { duration: 60000 });
+    await userEvent.click(await canvas.findByText("Rascunho salvo"));
+    await expect(document.body).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    expect(reasons).toEqual(["escape", "escape"]);
+    await closed(dialog);
+    toast.dismiss(id);
+
+    // O Esc que o app já cancelou não fecha; nem o de um diálogo persistent.
+    await open();
+    await blur();
+    const cancel = (event: Event): void => event.preventDefault();
+    window.addEventListener("keydown", cancel, true);
+    await userEvent.keyboard("{Escape}");
+    window.removeEventListener("keydown", cancel, true);
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
+    dialog.setAttribute("persistent", "");
+    await userEvent.keyboard("{Escape}");
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
+    dialog.removeAttribute("persistent");
+
+    // Menu aberto: o Esc é dele (o navegador o fecha; a tecla sintética do teste não), e o diálogo fica.
+    const trigger = canvas.getByText("Mais");
+    await userEvent.click(trigger);
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(true));
+    await blur();
+    await userEvent.keyboard("{Escape}");
+    await expect(dialog).toHaveAttribute("data-ark-state", "open");
+    menu.hide();
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(false));
+    await expect(trigger).toHaveFocus();
+    await blur();
+    await userEvent.keyboard("{Escape}");
+    expect(reasons).toEqual(["escape", "escape", "escape"]);
+    await closed(dialog);
+
+    // Gaveta e paleta.
+    for (const tag of ["ark-drawer", "ark-command-palette"]) {
+      const overlay = canvasElement.querySelector(tag) as DialogEl;
+      overlay.show();
+      await waitFor(() => expect(overlay.contains(document.activeElement), tag).toBe(true));
+      await blur();
+      await userEvent.keyboard("{Escape}");
+      await closed(overlay);
+    }
   }
 };
 

@@ -35,6 +35,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   drops the focus of an `ark-button` on `<body>` before the second opens: a `returnTo` on `<body>` now counts as none,
   and the element focused when the trap activates is used. `SwappedDialogReturnsFocusToTheOpener` story;
   `ReactDialogSwapKeepsFocus` now also disables the button.
+- `trapFocus`: Esc pressed with the focus on `<body>` while a dialog, drawer or palette is open (after a `blur()` of
+  the app, or a click on the text of a toast, whose popover is on top of the trap) never reached the overlay until a
+  Tab. The trap on top now hands that Esc to its container, as if the key had been pressed inside (a `persistent`
+  dialog still stays open), unless the app already cancelled it or a light-dismiss popover is open (a menu), which the
+  browser closes with it. A capture listener of the app on `window` or `document` that does not cancel the original
+  also sees the one handed over. `EscapeReachesTheOverlayWithFocusOnBody` story.
 
 ### Changed
 
@@ -43,6 +49,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   first focusable: it comes back to the last element focused inside, to `initial` only when that one left the
   container, else to the container. A test that expects a field to have the focus after removing the focused element
   gets the dialog, drawer or palette itself.
+- `trapFocus`: Esc with the focus on `<body>` now closes the dialog, drawer or palette on top, also after a `blur()` of
+  the app. Cancel the key to keep it open, or use `persistent`.
 
 ## [1.9.2] - 2026-11-24
 
