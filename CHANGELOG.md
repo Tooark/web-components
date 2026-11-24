@@ -9,6 +9,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.9.2] - 2026-11-24
+
 ### Fixed
 
 - `ark-dialog`, `ark-drawer` and `ark-command-palette` kept mounted and closed through a prop in React lost the
@@ -730,7 +732,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.9.1...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.9.2...HEAD
+[1.9.2]: https://github.com/Tooark/web-components/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/Tooark/web-components/compare/v1.9.0...v1.9.1
 [1.9.0]: https://github.com/Tooark/web-components/compare/v1.8.0...v1.9.0
 [1.8.0]: https://github.com/Tooark/web-components/compare/v1.7.0...v1.8.0
