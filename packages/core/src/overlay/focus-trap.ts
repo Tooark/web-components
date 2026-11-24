@@ -95,14 +95,19 @@ function isInsideOpenPopover(target: Element, leaving = true): boolean {
  * Ao liberar, o foco volta a `returnTo` num microtask, e só se ainda estiver no container ou sem dono (`body`): um
  * framework que refoca ao fim da própria atualização o elemento focado antes dela (o React, a cada commit) desfaria
  * uma devolução síncrona, e o app que levou o foco a outro lugar de propósito fica com a escolha dele. Se `returnTo`
- * já não aceita o foco (está num overlay que fechou, ou saiu da página), vale o `returnTo` do trap que o continha.
- * No-op sem DOM.
+ * já não aceita o foco (está num overlay que fechou, ou é o painel dele, ou saiu da página), vale o `returnTo` do trap
+ * desse overlay; um `returnTo` no body conta como nenhum. No-op sem DOM.
  */
 export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions = {}): () => void {
   if (typeof document === "undefined") return () => undefined;
 
   const doc = container.ownerDocument;
-  const returnTo = options.returnTo ?? (doc.activeElement instanceof HTMLElement ? doc.activeElement : null);
+  // Um `returnTo` no body é o mesmo que nenhum: é onde o foco estava quando nada o tinha (o botão que abriu este overlay
+  // ficou `disabled` no mesmo passo). Vale então o elemento focado agora, se está fora do container: o trap do overlay
+  // que fechou nesse passo já devolveu o foco a quem o tinha aberto.
+  const held = doc.activeElement instanceof HTMLElement ? doc.activeElement : null;
+  const outside = container.contains(held) ? null : held;
+  const returnTo = options.returnTo === doc.body ? outside : (options.returnTo ?? held);
 
   // O container de outro trap da pilha é um popover aberto, mas está embaixo deste: sem esta regra o diálogo que
   // abriu outro continuava recebendo o foco e os cliques com o de cima aberto.
@@ -304,7 +309,9 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
           // `contains`: um elemento pode delegar o foco a um filho.
           if (target.contains(doc.activeElement)) return;
         }
-        let owner: HTMLElement | null = target.parentElement;
+        // A busca começa no próprio alvo: quem abriu pode ser o painel de outro overlay (um clique num texto dele foca
+        // o host), e começar no pai pulava esse painel.
+        let owner: HTMLElement | null = target;
         while (owner && !returns.has(owner)) owner = owner.parentElement;
         target = owner ? (returns.get(owner) ?? null) : null;
       }

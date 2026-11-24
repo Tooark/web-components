@@ -784,6 +784,64 @@ export const FocusedElementRemovedStaysInTheDialog = {
   }
 };
 
+// Diálogo A trocado por B no mesmo passo, quando quem "abriu" B é o próprio painel de A (um clique num texto de A foca
+// o host, que tem tabindex=-1) ou ninguém (o botão de A ficou `disabled` no clique, e o foco caiu no body antes de B
+// abrir). Ao fechar B, o foco volta a quem abriu A: a cadeia de retorno começa no próprio `returnTo`, e o body não
+// conta como quem abriu.
+export const SwappedDialogReturnsFocusToTheOpener = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const first = createDialog({ label: "Passo 1", lang: "pt" }, { footer: false, body: [] });
+    const text = document.createElement("p");
+    text.textContent = "Um texto do passo 1";
+    const next = document.createElement("ark-button");
+    next.setAttribute("size", "sm");
+    next.textContent = "Avançar";
+    const second = createDialog({ label: "Passo 2", lang: "pt" });
+    next.addEventListener("click", () => {
+      // O botão fica bloqueado enquanto o passo seguinte abre: o foco sai dele antes da troca.
+      next.setAttribute("disabled", "");
+      first.close();
+      second.show();
+    });
+    (first.querySelector("div") as HTMLElement).append(text, next);
+    wrap.append(createOpener(first), first, second);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const [first, second] = Array.from(canvasElement.querySelectorAll("ark-dialog")) as DialogEl[];
+    const opener = canvas.getByText("Abrir");
+    const next = canvas.getByText("Avançar");
+    const field = second.querySelector("input") as HTMLInputElement;
+
+    // Clique no texto de A: o host de A é quem tem o foco quando B abre.
+    await userEvent.click(opener);
+    await waitFor(() => expect(next).toHaveFocus());
+    await userEvent.click(canvas.getByText("Um texto do passo 1"));
+    await expect(first).toHaveFocus();
+    first.close();
+    second.show();
+    await waitFor(() => expect(field).toHaveFocus());
+    await closed(first);
+    await userEvent.keyboard("{Escape}");
+    await closed(second);
+    await waitFor(() => expect(opener).toHaveFocus());
+
+    // Botão de A desabilitado no clique: o foco já estava no body quando B abriu.
+    next.removeAttribute("disabled");
+    await userEvent.click(opener);
+    await waitFor(() => expect(next).toHaveFocus());
+    await userEvent.click(next);
+    await expect(next).toHaveAttribute("disabled");
+    await waitFor(() => expect(field).toHaveFocus());
+    await closed(first);
+    await userEvent.keyboard("{Escape}");
+    await closed(second);
+    await waitFor(() => expect(opener).toHaveFocus());
+  }
+};
+
 // Cada jeito de o elemento focado deixar de aceitar o foco com o diálogo aberto: o foco vai ao painel. A última volta
 // barra o focusout antes do trap, como no Firefox e no WebKit, que não o disparam quando o elemento focado sai da
 // página: ali quem avisa é a remoção observada no DOM.

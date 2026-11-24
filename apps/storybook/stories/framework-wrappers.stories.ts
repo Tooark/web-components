@@ -688,13 +688,15 @@ export const ReactOverlayOpenedByPropFocusesField = {
 
 // Um diálogo fecha e outro abre no mesmo commit, nas duas ordens do DOM. O React refoca o botão que disparou a troca,
 // dentro do diálogo que está saindo (ainda no top layer durante a animação): o foco fica no campo do que abriu, e não
-// se perde quando o primeiro some.
-function OverlaySwap({ secondFirst }: { secondFirst: boolean }): ReactNode {
+// se perde quando o primeiro some. Com `disabling`, o botão fica desabilitado no mesmo commit (um "Avançar" bloqueado
+// durante o envio): o foco cai no body antes de o segundo abrir, e ninguém é quem abriu o segundo; ao fechá-lo, a
+// devolução ainda chega a quem abriu o primeiro.
+function OverlaySwap({ secondFirst, disabling }: { secondFirst: boolean; disabling: boolean }): ReactNode {
   const [step, setStep] = useState(0);
   const first = createElement(
     ReactArkDialog,
     { key: "first", open: step === 1, label: "Passo 1", onClose: () => setStep((now) => (now === 1 ? 0 : now)) },
-    createElement(ReactArkButton, { onClick: () => setStep(2) }, "Próximo")
+    createElement(ReactArkButton, { disabled: disabling && step === 2, onClick: () => setStep(2) }, "Próximo")
   );
   const second = createElement(
     ReactArkDialog,
@@ -711,8 +713,14 @@ export const ReactDialogSwapKeepsFocus = {
   render: () => document.createElement("div"),
   play: async ({ canvasElement }: Ctx) => {
     const errors: unknown[] = [];
-    for (const secondFirst of [false, true]) {
-      const root = reactRoot(canvasElement, errors)(createElement(OverlaySwap, { secondFirst }));
+    const swaps: Array<[boolean, boolean]> = [
+      [false, false],
+      [true, false],
+      [false, true],
+      [true, true]
+    ];
+    for (const [secondFirst, disabling] of swaps) {
+      const root = reactRoot(canvasElement, errors)(createElement(OverlaySwap, { secondFirst, disabling }));
       const scope = canvasElement.lastElementChild as HTMLElement;
       const first = scope.querySelector('ark-dialog[label="Passo 1"]') as HTMLElement;
       const second = scope.querySelector('ark-dialog[label="Passo 2"]') as HTMLElement;
@@ -731,8 +739,11 @@ export const ReactDialogSwapKeepsFocus = {
 
       await userEvent.keyboard("{Escape}");
       await waitFor(() => expect(second).not.toHaveAttribute("data-ark-state"));
-      // Quem abriu o segundo foi o botão do primeiro, já fechado: o foco sobe para quem abriu o primeiro.
-      await waitFor(() => expect(within(scope).getByText("Abrir")).toHaveFocus());
+      // Quem abriu o segundo foi o botão do primeiro, já fechado (ou ninguém, com o botão desabilitado): o foco sobe
+      // para quem abriu o primeiro.
+      await waitFor(() =>
+        expect(within(scope).getByText("Abrir"), `secondFirst=${secondFirst} disabling=${disabling}`).toHaveFocus()
+      );
       root.unmount();
     }
     await expect(errors).toEqual([]);
