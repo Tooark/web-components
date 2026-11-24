@@ -1,7 +1,7 @@
 // Focus trap para overlays modais abertos pela Popover API, que não aplica
 // `inert` ao resto da página: o trap cobre teclado e ponteiro no lugar dele.
 
-import { focusableElements } from "./focusable";
+import { canHoldFocus, focusableElements } from "./focusable";
 import { isPopoverClosing } from "./popover";
 
 /** Opções do focus trap. */
@@ -18,7 +18,7 @@ type Trap = {
   container: HTMLElement;
   activate(): void;
   pause(): void;
-  /** Traz o foco para dentro: o último elemento focado, senão `initial`, senão o primeiro focável. */
+  /** Traz o foco para dentro: o último elemento focado, senão `initial`, senão o container. */
   restore(): void;
 };
 
@@ -82,12 +82,15 @@ function isInsideOpenPopover(target: Element, leaving = true): boolean {
 /**
  * Prende o foco em `container` enquanto um overlay modal está aberto e devolve a função que o libera. A Popover
  * API não aplica `inert` ao resto da página, então o trap cobre o que `inert` cobriria: Tab e Shift+Tab ciclam
- * entre os focáveis do container, foco que escapa volta para onde estava (o último elemento focado no container;
- * sem ele, `initial`; sem os dois, o primeiro focável), e eventos de ponteiro iniciados fora são cancelados na
- * captura antes de chegar ao alvo (e reportados em `onOutsidePointer`). Popovers abertos por cima (menu, tooltip,
- * toaster) ficam fora do trap: são o próprio overlay em uso; um que está na saída do `closePopover` ainda recebe o
- * ponteiro, mas já não segura o foco. Traps aninhados empilham: só o mais recente escuta, e o container de um trap
- * de baixo (o diálogo que abriu este) não conta como popover por cima, nem para o foco nem para o ponteiro.
+ * entre os focáveis do container, foco que escapa volta para onde estava (o último elemento focado no container; se
+ * ele saiu, `initial`; se ele não aceita o foco agora, ou sem nenhum dos dois, o próprio container), e eventos de
+ * ponteiro iniciados fora são cancelados na captura antes de chegar ao alvo (e reportados em `onOutsidePointer`).
+ * Popovers abertos por cima (menu, tooltip, toaster) ficam fora do trap: são o próprio overlay em uso; um que está na
+ * saída do `closePopover` ainda recebe o ponteiro, mas já não segura o foco. Traps aninhados empilham: só o mais
+ * recente escuta, e o container de um trap de baixo (o diálogo que abriu este) não conta como popover por cima, nem
+ * para o foco nem para o ponteiro. O foco que cai no body porque o elemento focado deixou de aceitá-lo (saiu da
+ * página, ficou `disabled`, entrou em `inert`, deixou de ser desenhado) vai para o container, nunca para outro
+ * controle; se o elemento estava num popover por cima (um botão de toast), volta para onde estava.
  *
  * Ao liberar, o foco volta a `returnTo` num microtask, e só se ainda estiver no container ou sem dono (`body`): um
  * framework que refoca ao fim da própria atualização o elemento focado antes dela (o React, a cada commit) desfaria
@@ -131,15 +134,13 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
 
   // O foco volta para onde estava, e não para o primeiro focável do DOM: quem devolve o foco ao opener depois de o
   // overlay abrir (o React refoca, ao fim do commit, o elemento focado antes dele; um menu que fecha; o próprio app)
-  // tirava o foco do campo escolhido e ele terminava no botão de fechar do cabeçalho.
+  // tirava o foco do campo escolhido e ele terminava no botão de fechar do cabeçalho. Um último focado que continua no
+  // container mas não aceita o foco agora (o campo desabilitado durante um envio, com uma confirmação fechando por
+  // cima) deixa o foco no painel: no botão de fechar, o Enter seguinte fechava o diálogo.
   const focusInside = (): void => {
-    if (tryFocus(lastFocused) || tryFocus(options.initial)) return;
-    const first = focusableElements(container)[0];
-    if (first) {
-      first.focus();
-    } else {
-      focusContainer();
-    }
+    if (tryFocus(lastFocused)) return;
+    if (!container.contains(lastFocused) && tryFocus(options.initial)) return;
+    focusContainer();
   };
 
   // Tab e Shift+Tab ciclam; com o foco no container (ou fora) Tab vai ao primeiro e Shift+Tab ao último.
@@ -177,21 +178,37 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
     if (!owns(target, false)) focusInside();
   };
 
-  // O elemento focado saiu da página, ou deixou de ser desenhado, com o trap ativo (o botão "remover" de uma linha
-  // que some com ela): o navegador põe o foco no body, onde o teclado fica sem dono e o Esc não chega ao overlay.
-  // Nenhum focusin avisa, então a conferência vem do focusout, um microtask depois. Um blur() do app, com o
-  // elemento ainda na página, é escolha dele; a janela perdendo o foco não muda o `activeElement`.
+  // O elemento focado deixou de aceitar o foco com o trap ativo: saiu da página ou deixou de ser desenhado (o botão
+  // "remover" de uma linha que some com ela), ficou `disabled` (um campo durante o envio, um `<fieldset disabled>`),
+  // entrou num `inert`, ou perdeu o que o tornava focável. O navegador põe o foco no body, onde o teclado fica sem dono
+  // e o Esc não chega ao overlay. Nenhum focusin avisa, então a conferência vem do focusout, um microtask depois, e da
+  // remoção observada no DOM (o Firefox e o WebKit não disparam focusout quando o elemento focado sai da página). O
+  // foco vai para o painel, nunca para outro controle: no botão de fechar ou num campo, o Enter que o usuário repete
+  // durante um envio fechava o diálogo ou enviava de novo. Só o de um elemento de fora do container (o botão de um toast,
+  // que some com ele) volta para onde estava. Um blur() do app, com o elemento ainda focável, é escolha dele; a janela
+  // perdendo o foco não muda o `activeElement`.
+  const recover = (target: HTMLElement): void => {
+    if (!listening) return;
+    const active = doc.activeElement;
+    if (active && active !== doc.body) return;
+    if (canHoldFocus(target)) return;
+    if (target !== lastFocused) {
+      focusInside();
+      return;
+    }
+    if (!target.isConnected) lastFocused = null;
+    focusContainer();
+  };
+
   const handleFocusOut = (event: FocusEvent): void => {
     const target = event.target;
     if (event.relatedTarget || !(target instanceof HTMLElement)) return;
-    queueMicrotask(() => {
-      if (!listening) return;
-      const active = doc.activeElement;
-      if (active && active !== doc.body) return;
-      if (target.isConnected && target.getClientRects().length > 0) return;
-      focusInside();
-    });
+    queueMicrotask(() => recover(target));
   };
+
+  const removals = new MutationObserver(() => {
+    if (lastFocused && !lastFocused.isConnected) recover(lastFocused);
+  });
 
   // O ponteiro é solto só no fim do gesto: se o pointerdown fora fechar o overlay (e liberar o trap), o click do
   // mesmo gesto ainda seria entregue ao que está atrás do scrim.
@@ -231,6 +248,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
       doc.addEventListener("keydown", handleKeydown, true);
       doc.addEventListener("focusin", handleFocusIn, true);
       doc.addEventListener("focusout", handleFocusOut, true);
+      removals.observe(container, { childList: true, subtree: true });
       bindPointer();
     },
     pause(): void {
@@ -238,6 +256,7 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
       doc.removeEventListener("keydown", handleKeydown, true);
       doc.removeEventListener("focusin", handleFocusIn, true);
       doc.removeEventListener("focusout", handleFocusOut, true);
+      removals.disconnect();
       if (!gesture) unbindPointer();
     },
     restore: focusInside
@@ -252,7 +271,12 @@ export function trapFocus(container: HTMLElement, options: ArkFocusTrapOptions =
   if (initial === container) {
     focusContainer();
   } else if (!tryFocus(initial)) {
-    focusInside();
+    const first = focusableElements(container)[0];
+    if (first) {
+      first.focus();
+    } else {
+      focusContainer();
+    }
   }
 
   let released = false;

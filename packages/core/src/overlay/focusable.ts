@@ -29,6 +29,21 @@ function isTabbable(el: HTMLElement): boolean {
 }
 
 /**
+ * O elemento ainda aceita o foco: está na página, é de um tipo focável (o `tabindex` pode ser negativo), não está
+ * `disabled` (um `<fieldset disabled>` ancestral conta), não está em `inert` e é desenhado. É o que o focus trap
+ * confere quando o foco cai no body sem um `focusin` que diga para onde foi.
+ */
+export function canHoldFocus(el: HTMLElement): boolean {
+  if (!el.isConnected || !el.matches(FOCUSABLE_SELECTOR) || el.matches(":disabled") || el.closest("[inert]")) {
+    return false;
+  }
+  // checkVisibility cobre display: none, visibility: hidden e content-visibility (o <details> fechado).
+  return typeof el.checkVisibility === "function"
+    ? el.checkVisibility({ visibilityProperty: true })
+    : el.getClientRects().length > 0;
+}
+
+/**
  * Elementos que entram na ordem de Tab dentro de `root`, na ordem do DOM: com tabindex não negativo, sem
  * `disabled` nem `inert`, visíveis. `root` não entra na lista. Não reordena por tabindex positivo, que a lib
  * não usa.
