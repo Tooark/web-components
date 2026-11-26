@@ -19,7 +19,8 @@ type ArkAvatarSizing = {
  * `name`). Mostra a imagem de `src` e, sem ela ou quando ela falha ao
  * carregar, as iniciais de `name` (primeira letra, ou primeira mais última
  * quando há sobrenome); sem nome e sem imagem, um glifo de pessoa decorativo
- * (`aria-hidden`, a menos que o host tenha aria-label próprio). `color` troca
+ * (`aria-hidden`, a menos que o host tenha aria-label próprio; um `aria-hidden`
+ * do app fica, com ou sem nome). `color` troca
  * o tint primary por uma cor própria (texto na cor, fundo suave) e
  * `variant="solid"` preenche o fundo com a cor e escreve as iniciais em branco.
  */
@@ -34,9 +35,25 @@ export class ArkAvatar extends HTMLElementBase {
   private failedSrc: string | null = null;
   /** aria-label escrito pelo componente a partir de `name`, para o tirar quando o nome sai. */
   private ownLabel: string | null = null;
+  /** O `aria-hidden` do host foi gravado pelo componente (avatar decorativo), e não pelo app. */
+  private ownHidden = false;
+  /** Gravando o próprio `aria-hidden`: o attributeChangedCallback não o toma pelo do app. */
+  private writingHidden = false;
 
   static get observedAttributes(): string[] {
-    return ["name", "src", "size", "shape", "color", "variant", "aria-label", "theme", "class", "testid"];
+    return [
+      "name",
+      "src",
+      "size",
+      "shape",
+      "color",
+      "variant",
+      "aria-label",
+      "aria-hidden",
+      "theme",
+      "class",
+      "testid"
+    ];
   }
 
   connectedCallback(): void {
@@ -48,6 +65,11 @@ export class ArkAvatar extends HTMLElementBase {
   attributeChangedCallback(name: string): void {
     if (name === "class") {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
+      return;
+    }
+    // Um aria-hidden gravado de fora (mesmo com o valor que o componente pôs) é do app, que passa a ser o dono dele.
+    if (name === "aria-hidden") {
+      if (!this.writingHidden) this.ownHidden = false;
       return;
     }
     if (!this.initialsEl || !this.isConnected) return;
@@ -136,6 +158,18 @@ export class ArkAvatar extends HTMLElementBase {
     this.style.setProperty("--ark-avatar-fg", solid ? "#fff" : color);
   }
 
+  // O aria-hidden do componente: grava ("true") ou tira (null), marcando que é dele.
+  private writeHidden(value: "true" | null): void {
+    this.writingHidden = true;
+    if (value === null) {
+      this.removeAttribute("aria-hidden");
+    } else {
+      this.setAttribute("aria-hidden", value);
+    }
+    this.writingHidden = false;
+    this.ownHidden = value !== null;
+  }
+
   private applyOwnClasses(next: string[]): void {
     this.syncingClass = true;
     for (const cls of this.ownClasses) {
@@ -190,21 +224,22 @@ export class ArkAvatar extends HTMLElementBase {
         .split(" ")
     );
 
-    // Nome acessível: name, ou o aria-label próprio do usuário; sem os dois o avatar é decorativo.
+    // Nome acessível: name, ou o aria-label próprio do usuário; sem os dois o avatar é decorativo e o componente
+    // grava aria-hidden. Com nome ele tira só o que gravou: o aria-hidden do app (um avatar ao lado do nome escrito,
+    // que não precisa ser lido duas vezes) fica.
     this.setAttribute("role", "img");
     if (name) {
       this.ownLabel = name;
       // Só quando muda: aria-label é observado e um set igual reentraria aqui.
       if (this.getAttribute("aria-label") !== name) this.setAttribute("aria-label", name);
-      this.removeAttribute("aria-hidden");
     } else {
       if (this.ownLabel && this.getAttribute("aria-label") === this.ownLabel) this.removeAttribute("aria-label");
       this.ownLabel = null;
-      if (this.getAttribute("aria-label")) {
-        this.removeAttribute("aria-hidden");
-      } else {
-        this.setAttribute("aria-hidden", "true");
-      }
+    }
+    if (!name && !this.getAttribute("aria-label")) {
+      if (!this.hasAttribute("aria-hidden")) this.writeHidden("true");
+    } else if (this.ownHidden) {
+      this.writeHidden(null);
     }
 
     applyTestHooks(this, "avatar", this);
