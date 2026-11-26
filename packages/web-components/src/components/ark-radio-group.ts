@@ -16,7 +16,7 @@ let groupSeq = 0;
  * usuário ficam onde estão: dentro dele os rádios formam um grupo pela
  * presença no host, com ou sem `name` (fora de um grupo continuam agrupando
  * por `name`). `value` reflete o rádio marcado e, atribuído, marca o desse
- * valor; o `change` de cada rádio é parado aqui e sai um só, consolidado, com
+ * valor (tirado, desmarca todos); o `change` de cada rádio é parado aqui e sai um só, consolidado, com
  * `detail: { value }`. `label` desenha a legenda própria, `helper` e
  * `error-message` a mensagem abaixo, como nos campos; `name`, `size`,
  * `intent`, `theme` e `disabled` do grupo valem para todos os rádios. O
@@ -89,21 +89,28 @@ export class ArkRadioGroup extends HTMLElementBase {
     this.observer = null;
   }
 
-  attributeChangedCallback(name: string): void {
+  attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void {
     if (name === "class") {
       if (!this.syncingClass) this.applyOwnClasses(this.ownClasses);
       return;
     }
     if (!this.labelEl || !this.isConnected) return;
     if (name === "value") {
-      if (!this.syncingValue) this.syncRadios();
+      if (this.syncingValue) return;
+      // Tirar o `value` (ou atribuir "") desmarca todos, como atribuir marca um: sem `change`. Só numa remoção de
+      // verdade: sem `value` desde o início, o rádio marcado no HTML continua sendo adotado pelo syncRadios.
+      if (newValue === null && oldValue !== null) {
+        for (const radio of this.radios) radio.removeAttribute("checked");
+        return;
+      }
+      this.syncRadios();
       return;
     }
     this.updateAppearance();
     this.syncRadios();
   }
 
-  /** O `value` do rádio marcado ("" sem nenhum). Atribuir marca o rádio desse valor, sem emitir `change`. */
+  /** O `value` do rádio marcado ("" sem nenhum). Atribuído marca o desse valor, e "" desmarca todos; sem `change`. */
   get value(): string {
     return this.getAttribute("value") || "";
   }

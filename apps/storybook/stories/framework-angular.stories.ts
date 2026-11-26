@@ -54,6 +54,7 @@ import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
+import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
 // Os wrappers Angular de verdade, compilados em JIT a partir do src (o Vite transforma os decorators legados, ver
 // main.ts) e montados numa aplicação sem zone.js, como o padrão do Angular 21. O preview já registrou os elementos.
@@ -554,6 +555,39 @@ export const Groups = {
     await expect(radios).toHaveAttribute("value", "team");
     await expect(radio("pro").hasAttribute("checked")).toBe(false);
     await expect(host.log).toEqual(["radio team", "group team"]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+class RadioGroupValueHost {
+  label = "Plano";
+  value: string | undefined = undefined;
+}
+
+// `value` do ark-radio-group-wrapper: sem ele a escolha do usuário fica, com ele o app controla, e tirá-lo desmarca
+// (ver radio-group-value.ts).
+export const RadioGroupValue = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkRadioComponent, ArkRadioGroupComponent],
+      template: `
+        <ark-radio-group-wrapper name="plano" [label]="label" [value]="value">
+          <ark-radio-wrapper value="pro" label="Profissional"></ark-radio-wrapper>
+          <ark-radio-wrapper value="team" label="Equipe"></ark-radio-wrapper>
+        </ark-radio-group-wrapper>`
+    })(RadioGroupValueHost);
+
+    const { app, ref, host, detect } = await mount(canvasElement, Host, errors);
+    await expectRadioGroupValue(canvasElement, async (props: RadioGroupProps) => {
+      host.label = props.label;
+      host.value = props.value;
+      detect();
+    });
+    await expect(errors).toEqual([]);
     ref.destroy();
     app.destroy();
   }

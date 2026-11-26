@@ -58,7 +58,7 @@ export const ArkRadio = forwardRef<ArkRadioElement, ArkRadioProps>(
 export type ArkRadioGroupProps = PropsWithChildren<
   ArkDomProps<
     ArkRadioGroupStyleOptions & {
-      /** O `value` do rádio marcado; atribuído, marca o rádio desse valor. */
+      /** O `value` do rádio marcado; atribuído, marca o rádio desse valor, e vazio desmarca todos. */
       value?: string;
       /** `name` gravado em cada rádio, para o formulário. */
       name?: string;

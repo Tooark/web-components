@@ -50,7 +50,7 @@ export const ArkRadioGroup = defineComponent({
   props: {
     /** Propagado como data-testid ao host e sufixado nas partes internas. */
     testid: { type: String, default: undefined },
-    /** O `value` do rádio marcado; atribuído, marca o rádio desse valor. */
+    /** O `value` do rádio marcado; atribuído, marca o rádio desse valor, e vazio desmarca todos. */
     value: { type: String, default: undefined },
     /** `name` gravado em cada rádio, para o formulário. */
     name: { type: String, default: undefined },
@@ -75,7 +75,9 @@ export const ArkRadioGroup = defineComponent({
         {
           ...attrs,
           testid: props.testid,
-          value: props.value,
+          // Só quando o app dá um: o Vue regrava `value` a cada render, um `undefined` vira `""` e tirar o `value`
+          // desmarca o grupo, o que apagaria a escolha do usuário num grupo que o app não controla.
+          ...(props.value === undefined ? {} : { value: props.value }),
           name: props.name,
           label: props.label,
           helper: props.helper,
