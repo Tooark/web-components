@@ -349,7 +349,7 @@ All `@tooark/*` packages are published together, with one version and TypeScript
 
 Two things every setup needs, whatever the framework: **import the stylesheet once** (`@tooark/web-components/styles.css`, the only CSS you need — tokens, motion presets and component styles) and **register the elements** (`registerTooarkComponents()`; the React, Vue and Angular wrappers do this for you on first render). The side packages register their own elements (`registerTooarkChart()`, `registerTooarkWysiwyg()`, `registerTooarkCode()`).
 
-**Bundle size.** The registration is one call for every element and the wrappers make that call, so a bundle carries all of them whichever ones the page uses. Measured on 1.7.0, minified and before compression: one wrapper imported from `@tooark/react` adds about 415 kB (React itself not counted), and a single class imported from `@tooark/web-components` and defined by hand still adds about 383 kB, with esbuild and with Rolldown alike. Per-element entry points, with wrappers that register only their own element, are a planned improvement: they will be opt-in, and the imports shown here keep working. Until then, load the library in a lazy chunk if the first screen does not need it.
+**Bundle size.** The registration is one call for every element and the wrappers make that call, so a bundle carries all of them whichever ones the page uses. Measured on 1.7.0, minified and before compression: one wrapper imported from `@tooark/react` adds about 415 kB (React itself not counted), and a single class imported from `@tooark/web-components` and defined by hand still adds about 383 kB, with esbuild and with Rolldown alike. Per-element entry points, with wrappers that register only their own element, are a planned improvement: they will be opt-in, and the imports shown here keep working. Until then, load the library in a lazy chunk if the first screen does not need it, keeping the `styles.css` import in your entry (see below).
 
 ### Vanilla / any framework
 
@@ -364,6 +364,7 @@ registerTooarkComponents();
 
 - **No global reset.** Tailwind's preflight is not shipped; a scoped reset applies only inside `ark-*` elements.
 - **Prefixed utilities and variables.** Every component class is `ark:*` (e.g. `ark:inline-flex`) and theme variables are `--ark-*` (e.g. `--ark-color-primary`), so nothing collides with a Tailwind v3/v4 setup in your app.
+- **Your classes on an `ark-*` host: import `styles.css` first.** The stylesheet uses Tailwind v4's cascade layers (`theme`, `base`, `components`, `utilities`), and layers with the same name merge across stylesheets. So when a Tailwind v4 utility of yours and a component class set the same property on the same host (`hidden` against `ark:inline-flex`, `p-0` against `ark:px-4`), the stylesheet that loads **later** wins. Import `@tooark/web-components/styles.css` in your entry file, before your own CSS, also when the elements load in a lazy chunk: a stylesheet that only the chunk imports is inserted after yours, and your classes on the hosts stop applying. A single class can also win with Tailwind's important modifier (`hidden!`). CSS outside any layer (Tailwind v3, plain CSS of yours) wins in any order.
 
 A form with a field, a select, a confirmation dialog and a toast — the same scenario the framework sections below reproduce:
 
