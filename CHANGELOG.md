@@ -9,6 +9,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+## [1.9.4] - 2026-11-26
+
 ### Fixed
 
 - `ark-avatar`: an `aria-hidden` set by the app on an avatar with `name` (an avatar next to the written name, which
@@ -813,7 +815,8 @@ First public release of the Tooark Web Components family.
   (`ark-code-editor` on CodeMirror 6 with completions, formatting, indentation and line-ending options),
   `@tooark/motion` (stagger, reveal, FLIP and swipe on the Motion library).
 
-[Unreleased]: https://github.com/Tooark/web-components/compare/v1.9.3...HEAD
+[Unreleased]: https://github.com/Tooark/web-components/compare/v1.9.4...HEAD
+[1.9.4]: https://github.com/Tooark/web-components/compare/v1.9.3...v1.9.4
 [1.9.3]: https://github.com/Tooark/web-components/compare/v1.9.2...v1.9.3
 [1.9.2]: https://github.com/Tooark/web-components/compare/v1.9.1...v1.9.2
 [1.9.1]: https://github.com/Tooark/web-components/compare/v1.9.0...v1.9.1

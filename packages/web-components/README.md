@@ -196,8 +196,8 @@ Installed automatically unless marked as peer; peer dependencies are yours to in
 
 | Package                                                          | Version | Description                                                      |
 | ---------------------------------------------------------------- | ------- | ---------------------------------------------------------------- |
-| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.9.3  | Types, i18n, toast/announce services, motion and overlay helpers |
-| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.9.3  | Design tokens (colors, sizes, motion) and primitive types        |
+| [`@tooark/core`](https://www.npmjs.com/package/@tooark/core)     | ^1.9.4  | Types, i18n, toast/announce services, motion and overlay helpers |
+| [`@tooark/tokens`](https://www.npmjs.com/package/@tooark/tokens) | ^1.9.4  | Design tokens (colors, sizes, motion) and primitive types        |
 | [`tslib`](https://www.npmjs.com/package/tslib)                   | ^2.9.1  | TypeScript runtime helpers                                       |
 
 ---
