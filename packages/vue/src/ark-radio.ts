@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkOrientation, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkRadio = defineComponent({
   name: "ArkRadio",
@@ -31,7 +32,7 @@ export const ArkRadio = defineComponent({
           theme: props.theme,
           size: props.size,
           name: props.name,
-          value: props.value,
+          ...valueProp(props.value),
           label: props.label,
           helper: props.helper,
           checked: props.checked ? "" : undefined,
@@ -75,9 +76,7 @@ export const ArkRadioGroup = defineComponent({
         {
           ...attrs,
           testid: props.testid,
-          // Só quando o app dá um: o Vue regrava `value` a cada render, um `undefined` vira `""` e tirar o `value`
-          // desmarca o grupo, o que apagaria a escolha do usuário num grupo que o app não controla.
-          ...(props.value === undefined ? {} : { value: props.value }),
+          ...valueProp(props.value),
           name: props.name,
           label: props.label,
           helper: props.helper,

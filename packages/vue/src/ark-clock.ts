@@ -1,6 +1,7 @@
 import type { ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkClock = defineComponent({
   name: "ArkClock",
@@ -26,7 +27,7 @@ export const ArkClock = defineComponent({
       h("ark-clock", {
         ...attrs,
         testid: props.testid,
-        value: props.value,
+        ...valueProp(props.value),
         lang: props.lang,
         "locale-json": props.localeJson,
         theme: props.theme,

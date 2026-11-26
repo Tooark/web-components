@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkInput = defineComponent({
   name: "ArkInput",
@@ -51,7 +52,7 @@ export const ArkInput = defineComponent({
           type: props.type,
           label: props.label,
           placeholder: props.placeholder,
-          value: props.value,
+          ...valueProp(props.value),
           name: props.name,
           size: props.size,
           intent: props.intent,

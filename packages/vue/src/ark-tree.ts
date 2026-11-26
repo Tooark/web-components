@@ -1,6 +1,7 @@
 import type { ArkSize, ArkTheme, ArkTreeIcons, ArkTreeItemIcon, ArkTreeSelection } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkTree = defineComponent({
   name: "ArkTree",
@@ -61,11 +62,10 @@ export const ArkTree = defineComponent({
           selection: props.selection,
           checkboxes: props.checkboxes ? "" : undefined,
           propagate: props.propagate ? "" : undefined,
-          value: Array.isArray(props.value)
-            ? props.value.length
-              ? JSON.stringify(props.value)
-              : undefined
-            : props.value || undefined,
+          // Uma lista vazia limpa a seleção como "" limpa; só a prop ausente deixa o `value` do elemento como está.
+          ...valueProp(
+            Array.isArray(props.value) ? (props.value.length ? JSON.stringify(props.value) : "") : props.value
+          ),
           label: props.label,
           icons: props.icons,
           "icon-color": props.iconColor,
@@ -104,7 +104,7 @@ export const ArkTreeItem = defineComponent({
         {
           ...attrs,
           testid: props.testid,
-          value: props.value,
+          ...valueProp(props.value),
           label: props.label,
           icon: props.icon,
           expanded: props.expanded ? "" : undefined,

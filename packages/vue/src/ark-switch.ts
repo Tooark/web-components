@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkSwitch = defineComponent({
   name: "ArkSwitch",
@@ -36,7 +37,7 @@ export const ArkSwitch = defineComponent({
           size: props.size,
           color: props.color,
           name: props.name,
-          value: props.value,
+          ...valueProp(props.value),
           label: props.label,
           "label-on": props.labelOn,
           "label-off": props.labelOff,

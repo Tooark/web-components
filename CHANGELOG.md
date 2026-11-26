@@ -25,6 +25,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `undefined` into a removal, which would now clear the user's choice in a group the app does not control; bind
   `value` on the raw tag in a Vue template only when there is one (README). `RemovingValueUnchecks` story, and
   `RadioGroupValue` in the React, Vue and Angular wrapper stories.
+- Vue wrappers without a `value` prop cleared what the user had entered at every render of the wrapper (an error
+  message that appears, a label that changes): the text of `ArkInput` and `ArkTextarea`, and the choice of
+  `ArkSelect`, `ArkTabs`, `ArkCalendar` and `ArkShapePicker`. Vue writes `value` on every render, even unchanged, and
+  turned the missing prop into an empty value. Every Vue wrapper with an optional `value` now writes it only when the
+  app passes one; a controlled field still follows the prop, and removing it still clears. React and Angular only write
+  a prop that changed and were not affected. `VueUncontrolledValueSurvivesRender` story.
 
 ## [1.9.3] - 2026-11-24
 

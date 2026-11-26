@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTabsFill, ArkTabsVariant, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkTabs = defineComponent({
   name: "ArkTabs",
@@ -40,7 +41,7 @@ export const ArkTabs = defineComponent({
           ...attrs,
           testid: props.testid,
           ref: elRef,
-          value: props.value,
+          ...valueProp(props.value),
           variant: props.variant,
           size: props.size,
           intent: props.intent,

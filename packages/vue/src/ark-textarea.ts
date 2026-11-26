@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkRounded, ArkSize, ArkTextareaResize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkTextarea = defineComponent({
   name: "ArkTextarea",
@@ -44,7 +45,7 @@ export const ArkTextarea = defineComponent({
           testid: props.testid,
           label: props.label,
           placeholder: props.placeholder,
-          value: props.value,
+          ...valueProp(props.value),
           name: props.name,
           rows: props.rows,
           autosize: props.autosize ? "" : undefined,

@@ -1,6 +1,7 @@
 import type { ArkLang, ArkMarkShape, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkShapePicker = defineComponent({
   name: "ArkShapePicker",
@@ -26,7 +27,7 @@ export const ArkShapePicker = defineComponent({
       h("ark-shape-picker", {
         ...attrs,
         testid: props.testid,
-        value: props.value,
+        ...valueProp(props.value),
         shapes: Array.isArray(props.shapes)
           ? props.shapes.length > 0
             ? props.shapes.join(",")

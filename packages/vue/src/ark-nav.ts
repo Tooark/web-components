@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkLang, ArkNavCollapsible, ArkNavSide, ArkNavVariant, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 /** `detail` de `ark-navigate`: o destino do item e o seu identificador (`value`, ou o `href`). */
 export type ArkNavNavigateDetail = { href: string | null; value: string };
@@ -56,7 +57,7 @@ export const ArkNav = defineComponent({
           ref: elRef,
           variant: props.variant,
           side: props.side,
-          value: props.value,
+          ...valueProp(props.value),
           collapsed: props.collapsed ? "" : undefined,
           collapsible: props.collapsible === true ? "" : props.collapsible || undefined,
           label: props.label,
@@ -107,7 +108,7 @@ export const ArkNavItem = defineComponent({
           href: props.href,
           target: props.target,
           label: props.label,
-          value: props.value,
+          ...valueProp(props.value),
           current: props.current ? "" : undefined,
           disabled: props.disabled ? "" : undefined,
           divider: props.divider ? "" : undefined

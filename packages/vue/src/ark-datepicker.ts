@@ -1,6 +1,7 @@
 import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkDatepicker = defineComponent({
   name: "ArkDatepicker",
@@ -57,7 +58,7 @@ export const ArkDatepicker = defineComponent({
         intent: props.intent,
         "accent-color": props.accentColor,
         "locale-json": localeAttr,
-        value: props.value,
+        ...valueProp(props.value),
         min: props.min,
         max: props.max,
         mode: props.mode,

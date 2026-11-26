@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkProgress = defineComponent({
   name: "ArkProgress",
@@ -23,7 +24,7 @@ export const ArkProgress = defineComponent({
       h("ark-progress", {
         ...attrs,
         testid: props.testid,
-        value: props.value,
+        ...valueProp(props.value),
         max: props.max,
         indeterminate: props.indeterminate ? "" : undefined,
         label: props.label,
