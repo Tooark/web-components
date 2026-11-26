@@ -34,6 +34,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-chart`: where `ResizeObserver` does not exist (jsdom and other test environments) the first `option` threw a
   `ReferenceError` and the `auto` theme lost its observer, although the engine already checked for it. The element now
   renders without following its size there. `WithoutResizeObserver` story.
+- `ark-chart` and `createChart` with `palette="tokens"`: gauge and radar texts and lines kept the gray of ECharts'
+  light theme, unreadable on the dark side (gauge labels at 2.4:1 and the value at 1.6:1 on `surface`, a light track,
+  light radar bands). They now follow the tokens like the axes (labels, names, ticks and title in `fg-muted`, the value
+  in `fg`, track and radar lines in `border`, radar bands in `surface-muted`); colors set in the `option` still win.
+  `TokensPaletteGaugeAndRadar` story.
 
 ## [1.9.3] - 2026-11-24
 

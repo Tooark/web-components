@@ -304,6 +304,113 @@ export const TokensPalette = {
   }
 };
 
+// Contraste WCAG entre duas cores `rgb()`/`rgba()` opacas.
+function contrast(a: string, b: string): number {
+  const luminance = (color: string): number => {
+    const [r, g, b] = (color.match(/[\d.]+/g) ?? []).slice(0, 3).map((part) => {
+      const v = Number(part) / 255;
+      return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const [light, dark] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+// Gauge e radar em `palette="tokens"`: os textos e as linhas deles não seguem os eixos do tema, e no lado escuro
+// ficavam nos cinzas do tema claro do ECharts, quase invisíveis sobre a superfície escura. Agora seguem os tokens, e as
+// cores que o app dá na `option` continuam vencendo.
+export const TokensPaletteGaugeAndRadar = {
+  render: () => {
+    const box = document.createElement("div");
+    box.className = "rounded-lg border p-3";
+    box.style.cssText =
+      "width: 560px; height: 260px; color-scheme: dark; background: var(--ark-color-surface); border-color: var(--ark-color-border);";
+    return box;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const box = canvasElement.firstElementChild as HTMLElement;
+    const option: EChartsOption = {
+      radar: {
+        center: ["74%", "55%"],
+        radius: "60%",
+        indicator: [
+          { name: "Velocidade", max: 100 },
+          { name: "Custo", max: 100 },
+          { name: "Qualidade", max: 100 }
+        ]
+      },
+      series: [
+        { type: "gauge", center: ["26%", "55%"], radius: "80%", data: [{ value: 72, name: "Cobertura" }] },
+        { type: "radar", data: [{ value: [80, 40, 65], name: "Sprint" }] }
+      ]
+    };
+    const instance = createChart(box, { option, theme: "dark", palette: "tokens" });
+    try {
+      type Line = { lineStyle: { color: unknown } };
+      const read = () => {
+        const merged = instance.chart.getOption() as unknown as {
+          series: { axisLabel: { color: string }; title: { color: string }; detail: { color: string } } & Record<
+            "axisLine" | "axisTick" | "splitLine",
+            Line
+          >[];
+          radar: ({ axisName: { color: string }; splitArea: { areaStyle: { color: unknown } } } & Record<
+            "axisLine" | "splitLine",
+            Line
+          >)[];
+        };
+        return { gauge: merged.series[0], radar: merged.radar[0] };
+      };
+      const fg = tokenRgba("fg", "dark");
+      const muted = tokenRgba("fg-muted", "dark");
+      const border = tokenRgba("border", "dark");
+      const surface = tokenRgba("surface", "dark");
+      const { gauge, radar } = read();
+      // Antes: rótulos e título em #54555a (2,4:1 sobre a superfície), o valor em #3c3c41 (1,6:1), trilha e faixas
+      // claras do tema claro.
+      await expect(gauge.axisLabel.color).toBe(muted);
+      await expect(gauge.title.color).toBe(muted);
+      await expect(gauge.detail.color).toBe(fg);
+      await expect(gauge.axisTick.lineStyle.color).toBe(muted);
+      await expect(gauge.splitLine.lineStyle.color).toBe(muted);
+      await expect(gauge.axisLine.lineStyle.color).toEqual([[1, border]]);
+      await expect(radar.axisName.color).toBe(muted);
+      await expect(radar.axisLine.lineStyle.color).toBe(border);
+      await expect(radar.splitLine.lineStyle.color).toBe(border);
+      await expect(radar.splitArea.areaStyle.color).toEqual([tokenRgba("surface-muted", "dark"), "transparent"]);
+      // Texto legível sobre a superfície escura.
+      await expect(contrast(muted, surface)).toBeGreaterThanOrEqual(4.5);
+
+      // As cores da `option` vencem o tema: as faixas do medidor e o nome dos eixos do radar.
+      const bands: [number, string][] = [
+        [0.5, "#16a34a"],
+        [1, "#dc2626"]
+      ];
+      instance.setOption(
+        {
+          ...option,
+          radar: { ...(option.radar as object), axisName: { color: "#123456" } },
+          series: [
+            {
+              type: "gauge",
+              center: ["26%", "55%"],
+              axisLine: { lineStyle: { color: bands } },
+              data: [{ value: 72, name: "Cobertura" }]
+            },
+            { type: "radar", data: [{ value: [80, 40, 65], name: "Sprint" }] }
+          ]
+        },
+        { notMerge: true }
+      );
+      await expect(read().gauge.axisLine.lineStyle.color).toEqual(bands);
+      await expect(read().radar.axisName.color).toBe("#123456");
+      await expect(read().gauge.axisLabel.color).toBe(muted);
+    } finally {
+      instance.destroy();
+    }
+  }
+};
+
 // Engine sem o elemento: autoResize (padrão) acompanha o tamanho do container.
 export const EngineAutoResize = {
   render: () => {
