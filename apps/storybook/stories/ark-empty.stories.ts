@@ -1,5 +1,5 @@
 import type { ArkTheme } from "@tooark/core";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 
 const meta = {
   title: "Core/ArkEmpty",
@@ -148,6 +148,69 @@ export const StructureAndOrder = {
     expect(empty.querySelector('[data-ark="empty-heading"]')).toBeNull();
     expect(empty.contains(icon)).toBe(true);
     expect(empty.contains(action)).toBe(true);
+  }
+};
+
+// Ordem de leitura: título e descrição são os primeiros nós do host, antes do ícone, do conteúdo e da ação do app
+// (um leitor de tela lia a ação antes do título). A tela não muda: a ordem visual continua vindo do CSS.
+export const ReadingOrder = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "grid gap-4";
+    const full = createEmpty({ heading: "Nenhuma requisição", description: "Crie a primeira." });
+    full.dataset.case = "full";
+    const hint = document.createElement("p");
+    hint.textContent = "Conteúdo livre";
+    full.appendChild(hint);
+    const late = createEmpty({ description: "Só a descrição, por enquanto." });
+    late.dataset.case = "late";
+    wrap.append(full, late);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const empty = (name: string): HTMLElement =>
+      canvasElement.querySelector(`ark-empty[data-case="${name}"]`) as HTMLElement;
+    const order = (host: HTMLElement): string[] =>
+      Array.from(host.children).map(
+        (child) => child.getAttribute("data-ark")?.replace("empty-", "") || child.getAttribute("slot") || "free"
+      );
+    const frames = (): Promise<void> =>
+      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+
+    // O ícone e a ação foram inseridos antes de o componente criar título e descrição.
+    const full = empty("full");
+    await expect(order(full)).toEqual(["heading", "description", "icon", "action", "free"]);
+    const top = (selector: string): number => (full.querySelector(selector) as HTMLElement).getBoundingClientRect().top;
+    await expect(top('[slot="icon"]')).toBeLessThan(top('[data-ark="empty-heading"]'));
+    await expect(top('[data-ark="empty-description"]')).toBeLessThan(top('[slot="action"]'));
+
+    // Um filho que um framework insere no início volta para depois do texto; um que chega no fim fica onde está.
+    const first = document.createElement("p");
+    first.textContent = "Inserido no início";
+    full.prepend(first);
+    await waitFor(() => expect(order(full)).toEqual(["heading", "description", "free", "icon", "action", "free"]));
+    full.appendChild(document.createElement("span"));
+    await frames();
+    await expect(order(full).slice(0, 2)).toEqual(["heading", "description"]);
+
+    // Depois de assentar, nenhuma mutação a mais: o observer não entra em laço.
+    let mutations = 0;
+    const watch = new MutationObserver((records) => {
+      mutations += records.length;
+    });
+    watch.observe(full, { childList: true });
+    await frames();
+    watch.disconnect();
+    await expect(mutations).toBe(0);
+
+    // Título que chega depois da descrição entra antes dela; trocar o nível mantém o lugar.
+    const late = empty("late");
+    await expect(order(late)).toEqual(["description", "icon", "action"]);
+    late.setAttribute("heading", "Sem dados");
+    await expect(order(late)).toEqual(["heading", "description", "icon", "action"]);
+    late.setAttribute("heading-level", "2");
+    await expect(late.firstElementChild?.tagName).toBe("H2");
+    await expect(order(late)).toEqual(["heading", "description", "icon", "action"]);
   }
 };
 

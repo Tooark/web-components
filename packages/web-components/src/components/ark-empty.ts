@@ -8,8 +8,9 @@ import { upgradeProperties } from "./upgrade-properties";
  * e ação opcional. O PRÓPRIO host é a caixa: os filhos do usuário
  * (`slot="icon"` e `slot="action"`, um ark-button) ficam onde estão e são
  * ordenados por CSS; título e descrição vêm dos atributos `heading` e
- * `description`, em nós do componente ao fim do host. Filhos sem slot entram
- * entre a descrição e a ação. Não é interativo e não tem role próprio.
+ * `description`, em nós do componente no início do host, então a ordem de
+ * leitura (a do DOM) começa por eles. Filhos sem slot entram entre a descrição
+ * e a ação. Não é interativo e não tem role próprio.
  */
 export class ArkEmpty extends HTMLElementBase {
   static readonly tagName = "ark-empty";
@@ -27,8 +28,12 @@ export class ArkEmpty extends HTMLElementBase {
   connectedCallback(): void {
     upgradeProperties(this);
     if (!this.observer) {
-      // Ícone ou ação que chegam depois (frameworks) recebem o hook.
-      this.observer = new MutationObserver(() => this.syncSlots());
+      // Ícone ou ação que chegam depois (frameworks) recebem o hook, e um filho inserido antes do título o devolve
+      // ao início.
+      this.observer = new MutationObserver(() => {
+        this.placeText();
+        this.syncSlots();
+      });
       this.observer.observe(this, { childList: true });
     }
     this.updateAppearance();
@@ -48,7 +53,8 @@ export class ArkEmpty extends HTMLElementBase {
     this.updateAppearance();
   }
 
-  // Título e descrição: nós próprios ao fim do host, ordenados por CSS (ícone, título, descrição, resto, ação).
+  // Título e descrição: nós próprios no início do host (placeText), ordenados por CSS na tela (ícone, título,
+  // descrição, resto, ação).
   private syncText(): void {
     const heading = this.getAttribute("heading");
     if (heading) {
@@ -56,7 +62,7 @@ export class ArkEmpty extends HTMLElementBase {
       if (!this.headingEl) {
         const el = document.createElement(tag) as HTMLHeadingElement;
         el.setAttribute("data-ark-chrome", "heading");
-        this.appendChild(el);
+        this.prepend(el);
         this.headingEl = el;
       }
       this.headingEl = retagHeading(this.headingEl, tag);
@@ -72,8 +78,8 @@ export class ArkEmpty extends HTMLElementBase {
       if (!this.descriptionEl) {
         const el = document.createElement("p");
         el.setAttribute("data-ark-chrome", "description");
-        // Depois do título, quando ele existir.
-        this.insertBefore(el, this.headingEl?.nextSibling ?? null);
+        // Depois do título, quando ele existir; senão, no início.
+        this.insertBefore(el, this.headingEl ? this.headingEl.nextSibling : this.firstChild);
         this.descriptionEl = el;
       }
       this.descriptionEl.textContent = description;
@@ -81,6 +87,21 @@ export class ArkEmpty extends HTMLElementBase {
     } else {
       this.descriptionEl?.remove();
       this.descriptionEl = null;
+    }
+  }
+
+  // Título e descrição no início do host, como a legenda do ark-radio-group: a ordem do DOM, que é a de leitura,
+  // fica título, descrição, filhos do usuário (a ação por último, se o app a puser por último), seja qual for a
+  // ordem em que os nós chegaram. Só se movem nós do componente, e só os fora do lugar, para o observer não entrar
+  // em laço.
+  private placeText(): void {
+    let previous: Element | null = null;
+    for (const el of [this.headingEl, this.descriptionEl]) {
+      if (!el) continue;
+      if (el.previousElementSibling !== previous) {
+        this.insertBefore(el, previous ? previous.nextSibling : this.firstChild);
+      }
+      previous = el;
     }
   }
 
@@ -105,6 +126,7 @@ export class ArkEmpty extends HTMLElementBase {
 
   private updateAppearance(): void {
     this.syncText();
+    this.placeText();
 
     this.applyOwnClasses(
       "ark:flex ark:flex-col ark:items-center ark:justify-center ark:gap-2 ark:rounded-xl ark:border ark:border-dashed ark:border-border ark:px-6 ark:py-10 ark:text-center ark:text-fg".split(
