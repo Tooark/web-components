@@ -39,6 +39,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   light radar bands). They now follow the tokens like the axes (labels, names, ticks and title in `fg-muted`, the value
   in `fg`, track and radar lines in `border`, radar bands in `surface-muted`); colors set in the `option` still win.
   `TokensPaletteGaugeAndRadar` story.
+- Documentation: the README did not say that the order of the stylesheets decides between a Tailwind v4 utility of
+  the app and a component class on the same `ark-*` host (both use the `utilities` layer, and same-named layers
+  merge, so the later stylesheet wins; the lazy chunk the README suggested for bundle size inserts the library's CSS
+  after the app's). The coexistence note now says to import `styles.css` first, in the entry, and points to the
+  important modifier for a single class.
 
 ## [1.9.3] - 2026-11-24
 
