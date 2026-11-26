@@ -23,7 +23,8 @@ function toRgba(color: string, context: CanvasRenderingContext2D | null): string
 /**
  * Tema do ECharts com as cores dos tokens `--ark-color-*` lidas em `element`, no lado `side`: séries nos intents
  * (primary, info, success, warning, danger, neutral), texto, eixos e legenda em `fg`/`fg-muted`, grade em `border`,
- * tooltip em `surface-raised` e fundo transparente. `null` sem o CSS dos tokens na página.
+ * tooltip em `surface-raised` e fundo transparente; gauge e radar com os mesmos textos e linhas, e as faixas do radar em
+ * `surface-muted`. `null` sem o CSS dos tokens na página.
  */
 export function tokensChartTheme(element: HTMLElement, side: ArkThemeSelected): Record<string, unknown> | null {
   if (typeof getComputedStyle !== "function") return null;
@@ -62,6 +63,23 @@ export function tokensChartTheme(element: HTMLElement, side: ArkThemeSelected): 
       title: { textStyle: { color: fg }, subtextStyle: { color: muted } },
       legend: { textStyle: { color: muted }, pageTextStyle: { color: muted } },
       tooltip: { backgroundColor: read("surface-raised"), borderColor: border, textStyle: { color: fg } },
+      // Gauge e radar não seguem os eixos acima: sem as chaves próprias, os textos e as linhas ficavam nos cinzas do
+      // tema claro do ECharts, ilegíveis no lado escuro (as mesmas chaves que o tema dark embutido troca).
+      gauge: {
+        axisLabel: { color: muted },
+        axisTick: { lineStyle: { color: muted } },
+        splitLine: { lineStyle: { color: muted } },
+        axisLine: { lineStyle: { color: [[1, border]] } },
+        title: { color: muted },
+        detail: { color: fg }
+      },
+      // O tema `radar` também entra na série radar do ECharts, que ignora estas chaves de coordenada.
+      radar: {
+        axisName: { color: muted },
+        axisLine: { lineStyle: { color: border } },
+        splitLine: { lineStyle: { color: border } },
+        splitArea: { areaStyle: { color: [read("surface-muted"), "transparent"] } }
+      },
       categoryAxis: axis,
       valueAxis: axis,
       logAxis: axis,
