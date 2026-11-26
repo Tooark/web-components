@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkRounded, ArkSelectOption, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkSelect = defineComponent({
   name: "ArkSelect",
@@ -35,7 +36,7 @@ export const ArkSelect = defineComponent({
           label: props.label,
           placeholder: props.placeholder,
           options: props.options ? JSON.stringify(props.options) : undefined,
-          value: props.value,
+          ...valueProp(props.value),
           name: props.name,
           size: props.size,
           intent: props.intent,

@@ -1,6 +1,7 @@
 import type { ArkColorSwatch, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkColorSwatches = defineComponent({
   name: "ArkColorSwatches",
@@ -22,7 +23,7 @@ export const ArkColorSwatches = defineComponent({
       h("ark-color-swatches", {
         ...attrs,
         testid: props.testid,
-        value: props.value,
+        ...valueProp(props.value),
         colors: props.colors ? JSON.stringify(props.colors) : undefined,
         label: props.label,
         disabled: props.disabled ? "" : undefined,

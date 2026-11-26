@@ -70,6 +70,7 @@ import {
   ArkDialog as VueArkDialog,
   ArkDrawer as VueArkDrawer,
   ArkEmpty as VueArkEmpty,
+  ArkInput as VueArkInput,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
   ArkMenuGroup as VueArkMenuGroup,
@@ -81,11 +82,13 @@ import {
   ArkRadio as VueArkRadio,
   ArkRadioGroup as VueArkRadioGroup,
   ArkScheduler as VueArkScheduler,
+  ArkSelect as VueArkSelect,
   ArkShapePicker as VueArkShapePicker,
   ArkSplitPane as VueArkSplitPane,
   ArkSwitch as VueArkSwitch,
   ArkTab as VueArkTab,
   ArkTabs as VueArkTabs,
+  ArkTextarea as VueArkTextarea,
   ArkTime as VueArkTime,
   ArkToaster as VueArkToaster,
   ArkTree as VueArkTree,
@@ -2264,6 +2267,77 @@ export const VueRadioGroupValue = {
       value.value = props.value;
       await nextTick();
     });
+    await expect(problems).toEqual([]);
+    app.unmount();
+  }
+};
+
+// Sem a prop `value`, o wrapper Vue não toca no `value` do elemento: o Vue grava `value` em todo render, e um
+// `undefined` virava `""`, que apagava o texto digitado e desfazia a escolha do usuário a cada render do wrapper (uma
+// mensagem de erro que aparece, um rótulo que muda). Com a prop o app controla, e tirá-la ainda limpa.
+export const VueUncontrolledValueSurvivesRender = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const message = ref<string | undefined>(undefined);
+    const controlled = ref<string | undefined>("fixo");
+    const app = createApp({
+      setup: () => () =>
+        h("div", null, [
+          h(VueArkInput, { label: "Nome", errorMessage: message.value }),
+          h(VueArkTextarea, { label: "Notas", errorMessage: message.value }),
+          h(VueArkSelect, {
+            label: "Plano",
+            errorMessage: message.value,
+            options: [
+              { value: "free", label: "Gratuito" },
+              { value: "pro", label: "Profissional" }
+            ]
+          }),
+          h(VueArkTabs, { testid: message.value }, () => [
+            h(VueArkTab, { value: "t1", label: "Um" }, () => "1"),
+            h(VueArkTab, { value: "t2", label: "Dois" }, () => "2")
+          ]),
+          h(VueArkCalendar, { testid: message.value }),
+          h(VueArkShapePicker, { testid: message.value }),
+          h(VueArkInput, { label: "Controlado", value: controlled.value, testid: "controlado" })
+        ])
+    });
+    app.config.warnHandler = (warning) => problems.push(warning);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+
+    const q = <T extends HTMLElement>(selector: string): T => canvasElement.querySelector(selector) as T;
+    await userEvent.type(q("ark-input:not([testid]) input"), "Ana");
+    await userEvent.type(q("ark-textarea textarea"), "Ligar amanhã");
+    await userEvent.selectOptions(q("ark-select select"), "pro");
+    await userEvent.click(canvasElement.querySelectorAll<HTMLElement>('ark-tabs [role="tab"]')[1]);
+    await userEvent.click(canvasElement.querySelectorAll<HTMLElement>('[data-ark="calendar-day"]')[10]);
+    await userEvent.click(canvasElement.querySelectorAll<HTMLElement>('[data-ark="shape-picker-option"]')[2]);
+    const read = () => ({
+      input: q<HTMLInputElement>("ark-input:not([testid]) input").value,
+      textarea: q<HTMLTextAreaElement>("ark-textarea textarea").value,
+      select: q<HTMLSelectElement>("ark-select select").value,
+      tabs: q("ark-tabs").getAttribute("value"),
+      calendar: q("ark-calendar").getAttribute("value"),
+      shape: q("ark-shape-picker").getAttribute("value")
+    });
+    const chosen = read();
+    await expect(chosen.input).toBe("Ana");
+    await expect(chosen.tabs).toBe("t2");
+    await expect(chosen.calendar).not.toBeNull();
+    await expect(chosen.shape).not.toBeNull();
+
+    message.value = "Revise os campos.";
+    await nextTick();
+    await expect(read()).toEqual(chosen);
+
+    const field = q<HTMLInputElement>('ark-input[testid="controlado"] input');
+    await expect(field.value).toBe("fixo");
+    controlled.value = undefined;
+    await nextTick();
+    await expect(field.value).toBe("");
     await expect(problems).toEqual([]);
     app.unmount();
   }

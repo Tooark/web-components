@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkCheckbox = defineComponent({
   name: "ArkCheckbox",
@@ -32,7 +33,7 @@ export const ArkCheckbox = defineComponent({
           theme: props.theme,
           size: props.size,
           name: props.name,
-          value: props.value,
+          ...valueProp(props.value),
           label: props.label,
           helper: props.helper,
           checked: props.checked ? "" : undefined,

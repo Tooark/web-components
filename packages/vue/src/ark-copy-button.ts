@@ -1,6 +1,7 @@
 import type { ArkButtonVariant, ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkCopyButton = defineComponent({
   name: "ArkCopyButton",
@@ -43,7 +44,7 @@ export const ArkCopyButton = defineComponent({
           ...attrs,
           testid: props.testid,
           ref: elRef,
-          value: props.value,
+          ...valueProp(props.value),
           for: props.for,
           "feedback-ms": props.feedbackMs,
           variant: props.variant,

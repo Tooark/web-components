@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, type PropType } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkToggle = defineComponent({
   name: "ArkToggle",
@@ -27,7 +28,7 @@ export const ArkToggle = defineComponent({
           intent: props.intent,
           theme: props.theme,
           size: props.size,
-          value: props.value,
+          ...valueProp(props.value),
           pressed: props.pressed ? "" : undefined,
           disabled: props.disabled ? "" : undefined,
           onChange: (event: CustomEvent<{ pressed: boolean; value: string }>) => emit("change", event)
@@ -59,7 +60,7 @@ export const ArkToggleGroup = defineComponent({
         {
           ...attrs,
           testid: props.testid,
-          value: props.value,
+          ...valueProp(props.value),
           intent: props.intent,
           theme: props.theme,
           size: props.size,

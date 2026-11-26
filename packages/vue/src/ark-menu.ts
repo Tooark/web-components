@@ -1,6 +1,7 @@
 import type { ArkIntent, ArkMenuAlign, ArkMenuDirection, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
+import { valueProp } from "./value-prop.js";
 
 export const ArkMenu = defineComponent({
   name: "ArkMenu",
@@ -82,7 +83,7 @@ export const ArkMenuItem = defineComponent({
         {
           ...attrs,
           testid: props.testid,
-          value: props.value,
+          ...valueProp(props.value),
           intent: props.intent,
           disabled: props.disabled ? "" : undefined,
           // "^" grava como atributo: pela propriedade o Vue converteria o undefined em false (checkbox desmarcado).
