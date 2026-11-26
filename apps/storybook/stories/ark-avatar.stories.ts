@@ -177,6 +177,62 @@ export const Stack = {
   }
 };
 
+// O aria-hidden do app fica: um avatar ao lado do nome escrito não precisa ser lido duas vezes. O componente só tira o
+// que ele mesmo gravou (avatar decorativo que ganhou nome), e um aria-hidden regravado pelo app passa a ser do app.
+export const AppAriaHidden = {
+  render: () => {
+    // Como um framework faz: o atributo chega antes de o elemento entrar na página.
+    const before = createAvatar({ name: "Ana Lima" });
+    before.setAttribute("aria-hidden", "true");
+    before.dataset.case = "before";
+    const after = createAvatar({ name: "Bruno Costa" });
+    after.dataset.case = "after";
+    const decorative = createAvatar({});
+    decorative.dataset.case = "decorative";
+    const control = createAvatar({});
+    control.dataset.case = "control";
+    return row(before, after, decorative, control);
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const avatar = (name: string): AvatarEl =>
+      canvasElement.querySelector(`ark-avatar[data-case="${name}"]`) as AvatarEl;
+
+    // Antes de conectar: continua com o nome, trocado ou tirado e devolvido.
+    const before = avatar("before");
+    await expect(before).toHaveAttribute("aria-hidden", "true");
+    await expect(before).toHaveAttribute("aria-label", "Ana Lima");
+    before.setAttribute("name", "Ana Maria Lima");
+    await expect(before).toHaveAttribute("aria-hidden", "true");
+    before.removeAttribute("name");
+    await expect(before).toHaveAttribute("aria-hidden", "true");
+    before.setAttribute("name", "Ana Lima");
+    await expect(before).toHaveAttribute("aria-hidden", "true");
+
+    // Depois de conectar, com nome.
+    const after = avatar("after");
+    await expect(after.hasAttribute("aria-hidden")).toBe(false);
+    after.setAttribute("aria-hidden", "true");
+    after.setAttribute("name", "Bruno C. Costa");
+    await expect(after).toHaveAttribute("aria-hidden", "true");
+
+    // Decorativo: o app regrava o mesmo valor que o componente pôs, e o atributo passa a ser dele.
+    const decorative = avatar("decorative");
+    await expect(decorative).toHaveAttribute("aria-hidden", "true");
+    decorative.setAttribute("aria-hidden", "true");
+    decorative.setAttribute("name", "Carla Dias");
+    await expect(decorative).toHaveAttribute("aria-hidden", "true");
+
+    // Controle: o aria-hidden que o componente gravou sai quando o nome chega, e volta quando ele sai.
+    const control = avatar("control");
+    await expect(control).toHaveAttribute("aria-hidden", "true");
+    control.setAttribute("name", "Diego Faria");
+    await expect(control.hasAttribute("aria-hidden")).toBe(false);
+    await expect(control).toHaveAccessibleName("Diego Faria");
+    control.removeAttribute("name");
+    await expect(control).toHaveAttribute("aria-hidden", "true");
+  }
+};
+
 // Iniciais por name (primeira letra, ou primeira + última com sobrenome), role="img" nomeado; sem nome fica
 // decorativo com o glifo; a imagem cai para as iniciais em erro de carga e volta quando o src muda.
 export const Semantics = {

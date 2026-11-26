@@ -9,6 +9,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Fixed
+
+- `ark-avatar`: an `aria-hidden` set by the app on an avatar with `name` (an avatar next to the written name, which
+  should not be read twice) was removed on every update, so screen readers announced the name twice. The component now
+  removes only the `aria-hidden` it wrote itself (a decorative avatar that gets a name); one the app sets, even with
+  the same value, stays. `AppAriaHidden` story.
+
 ## [1.9.3] - 2026-11-24
 
 ### Fixed
