@@ -162,6 +162,61 @@ export const ValueAttribute = {
   }
 };
 
+// Tirar o `value` (removeAttribute, `value = ""` ou `null`) desmarca todos, sem `change`, e o formulário deixa de
+// enviar o grupo; antes o grupo readotava o rádio marcado e o valor voltava. Sem `value` desde o início, o rádio
+// marcado no HTML continua sendo adotado, e um rádio que chega depois não desmarca nada.
+export const RemovingValueUnchecks = {
+  render: () => {
+    const form = document.createElement("form");
+    form.appendChild(createGroup({ value: "pro", name: "plano" }));
+    const declared = createGroup({ name: "declarado" });
+    declared.dataset.case = "declared";
+    byValue(declared, "team").setAttribute("checked", "");
+    form.appendChild(declared);
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    const group = form.querySelector("ark-radio-group") as ArkRadioGroup;
+    let changes = 0;
+    group.addEventListener("change", () => {
+      changes += 1;
+    });
+    await expect(new FormData(form).get("plano")).toBe("pro");
+
+    group.removeAttribute("value");
+    await expect(checkedValues(group)).toEqual([]);
+    await expect(new FormData(form).get("plano")).toBeNull();
+    // O observer dos rádios não devolve o valor.
+    await waitFor(() => expect(group.hasAttribute("value")).toBe(false));
+    await expect(group.value).toBe("");
+
+    group.value = "team";
+    await expect(checkedValues(group)).toEqual(["team"]);
+    group.value = "";
+    await expect(checkedValues(group)).toEqual([]);
+    group.value = "free";
+    group.value = null;
+    await expect(checkedValues(group)).toEqual([]);
+
+    // Depois de uma escolha do usuário, que escreve o `value`, tirar desmarca do mesmo jeito.
+    await userEvent.click(within(group).getByRole("radio", { name: "Equipe" }));
+    await expect(group).toHaveAttribute("value", "team");
+    await expect(changes).toBe(1);
+    group.removeAttribute("value");
+    await expect(checkedValues(group)).toEqual([]);
+    await expect(changes).toBe(1);
+
+    const declared = form.querySelector('ark-radio-group[data-case="declared"]') as ArkRadioGroup;
+    await waitFor(() => expect(declared).toHaveAttribute("value", "team"));
+    declared.appendChild(createRadio("enterprise", "Corporativo"));
+    declared.setAttribute("label", "Plano declarado");
+    await waitFor(() => expect(radiosOf(declared)).toHaveLength(4));
+    await expect(checkedValues(declared)).toEqual(["team"]);
+    await expect(declared).toHaveAttribute("value", "team");
+  }
+};
+
 export const NamelessGroupsStayApart = {
   render: () => {
     const wrap = document.createElement("div");

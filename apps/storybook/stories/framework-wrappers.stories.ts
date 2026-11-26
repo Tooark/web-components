@@ -108,6 +108,7 @@ import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
+import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
 // Os wrappers com react-dom e vue de verdade. O preview já registrou os elementos, então cada ark-* nasce "upgraded"
 // e os frameworks gravam as props como propriedade: o caminho que o React 19 e o Vue seguem num app real a partir do
@@ -2215,6 +2216,55 @@ export const VueGroups = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectGroupWrappers(canvasElement, log);
+    app.unmount();
+  }
+};
+
+// `value` do ArkRadioGroup: sem ele a escolha do usuário fica, com ele o app controla, e tirá-lo desmarca (ver
+// radio-group-value.ts).
+export const ReactRadioGroupValue = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    const tree = (props: RadioGroupProps): ReactNode =>
+      createElement(
+        ReactArkRadioGroup,
+        { name: "plano", ...props },
+        createElement(ReactArkRadio, { value: "pro", label: "Profissional" }),
+        createElement(ReactArkRadio, { value: "team", label: "Equipe" })
+      );
+    render(tree({ label: "Plano" }));
+    await expectRadioGroupValue(canvasElement, async (props) => {
+      render(tree(props));
+    });
+    await expect(errors).toEqual([]);
+  }
+};
+
+export const VueRadioGroupValue = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const label = ref("Plano");
+    const value = ref<string | undefined>(undefined);
+    const app = createApp({
+      setup: () => () =>
+        h(VueArkRadioGroup, { name: "plano", label: label.value, value: value.value }, () => [
+          h(VueArkRadio, { value: "pro", label: "Profissional" }),
+          h(VueArkRadio, { value: "team", label: "Equipe" })
+        ])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.config.errorHandler = (error) => problems.push(String(error));
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expectRadioGroupValue(canvasElement, async (props) => {
+      label.value = props.label;
+      value.value = props.value;
+      await nextTick();
+    });
+    await expect(problems).toEqual([]);
     app.unmount();
   }
 };

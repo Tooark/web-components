@@ -99,7 +99,7 @@ export class ArkRadioGroupComponent {
   @Input() testid: string | undefined;
   /** Nome acessível, repassado ao elemento (o aria-label no wrapper ficaria no host errado). */
   @Input() ariaLabel: string | undefined;
-  /** O `value` do rádio marcado; atribuído, marca o rádio desse valor. */
+  /** O `value` do rádio marcado; atribuído, marca o rádio desse valor, e vazio desmarca todos. */
   @Input() value: string | undefined;
   /** `name` gravado em cada rádio, para o formulário. */
   @Input() name: string | undefined;

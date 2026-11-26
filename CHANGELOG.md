@@ -18,6 +18,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-empty`: the heading and the description were the last nodes of the host, so a screen reader read the icon,
   the content and the action before the title (WCAG 1.3.2). They are now the first nodes, also when a framework inserts
   a child before them later; the visual order, set by CSS, does not change. `ReadingOrder` story.
+- `ark-radio-group`: removing `value` (or setting it to `""` or `null`) did nothing: the group adopted the checked radio
+  again and the value came back, so an app could not clear the choice. It now unchecks every radio, without `change`,
+  and the form no longer submits the group. A group without `value` from the start still adopts the radio marked
+  `checked`. The Vue wrapper writes `value` only when the app passes one: Vue writes `value` on every render and turns
+  `undefined` into a removal, which would now clear the user's choice in a group the app does not control; bind
+  `value` on the raw tag in a Vue template only when there is one (README). `RemovingValueUnchecks` story, and
+  `RadioGroupValue` in the React, Vue and Angular wrapper stories.
 
 ## [1.9.3] - 2026-11-24
 
