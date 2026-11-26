@@ -15,6 +15,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   should not be read twice) was removed on every update, so screen readers announced the name twice. The component now
   removes only the `aria-hidden` it wrote itself (a decorative avatar that gets a name); one the app sets, even with
   the same value, stays. `AppAriaHidden` story.
+- `ark-empty`: the heading and the description were the last nodes of the host, so a screen reader read the icon,
+  the content and the action before the title (WCAG 1.3.2). They are now the first nodes, also when a framework inserts
+  a child before them later; the visual order, set by CSS, does not change. `ReadingOrder` story.
 
 ## [1.9.3] - 2026-11-24
 
