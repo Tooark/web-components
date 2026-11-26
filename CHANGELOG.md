@@ -31,6 +31,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   turned the missing prop into an empty value. Every Vue wrapper with an optional `value` now writes it only when the
   app passes one; a controlled field still follows the prop, and removing it still clears. React and Angular only write
   a prop that changed and were not affected. `VueUncontrolledValueSurvivesRender` story.
+- `ark-chart`: where `ResizeObserver` does not exist (jsdom and other test environments) the first `option` threw a
+  `ReferenceError` and the `auto` theme lost its observer, although the engine already checked for it. The element now
+  renders without following its size there. `WithoutResizeObserver` story.
 
 ## [1.9.3] - 2026-11-24
 

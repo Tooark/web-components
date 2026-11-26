@@ -208,7 +208,8 @@ export class ArkChart extends HTMLElementBase {
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
 
-    if (!this.isAutoResize() || !this.container) return;
+    // Sem ResizeObserver (jsdom e outros ambientes de teste) o gráfico monta sem acompanhar o tamanho, como o engine.
+    if (!this.isAutoResize() || !this.container || typeof ResizeObserver === "undefined") return;
 
     this.resizeObserver = new ResizeObserver(() => {
       this.instance?.resize();

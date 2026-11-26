@@ -325,6 +325,33 @@ export const EngineAutoResize = {
   }
 };
 
+// Sem ResizeObserver (jsdom e outros ambientes de teste) o elemento monta e troca de tema como sempre, só sem
+// acompanhar o tamanho; antes a primeira `option` lançava ReferenceError e o tema `auto` ficava sem observador.
+export const WithoutResizeObserver = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const original = Object.getOwnPropertyDescriptor(window, "ResizeObserver");
+    Object.defineProperty(window, "ResizeObserver", { value: undefined, configurable: true, writable: true });
+    try {
+      const chart = document.createElement("ark-chart") as ArkChart;
+      chart.setAttribute("height", "200px");
+      chart.setAttribute("theme", "light");
+      canvasElement.appendChild(chart);
+      // Conectado e sem instância: a primeira `option` monta o gráfico aqui mesmo, e um erro sairia nesta linha.
+      chart.option = buildOption("bar");
+      await expect(chart.resolvedTheme).toBe("light");
+      await expect(chart.querySelector('[data-ark="chart"] canvas')).not.toBeNull();
+
+      chart.setAttribute("auto-resize", "false");
+      chart.setAttribute("auto-resize", "true");
+      chart.setAttribute("theme", "dark");
+      await expect(chart.resolvedTheme).toBe("dark");
+    } finally {
+      if (original) Object.defineProperty(window, "ResizeObserver", original);
+    }
+  }
+};
+
 // Hooks de E2E: o contêiner do gráfico leva `data-ark="chart"` e o `testid` como `data-testid`.
 export const TestHooks = {
   render: () => {
