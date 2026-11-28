@@ -110,6 +110,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
+import { expectOptInAttributes } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -2585,6 +2586,35 @@ export const VueContainerEventsAreItsOwn = {
     await nextTick();
     await expect(problems).toEqual([]);
     await expectOwnContainerEvents(host, log);
+    app.unmount();
+  }
+};
+
+// Atributos opt-in da 1.10.0 pelos wrappers: cada prop nova chega ao elemento (conferência comum em
+// opt-in-attributes.ts, a mesma cena nos três frameworks).
+export const ReactOptInAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const render = reactRoot(canvasElement, errors);
+    render(createElement("div", null, createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 })));
+    await expect(errors).toEqual([]);
+    await expectOptInAttributes(canvasElement);
+  }
+};
+
+export const VueOptInAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const problems: string[] = [];
+    const app = createApp({
+      setup: () => () => h("div", [h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 })])
+    });
+    app.config.warnHandler = (message) => problems.push(message);
+    app.mount(mountPoint(canvasElement));
+    await nextTick();
+    await expect(problems).toEqual([]);
+    await expectOptInAttributes(canvasElement);
     app.unmount();
   }
 };

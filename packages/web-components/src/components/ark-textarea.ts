@@ -14,8 +14,9 @@ let arkTextareaIdCounter = 0;
  * ark-input (ver components.css) e os mesmos atributos de label, helper e
  * erro. `rows` dá a altura inicial, `autosize` cresce com o conteúdo
  * (`field-sizing: content` nativo, com fallback por JS) a partir de uma
- * linha, ou das linhas de um `rows` explícito, `monospace` e `resize`
- * atendem edição de código e de dados.
+ * linha, ou das linhas de um `rows` explícito, até `max-rows` linhas quando
+ * o atributo existe, `monospace` e `resize` atendem edição de código e de
+ * dados.
  */
 export class ArkTextarea extends HTMLElementBase {
   static readonly tagName = "ark-textarea";
@@ -33,6 +34,7 @@ export class ArkTextarea extends HTMLElementBase {
       "value",
       "name",
       "rows",
+      "max-rows",
       "autosize",
       "monospace",
       "resize",
@@ -202,6 +204,14 @@ export class ArkTextarea extends HTMLElementBase {
       this.textareaEl.style.minHeight = `max(var(${size.token}), calc(${rows}lh + var(--ark-spacing, 0.25rem) * ${size.padY * 2} + 2px))`;
     } else {
       this.textareaEl.style.removeProperty("min-height");
+    }
+    // Teto do autosize (`max-rows`), na mesma conta: dali em diante a caixa rola. Vale nos dois caminhos, porque o
+    // max-height também limita a altura que o fallback por JS fixa; abaixo do `rows` não conta (min-height vence).
+    const maxRows = Number.parseInt(this.getAttribute("max-rows") || "", 10);
+    if (autosize && Number.isFinite(maxRows) && maxRows > 0) {
+      this.textareaEl.style.maxHeight = `calc(${maxRows}lh + var(--ark-spacing, 0.25rem) * ${size.padY * 2} + 2px)`;
+    } else {
+      this.textareaEl.style.removeProperty("max-height");
     }
 
     const roundedMap: Record<ArkRounded, string> = {

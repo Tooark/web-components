@@ -223,6 +223,72 @@ export const AutosizeMinRows = {
   }
 };
 
+// `max-rows` é o teto do autosize: o campo cresce até ali e passa a rolar, também no caminho por JS (sem field-sizing,
+// o caso do Firefox), que fixa `height` a cada input. Sem o atributo, cresce sem teto como antes.
+export const AutosizeMaxRows = {
+  render: () => {
+    const wrap = createStack();
+    const cases: [string, Partial<StoryArgs>, number?][] = [
+      ["capped", { label: "rows=3, max-rows=6", autosize: true, rows: 3 }, 6],
+      ["free", { label: "Autosize sem max-rows", autosize: true, rows: 3 }],
+      ["six", { label: "rows=6, sem autosize", rows: 6 }]
+    ];
+    for (const [id, args, maxRows] of cases) {
+      const el = createTextarea(args);
+      el.dataset.case = id;
+      if (maxRows) el.setAttribute("max-rows", String(maxRows));
+      wrap.appendChild(el);
+    }
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const field = (root: ParentNode, id: string) =>
+      root.querySelector<HTMLTextAreaElement>(`[data-case="${id}"] [data-ark="textarea"]`)!;
+    const height = (el: HTMLElement) => Math.round(el.getBoundingClientRect().height);
+    const lines = "1{enter}2{enter}3{enter}4{enter}5{enter}6{enter}7{enter}8{enter}9{enter}10";
+    const six = height(field(canvasElement, "six"));
+
+    const capped = field(canvasElement, "capped");
+    const empty = height(capped);
+    await userEvent.type(capped, lines);
+    await waitFor(() => expect(height(capped)).toBe(six));
+    await expect(height(capped)).toBeGreaterThan(empty);
+    await expect(capped.scrollHeight).toBeGreaterThan(capped.clientHeight);
+
+    const free = field(canvasElement, "free");
+    await userEvent.type(free, lines);
+    await waitFor(() => expect(height(free)).toBeGreaterThan(six + 40));
+    await expect(free.style.maxHeight).toBe("");
+
+    // Tirar o atributo devolve o crescimento sem teto.
+    (canvasElement.querySelector('[data-case="capped"]') as HTMLElement).removeAttribute("max-rows");
+    await expect(capped.style.maxHeight).toBe("");
+    await waitFor(() => expect(height(capped)).toBeGreaterThan(six + 40));
+
+    // Caminho por JS: sem field-sizing, a altura medida a cada input também para no teto.
+    const supports = CSS.supports;
+    const original = supports.bind(CSS);
+    CSS.supports = ((property: string, value?: string) => {
+      if (property === "field-sizing") return false;
+      return value === undefined ? original(property) : original(property, value);
+    }) as typeof CSS.supports;
+    try {
+      const host = createTextarea({ label: "Fallback por JS", autosize: true, rows: 3 });
+      host.setAttribute("max-rows", "6");
+      host.dataset.case = "js";
+      canvasElement.firstElementChild!.appendChild(host);
+      const js = field(canvasElement, "js");
+      await expect(js.className).not.toContain("field-sizing");
+      await userEvent.type(js, lines);
+      await waitFor(() => expect(js.style.height).not.toBe(""));
+      await expect(height(js)).toBe(six);
+      await expect(js.scrollHeight).toBeGreaterThan(js.clientHeight);
+    } finally {
+      CSS.supports = supports;
+    }
+  }
+};
+
 export const TypingUpdatesValue = {
   render: () => {
     const el = createTextarea({ label: "Nota", testid: "campo-nota" });

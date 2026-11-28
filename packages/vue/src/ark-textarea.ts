@@ -14,6 +14,8 @@ export const ArkTextarea = defineComponent({
     value: { type: String, default: undefined },
     name: { type: String, default: undefined },
     rows: { type: Number, default: undefined },
+    /** Teto do `autosize`, em linhas: dali em diante o campo rola. Padrão: sem teto. */
+    maxRows: { type: Number, default: undefined },
     autosize: { type: Boolean, default: false },
     monospace: { type: Boolean, default: false },
     resize: { type: String as PropType<ArkTextareaResize>, default: "vertical" },
@@ -48,6 +50,7 @@ export const ArkTextarea = defineComponent({
           ...valueProp(props.value),
           name: props.name,
           rows: props.rows,
+          "max-rows": props.maxRows,
           autosize: props.autosize ? "" : undefined,
           monospace: props.monospace ? "" : undefined,
           resize: props.resize,

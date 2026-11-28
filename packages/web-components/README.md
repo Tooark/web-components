@@ -115,7 +115,7 @@ Declare the page's `color-scheme` to pick the theme (`light`, `dark` or `light d
 - `ark-switch` — Accessible on/off switch (`role="switch"`): optional ON/OFF text and ✓/✕ icons, intents, form participation via hidden checkbox.
 - `ark-tab` — Tab item (`role="tab"`, the host is the control): free children, `disabled`, `controls`, `closable` and `dirty` in the editor variant. Emits `ark-close`.
 - `ark-tabs` — Tab strip (`role="tablist"`): `underline`/`chips`/`editor`, roving tabindex with arrows/Home/End, `slot="actions"` at the end, `change` with the active value. Panels stay with the app.
-- `ark-textarea` — Multi-line field with the `ark-input` grid: `rows`, `autosize` (native `field-sizing`, JS fallback), `monospace`, `resize`, helper/error with aria, sizes, intents, `rounded`.
+- `ark-textarea` — Multi-line field with the `ark-input` grid: `rows`, `autosize` (native `field-sizing`, JS fallback) up to `max-rows`, `monospace`, `resize`, helper/error with aria, sizes, intents, `rounded`.
 - `ark-time` — Date and time through `Intl`: relative to now ("3 minutes ago", "yesterday") and updating itself, or absolute (`date`, `time`, `datetime`); a `<time datetime>` with the full date as `title`.
 - `ark-toaster` — Sonner-style toasts: programmatic API, positions, rich colors, actions, animated enter/exit, localized close button.
 - `ark-toggle` — Pressed-state button (`aria-pressed`), standalone (outline/tinted per intent) or as a group item.

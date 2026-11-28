@@ -35,6 +35,7 @@ import {
   ArkSwitchComponent,
   ArkTabComponent,
   ArkTabsComponent,
+  ArkTextareaComponent,
   ArkTimeComponent,
   ArkTreeComponent,
   ArkTreeItemComponent,
@@ -53,6 +54,7 @@ import type {
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expectOptInAttributes } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -712,6 +714,28 @@ export const ContainerEventsAreItsOwn = {
     await expect(errors).toEqual([]);
     await expectOwnContainerEvents(canvasElement.lastElementChild as HTMLElement, host.log);
     await expect(errors).toEqual([]);
+    ref.destroy();
+    app.destroy();
+  }
+};
+
+class OptInAttributesHost {}
+
+// Atributos opt-in da 1.10.0 pelos wrappers: cada prop nova chega ao elemento (conferência comum em
+// opt-in-attributes.ts, a mesma cena nos três frameworks).
+export const OptInAttributes = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: Ctx) => {
+    const errors: unknown[] = [];
+    const Host = Component({
+      standalone: true,
+      imports: [ArkTextareaComponent],
+      template: `<ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>`
+    })(OptInAttributesHost);
+
+    const { app, ref } = await mount(canvasElement, Host, errors);
+    await expect(errors).toEqual([]);
+    await expectOptInAttributes(canvasElement);
     ref.destroy();
     app.destroy();
   }
