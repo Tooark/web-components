@@ -511,6 +511,11 @@
 
   /* ---------- ark-datepicker: popup em popover manual, ancorado no campo ---------- */
 
+  /* full-width: o host vira bloco e o campo o preenche (sem ele, o host segue inline, do tamanho do campo). */
+  ark-datepicker[full-width] {
+    display: block;
+  }
+
   /* Fechado fica oculto (um [popover] com display do autor apareceria no fluxo); left/top vêm inline. */
   ark-datepicker [data-ark="datepicker-popup"]:not(:popover-open) {
     display: none;

@@ -67,6 +67,7 @@ import {
   ArkCommandItem as VueArkCommandItem,
   ArkCommandPalette as VueArkCommandPalette,
   ArkDataView as VueArkDataView,
+  ArkDatepicker as VueArkDatepicker,
   ArkDialog as VueArkDialog,
   ArkDrawer as VueArkDrawer,
   ArkEmpty as VueArkEmpty,
@@ -2604,7 +2605,16 @@ export const ReactOptInAttributes = {
         createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
         createElement(ReactArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, "Resumo"),
         createElement(ReactArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS }),
-        createElement(ReactArkButton, { softDisabled: true }, "Executar")
+        createElement(ReactArkButton, { softDisabled: true }, "Executar"),
+        createElement(ReactArkDatepicker, {
+          input: true,
+          mode: "date",
+          label: "Prazo",
+          required: true,
+          errorMessage: "Obrigatório",
+          size: "sm",
+          fullWidth: true
+        })
       )
     );
     await expect(errors).toEqual([]);
@@ -2622,7 +2632,16 @@ export const VueOptInAttributes = {
           h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
           h(VueArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, () => "Resumo"),
           h(VueArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS }),
-          h(VueArkButton, { softDisabled: true }, () => "Executar")
+          h(VueArkButton, { softDisabled: true }, () => "Executar"),
+          h(VueArkDatepicker, {
+            input: true,
+            mode: "date",
+            label: "Prazo",
+            required: true,
+            errorMessage: "Obrigatório",
+            size: "sm",
+            fullWidth: true
+          })
         ])
     });
     app.config.warnHandler = (message) => problems.push(message);

@@ -42,6 +42,11 @@ export const ArkDatepicker = forwardRef<ArkDatepickerElement, ArkDatepickerProps
       eventDisplay,
       stepMinutes,
       hoursFormat,
+      error,
+      errorMessage,
+      required,
+      readonly,
+      fullWidth,
       ...rest
     } = props;
     const [ref, setRef] = useForwardedRef<ArkDatepickerElement>(forwardedRef);
@@ -90,7 +95,13 @@ export const ArkDatepicker = forwardRef<ArkDatepickerElement, ArkDatepickerProps
       events: events ? JSON.stringify(events) : undefined,
       "event-display": eventDisplay,
       "step-minutes": stepMinutes !== undefined ? String(stepMinutes) : undefined,
-      "hours-format": hoursFormat
+      "hours-format": hoursFormat,
+      // label, helper, size, rounded e autocomplete seguem no rest com o mesmo nome do atributo.
+      error: error ? "" : undefined,
+      "error-message": errorMessage,
+      required: required ? "" : undefined,
+      readonly: readonly ? "" : undefined,
+      "full-width": fullWidth ? "" : undefined
     };
 
     return React.createElement("ark-datepicker", { ...attrs, ref: setRef });

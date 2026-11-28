@@ -22,6 +22,22 @@ const CALENDAR_ATTRS = [
   "event-display"
 ];
 const CLOCK_ATTRS = ["lang", "locale-json", "theme", "intent", "seconds", "step-minutes", "hours-format"];
+/**
+ * Atributos do campo, repassados ao ark-input interno no modo `input` (o `name` fica no input oculto). Sem `intent`:
+ * ele já vai aos painéis, e no campo mudaria a cor do foco de quem já usa.
+ */
+const FIELD_ATTRS = [
+  "label",
+  "helper",
+  "error",
+  "error-message",
+  "required",
+  "readonly",
+  "size",
+  "rounded",
+  "autocomplete",
+  "aria-label"
+];
 
 const CALENDAR_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>`;
 const CLOCK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
@@ -39,7 +55,10 @@ const CLOCK_ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="16" heigh
  *   popup é um `popover="manual"` próprio (top layer: nenhum `overflow` do
  *   app o corta, sem z-index), ancorado no campo por `positionAnchored` de
  *   core (abre abaixo, vira para cima sem espaço) e animado com `scale` a
- *   partir da origem.
+ *   partir da origem. Os atributos de campo (`label`, `helper`, `error`,
+ *   `error-message`, `required`, `readonly`, `size`, `rounded`,
+ *   `autocomplete`, `aria-label`) vão ao ark-input; `full-width` estica o
+ *   campo à largura do contêiner.
  */
 export class ArkDatepicker extends HTMLElementBase {
   static readonly tagName = "ark-datepicker";
@@ -47,6 +66,8 @@ export class ArkDatepicker extends HTMLElementBase {
   private calendarEl: ArkCalendar | null = null;
   private clockEl: ArkClock | null = null;
   private inputComp: ArkInput | null = null;
+  /** Caixa do campo e do popup no modo input. */
+  private wrapperEl: HTMLDivElement | null = null;
   private toggleEl: HTMLButtonElement | null = null;
   private popupEl: HTMLDivElement | null = null;
   /** Calendário e/ou relógio: inline no host ou dentro do popup. */
@@ -76,7 +97,9 @@ export class ArkDatepicker extends HTMLElementBase {
       "events",
       "event-display",
       "step-minutes",
-      "hours-format"
+      "hours-format",
+      "full-width",
+      ...FIELD_ATTRS
     ];
   }
 
@@ -325,6 +348,7 @@ export class ArkDatepicker extends HTMLElementBase {
     this.calendarEl = null;
     this.clockEl = null;
     this.inputComp = null;
+    this.wrapperEl = null;
     this.toggleEl = null;
     this.popupEl = null;
     this.panelEl = null;
@@ -443,6 +467,7 @@ export class ArkDatepicker extends HTMLElementBase {
     this.appendChild(hidden);
 
     this.inputComp = inputComp;
+    this.wrapperEl = wrapper;
     this.toggleEl = toggle;
     this.popupEl = popup;
     this.applyHooks();
@@ -522,6 +547,7 @@ export class ArkDatepicker extends HTMLElementBase {
     const loc = this.getLocale();
 
     this.forwardAttr(this.inputComp, "theme");
+    for (const name of FIELD_ATTRS) this.forwardAttr(this.inputComp, name);
     this.inputComp.setAttribute("placeholder", this.getAttribute("placeholder") || this.getFormat().toLowerCase());
     if (disabled) {
       this.inputComp.setAttribute("disabled", "");
@@ -529,7 +555,18 @@ export class ArkDatepicker extends HTMLElementBase {
       this.inputComp.removeAttribute("disabled");
     }
 
-    this.toggleEl.disabled = disabled;
+    // `full-width`: o campo acompanha a largura do contêiner (o host vira bloco pelo components.css). Sem ele, a
+    // caixa de sempre, do tamanho do campo.
+    const fullWidth = this.hasAttribute("full-width");
+    if (this.wrapperEl) {
+      this.wrapperEl.className = fullWidth ? "ark:relative ark:block ark:w-full" : "ark:relative ark:inline-block";
+    }
+    this.inputComp.classList.toggle("ark:w-full", fullWidth);
+
+    // Só leitura: o texto não muda, e o calendário também não o mudaria.
+    const readonly = this.hasAttribute("readonly");
+    if (readonly && this.popupOpen) this.closePopup();
+    this.toggleEl.disabled = disabled || readonly;
     this.toggleEl.setAttribute("aria-label", loc.openCalendar);
     this.toggleEl.className =
       "ark:rounded ark:p-0.5 ark:text-fg-muted ark:transition ark:hover:text-fg-soft ark:disabled:cursor-not-allowed ark:disabled:opacity-50";
@@ -652,7 +689,8 @@ export class ArkDatepicker extends HTMLElementBase {
   }
 
   private openPopup(): void {
-    if (!this.popupEl || !this.inputComp || this.popupOpen || this.hasAttribute("disabled")) return;
+    if (!this.popupEl || !this.inputComp || this.popupOpen) return;
+    if (this.hasAttribute("disabled") || this.hasAttribute("readonly")) return;
     this.popupOpen = true;
 
     this.inputComp.inputElement?.setAttribute("aria-expanded", "true");
@@ -660,7 +698,9 @@ export class ArkDatepicker extends HTMLElementBase {
     // showPopover() primeiro: o painel só tem caixa para medir depois de entrar no top layer.
     void openPopover(this.popupEl, "scale", { duration: "quick" });
     this.disposePosition?.();
-    this.disposePosition = positionAnchored(this.popupEl, this.inputComp, {
+    // Ancorado no <input>, e não no ark-input inteiro: com rótulo e mensagem o popup abriria abaixo da mensagem. Sem
+    // os dois a caixa é a mesma.
+    this.disposePosition = positionAnchored(this.popupEl, this.inputComp.inputElement ?? this.inputComp, {
       side: "bottom",
       align: "start",
       offset: 8

@@ -10,7 +10,7 @@ import {
   Output,
   ViewChild
 } from "@angular/core";
-import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
+import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import type { ArkDatepicker as ArkDatepickerElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -40,7 +40,18 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.events]="eventsStr"
     [attr.event-display]="eventDisplay"
     [attr.step-minutes]="stepMinutes"
-    [attr.hours-format]="hoursFormat">
+    [attr.hours-format]="hoursFormat"
+    [attr.label]="label"
+    [attr.helper]="helper"
+    [attr.error]="error ? '' : null"
+    [attr.error-message]="errorMessage"
+    [attr.required]="required ? '' : null"
+    [attr.readonly]="readonly ? '' : null"
+    [attr.size]="size"
+    [attr.rounded]="rounded"
+    [attr.autocomplete]="autocomplete"
+    [attr.full-width]="fullWidth ? '' : null"
+    [attr.aria-label]="ariaLabel">
   </ark-datepicker>`
 })
 export class ArkDatepickerComponent implements AfterViewInit, OnDestroy {
@@ -76,6 +87,19 @@ export class ArkDatepickerComponent implements AfterViewInit, OnDestroy {
   @Input() eventDisplay: "dots" | "count" | "list" | undefined;
   @Input() stepMinutes: number | undefined;
   @Input() hoursFormat: "24" | "12" | undefined;
+  /** Atributos do campo, só com input. */
+  @Input() label: string | undefined;
+  @Input() helper: string | undefined;
+  @Input() error = false;
+  @Input() errorMessage: string | undefined;
+  @Input() required = false;
+  @Input() readonly = false;
+  @Input() size: ArkSize | undefined;
+  @Input() rounded: ArkRounded | undefined;
+  @Input() autocomplete: string | undefined;
+  @Input() fullWidth = false;
+  /** Nome acessível do campo sem rótulo visível, repassado ao elemento (no wrapper ficaria no host errado). */
+  @Input() ariaLabel: string | undefined;
 
   @Output() arkChange = new EventEmitter<{ value: string | null; date: Date | null }>();
 

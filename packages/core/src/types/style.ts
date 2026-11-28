@@ -781,6 +781,26 @@ export type ArkDatepickerStyleOptions = {
   stepMinutes?: number;
   /** Exibição das horas no ark-clock interno; o valor continua em 24h. Padrão: "24". */
   hoursFormat?: "24" | "12";
+  /** Rótulo visível do campo (um <label for>); só com input. */
+  label?: string;
+  /** Texto de ajuda abaixo do campo; só com input. */
+  helper?: string;
+  /** Estado de erro do campo (borda e aria-invalid); só com input. */
+  error?: boolean;
+  /** Mensagem de erro do campo, no lugar do helper; só com input. */
+  errorMessage?: string;
+  /** Campo obrigatório na validação nativa do formulário; só com input. */
+  required?: boolean;
+  /** Campo só leitura: o texto não muda e o popup não abre; só com input. */
+  readonly?: boolean;
+  /** Altura e fonte do campo pelo token --ark-size-*; só com input. Padrão: "md". */
+  size?: ArkSize;
+  /** Arredondamento do campo; só com input. Padrão: "lg". */
+  rounded?: ArkRounded;
+  /** Autocompletar do navegador no campo; só com input. */
+  autocomplete?: string;
+  /** O campo ocupa a largura do contêiner; só com input. */
+  fullWidth?: boolean;
 };
 
 /** Modo de visualização da agenda. */

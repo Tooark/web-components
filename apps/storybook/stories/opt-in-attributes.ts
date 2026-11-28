@@ -36,4 +36,12 @@ export async function expectOptInAttributes(canvasElement: HTMLElement): Promise
   await expect(button).toHaveAttribute("soft-disabled", "");
   await expect(button).toHaveAttribute("aria-disabled", "true");
   await expect(button).toHaveAttribute("tabindex", "0");
+
+  const picker = canvasElement.querySelector("ark-datepicker") as HTMLElement;
+  await expect(picker).toHaveAttribute("full-width", "");
+  const field = picker.querySelector("ark-input") as HTMLElement;
+  await waitFor(() => expect(field).toHaveAttribute("label", "Prazo"));
+  await expect(field).toHaveAttribute("required", "");
+  await expect(field).toHaveAttribute("error-message", "Obrigatório");
+  await expect(field).toHaveAttribute("size", "sm");
 }
