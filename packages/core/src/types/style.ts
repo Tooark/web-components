@@ -435,6 +435,8 @@ export type ArkDataViewColumn<Row extends object = ArkDataViewRow> = {
   align?: "left" | "center" | "right";
   /** Largura da coluna na tabela (comprimento CSS). Padrão: automática. */
   width?: string;
+  /** A célula da tabela é o cabeçalho da linha (`<th scope="row">`), o campo que identifica o registro. Padrão: false. */
+  rowHeader?: boolean;
   /** Onde o campo aparece. Padrão: "both". */
   show?: "both" | ArkDataViewLayout;
   /** Colunas da grade do card que o campo ocupa, limitado a `card-columns`. Padrão: 1. */

@@ -1012,11 +1012,11 @@
     opacity: 0.5;
   }
 
-  ark-data-view tr[data-ark-drop="before"] > td {
+  ark-data-view tr[data-ark-drop="before"] > :is(td, th) {
     box-shadow: inset 0 2px 0 0 var(--ark-color-primary);
   }
 
-  ark-data-view tr[data-ark-drop="after"] > td {
+  ark-data-view tr[data-ark-drop="after"] > :is(td, th) {
     box-shadow: inset 0 -2px 0 0 var(--ark-color-primary);
   }
 

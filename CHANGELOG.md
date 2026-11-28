@@ -31,6 +31,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   and turns the host into a two-column grid (also without children, the hint next to the track). Hook
   `switch-helper`. Without the two attributes the markup is the same as before. `labelPosition` and `helper` props in
   the wrappers. `LabelPositionAndHelper` story.
+- `ark-data-view`: `rowHeader` on a column (`ArkDataViewColumn`) renders its table cell as the row header
+  (`<th scope="row">`, with the weight and alignment of a regular cell), so a screen reader announces which record a
+  cell belongs to while moving across the other columns. It works with a custom `render` and in the three wrappers,
+  and the reorder drop mark covers it too. Without it the table body has only `<td>`, as before. `RowHeader` story.
 
 ## [1.9.4] - 2026-11-26
 

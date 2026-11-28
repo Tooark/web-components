@@ -54,7 +54,7 @@ import type {
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { expectOptInAttributes } from "./opt-in-attributes";
+import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -719,7 +719,10 @@ export const ContainerEventsAreItsOwn = {
   }
 };
 
-class OptInAttributesHost {}
+class OptInAttributesHost {
+  rows = OPT_IN_ROWS;
+  columns = OPT_IN_COLUMNS;
+}
 
 // Atributos opt-in da 1.10.0 pelos wrappers: cada prop nova chega ao elemento (conferência comum em
 // opt-in-attributes.ts, a mesma cena nos três frameworks).
@@ -729,10 +732,11 @@ export const OptInAttributes = {
     const errors: unknown[] = [];
     const Host = Component({
       standalone: true,
-      imports: [ArkTextareaComponent, ArkSwitchComponent],
+      imports: [ArkTextareaComponent, ArkSwitchComponent, ArkDataViewComponent],
       template: `
         <ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>
-        <ark-switch-wrapper labelPosition="start" helper="Um resumo por dia.">Resumo</ark-switch-wrapper>`
+        <ark-switch-wrapper labelPosition="start" helper="Um resumo por dia.">Resumo</ark-switch-wrapper>
+        <ark-data-view-wrapper view="table" [rows]="rows" [columns]="columns"></ark-data-view-wrapper>`
     })(OptInAttributesHost);
 
     const { app, ref } = await mount(canvasElement, Host, errors);
