@@ -27,22 +27,9 @@ function toRgba(color: string, context: CanvasRenderingContext2D | null): string
  * `surface-muted`. `null` sem o CSS dos tokens na página.
  */
 export function tokensChartTheme(element: HTMLElement, side: ArkThemeSelected): Record<string, unknown> | null {
-  if (typeof getComputedStyle !== "function") return null;
-  if (!getComputedStyle(element).getPropertyValue("--ark-color-primary").trim()) return null;
+  if (!hasTokens(element)) return null;
 
-  const probe = document.createElement("span");
-  probe.setAttribute("aria-hidden", "true");
-  probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;color-scheme:${side}`;
-  element.appendChild(probe);
-  const canvas = document.createElement("canvas");
-  canvas.width = 1;
-  canvas.height = 1;
-  const context = canvas.getContext("2d", { willReadFrequently: true });
-  const read = (token: string): string => {
-    probe.style.color = `var(--ark-color-${token})`;
-    return toRgba(getComputedStyle(probe).color, context);
-  };
-
+  const { read, dispose } = createTokenReader(element, side);
   try {
     const fg = read("fg");
     const muted = read("fg-muted");
@@ -86,6 +73,37 @@ export function tokensChartTheme(element: HTMLElement, side: ArkThemeSelected): 
       timeAxis: axis
     };
   } finally {
-    probe.remove();
+    dispose();
   }
+}
+
+/** O CSS dos tokens alcança `element` (fora do navegador, nunca). */
+export function hasTokens(element: Element): boolean {
+  if (typeof getComputedStyle !== "function") return false;
+  return getComputedStyle(element).getPropertyValue("--ark-color-primary").trim() !== "";
+}
+
+/**
+ * Leitor de tokens `--ark-color-*` em `element`, no lado `side`: um nó-sonda no elemento e um canvas de um pixel.
+ * `read` recebe o nome sem o prefixo e devolve a cor em `rgba()` sRGB; `dispose` tira a sonda da página.
+ */
+export function createTokenReader(
+  element: HTMLElement,
+  side: ArkThemeSelected
+): { read: (token: string) => string; dispose: () => void } {
+  const probe = document.createElement("span");
+  probe.setAttribute("aria-hidden", "true");
+  probe.style.cssText = `position:absolute;visibility:hidden;pointer-events:none;color-scheme:${side}`;
+  element.appendChild(probe);
+  const canvas = document.createElement("canvas");
+  canvas.width = 1;
+  canvas.height = 1;
+  const context = canvas.getContext("2d", { willReadFrequently: true });
+  return {
+    read: (token) => {
+      probe.style.color = `var(--ark-color-${token})`;
+      return toRgba(getComputedStyle(probe).color, context);
+    },
+    dispose: () => probe.remove()
+  };
 }

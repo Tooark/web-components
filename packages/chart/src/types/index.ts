@@ -32,5 +32,13 @@ export type ArkChartOptions = {
   autoResize?: boolean;
 };
 
+/** Opções de `resolveTokenColors`. */
+export type ArkTokenColorOptions = {
+  /** Lado das cores: "auto" segue o color-scheme de `element`. Padrão: "auto". */
+  theme?: ArkChartTheme;
+  /** Onde ler os tokens (um override de marca num trecho da página vale ali). Padrão: `document.body`. */
+  element?: HTMLElement;
+};
+
 /** Re-export do tipo nativo do ECharts para conveniência dos consumidores. */
 export type { EChartsOption };

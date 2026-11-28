@@ -1,5 +1,5 @@
 import type { ArkChart, EChartsOption } from "@tooark/chart";
-import { createChart } from "@tooark/chart";
+import { createChart, resolveTokenColors } from "@tooark/chart";
 import { expect, waitFor, within } from "storybook/test";
 
 const meta = {
@@ -408,6 +408,51 @@ export const TokensPaletteGaugeAndRadar = {
     } finally {
       instance.destroy();
     }
+  }
+};
+
+// resolveTokenColors: as cores dos tokens prontas para a `option` (a série "Aprovado" no intent success), no lado pedido
+// ou no da página, lidas onde o app manda (um override de marca vale ali), sem deixar sonda na página; `null` onde o
+// CSS dos tokens não chega, e "" para um nome que não é token.
+export const ResolveTokenColors = {
+  render: () => {
+    const wrap = document.createElement("div");
+    const branded = document.createElement("div");
+    branded.dataset.case = "branded";
+    branded.style.setProperty("--ark-color-success", "rgb(1, 2, 3)");
+    const bare = document.createElement("div");
+    bare.dataset.case = "bare";
+    // Um custom property `initial` fica vazio, como numa página sem o CSS dos tokens.
+    bare.style.setProperty("--ark-color-primary", "initial");
+    wrap.append(branded, bare);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const spans = document.querySelectorAll("span").length;
+    const tokens = ["success", "danger", "fg", "surface-muted"] as const;
+    for (const side of ["light", "dark"] as const) {
+      const colors = resolveTokenColors(tokens, { theme: side });
+      await expect(colors).not.toBeNull();
+      for (const token of tokens) await expect(colors![token]).toBe(tokenRgba(token, side));
+    }
+    await expect(document.querySelectorAll("span").length).toBe(spans);
+
+    // Sem `theme`, o lado da página (a Storybook segue o sistema, então compara com o lado que a página resolve).
+    const pageSide = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    await expect(resolveTokenColors(["success"])?.success).toBe(tokenRgba("success", pageSide));
+
+    const branded = canvasElement.querySelector<HTMLElement>('[data-case="branded"]')!;
+    await expect(resolveTokenColors(["success"], { theme: "light", element: branded })?.success).toBe(
+      "rgba(1, 2, 3, 1)"
+    );
+    await expect(resolveTokenColors(["nao-existe", "fg"], { theme: "light" })).toEqual({
+      "nao-existe": "",
+      fg: tokenRgba("fg", "light")
+    });
+
+    const bare = canvasElement.querySelector<HTMLElement>('[data-case="bare"]')!;
+    await expect(resolveTokenColors(["success"], { element: bare })).toBeNull();
+    await expect(bare.childElementCount).toBe(0);
   }
 };
 
