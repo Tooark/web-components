@@ -162,7 +162,9 @@ export const InlineConsole = {
   }
 };
 
-const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0));
+// 3 s: a entrada dura uns 500 ms, mas com a suíte inteira rodando em paralelo o fim da animação passou de 1 s (o padrão
+// do waitFor) e a story falhou só ali.
+const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0), { timeout: 3000 });
 
 // Ações do app na linha do cabeçalho (slot="actions"), entre o título e o fechar: um console com a contagem e os
 // botões dele, e uma gaveta overlay com um botão de editar.

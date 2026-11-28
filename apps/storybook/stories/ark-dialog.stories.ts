@@ -216,7 +216,8 @@ export const LongContent = {
     const dialog = canvasElement.querySelector("ark-dialog") as DialogEl;
 
     await userEvent.click(canvas.getByText("Abrir"));
-    expect(dialog.scrollHeight).toBeGreaterThan(dialog.clientHeight);
+    // Em waitFor: com a suíte inteira e a cobertura rodando, o layout do painel chegou depois do clique.
+    await waitFor(() => expect(dialog.scrollHeight).toBeGreaterThan(dialog.clientHeight));
     expect(getComputedStyle(dialog.querySelector('[data-ark="dialog-header"]')!).position).toBe("sticky");
     expect(getComputedStyle(dialog.querySelector('[slot="footer"]')!).position).toBe("sticky");
 
