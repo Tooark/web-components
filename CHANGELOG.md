@@ -9,6 +9,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+
+- `ark-select`: `lang` on an option (`ArkSelectOption`) is written on its `<option>`, so a label in another language
+  than the page (the list of a language picker) is read with its own pronunciation (WCAG 3.1.2). Options without it
+  render as before. `OptionLang` story.
+
 ## [1.9.4] - 2026-11-26
 
 ### Fixed

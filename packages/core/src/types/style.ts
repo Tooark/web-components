@@ -1161,6 +1161,8 @@ export type ArkSelectOption = {
   disabled?: boolean;
   /** Rótulo do <optgroup> que agrupa esta opção. */
   group?: string;
+  /** Idioma do rótulo quando difere do da página (o nome de um idioma), gravado no `lang` do <option> (WCAG 3.1.2). */
+  lang?: string;
 };
 
 /** Props de estilo do ark-select. */
