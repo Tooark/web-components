@@ -157,7 +157,9 @@ export const AsyncQuery = {
   }
 };
 
-const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0));
+// 3 s: a entrada dura uns 500 ms, mas com a suíte inteira rodando em paralelo o fim da animação passou de 1 s (o padrão
+// do waitFor) e a story falhou só ali.
+const settled = (el: HTMLElement) => waitFor(() => expect(el.getAnimations()).toHaveLength(0), { timeout: 3000 });
 
 // Busca assíncrona com `hint` e `busy`: sem itens, o campo vazio mostra a dica do app; ao digitar o app liga `busy`
 // (a mensagem vira "Buscando…" e o listbox fica aria-busy) e o desliga quando os resultados chegam.
