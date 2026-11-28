@@ -16,6 +16,8 @@ export type ArkTextareaProps = PropsWithChildren<
       rows?: number;
       /** Cresce com o conteúdo (field-sizing nativo, fallback por JS). */
       autosize?: boolean;
+      /** Teto do `autosize`, em linhas: dali em diante o campo rola. Padrão: sem teto. */
+      maxRows?: number;
       /** Fonte monoespaçada, para código e dados. */
       monospace?: boolean;
       /** Direções de redimensionamento pelo usuário. Padrão: "vertical". */
@@ -52,6 +54,7 @@ export const ArkTextarea = forwardRef<ArkTextareaElement, ArkTextareaProps>(
       children,
       className,
       rows,
+      maxRows,
       autosize,
       monospace,
       errorMessage,
@@ -92,6 +95,7 @@ export const ArkTextarea = forwardRef<ArkTextareaElement, ArkTextareaProps>(
       ref: setRef,
       class: className,
       rows: attr(rows),
+      "max-rows": attr(maxRows),
       autosize: autosize ? "" : undefined,
       monospace: monospace ? "" : undefined,
       "error-message": errorMessage,

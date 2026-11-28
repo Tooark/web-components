@@ -15,6 +15,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.value]="value"
     [attr.name]="name"
     [attr.rows]="rows"
+    [attr.max-rows]="maxRows"
     [attr.autosize]="autosize ? '' : null"
     [attr.monospace]="monospace ? '' : null"
     [attr.resize]="resize"
@@ -57,6 +58,8 @@ export class ArkTextareaComponent {
   @Input() name: string | undefined;
   /** Linhas visíveis iniciais. Padrão: 3. */
   @Input() rows: number | undefined;
+  /** Teto do `autosize`, em linhas: dali em diante o campo rola. Padrão: sem teto. */
+  @Input() maxRows: number | undefined;
   /** Cresce com o conteúdo (field-sizing nativo, fallback por JS). */
   @Input() autosize = false;
   /** Fonte monoespaçada, para código e dados. */

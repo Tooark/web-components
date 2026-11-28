@@ -22,6 +22,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-chart`: read-only `chart` property with the ECharts instance (`null` before the first render and while
   disconnected), for exporting the chart (`getDataURL()`, or `renderToSVGString()` with `renderer="svg"`) and the
   rest of the ECharts API without reaching for `echarts.getInstanceByDom`. `ChartInstance` story.
+- `ark-textarea`: `max-rows` caps `autosize`: the field grows up to that many lines and then scrolls, also on the JS
+  fallback used where `field-sizing` is missing. Without it `autosize` has no ceiling, as before. `maxRows` prop in
+  the React, Vue and Angular wrappers. `AutosizeMaxRows` story, and `OptInAttributes` in the wrapper stories.
 
 ## [1.9.4] - 2026-11-26
 

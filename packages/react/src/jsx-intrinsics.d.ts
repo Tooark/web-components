@@ -654,6 +654,7 @@ interface ArkIntrinsicElements {
     value?: string;
     name?: string;
     rows?: number | string;
+    "max-rows"?: number | string;
     autosize?: boolean;
     monospace?: boolean;
     resize?: ArkTextareaResize;
