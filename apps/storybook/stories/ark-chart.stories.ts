@@ -586,3 +586,70 @@ export const AccessibleName = {
     await expect(chart).toHaveAttribute("role", "figure");
   }
 };
+
+// Com nome e `option.aria`, o host fica com o nome do app e a descrição que o ECharts gera (tipo, título, séries e
+// valores, em inglês, o idioma padrão do ECharts); sem `option.aria` ou sem nome, nada muda, e um `aria-describedby`
+// do app fica como está.
+export const GeneratedDescription = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "grid gap-4";
+    const make = (id: string, attrs: Record<string, string>, aria: boolean): ArkChart => {
+      const chart = document.createElement("ark-chart") as ArkChart;
+      chart.dataset.case = id;
+      chart.setAttribute("height", "160px");
+      for (const [name, value] of Object.entries(attrs)) chart.setAttribute(name, value);
+      chart.option = { ...buildOption("bar"), title: { text: "Vendas" }, aria: { enabled: aria } } as EChartsOption;
+      return chart;
+    };
+    const note = document.createElement("p");
+    note.id = "nota-vendas";
+    note.textContent = "Valores em milhares.";
+    wrap.append(
+      make("described", { "aria-label": "Vendas por dia" }, true),
+      make("plain", { "aria-label": "Vendas por dia" }, false),
+      make("own", { "aria-label": "Vendas por dia", "aria-describedby": "nota-vendas" }, true),
+      make("unnamed", {}, true),
+      note
+    );
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const chart = (id: string) => canvasElement.querySelector(`ark-chart[data-case="${id}"]`) as ArkChart;
+
+    const described = chart("described");
+    await expect(described).toHaveAccessibleName("Vendas por dia");
+    await waitFor(() => expect(described).toHaveAccessibleDescription(/This is a chart about "Vendas"/));
+    // A referência é uma cópia oculta do texto que o ECharts grava no contêiner, e acompanha a troca de dados.
+    const copy = described.querySelector('[data-ark="chart-description"]') as HTMLElement;
+    await expect(described.getAttribute("aria-describedby")).toBe(copy.id);
+    await expect(copy.hidden).toBe(true);
+    const canvasLabel = () => described.querySelector('[part="canvas"]')!.getAttribute("aria-label")?.trim();
+    await expect(copy.textContent).toBe(canvasLabel());
+    described.option = { ...buildOption("bar"), title: { text: "Pedidos" }, aria: { enabled: true } } as EChartsOption;
+    await waitFor(() => expect(described).toHaveAccessibleDescription(/This is a chart about "Pedidos"/));
+    await expect(copy.textContent).toBe(canvasLabel());
+
+    // Sem option.aria o ECharts não gera texto e o host não ganha descrição.
+    await expect(chart("plain").hasAttribute("aria-describedby")).toBe(false);
+    // O aria-describedby do app vence.
+    await expect(chart("own")).toHaveAttribute("aria-describedby", "nota-vendas");
+    await expect(chart("own")).toHaveAccessibleDescription("Valores em milhares.");
+    // Sem nome o contêiner do ECharts já é a imagem descrita, e o host fica como estava.
+    await expect(chart("unnamed").hasAttribute("role")).toBe(false);
+    await expect(chart("unnamed").hasAttribute("aria-describedby")).toBe(false);
+
+    // Tirar o nome tira a descrição posta pelo componente; recolocar devolve, também depois de um tema que recria.
+    described.removeAttribute("aria-label");
+    await expect(described.hasAttribute("aria-describedby")).toBe(false);
+    await expect(described.querySelector('[data-ark="chart-description"]')).toBeNull();
+    described.setAttribute("aria-label", "Vendas por dia");
+    described.setAttribute("theme", "dark");
+    await waitFor(() => expect(described).toHaveAccessibleDescription(/This is a chart about "Pedidos"/));
+
+    // Um aria-describedby gravado pelo app depois passa a ser dele.
+    described.setAttribute("aria-describedby", "nota-vendas");
+    described.option = { ...buildOption("line"), title: { text: "Receita" }, aria: { enabled: true } } as EChartsOption;
+    await expect(described).toHaveAttribute("aria-describedby", "nota-vendas");
+  }
+};

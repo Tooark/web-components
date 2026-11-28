@@ -5,6 +5,9 @@ import type { ArkChartPalette, ArkChartRenderer, ArkChartTheme } from "../types"
 import { HTMLElementBase } from "./html-element-base";
 import { upgradeProperties } from "./upgrade-properties";
 
+/** Contador do id gerado da descrição, que o `aria-describedby` do host referencia. */
+let nextId = 0;
+
 /**
  * Custom Element que renderiza um gráfico ECharts.
  *
@@ -24,7 +27,8 @@ import { upgradeProperties } from "./upgrade-properties";
  * `data-testid`. Com `aria-label` (ou `aria-labelledby`) o host vira
  * `role="img"` com esse nome, a menos que o app já tenha dado outro `role`;
  * sem eles nada muda, e a descrição gerada pelo ECharts (`option.aria`)
- * continua disponível.
+ * continua disponível. Com nome e `option.aria`, o host aponta para essa
+ * descrição por `aria-describedby`.
  *
  * Eventos: dispara `ark-chart-click` (bubbles/composed) ao clicar em uma série,
  * com `detail` = params nativos do ECharts.
@@ -40,9 +44,27 @@ export class ArkChart extends HTMLElementBase {
   private disposeTheme: (() => void) | null = null;
   /** O `role="img"` do host foi posto pelo componente (e sai com o nome). */
   private ownsRole = false;
+  /** O `aria-describedby` do host foi posto pelo componente (descrição gerada pelo ECharts). */
+  private ownsDescription = false;
+  /** Cópia oculta da descrição gerada pelo ECharts, referenciada pelo `aria-describedby` do host. */
+  private descriptionEl: HTMLSpanElement | null = null;
+  /** Acompanha o `aria-label` que o ECharts grava no contêiner. */
+  private descriptionObserver: MutationObserver | null = null;
+  /** O próprio componente está gravando o `aria-describedby` (o callback não troca o dono). */
+  private writingDescription = false;
 
   static get observedAttributes(): string[] {
-    return ["theme", "palette", "renderer", "height", "auto-resize", "testid", "aria-label", "aria-labelledby"];
+    return [
+      "theme",
+      "palette",
+      "renderer",
+      "height",
+      "auto-resize",
+      "testid",
+      "aria-label",
+      "aria-labelledby",
+      "aria-describedby"
+    ];
   }
 
   /** Opções nativas do ECharts. Atribuir re-renderiza o gráfico. */
@@ -54,6 +76,7 @@ export class ArkChart extends HTMLElementBase {
     this.pendingOption = value;
     if (this.instance && value) {
       this.instance.setOption(value, { notMerge: true });
+      this.syncDescription();
     } else if (value) {
       // Conectado sem instância (primeira option) monta agora; desconectado, o connectedCallback monta.
       this.render();
@@ -109,6 +132,12 @@ export class ArkChart extends HTMLElementBase {
       return;
     }
 
+    // Um `aria-describedby` gravado pelo app passa a ser dele: o componente não o troca nem o tira.
+    if (name === "aria-describedby") {
+      if (!this.writingDescription) this.ownsDescription = false;
+      return;
+    }
+
     if (name === "aria-label" || name === "aria-labelledby") {
       this.syncRole();
       return;
@@ -154,6 +183,9 @@ export class ArkChart extends HTMLElementBase {
     container.style.height = this.getHeight();
     this.appendChild(container);
     this.container = container;
+    // O ECharts regrava a descrição gerada a cada atualização dos dados: a cópia do host acompanha.
+    this.descriptionObserver = new MutationObserver(() => this.syncDescription());
+    this.descriptionObserver.observe(container, { attributes: true, attributeFilter: ["aria-label"] });
     this.applyHooks();
 
     this.instance = createChart(container, {
@@ -177,6 +209,7 @@ export class ArkChart extends HTMLElementBase {
 
     this.syncAutoResize();
     this.syncThemeObserver();
+    this.syncDescription();
   }
 
   // Com nome, o gráfico inteiro é uma imagem para a tecnologia assistiva (o canvas não tem semântica própria); o
@@ -190,17 +223,59 @@ export class ArkChart extends HTMLElementBase {
       this.removeAttribute("role");
       this.ownsRole = false;
     }
+    this.syncDescription();
   }
 
-  // O contêiner leva o hook de E2E, como os componentes de @tooark/web-components.
+  // Com `option.aria` o ECharts grava a descrição gerada (tipo, título, séries e valores) como `aria-label` do
+  // contêiner, que ele também marca `role="img"`. Com o host nomeado, o contêiner é filho de uma imagem e a tecnologia
+  // assistiva não o lê: o host passa a apontar para ele por `aria-describedby`, ficando com o nome do app e a
+  // descrição do gráfico. Sem nome o contêiner já é lido sozinho; um `aria-describedby` do app fica como está.
+  // A referência é um <span hidden> próprio com o mesmo texto, e não o contêiner: o cálculo da descrição de um nó
+  // referenciado nem sempre usa o aria-label dele, e o texto de conteúdo entra em todos.
+  private syncDescription(): void {
+    const text = this.container?.getAttribute("aria-label")?.trim() ?? "";
+    const named = this.hasAttribute("aria-label") || this.hasAttribute("aria-labelledby");
+    const described = text !== "" && named && this.getAttribute("role") === "img";
+    if (described && (this.ownsDescription || !this.hasAttribute("aria-describedby"))) {
+      if (!this.descriptionEl) {
+        const span = document.createElement("span");
+        span.hidden = true;
+        span.id = `ark-chart-${++nextId}-description`;
+        span.setAttribute("data-ark", "chart-description");
+        this.appendChild(span);
+        this.descriptionEl = span;
+        this.applyHooks();
+      }
+      if (this.descriptionEl.textContent !== text) this.descriptionEl.textContent = text;
+      this.writingDescription = true;
+      if (this.getAttribute("aria-describedby") !== this.descriptionEl.id) {
+        this.setAttribute("aria-describedby", this.descriptionEl.id);
+      }
+      this.writingDescription = false;
+      this.ownsDescription = true;
+    } else if (!described && this.ownsDescription) {
+      this.writingDescription = true;
+      this.removeAttribute("aria-describedby");
+      this.writingDescription = false;
+      this.ownsDescription = false;
+    }
+    if (!this.ownsDescription && this.descriptionEl) {
+      this.descriptionEl.remove();
+      this.descriptionEl = null;
+    }
+  }
+
+  // O contêiner leva o hook de E2E, como os componentes de @tooark/web-components (a descrição, o testid sufixado).
   private applyHooks(): void {
     if (!this.container) return;
     this.container.setAttribute("data-ark", "chart");
     const testid = this.getAttribute("testid");
     if (testid) {
       this.container.setAttribute("data-testid", testid);
+      this.descriptionEl?.setAttribute("data-testid", `${testid}-description`);
     } else {
       this.container.removeAttribute("data-testid");
+      this.descriptionEl?.removeAttribute("data-testid");
     }
   }
 
@@ -233,6 +308,8 @@ export class ArkChart extends HTMLElementBase {
     this.disposeTheme = null;
     this.instance?.destroy();
     this.instance = null;
+    this.descriptionObserver?.disconnect();
+    this.descriptionObserver = null;
     if (this.container) {
       this.container.remove();
       this.container = null;

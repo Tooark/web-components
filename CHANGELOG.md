@@ -57,6 +57,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   attributes a drop outside `accept` is still accepted, as documented since 1.0.0. Props and the reject handler
   (`onReject`, `@ark-reject`, `(arkReject)`) in the wrappers. `RejectsAndTransient` story.
 
+### Fixed
+
+- `ark-chart` with `aria-label` (or `aria-labelledby`) and `option.aria: { enabled: true }`: the description ECharts
+  generates (chart type, title, series and values) was written on the chart container, which inside the host's
+  `role="img"` is never read, so a screen reader got the name only. The host is now described by that text through
+  `aria-describedby` to a hidden copy the component keeps in sync (hook `chart-description`); an `aria-describedby` of
+  the app wins, and without a name or `option.aria` nothing changes. The text follows ECharts' locale (English by
+  default); the README shows how to write it in another language. `GeneratedDescription` story.
+
 ## [1.9.4] - 2026-11-26
 
 ### Fixed
