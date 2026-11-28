@@ -1,4 +1,4 @@
-import type { ArkFileInputStyleOptions } from "@tooark/core";
+import type { ArkFileInputStyleOptions, ArkFileRejectDetail } from "@tooark/core";
 import type { ArkFileInput as ArkFileInputElement } from "@tooark/web-components";
 import type React from "react";
 import { createElement, forwardRef, useEffect } from "react";
@@ -28,13 +28,29 @@ export type ArkFileInputProps = ArkDomProps<
     className?: string;
     /** Arquivos escolhidos ou soltos em detail.files (array de File); com `directory`, detail.paths traz os caminhos. */
     onChange?: (event: CustomEvent<{ files: File[]; paths?: string[] }>) => void;
+    /** Arquivos recusados por `strict-accept` ou `max-size`, com o motivo, em detail. */
+    onReject?: (event: CustomEvent<ArkFileRejectDetail>) => void;
   }
 >;
 
 export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
   function ArkFileInput(props, forwardedRef): React.JSX.Element {
-    const { className, multiple, directory, errorMessage, error, disabled, required, localeJson, onChange, ...rest } =
-      props;
+    const {
+      className,
+      multiple,
+      directory,
+      errorMessage,
+      error,
+      disabled,
+      required,
+      localeJson,
+      strictAccept,
+      maxSize,
+      transient,
+      onChange,
+      onReject,
+      ...rest
+    } = props;
     const [ref, setRef] = useForwardedRef<ArkFileInputElement>(forwardedRef);
 
     useEffect(() => {
@@ -50,6 +66,15 @@ export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
       return () => el.removeEventListener("change", handler);
     }, [ref, onChange]);
 
+    useEffect(() => {
+      const el = ref.current;
+      if (!el || !onReject) return;
+
+      const handler = (event: Event) => onReject(event as CustomEvent<ArkFileRejectDetail>);
+      el.addEventListener("ark-reject", handler);
+      return () => el.removeEventListener("ark-reject", handler);
+    }, [ref, onReject]);
+
     const attrs: Record<string, unknown> = {
       ...domAttrs(rest),
       ref: setRef,
@@ -60,7 +85,10 @@ export const ArkFileInput = forwardRef<ArkFileInputElement, ArkFileInputProps>(
       error: error ? "" : undefined,
       disabled: disabled ? "" : undefined,
       required: required ? "" : undefined,
-      "locale-json": localeJson
+      "locale-json": localeJson,
+      "strict-accept": strictAccept ? "" : undefined,
+      "max-size": maxSize === undefined ? undefined : String(maxSize),
+      transient: transient ? "" : undefined
     };
 
     return createElement("ark-file-input", attrs);

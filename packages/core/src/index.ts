@@ -88,6 +88,7 @@ export type {
   ArkDrawerStyleOptions,
   ArkEmptyStyleOptions,
   ArkFileInputStyleOptions,
+  ArkFileRejectDetail,
   ArkHeadingLevel,
   ArkInputStyleOptions,
   ArkIntent,
