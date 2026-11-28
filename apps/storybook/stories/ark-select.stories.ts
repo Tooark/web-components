@@ -22,7 +22,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Campo de seleção padronizado: um <select> nativo estilizado (teclado, leitor de tela e mobile de graça) com a mesma grid label / campo / mensagem do ark-input e um chevron próprio. As opções vêm do atributo `options` (JSON) ou da propriedade JS `options` ({ value, label, disabled?, group? }[]; `group` vira <optgroup>), nunca de filhos. `placeholder` vira uma opção vazia desabilitada. Emite `change` com `detail: { value }` (o change nativo não sobe duplicado) e `input`."
+          "Campo de seleção padronizado: um <select> nativo estilizado (teclado, leitor de tela e mobile de graça) com a mesma grid label / campo / mensagem do ark-input e um chevron próprio. As opções vêm do atributo `options` (JSON) ou da propriedade JS `options` ({ value, label, disabled?, group?, lang? }[]; `group` vira <optgroup>, `lang` vai ao <option>), nunca de filhos. `placeholder` vira uma opção vazia desabilitada. Emite `change` com `detail: { value }` (o change nativo não sobe duplicado) e `input`."
       }
     }
   },
@@ -207,6 +207,35 @@ export const OptionsPropertyAndValue = {
     // Opções iguais não reconstroem o <select> (a seleção do usuário sobrevive a um rerender de atributos).
     host.setAttribute("size", "sm");
     await expect(select.value).toBe("df");
+  }
+};
+
+export const OptionLang = {
+  render: () => createSelect({ label: "Language" }),
+  // `lang` de uma opção vai ao <option>, para o leitor de tela ler o nome do idioma na pronúncia dele (WCAG 3.1.2);
+  // opção sem `lang` não ganha o atributo, e trocar só o `lang` refaz as opções.
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = canvasElement.querySelector("ark-select") as HTMLElement & { options: ArkSelectOption[] };
+    const select = canvasElement.querySelector<HTMLSelectElement>('[data-ark="select"]')!;
+    const option = (value: string) => select.querySelector<HTMLOptionElement>(`option[value="${value}"]`)!;
+
+    host.options = [
+      { value: "en", label: "English" },
+      { value: "pt-BR", label: "Português (Brasil)", lang: "pt-BR" },
+      { value: "es", label: "Español", lang: "es", group: "Other" }
+    ];
+    await waitFor(() => expect(option("pt-BR")).toHaveAttribute("lang", "pt-BR"));
+    await expect(option("es")).toHaveAttribute("lang", "es");
+    await expect(option("es").parentElement?.tagName).toBe("OPTGROUP");
+    await expect(option("en").hasAttribute("lang")).toBe(false);
+
+    host.options = [
+      { value: "en", label: "English", lang: "en" },
+      { value: "pt-BR", label: "Português (Brasil)" },
+      { value: "es", label: "Español", lang: "es", group: "Other" }
+    ];
+    await waitFor(() => expect(option("en")).toHaveAttribute("lang", "en"));
+    await expect(option("pt-BR").hasAttribute("lang")).toBe(false);
   }
 };
 

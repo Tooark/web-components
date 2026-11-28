@@ -187,6 +187,8 @@ export class ArkSelect extends HTMLElementBase {
       option.value = String(item.value);
       option.textContent = item.label ?? String(item.value);
       option.disabled = Boolean(item.disabled);
+      // Um rótulo noutro idioma (a lista de idiomas de um seletor) é lido com a pronúncia dele (WCAG 3.1.2).
+      if (item.lang) option.lang = item.lang;
 
       if (item.group) {
         let group = groups.get(item.group);
