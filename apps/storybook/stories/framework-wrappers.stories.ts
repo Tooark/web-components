@@ -110,7 +110,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
-import { expectOptInAttributes } from "./opt-in-attributes";
+import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -2602,7 +2602,8 @@ export const ReactOptInAttributes = {
         "div",
         null,
         createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
-        createElement(ReactArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, "Resumo")
+        createElement(ReactArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, "Resumo"),
+        createElement(ReactArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS })
       )
     );
     await expect(errors).toEqual([]);
@@ -2618,7 +2619,8 @@ export const VueOptInAttributes = {
       setup: () => () =>
         h("div", [
           h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
-          h(VueArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, () => "Resumo")
+          h(VueArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, () => "Resumo"),
+          h(VueArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS })
         ])
     });
     app.config.warnHandler = (message) => problems.push(message);

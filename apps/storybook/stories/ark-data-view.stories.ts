@@ -244,6 +244,12 @@ const meta = {
       "left"
     ),
     "column.width": doc(COLUMN, "Largura da coluna na tabela (comprimento CSS)", "string"),
+    "column.rowHeader": doc(
+      COLUMN,
+      'A célula da tabela é o cabeçalho da linha (`<th scope="row">`), o campo que identifica o registro',
+      "boolean",
+      "false"
+    ),
     "column.show": doc(COLUMN, "Em que apresentação o campo aparece", '"both" | "table" | "cards"', "both"),
     "column.cardRole": doc(
       COLUMN,
@@ -1644,5 +1650,52 @@ export const TestHooks = {
     await expect(part(el, "list")).toHaveAttribute("data-testid", "usuarios-list");
     await expect(part(el, "card")).toHaveAttribute("data-testid", "usuarios-card");
     await expect(part(el, "sort")).toHaveAttribute("data-testid", "usuarios-sort");
+  }
+};
+
+// `rowHeader` numa coluna faz da célula dela o cabeçalho da linha (<th scope="row">): o leitor de tela anuncia o
+// registro ao andar pelas outras colunas. Vale com `render` próprio, mantém o visual da célula comum e recebe a marca
+// de soltar da reordenação; sem a opção, o corpo da tabela só tem <td>, como antes.
+export const RowHeader = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "grid gap-6";
+    const columns: ArkDataViewColumn<User>[] = [
+      { key: "name", label: "Nome", rowHeader: true, render: ({ row }) => userCell(row) },
+      { key: "role", label: "Perfil" },
+      { key: "age", label: "Idade", align: "right" }
+    ];
+    const withHeader = createDataView({ view: "table", reorderable: true }, USERS.slice(0, 3), columns);
+    withHeader.dataset.case = "header";
+    const plain = createDataView({ view: "table" }, USERS.slice(0, 3));
+    plain.dataset.case = "plain";
+    wrap.append(withHeader, plain);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = (id: string) => canvasElement.querySelector(`ark-data-view[data-case="${id}"]`) as DataViewEl;
+    const canvas = within(host("header"));
+
+    const headers = host("header").querySelectorAll<HTMLTableCellElement>('tbody th[scope="row"]');
+    await expect(headers).toHaveLength(3);
+    await expect(canvas.getByRole("rowheader", { name: /Ana Lima/ })).toBe(headers[0]);
+    // O conteúdo do `render` vai para o cabeçalho da linha, que continua sendo a célula com o hook.
+    await expect(headers[0].querySelector("ark-avatar")).not.toBeNull();
+    await expect(headers[0]).toHaveAttribute("data-ark", "data-view-cell");
+    // Mesmo peso e alinhamento da célula comum (o <th> do navegador seria negrito e centralizado).
+    const cell = host("header").querySelector<HTMLTableCellElement>("tbody td:not([data-ark-control])")!;
+    await expect(getComputedStyle(headers[1]).fontWeight).toBe(getComputedStyle(cell).fontWeight);
+    await expect(getComputedStyle(headers[1]).textAlign).toBe("left");
+
+    // A marca de soltar da reordenação pinta o cabeçalho da linha como as outras células.
+    const row = headers[1].parentElement as HTMLTableRowElement;
+    row.setAttribute("data-ark-drop", "before");
+    await expect(getComputedStyle(headers[1]).boxShadow).toBe(getComputedStyle(row.cells[2]).boxShadow);
+    await expect(getComputedStyle(headers[1]).boxShadow).toContain("inset");
+    row.removeAttribute("data-ark-drop");
+
+    // Sem `rowHeader` o corpo da tabela não tem <th>.
+    await expect(host("plain").querySelectorAll("tbody th")).toHaveLength(0);
+    await expect(within(host("plain")).queryAllByRole("rowheader")).toHaveLength(0);
   }
 };

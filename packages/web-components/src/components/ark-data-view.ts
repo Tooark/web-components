@@ -1507,10 +1507,20 @@ export class ArkDataView extends HTMLElementBase {
         tr.appendChild(td);
       }
       for (const column of ctx.columns) {
-        const td = document.createElement("td");
-        td.className = [size.cell, "ark:align-middle", ALIGNMENTS[column.align ?? "left"] ?? ""].join(" ").trim();
-        this.fillCell(td, entry, column, "table");
-        tr.appendChild(td);
+        // A coluna `rowHeader` é o cabeçalho da linha (<th scope="row">): andando pelas outras colunas, o leitor de
+        // tela anuncia de qual registro é a célula. O peso da fonte segue o da célula comum.
+        const cell = document.createElement(column.rowHeader ? "th" : "td");
+        if (column.rowHeader) cell.scope = "row";
+        cell.className = [
+          size.cell,
+          "ark:align-middle",
+          column.rowHeader ? "ark:font-normal" : "",
+          ALIGNMENTS[column.align ?? "left"] ?? ""
+        ]
+          .filter(Boolean)
+          .join(" ");
+        this.fillCell(cell, entry, column, "table");
+        tr.appendChild(cell);
       }
       applyTestHooks(this, "data-view", tr, "row");
       body.appendChild(tr);
