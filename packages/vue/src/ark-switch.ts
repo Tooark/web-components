@@ -22,7 +22,11 @@ export const ArkSwitch = defineComponent({
     color: { type: String, default: undefined },
     name: { type: String, default: undefined },
     value: { type: String, default: undefined },
-    label: { type: String, default: undefined }
+    label: { type: String, default: undefined },
+    /** Lado do rótulo visível (o slot) em relação ao trilho: "start" põe o texto antes. Padrão: "end". */
+    labelPosition: { type: String as PropType<"start" | "end">, default: undefined },
+    /** Dica abaixo do rótulo, que descreve o trilho por aria-describedby. */
+    helper: { type: String, default: undefined }
   },
   setup(props, { attrs, emit, slots }) {
     ensureTooarkComponentsRegistered();
@@ -41,6 +45,8 @@ export const ArkSwitch = defineComponent({
           label: props.label,
           "label-on": props.labelOn,
           "label-off": props.labelOff,
+          "label-position": props.labelPosition,
+          helper: props.helper,
           checked: props.checked ? "" : undefined,
           disabled: props.disabled ? "" : undefined,
           labels: props.labels ? "" : undefined,

@@ -167,6 +167,18 @@
     grid-column: 2;
   }
 
+  /* ---------- ark-switch: com helper, rótulo e dica empilhados ao lado do trilho ---------- */
+
+  /* O mesmo arranjo, com o lado do texto escolhido por label-position. O trilho e o input oculto também casam com
+     o seletor, mas o trilho traz a coluna nas próprias classes (que vencem esta regra) e o input não é renderizado. */
+  ark-switch:where(:has(> [data-ark-chrome="helper"])) > :not([data-ark-chrome]) {
+    grid-column: 2;
+  }
+
+  ark-switch:where([label-position="start" i]):where(:has(> [data-ark-chrome="helper"])) > :not([data-ark-chrome]) {
+    grid-column: 1;
+  }
+
   /* ---------- ark-select: mesma grid do ark-input, chevron sobre o campo ---------- */
 
   ark-select {

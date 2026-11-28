@@ -291,3 +291,110 @@ export const ChildrenAsLabel = {
     await expect(changes).toEqual(["email", "email"]);
   }
 };
+
+// `label-position="start"` põe o rótulo antes do trilho (a linha de uma tela de configurações: num host esticado o
+// trilho vai para a ponta) e `helper` acrescenta uma dica empilhada sob o rótulo, que descreve o trilho e alterna como
+// o resto do host, como no ark-checkbox. Sem os dois atributos, nada muda.
+export const LabelPositionAndHelper = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "16px";
+    wrap.style.width = "320px";
+    const make = (id: string, attrs: Record<string, string>, text?: string): HTMLElement => {
+      const el = document.createElement("ark-switch");
+      el.dataset.case = id;
+      for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, value);
+      if (text) el.textContent = text;
+      return el;
+    };
+    const stretched = (el: HTMLElement): HTMLElement => {
+      el.style.width = "100%";
+      return el;
+    };
+    wrap.append(
+      make("end-helper", { helper: "Um resumo por dia." }, "Notificações por e-mail"),
+      stretched(make("start", { "label-position": "start" }, "Modo escuro")),
+      stretched(make("start-helper", { "label-position": "start", helper: "Vale para este navegador." }, "Sons")),
+      make("named-helper", { label: "Wi-Fi", helper: "Conectado" }),
+      make("plain", {}, "Sem os atributos"),
+      make("bare", { label: "Sem filhos", "label-position": "start" })
+    );
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const canvas = within(canvasElement);
+    const host = (id: string) => canvasElement.querySelector(`ark-switch[data-case="${id}"]`) as HTMLElement;
+    const track = (id: string) => host(id).querySelector('[role="switch"]') as HTMLElement;
+    const helper = (id: string) => host(id).querySelector('[data-ark="switch-helper"]') as HTMLElement | null;
+    const rect = (el: Element) => el.getBoundingClientRect();
+    // Caixa do texto solto do host (um nó de texto não tem rect próprio).
+    const textRect = (id: string) => {
+      const range = document.createRange();
+      const node = Array.from(host(id).childNodes).find((n) => n.nodeType === Node.TEXT_NODE)!;
+      range.selectNodeContents(node);
+      return range.getBoundingClientRect();
+    };
+
+    // Dica com o rótulo nos filhos: descreve o trilho, fica fora do nome (aria-hidden) e sob o texto.
+    const email = canvas.getByRole("switch", { name: "Notificações por e-mail" });
+    await expect(email).toHaveAccessibleDescription("Um resumo por dia.");
+    await expect(email).toHaveAttribute("aria-describedby", helper("end-helper")!.id);
+    await expect(helper("end-helper")).toHaveAttribute("aria-hidden", "true");
+    await expect(helper("end-helper")).toHaveAttribute("data-ark-chrome", "helper");
+    await expect(rect(track("end-helper")).right).toBeLessThan(textRect("end-helper").left);
+    await expect(rect(helper("end-helper")!).top).toBeGreaterThanOrEqual(textRect("end-helper").bottom - 1);
+    await expect(Math.abs(rect(helper("end-helper")!).left - textRect("end-helper").left)).toBeLessThanOrEqual(1);
+    await expect(getComputedStyle(host("end-helper")).display).toMatch(/grid$/);
+
+    // A dica alterna como o resto do host (paridade com o ark-checkbox).
+    await userEvent.click(helper("end-helper")!);
+    await expect(host("end-helper")).toHaveAttribute("checked");
+
+    // Rótulo antes: texto na borda inicial e trilho na ponta do host esticado.
+    await expect(textRect("start").left).toBeLessThan(rect(track("start")).left);
+    await expect(Math.abs(rect(track("start")).right - rect(host("start")).right)).toBeLessThanOrEqual(1);
+    await expect(Math.abs(textRect("start").left - rect(host("start")).left)).toBeLessThanOrEqual(1);
+    await userEvent.click(host("start"));
+    await expect(host("start")).toHaveAttribute("checked");
+
+    // Rótulo antes com dica: trilho na ponta, dica sob o texto, na coluna dele.
+    await expect(Math.abs(rect(track("start-helper")).right - rect(host("start-helper")).right)).toBeLessThanOrEqual(1);
+    await expect(rect(helper("start-helper")!).top).toBeGreaterThanOrEqual(textRect("start-helper").bottom - 1);
+    await expect(rect(helper("start-helper")!).right).toBeLessThan(rect(track("start-helper")).left);
+    // Um rótulo que o framework acrescenta depois fica na coluna do texto, acima da dica.
+    const extra = document.createElement("span");
+    extra.textContent = "(beta)";
+    host("start-helper").append(extra);
+    await waitFor(() => expect(rect(helper("start-helper")!).top).toBeGreaterThanOrEqual(rect(extra).bottom - 1));
+    await expect(rect(extra).right).toBeLessThan(rect(track("start-helper")).left);
+
+    // Sem filhos e com dica: o nome vem do `label` e a dica, visível para a tecnologia assistiva, vai ao lado.
+    const wifi = canvas.getByRole("switch", { name: "Wi-Fi" });
+    await expect(wifi).toHaveAccessibleDescription("Conectado");
+    await expect(helper("named-helper")).not.toHaveAttribute("aria-hidden");
+    await expect(rect(helper("named-helper")!).left).toBeGreaterThan(rect(wifi).right);
+
+    // Sem os atributos, nada muda: as classes de sempre e nenhuma dica; sem filhos, nenhuma classe no host.
+    await expect(host("plain").className).toBe(
+      "ark:inline-flex ark:items-center ark:gap-2 ark:select-none ark:cursor-pointer"
+    );
+    await expect(track("plain").className).toMatch(/^ark:relative ark:order-first ark:inline-flex /);
+    await expect(helper("plain")).toBeNull();
+    await expect(track("plain")).not.toHaveAttribute("aria-describedby");
+    await expect(host("bare").className).toBe("");
+
+    // A dica liga e desliga em tempo de execução.
+    host("plain").setAttribute("helper", "Dica tardia");
+    await expect(track("plain")).toHaveAccessibleDescription("Dica tardia");
+    await expect(getComputedStyle(host("plain")).display).toMatch(/grid$/);
+    host("plain").removeAttribute("helper");
+    await expect(helper("plain")).toBeNull();
+    await expect(track("plain")).not.toHaveAttribute("aria-describedby");
+    // As mesmas classes de antes (a ordem muda: as que ficaram não saem e voltar a ser linha só acrescenta as outras).
+    await expect([...host("plain").classList].sort()).toEqual(
+      ["ark:cursor-pointer", "ark:gap-2", "ark:inline-flex", "ark:items-center", "ark:select-none"].sort()
+    );
+    await expect(getComputedStyle(host("plain")).display).toMatch(/flex$/);
+  }
+};

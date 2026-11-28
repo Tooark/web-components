@@ -21,7 +21,19 @@ export type ArkSwitchProps = PropsWithChildren<
 
 export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
   function ArkSwitch(props, forwardedRef): React.JSX.Element {
-    const { children, className, checked, labels, labelOn, labelOff, icons, disabled, onChange, ...rest } = props;
+    const {
+      children,
+      className,
+      checked,
+      labels,
+      labelOn,
+      labelOff,
+      labelPosition,
+      icons,
+      disabled,
+      onChange,
+      ...rest
+    } = props;
 
     useEffect(() => {
       ensureTooarkComponentsRegistered();
@@ -47,7 +59,8 @@ export const ArkSwitch = forwardRef<ArkSwitchElement, ArkSwitchProps>(
       labels: labels ? "" : undefined,
       icons: icons ? "" : undefined,
       "label-on": labelOn,
-      "label-off": labelOff
+      "label-off": labelOff,
+      "label-position": labelPosition
     };
 
     // Filhos viram o rótulo visível do switch (o host inteiro alterna ao clique).

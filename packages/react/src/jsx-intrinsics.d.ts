@@ -197,6 +197,8 @@ interface ArkIntrinsicElements {
     name?: string;
     value?: string;
     label?: string;
+    "label-position"?: "start" | "end";
+    helper?: string;
   };
   "ark-toggle": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;

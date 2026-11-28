@@ -729,8 +729,10 @@ export const OptInAttributes = {
     const errors: unknown[] = [];
     const Host = Component({
       standalone: true,
-      imports: [ArkTextareaComponent],
-      template: `<ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>`
+      imports: [ArkTextareaComponent, ArkSwitchComponent],
+      template: `
+        <ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>
+        <ark-switch-wrapper labelPosition="start" helper="Um resumo por dia.">Resumo</ark-switch-wrapper>`
     })(OptInAttributesHost);
 
     const { app, ref } = await mount(canvasElement, Host, errors);
