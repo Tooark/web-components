@@ -24,6 +24,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.type]="type"
     [attr.form]="form"
     [attr.disabled]="disabled ? '' : null"
+    [attr.soft-disabled]="softDisabled ? '' : null"
     [attr.loading]="loading ? '' : null"
     [attr.status]="status"
     [attr.status-label]="statusLabel"
@@ -62,6 +63,8 @@ export class ArkButtonComponent {
   /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
   @Input() form: string | undefined;
   @Input() disabled = false;
+  /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+  @Input() softDisabled = false;
   @Input() loading = false;
   /** Feedback do resultado: "success" ou "error" trocam o glifo (loading vence). */
   @Input() status: ArkButtonStatus | undefined;

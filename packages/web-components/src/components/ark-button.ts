@@ -100,6 +100,7 @@ export class ArkButton extends HTMLElementBase {
   static get observedAttributes(): string[] {
     return [
       "disabled",
+      "soft-disabled",
       "type",
       "variant",
       "size",
@@ -248,6 +249,18 @@ export class ArkButton extends HTMLElementBase {
    */
   set disabled(value: boolean | string | null | undefined) {
     this.toggleAttribute("disabled", coerceBooleanAttr(value));
+  }
+
+  /**
+   * Desabilitado só para a ação (`soft-disabled`): continua no Tab e sob o ponteiro, com `aria-disabled`, para um
+   * tooltip dizer o motivo; clique, Enter, Espaço e o envio do formulário seguem bloqueados.
+   */
+  get softDisabled(): boolean {
+    return this.hasAttribute("soft-disabled");
+  }
+
+  set softDisabled(value: boolean | string | null | undefined) {
+    this.toggleAttribute("soft-disabled", coerceBooleanAttr(value));
   }
 
   /**
@@ -409,6 +422,11 @@ export class ArkButton extends HTMLElementBase {
    * @param event Evento de teclado.
    */
   private readonly handleKeydown = (event: KeyboardEvent): void => {
+    // Focado com `soft-disabled`: Espaço não rola a página nem ativa (o clique já é bloqueado na captura).
+    if (!this.anchorEl && event.target === this && event.key === " " && this.isSoftDisabled()) {
+      event.preventDefault();
+      return;
+    }
     // Se o botão é um link, não é o alvo do evento ou está desabilitado, não faz nada.
     if (this.anchorEl || event.target !== this || this.isDisabled()) {
       return;
@@ -570,9 +588,31 @@ export class ArkButton extends HTMLElementBase {
     return palettes[intent];
   }
 
-  /** Desabilitado por atributo, por `loading` ou pelo formulário; subclasses consultam antes de agir. */
+  /**
+   * Desabilitado por atributo (`disabled` ou `soft-disabled`), por `loading` ou pelo formulário; subclasses consultam
+   * antes de agir.
+   */
   protected isDisabled(): boolean {
-    return this.formDisabled || this.hasAttribute("disabled") || this.hasAttribute("loading");
+    return (
+      this.formDisabled ||
+      this.hasAttribute("disabled") ||
+      this.hasAttribute("loading") ||
+      this.hasAttribute("soft-disabled")
+    );
+  }
+
+  /**
+   * Desabilitado só por `soft-disabled`: continua focável e sob o ponteiro. Um atributo à parte porque, num elemento
+   * form-associated, o `disabled` faz o navegador tirar o foco com qualquer `tabindex`; `disabled`, `loading` e um
+   * `<fieldset disabled>` vencem.
+   */
+  private isSoftDisabled(): boolean {
+    return (
+      this.hasAttribute("soft-disabled") &&
+      !this.formDisabled &&
+      !this.hasAttribute("disabled") &&
+      !this.hasAttribute("loading")
+    );
   }
 
   private computeClasses(): string[] {
@@ -583,7 +623,10 @@ export class ArkButton extends HTMLElementBase {
       // Botão: anel no próprio host quando focado via teclado. Link: o foco
       // está no <a> esticado, então o anel vem de focus-within.
       isLink ? "ark:focus-within:ring-2" : "ark:focus-visible:ring-2",
-      "ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none"
+      // Com `soft-disabled` o ponteiro chega (um tooltip diz o motivo); o clique segue bloqueado na captura.
+      this.isSoftDisabled()
+        ? "ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50"
+        : "ark:aria-disabled:cursor-not-allowed ark:aria-disabled:opacity-50 ark:aria-disabled:pointer-events-none"
     ].join(" ");
     const size = (this.getAttribute("size") || "md").toLowerCase() as ArkSize;
     const { styleVariant, intent } = this.resolveVariantAndIntent();
@@ -785,15 +828,23 @@ export class ArkButton extends HTMLElementBase {
       anchor.removeAttribute("download");
     }
 
-    // Âncora não tem "disabled": remove o href e sinaliza via aria.
+    // Âncora não tem "disabled": remove o href e sinaliza via aria. Com `soft-disabled` ela fica no Tab, e sem href
+    // precisa do role para continuar anunciada como link.
     if (disabled) {
+      const soft = this.isSoftDisabled();
       anchor.removeAttribute("href");
       anchor.setAttribute("aria-disabled", "true");
-      anchor.setAttribute("tabindex", "-1");
+      anchor.setAttribute("tabindex", soft ? "0" : "-1");
+      if (soft) {
+        anchor.setAttribute("role", "link");
+      } else {
+        anchor.removeAttribute("role");
+      }
     } else {
       anchor.setAttribute("href", this.getAttribute("href") || "");
       anchor.removeAttribute("aria-disabled");
       anchor.removeAttribute("tabindex");
+      anchor.removeAttribute("role");
     }
   }
 
@@ -806,7 +857,7 @@ export class ArkButton extends HTMLElementBase {
       this.removeAttribute("tabindex");
     } else {
       this.setAttribute("role", "button");
-      this.setAttribute("tabindex", disabled ? "-1" : "0");
+      this.setAttribute("tabindex", disabled && !this.isSoftDisabled() ? "-1" : "0");
     }
 
     if (disabled) {

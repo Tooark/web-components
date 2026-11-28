@@ -32,6 +32,8 @@ export const ArkButton = defineComponent({
     rounded: { type: String as PropType<ArkRounded>, default: "md" },
     type: { type: String as PropType<ArkButtonType>, default: "button" },
     disabled: { type: Boolean, default: false },
+    /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+    softDisabled: { type: Boolean, default: false },
     /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
     form: { type: String, default: undefined },
     loading: { type: Boolean, default: false },
@@ -69,6 +71,7 @@ export const ArkButton = defineComponent({
           color: props.color,
           "text-color": props.textColor,
           disabled: props.disabled ? "" : undefined,
+          "soft-disabled": props.softDisabled ? "" : undefined,
           loading: props.loading ? "" : undefined,
           status: props.status,
           "status-label": props.statusLabel,

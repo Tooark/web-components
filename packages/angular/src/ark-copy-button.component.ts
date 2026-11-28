@@ -32,6 +32,7 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.size]="size"
     [attr.rounded]="rounded"
     [attr.disabled]="disabled ? '' : null"
+    [attr.soft-disabled]="softDisabled ? '' : null"
     [attr.loading]="loading ? '' : null"
     [attr.icon-only]="iconOnly ? '' : null"
     [attr.full-width]="fullWidth ? '' : null"
@@ -70,6 +71,8 @@ export class ArkCopyButtonComponent implements AfterViewInit, OnDestroy {
   @Input() size: ArkSize = "md";
   @Input() rounded: ArkRounded = "md";
   @Input() disabled = false;
+  /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+  @Input() softDisabled = false;
   @Input() loading = false;
   @Input() iconOnly = false;
   @Input() fullWidth = false;

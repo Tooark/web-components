@@ -78,6 +78,7 @@ interface ArkIntrinsicElements {
     type?: ArkButtonType;
     form?: string;
     disabled?: boolean;
+    "soft-disabled"?: boolean;
     variant?: ArkButtonVariant;
     intent?: ArkIntent;
     theme?: ArkTheme;
@@ -285,6 +286,7 @@ interface ArkIntrinsicElements {
     rounded?: ArkRounded;
     loading?: boolean;
     disabled?: boolean;
+    "soft-disabled"?: boolean;
     "icon-only"?: boolean;
     "full-width"?: boolean;
     color?: string;

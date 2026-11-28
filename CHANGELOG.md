@@ -35,6 +35,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   (`<th scope="row">`, with the weight and alignment of a regular cell), so a screen reader announces which record a
   cell belongs to while moving across the other columns. It works with a custom `render` and in the three wrappers,
   and the reorder drop mark covers it too. Without it the table body has only `<td>`, as before. `RowHeader` story.
+- `ark-button` and `ark-copy-button`: `soft-disabled` (JS `softDisabled`), disabled for the action only. The button
+  stays in the Tab order and under the pointer with `aria-disabled="true"`, so an `ark-tooltip` around it opens on
+  focus and hover and can say why the action is blocked, while click, Enter, Space and form submission (the implicit
+  Enter included) do nothing. `disabled` cannot do this: on a form-associated element the browser removes the focus
+  whatever the `tabindex`. On a link the `<a>` keeps `tabindex="0"` and gets `role="link"`, since it loses its
+  `href`; a plain disabled link is unchanged. `disabled`, `loading` and a `<fieldset disabled>` win over it.
+  `softDisabled` prop in the wrappers. `SoftDisabled` story.
 
 ## [1.9.4] - 2026-11-26
 

@@ -20,6 +20,8 @@ export const ArkCopyButton = defineComponent({
     size: { type: String as PropType<ArkSize>, default: "md" },
     rounded: { type: String as PropType<ArkRounded>, default: "md" },
     disabled: { type: Boolean, default: false },
+    /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+    softDisabled: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     iconOnly: { type: Boolean, default: false },
     fullWidth: { type: Boolean, default: false },
@@ -53,6 +55,7 @@ export const ArkCopyButton = defineComponent({
           size: props.size,
           rounded: props.rounded,
           disabled: props.disabled ? "" : undefined,
+          "soft-disabled": props.softDisabled ? "" : undefined,
           loading: props.loading ? "" : undefined,
           "icon-only": props.iconOnly ? "" : undefined,
           "full-width": props.fullWidth ? "" : undefined,

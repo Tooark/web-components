@@ -28,4 +28,12 @@ export async function expectOptInAttributes(canvasElement: HTMLElement): Promise
   const view = canvasElement.querySelector("ark-data-view") as HTMLElement;
   await waitFor(() => expect(view.querySelectorAll('tbody th[scope="row"]')).toHaveLength(2));
   await expect(view.querySelector('tbody th[scope="row"]')).toHaveTextContent("Ana");
+
+  // O data-view acima tem botões próprios: o da cena é o de texto "Executar".
+  const button = Array.from(canvasElement.querySelectorAll("ark-button")).find(
+    (el) => el.textContent?.trim() === "Executar"
+  ) as HTMLElement;
+  await expect(button).toHaveAttribute("soft-disabled", "");
+  await expect(button).toHaveAttribute("aria-disabled", "true");
+  await expect(button).toHaveAttribute("tabindex", "0");
 }
