@@ -59,6 +59,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ### Fixed
 
+- `ark-file-input`: a `reset` of the form (`form.reset()` or a `type="reset"` button) emptied the hidden input, which
+  fires no event, so the list kept showing the files of before and the form submitted none. The list now follows,
+  without `change`, as with `clear()`; a reset cancelled by the app changes nothing. `FormReset` story.
 - `ark-chart` with `aria-label` (or `aria-labelledby`) and `option.aria: { enabled: true }`: the description ECharts
   generates (chart type, title, series and values) was written on the chart container, which inside the host's
   `role="img"` is never read, so a screen reader got the name only. The host is now described by that text through

@@ -74,6 +74,8 @@ export class ArkFileInput extends HTMLElementBase {
   private rejected: Rejected = { accept: [], size: [] };
   /** Seleção publicada por último, para voltar a ela quando o seletor trouxe só arquivos recusados. */
   private lastFiles: File[] = [];
+  /** Formulário do input oculto enquanto o host está conectado: o `reset` dele esvazia a lista. */
+  private resetForm: HTMLFormElement | null = null;
 
   static get observedAttributes(): string[] {
     return [
@@ -105,10 +107,15 @@ export class ArkFileInput extends HTMLElementBase {
     followArkLocale(this);
     if (!this.inputEl) this.render();
     this.updateAppearance();
+    // O dono do input só muda quando o host sai e volta, então o formulário é lido na conexão.
+    this.resetForm = this.inputEl?.form ?? null;
+    this.resetForm?.addEventListener("reset", this.handleFormReset);
   }
 
   disconnectedCallback(): void {
     unfollowArkLocale(this);
+    this.resetForm?.removeEventListener("reset", this.handleFormReset);
+    this.resetForm = null;
   }
 
   attributeChangedCallback(): void {
@@ -205,6 +212,18 @@ export class ArkFileInput extends HTMLElementBase {
     this.resetSelection();
     this.rejected = rejected;
     this.publish();
+  };
+
+  // O formulário esvazia o input oculto depois do evento `reset`, sem evento próprio, e só se ninguém o cancelou. A
+  // conferência espera a volta ao laço de eventos: num reset vindo de um botão, um microtask rodaria entre o evento e a
+  // limpeza e ainda veria a seleção antiga. Como no input nativo e no `clear()`, não há `change`.
+  private readonly handleFormReset = (event: Event): void => {
+    setTimeout(() => {
+      if (event.defaultPrevented || !this.inputEl || this.inputEl.files?.length) return;
+      this.lastFiles = [];
+      this.resetSelection();
+      this.syncList();
+    }, 0);
   };
 
   // Uma seleção nova (seletor, drop ou clear) descarta os avisos, os caminhos do drop anterior e a leitura em curso.

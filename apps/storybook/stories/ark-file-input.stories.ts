@@ -614,3 +614,67 @@ export const RejectsAndTransient = {
     await expect(log).toEqual(["folder:change:grande.bin"]);
   }
 };
+
+// `form.reset()` (ou um botão `type="reset"`) esvazia o input oculto sem evento: a lista e a seleção guardada para as
+// recusas acompanham, sem `change`, como no input nativo. Um reset cancelado não mexe em nada.
+export const FormReset = {
+  render: () => {
+    const form = document.createElement("form");
+    const field = createFileInput({ label: "Anexos", name: "anexos", multiple: true, lang: "en" });
+    field.setAttribute("max-size", "1024");
+    const reset = document.createElement("button");
+    reset.type = "reset";
+    reset.textContent = "Limpar";
+    form.append(field, reset);
+    return form;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    const host = canvasElement.querySelector("ark-file-input") as FileInputEl;
+    const items = () =>
+      Array.from(host.querySelectorAll('[data-ark="file-input-item"]')).map(
+        (item) => item.querySelector("span")?.textContent
+      );
+    const file = (name: string, size: number) => new File([new Uint8Array(size)], name, { type: "application/pdf" });
+    const pick = (...picked: File[]) => {
+      const transfer = new DataTransfer();
+      for (const item of picked) transfer.items.add(item);
+      host.inputElement.files = transfer.files;
+      host.inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const changes: string[] = [];
+    host.addEventListener("change", (event) => {
+      changes.push((event as CustomEvent<{ files: File[] }>).detail.files.map((f) => f.name).join(","));
+    });
+
+    pick(file("a.pdf", 10), file("b.pdf", 10));
+    await expect(items()).toHaveLength(2);
+
+    // Reset cancelado: a seleção e a lista ficam.
+    const cancel = (event: Event) => event.preventDefault();
+    form.addEventListener("reset", cancel);
+    form.reset();
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await expect(host.files.map((f) => f.name)).toEqual(["a.pdf", "b.pdf"]);
+    await expect(items()).toHaveLength(2);
+    form.removeEventListener("reset", cancel);
+
+    // Reset pelo método: o input volta vazio e a lista acompanha, sem change.
+    form.reset();
+    await waitFor(() => expect(items()).toHaveLength(0));
+    await expect(host.files).toHaveLength(0);
+    await expect(changes).toEqual(["a.pdf,b.pdf"]);
+
+    // Depois do reset, um seletor só com recusados deixa a seleção vazia (e não devolve a de antes do reset).
+    pick(file("grande.pdf", 4096));
+    await expect(host.files).toHaveLength(0);
+    await expect(items()).toHaveLength(0);
+
+    // Reset pelo botão do formulário, como a pessoa faria.
+    pick(file("c.pdf", 10));
+    await expect(items()).toHaveLength(1);
+    await userEvent.click(within(form).getByRole("button", { name: "Limpar" }));
+    await waitFor(() => expect(items()).toHaveLength(0));
+    await expect(changes).toEqual(["a.pdf,b.pdf", "c.pdf"]);
+  }
+};
