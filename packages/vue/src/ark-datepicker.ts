@@ -1,4 +1,4 @@
-import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkTheme } from "@tooark/core";
+import type { ArkCalendarEvent, ArkDatepickerLang, ArkIntent, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import { defineComponent, h, onBeforeUnmount, onMounted, type PropType, ref } from "vue";
 import { ensureTooarkComponentsRegistered } from "./register.js";
 import { valueProp } from "./value-prop.js";
@@ -28,7 +28,18 @@ export const ArkDatepicker = defineComponent({
     events: { type: Array as PropType<ArkCalendarEvent[]>, default: undefined },
     eventDisplay: { type: String as PropType<"dots" | "count" | "list">, default: undefined },
     stepMinutes: { type: Number, default: undefined },
-    hoursFormat: { type: String as PropType<"24" | "12">, default: undefined }
+    hoursFormat: { type: String as PropType<"24" | "12">, default: undefined },
+    /** Atributos do campo, só com input. */
+    label: { type: String, default: undefined },
+    helper: { type: String, default: undefined },
+    error: { type: Boolean, default: false },
+    errorMessage: { type: String, default: undefined },
+    required: { type: Boolean, default: false },
+    readonly: { type: Boolean, default: false },
+    size: { type: String as PropType<ArkSize>, default: undefined },
+    rounded: { type: String as PropType<ArkRounded>, default: undefined },
+    autocomplete: { type: String, default: undefined },
+    fullWidth: { type: Boolean, default: false }
   },
   emits: ["ark-change"],
   setup(props, { attrs, emit }) {
@@ -71,7 +82,17 @@ export const ArkDatepicker = defineComponent({
         events: props.events ? JSON.stringify(props.events) : undefined,
         "event-display": props.eventDisplay,
         "step-minutes": props.stepMinutes !== undefined ? String(props.stepMinutes) : undefined,
-        "hours-format": props.hoursFormat
+        "hours-format": props.hoursFormat,
+        label: props.label,
+        helper: props.helper,
+        error: props.error ? "" : undefined,
+        "error-message": props.errorMessage,
+        required: props.required ? "" : undefined,
+        readonly: props.readonly ? "" : undefined,
+        size: props.size,
+        rounded: props.rounded,
+        autocomplete: props.autocomplete,
+        "full-width": props.fullWidth ? "" : undefined
       });
     };
   }

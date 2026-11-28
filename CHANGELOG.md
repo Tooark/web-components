@@ -42,6 +42,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   whatever the `tabindex`. On a link the `<a>` keeps `tabindex="0"` and gets `role="link"`, since it loses its
   `href`; a plain disabled link is unchanged. `disabled`, `loading` and a `<fieldset disabled>` win over it.
   `softDisabled` prop in the wrappers. `SoftDisabled` story.
+- `ark-datepicker` with `input`: the field attributes go to the inner `ark-input`: `label` (the field's accessible
+  name, which no attribute gave before), `helper`, `error`, `error-message`, `required` (native validation of the
+  visible field), `readonly` (the popup does not open either), `size`, `rounded`, `autocomplete` and `aria-label`;
+  `name` stays on the hidden input and `intent` still goes only to the panels. `full-width` makes the field fill the
+  container. The popup is now anchored to the `<input>`, so with a label or a message it opens right below the field;
+  without them the box is the same as before. Props in the three wrappers. `InputFieldAttributes` story.
 
 ## [1.9.4] - 2026-11-26
 

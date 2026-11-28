@@ -559,3 +559,109 @@ export const InlineFormAndDisabled = {
     await expect(day.closest("[inert]")).toBeNull();
   }
 };
+
+// Modo `input` com os atributos de campo: rótulo, dica, erro, obrigatório, só leitura, tamanho e arredondamento vão
+// ao ark-input interno; o `name` fica no input oculto. Sem eles o campo é o de sempre, e `full-width` é opt-in.
+export const InputFieldAttributes = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.style.display = "grid";
+    wrap.style.gap = "16px";
+    wrap.style.width = "300px";
+    const make = (id: string, attrs: Record<string, string>): HTMLElement => {
+      const el = document.createElement("ark-datepicker");
+      el.dataset.case = id;
+      el.setAttribute("input", "");
+      el.setAttribute("mode", "date");
+      el.setAttribute("lang", "en");
+      for (const [name, value] of Object.entries(attrs)) el.setAttribute(name, value);
+      return el;
+    };
+    const form = document.createElement("form");
+    form.append(
+      make("field", {
+        label: "Due date",
+        helper: "Optional",
+        required: "",
+        size: "sm",
+        rounded: "md",
+        autocomplete: "off",
+        name: "due"
+      })
+    );
+    wrap.append(
+      form,
+      make("named", { "aria-label": "Start date" }),
+      make("readonly", { label: "Created", readonly: "", value: "2026-11-20" }),
+      make("plain", {}),
+      make("full", { label: "Deadline", "full-width": "" })
+    );
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = (id: string) => canvasElement.querySelector(`ark-datepicker[data-case="${id}"]`) as HTMLElement;
+    const inner = (id: string) => host(id).querySelector("ark-input") as HTMLElement;
+    const input = (id: string) => host(id).querySelector<HTMLInputElement>('[data-ark="input"]')!;
+    const toggle = (id: string) => host(id).querySelector<HTMLButtonElement>('[data-ark="datepicker-toggle"]')!;
+    const popup = (id: string) => host(id).querySelector<HTMLElement>('[data-ark="datepicker-popup"]')!;
+
+    // Nome pelo rótulo, dica como descrição, obrigatório na validação nativa, tamanho do token sm.
+    await expect(input("field")).toHaveAccessibleName("Due date");
+    await expect(input("field")).toHaveAccessibleDescription("Optional");
+    await expect(input("field").required).toBe(true);
+    await expect((canvasElement.querySelector("form") as HTMLFormElement).checkValidity()).toBe(false);
+    await expect(Math.round(input("field").getBoundingClientRect().height)).toBe(28);
+    await expect(inner("field")).toHaveAttribute("rounded", "md");
+    await expect(input("field")).toHaveAttribute("autocomplete", "off");
+    // O nome do formulário continua no input oculto, não no campo visível.
+    await expect(input("field").name).toBe("");
+    await expect(host("field").querySelector<HTMLInputElement>('input[type="hidden"]')!.name).toBe("due");
+
+    // Erro: aria-invalid e a mensagem no lugar da dica; tirar volta à dica.
+    host("field").setAttribute("error-message", "Pick a date");
+    await expect(input("field")).toHaveAttribute("aria-invalid", "true");
+    await expect(input("field")).toHaveAccessibleDescription("Pick a date");
+    host("field").removeAttribute("error-message");
+    await expect(input("field")).toHaveAccessibleDescription("Optional");
+
+    // Popup ancorado no <input>, não abaixo da dica.
+    await userEvent.click(toggle("field"));
+    await waitFor(() => expect(popup("field").matches(":popover-open")).toBe(true));
+    const fieldBottom = input("field").getBoundingClientRect().bottom;
+    const helper = host("field").querySelector('[data-ark="input-helper"]')!.getBoundingClientRect();
+    await expect(popup("field").getBoundingClientRect().top).toBeGreaterThanOrEqual(fieldBottom);
+    await expect(popup("field").getBoundingClientRect().top).toBeLessThan(helper.bottom);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(popup("field").matches(":popover-open")).toBe(false));
+
+    // aria-label sem rótulo visível.
+    await expect(input("named")).toHaveAccessibleName("Start date");
+
+    // Só leitura: o texto não muda e o calendário não abre (botão desabilitado, clique e ArrowDown no campo).
+    await expect(input("readonly").readOnly).toBe(true);
+    await expect(toggle("readonly").disabled).toBe(true);
+    await userEvent.click(input("readonly"));
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(popup("readonly").matches(":popover-open")).toBe(false);
+    host("readonly").removeAttribute("readonly");
+    await expect(toggle("readonly").disabled).toBe(false);
+
+    // Sem os atributos: nada repassado, a caixa de sempre.
+    for (const name of ["label", "helper", "required", "readonly", "size", "rounded", "autocomplete", "aria-label"]) {
+      await expect({ name, has: inner("plain").hasAttribute(name) }).toEqual({ name, has: false });
+    }
+    await expect(inner("plain").parentElement!.className).toBe("ark:relative ark:inline-block");
+    // Sem rótulo e mensagem o <input> tem a caixa do ark-input: ancorar o popup nele não o move.
+    const box = (el: Element) => {
+      const rect = el.getBoundingClientRect();
+      return [rect.left, rect.top, rect.width, rect.height].map(Math.round);
+    };
+    await expect(box(input("plain"))).toEqual(box(inner("plain")));
+    await expect(inner("plain").getBoundingClientRect().width).toBeLessThan(300);
+
+    // full-width: o campo acompanha o contêiner.
+    await expect(Math.round(input("full").getBoundingClientRect().width)).toBe(300);
+    host("full").removeAttribute("full-width");
+    await expect(input("full").getBoundingClientRect().width).toBeLessThan(300);
+  }
+};

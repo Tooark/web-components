@@ -20,6 +20,7 @@ import {
   ArkDataViewCardDirective,
   ArkDataViewCellDirective,
   ArkDataViewComponent,
+  ArkDatepickerComponent,
   ArkDialogComponent,
   ArkDrawerComponent,
   ArkEmptyComponent,
@@ -732,12 +733,20 @@ export const OptInAttributes = {
     const errors: unknown[] = [];
     const Host = Component({
       standalone: true,
-      imports: [ArkTextareaComponent, ArkSwitchComponent, ArkDataViewComponent, ArkButtonComponent],
+      imports: [
+        ArkTextareaComponent,
+        ArkSwitchComponent,
+        ArkDataViewComponent,
+        ArkButtonComponent,
+        ArkDatepickerComponent
+      ],
       template: `
         <ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>
         <ark-switch-wrapper labelPosition="start" helper="Um resumo por dia.">Resumo</ark-switch-wrapper>
         <ark-data-view-wrapper view="table" [rows]="rows" [columns]="columns"></ark-data-view-wrapper>
-        <ark-button-wrapper [softDisabled]="true">Executar</ark-button-wrapper>`
+        <ark-button-wrapper [softDisabled]="true">Executar</ark-button-wrapper>
+        <ark-datepicker-wrapper [input]="true" mode="date" label="Prazo" [required]="true" errorMessage="Obrigatório"
+          size="sm" [fullWidth]="true"></ark-datepicker-wrapper>`
     })(OptInAttributesHost);
 
     const { app, ref } = await mount(canvasElement, Host, errors);

@@ -315,6 +315,16 @@ interface ArkIntrinsicElements {
     "event-display"?: "dots" | "count" | "list";
     "step-minutes"?: number;
     "hours-format"?: "24" | "12";
+    label?: string;
+    helper?: string;
+    error?: boolean;
+    "error-message"?: string;
+    required?: boolean;
+    readonly?: boolean;
+    size?: ArkSize;
+    rounded?: ArkRounded;
+    autocomplete?: string;
+    "full-width"?: boolean;
   };
   "ark-dialog": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;
