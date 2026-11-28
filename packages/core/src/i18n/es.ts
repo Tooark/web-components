@@ -49,6 +49,8 @@ export const es: ArkLocale = {
   dropHint: "o arrastra y suelta aquí",
   noFile: "Ningún archivo seleccionado",
   foldersNotAccepted: "No se aceptan carpetas",
+  typeNotAccepted: "Tipo de archivo no aceptado: {files}",
+  sizeExceeded: "Mayor que {size}: {files}",
   chooseFolder: "Elegir carpeta",
   dropFolderHint: "o arrastra y suelta una carpeta aquí",
   noFolder: "Ninguna carpeta seleccionada",

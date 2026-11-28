@@ -71,6 +71,7 @@ import {
   ArkDialog as VueArkDialog,
   ArkDrawer as VueArkDrawer,
   ArkEmpty as VueArkEmpty,
+  ArkFileInput as VueArkFileInput,
   ArkInput as VueArkInput,
   ArkKvEditor as VueArkKvEditor,
   ArkMenu as VueArkMenu,
@@ -111,7 +112,7 @@ import { flushSync } from "react-dom";
 import { createRoot, type Root } from "react-dom/client";
 import { expect, userEvent, waitFor, within } from "storybook/test";
 import { createApp, h, nextTick, ref } from "vue";
-import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS } from "./opt-in-attributes";
+import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS, rejectEntry } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -2597,6 +2598,7 @@ export const ReactOptInAttributes = {
   render: () => document.createElement("div"),
   play: async ({ canvasElement }: Ctx) => {
     const errors: unknown[] = [];
+    const rejects: string[] = [];
     const render = reactRoot(canvasElement, errors);
     render(
       createElement(
@@ -2614,11 +2616,19 @@ export const ReactOptInAttributes = {
           errorMessage: "Obrigatório",
           size: "sm",
           fullWidth: true
+        }),
+        createElement(ReactArkFileInput, {
+          accept: ".png",
+          strictAccept: true,
+          maxSize: 1024,
+          transient: true,
+          multiple: true,
+          onReject: (event: Event) => rejects.push(rejectEntry(event))
         })
       )
     );
     await expect(errors).toEqual([]);
-    await expectOptInAttributes(canvasElement);
+    await expectOptInAttributes(canvasElement, rejects);
   }
 };
 
@@ -2626,6 +2636,7 @@ export const VueOptInAttributes = {
   render: () => document.createElement("div"),
   play: async ({ canvasElement }: Ctx) => {
     const problems: string[] = [];
+    const rejects: string[] = [];
     const app = createApp({
       setup: () => () =>
         h("div", [
@@ -2641,6 +2652,14 @@ export const VueOptInAttributes = {
             errorMessage: "Obrigatório",
             size: "sm",
             fullWidth: true
+          }),
+          h(VueArkFileInput, {
+            accept: ".png",
+            strictAccept: true,
+            maxSize: 1024,
+            transient: true,
+            multiple: true,
+            onArkReject: (event: Event) => rejects.push(rejectEntry(event))
           })
         ])
     });
@@ -2648,7 +2667,7 @@ export const VueOptInAttributes = {
     app.mount(mountPoint(canvasElement));
     await nextTick();
     await expect(problems).toEqual([]);
-    await expectOptInAttributes(canvasElement);
+    await expectOptInAttributes(canvasElement, rejects);
     app.unmount();
   }
 };

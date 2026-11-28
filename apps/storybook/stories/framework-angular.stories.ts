@@ -24,6 +24,7 @@ import {
   ArkDialogComponent,
   ArkDrawerComponent,
   ArkEmptyComponent,
+  ArkFileInputComponent,
   ArkMenuComponent,
   ArkMenuGroupComponent,
   ArkMenuItemComponent,
@@ -55,7 +56,7 @@ import type {
 import { resolveLocale, setArkLocale } from "@tooark/core";
 import type { ArkDataView as ArkDataViewElement } from "@tooark/web-components";
 import { expect, userEvent, waitFor, within } from "storybook/test";
-import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS } from "./opt-in-attributes";
+import { expectOptInAttributes, OPT_IN_COLUMNS, OPT_IN_ROWS, rejectEntry } from "./opt-in-attributes";
 import { expectOwnContainerEvents, expectOwnOverlayEvents } from "./overlay-events";
 import { expectRadioGroupValue, type RadioGroupProps } from "./radio-group-value";
 
@@ -723,6 +724,10 @@ export const ContainerEventsAreItsOwn = {
 class OptInAttributesHost {
   rows = OPT_IN_ROWS;
   columns = OPT_IN_COLUMNS;
+  rejects: string[] = [];
+  onReject(event: Event): void {
+    this.rejects.push(rejectEntry(event));
+  }
 }
 
 // Atributos opt-in da 1.10.0 pelos wrappers: cada prop nova chega ao elemento (conferência comum em
@@ -738,7 +743,8 @@ export const OptInAttributes = {
         ArkSwitchComponent,
         ArkDataViewComponent,
         ArkButtonComponent,
-        ArkDatepickerComponent
+        ArkDatepickerComponent,
+        ArkFileInputComponent
       ],
       template: `
         <ark-textarea-wrapper label="Notas" [autosize]="true" [maxRows]="4"></ark-textarea-wrapper>
@@ -746,12 +752,14 @@ export const OptInAttributes = {
         <ark-data-view-wrapper view="table" [rows]="rows" [columns]="columns"></ark-data-view-wrapper>
         <ark-button-wrapper [softDisabled]="true">Executar</ark-button-wrapper>
         <ark-datepicker-wrapper [input]="true" mode="date" label="Prazo" [required]="true" errorMessage="Obrigatório"
-          size="sm" [fullWidth]="true"></ark-datepicker-wrapper>`
+          size="sm" [fullWidth]="true"></ark-datepicker-wrapper>
+        <ark-file-input-wrapper accept=".png" [strictAccept]="true" [maxSize]="1024" [transient]="true" [multiple]="true"
+          (arkReject)="onReject($event)"></ark-file-input-wrapper>`
     })(OptInAttributesHost);
 
-    const { app, ref } = await mount(canvasElement, Host, errors);
+    const { app, ref, host } = await mount(canvasElement, Host, errors);
     await expect(errors).toEqual([]);
-    await expectOptInAttributes(canvasElement);
+    await expectOptInAttributes(canvasElement, host.rejects);
     ref.destroy();
     app.destroy();
   }

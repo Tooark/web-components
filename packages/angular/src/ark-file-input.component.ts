@@ -1,5 +1,5 @@
 import { Component, CUSTOM_ELEMENTS_SCHEMA, ElementRef, EventEmitter, Input, inject, Output } from "@angular/core";
-import type { ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
+import type { ArkFileRejectDetail, ArkIntent, ArkLang, ArkRounded, ArkSize, ArkTheme } from "@tooark/core";
 import type { ArkFileInput as ArkFileInputElement } from "@tooark/web-components";
 import { ensureTooarkComponentsRegistered } from "./register";
 
@@ -26,7 +26,11 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.theme]="theme"
     [attr.lang]="lang"
     [attr.locale-json]="localeJson"
-    (change)="onChange($event)">
+    [attr.strict-accept]="strictAccept ? '' : null"
+    [attr.max-size]="maxSize"
+    [attr.transient]="transient ? '' : null"
+    (change)="onChange($event)"
+    (ark-reject)="onReject($event)">
   </ark-file-input>`
 })
 export class ArkFileInputComponent {
@@ -68,8 +72,20 @@ export class ArkFileInputComponent {
   @Input() localeJson: string | undefined;
   /** Arquivos escolhidos ou soltos em detail.files (array de File); com `directory`, detail.paths traz os caminhos. */
   @Output() changed = new EventEmitter<CustomEvent<{ files: File[]; paths?: string[] }>>();
+  /** O `accept` vale também para os arquivos soltos. */
+  @Input() strictAccept = false;
+  /** Tamanho máximo de cada arquivo, em bytes. */
+  @Input() maxSize: number | undefined;
+  /** Entrega os arquivos no `change` e volta vazio, sem lista própria. */
+  @Input() transient = false;
+  /** Arquivos recusados por `strict-accept` ou `max-size`, com o motivo, em detail. */
+  @Output() arkReject = new EventEmitter<CustomEvent<ArkFileRejectDetail>>();
 
   onChange(event: Event): void {
     this.changed.emit(event as CustomEvent<{ files: File[]; paths?: string[] }>);
+  }
+
+  onReject(event: Event): void {
+    this.arkReject.emit(event as CustomEvent<ArkFileRejectDetail>);
   }
 }

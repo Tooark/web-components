@@ -607,6 +607,9 @@ interface ArkIntrinsicElements {
     theme?: ArkTheme;
     lang?: ArkLang;
     "locale-json"?: string;
+    "strict-accept"?: boolean;
+    "max-size"?: number | string;
+    transient?: boolean;
   };
   "ark-input": React.DetailedHTMLProps<React.HTMLAttributes<HTMLElement>, HTMLElement> & {
     testid?: string;

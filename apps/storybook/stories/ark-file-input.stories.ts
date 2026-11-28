@@ -490,3 +490,127 @@ export const TestHooks = {
     await expect(canvasElement.querySelector('[data-ark="file-input"]')?.tagName).toBe("INPUT");
   }
 };
+
+// Recusas opt-in: `strict-accept` aplica o `accept` também aos arquivos soltos (e ao "todos os arquivos" do seletor),
+// `max-size` recusa os grandes nos dois caminhos; cada motivo sai num `ark-reject` e num aviso visível e anunciado, e
+// nada aproveitável mantém a seleção sem `change`. `transient` entrega e volta vazio. Sem os atributos, tudo passa.
+export const RejectsAndTransient = {
+  render: () => {
+    const strict = createFileInput({ label: "Imagens", accept: ".png,image/jpeg", multiple: true, lang: "en" });
+    strict.dataset.case = "strict";
+    strict.setAttribute("strict-accept", "");
+    strict.setAttribute("max-size", "1024");
+    const loose = createFileInput({ label: "Sem strict", accept: ".png", lang: "en" });
+    loose.dataset.case = "loose";
+    const transient = createFileInput({ label: "Anexar", multiple: true, lang: "en" });
+    transient.dataset.case = "transient";
+    transient.setAttribute("transient", "");
+    transient.setAttribute("max-size", "1024");
+    const folder = createFileInput({ label: "Pasta", directory: true, lang: "en" });
+    folder.dataset.case = "folder";
+    folder.setAttribute("max-size", "1024");
+    return column(strict, loose, transient, folder);
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const host = (id: string) => canvasElement.querySelector(`ark-file-input[data-case="${id}"]`) as FileInputEl;
+    const zone = (id: string) => host(id).querySelector('[data-ark="file-input-zone"]') as HTMLElement;
+    const list = (id: string) => host(id).querySelector('[data-ark="file-input-list"]') as HTMLElement;
+    const notices = (id: string) =>
+      Array.from(list(id).querySelectorAll('[data-ark="file-input-rejected"]')).map((item) => item.textContent);
+    const names = (id: string) => host(id).files.map((file) => file.name);
+    const file = (name: string, size: number, type: string) => new File([new Uint8Array(size)], name, { type });
+    const files = (...items: File[]) => {
+      const transfer = new DataTransfer();
+      for (const item of items) transfer.items.add(item);
+      return transfer.files;
+    };
+    const pick = (id: string, ...items: File[]) => {
+      host(id).inputElement.files = files(...items);
+      host(id).inputElement.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const log: string[] = [];
+    canvasElement.addEventListener("change", (event) => {
+      const id = (event.target as HTMLElement).dataset.case;
+      log.push(`${id}:change:${(event as CustomEvent<{ files: File[] }>).detail.files.map((f) => f.name).join(",")}`);
+    });
+    canvasElement.addEventListener("ark-reject", (event) => {
+      const { files: rejected, reason } = (event as CustomEvent<{ files: File[]; reason: string }>).detail;
+      log.push(`${(event.target as HTMLElement).dataset.case}:${reason}:${rejected.map((f) => f.name).join(",")}`);
+    });
+    const announcer = () => document.querySelector('[data-ark="announcer"]')?.textContent ?? "";
+
+    // Soltar: tipo fora do accept e tamanho acima do limite saem, cada motivo num evento e num aviso.
+    zone("strict").dispatchEvent(
+      dragEvent(
+        "drop",
+        files(
+          file("nota.txt", 10, "text/plain"),
+          file("a.png", 10, "image/png"),
+          file("b.JPG", 10, "image/jpeg"),
+          file("grande.png", 2048, "image/png"),
+          // Sem tipo (alguns sistemas entregam vazio): passa pela regra de extensão.
+          file("sem-tipo.png", 10, "")
+        )
+      )
+    );
+    await expect(names("strict")).toEqual(["a.png", "b.JPG", "sem-tipo.png"]);
+    await expect(log).toEqual([
+      "strict:accept:nota.txt",
+      "strict:size:grande.png",
+      "strict:change:a.png,b.JPG,sem-tipo.png"
+    ]);
+    await expect(notices("strict")).toEqual(["File type not accepted: nota.txt", "Larger than 1.0 KB: grande.png"]);
+    await waitFor(() => expect(announcer()).toContain("a.png, b.JPG, sem-tipo.png. File type not accepted: nota.txt"));
+
+    // Só recusados (soltos ou escolhidos): a seleção fica e não há change.
+    log.length = 0;
+    zone("strict").dispatchEvent(dragEvent("drop", files(file("x.txt", 10, "text/plain"))));
+    pick("strict", file("enorme.png", 4096, "image/png"));
+    await expect(names("strict")).toEqual(["a.png", "b.JPG", "sem-tipo.png"]);
+    await expect(log).toEqual(["strict:accept:x.txt", "strict:size:enorme.png"]);
+    await expect(notices("strict")).toEqual(["Larger than 1.0 KB: enorme.png"]);
+
+    // Seletor misto: o grande sai e o resto entra; o tipo também vale no seletor ("todos os arquivos").
+    log.length = 0;
+    pick("strict", file("c.png", 10, "image/png"), file("d.gif", 10, "image/gif"), file("e.png", 2048, "image/png"));
+    await expect(names("strict")).toEqual(["c.png"]);
+    await expect(log).toEqual(["strict:accept:d.gif", "strict:size:e.png", "strict:change:c.png"]);
+
+    // A próxima seleção sem recusa, e o clear(), tiram os avisos.
+    pick("strict", file("f.png", 10, "image/png"));
+    await expect(notices("strict")).toEqual([]);
+
+    // Depois do clear(), um seletor só com recusados deixa a seleção vazia (e não devolve a que foi limpa).
+    log.length = 0;
+    host("strict").clear();
+    pick("strict", file("enorme.png", 4096, "image/png"));
+    await expect(names("strict")).toEqual([]);
+    await expect(log).toEqual(["strict:size:enorme.png"]);
+    await expect(notices("strict")).toEqual(["Larger than 1.0 KB: enorme.png"]);
+
+    // Sem strict-accept, soltar fora do accept continua aceitando, como antes, e não há ark-reject.
+    log.length = 0;
+    zone("loose").dispatchEvent(dragEvent("drop", files(file("nota.txt", 10, "text/plain"))));
+    await expect(names("loose")).toEqual(["nota.txt"]);
+    await expect(log).toEqual(["loose:change:nota.txt"]);
+
+    // transient: change com os arquivos, depois o campo vazio e sem lista; o aviso de uma recusa ainda aparece.
+    log.length = 0;
+    await expect(list("transient").hidden).toBe(true);
+    pick("transient", file("r.pdf", 10, "application/pdf"), file("s.pdf", 2048, "application/pdf"));
+    await expect(log).toEqual(["transient:size:s.pdf", "transient:change:r.pdf"]);
+    await expect(host("transient").files).toHaveLength(0);
+    await expect(list("transient").hidden).toBe(false);
+    await expect(notices("transient")).toEqual(["Larger than 1.0 KB: s.pdf"]);
+    await expect(list("transient").querySelector('[data-ark="file-input-item"]')).toBeNull();
+    pick("transient", file("t.pdf", 10, "application/pdf"));
+    await expect(host("transient").files).toHaveLength(0);
+    await expect(list("transient").hidden).toBe(true);
+    await expect(list("transient").textContent).toBe("");
+
+    // Modo pasta: nada é filtrado.
+    log.length = 0;
+    pick("folder", file("grande.bin", 2048, ""));
+    await expect(log).toEqual(["folder:change:grande.bin"]);
+  }
+};

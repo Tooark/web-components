@@ -1143,6 +1143,20 @@ export type ArkFileInputStyleOptions = {
   lang?: ArkLang;
   /** JSON com strings próprias, mesclado sobre o inglês, quando lang é "custom". */
   localeJson?: string;
+  /** O `accept` vale também para os arquivos soltos (e para o "todos os arquivos" do seletor). Padrão: desligado. */
+  strictAccept?: boolean;
+  /** Tamanho máximo de cada arquivo, em bytes; os maiores saem por `ark-reject`. Padrão: sem limite. */
+  maxSize?: number;
+  /** Entrega os arquivos no `change` e volta vazio, sem lista própria (envio ao escolher). Padrão: desligado. */
+  transient?: boolean;
+};
+
+/** Detalhe do `ark-reject` do ark-file-input: os arquivos recusados e o motivo. */
+export type ArkFileRejectDetail = {
+  /** Os arquivos que ficaram de fora da seleção. */
+  files: File[];
+  /** "accept": tipo fora do `accept` (com `strict-accept`); "size": acima do `max-size`. */
+  reason: "accept" | "size";
 };
 
 // Exports types específicos do componente skeleton

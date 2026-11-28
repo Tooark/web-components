@@ -1,4 +1,5 @@
 import {
+  type ArkFileRejectDetail,
   type ArkIntent,
   type ArkLocale,
   type ArkRounded,
@@ -14,6 +15,9 @@ import { applyTestHooks } from "./test-hooks";
 import { upgradeProperties } from "./upgrade-properties";
 
 let arkFileInputIdCounter = 0;
+
+/** Arquivos recusados por motivo, para os avisos da lista. */
+type Rejected = { accept: File[]; size: File[] };
 
 /** Ícone de enviar (seta para cima numa bandeja), chrome do botão de escolher. */
 const UPLOAD_SVG = `
@@ -66,10 +70,17 @@ export class ArkFileInput extends HTMLElementBase {
   private droppedPaths: string[] | null = null;
   /** Conta as seleções: a leitura assíncrona de uma pasta solta só é publicada se nada veio depois dela. */
   private selectionSeq = 0;
+  /** Arquivos recusados na última seleção (`strict-accept`, `max-size`): a lista mostra o aviso até a próxima. */
+  private rejected: Rejected = { accept: [], size: [] };
+  /** Seleção publicada por último, para voltar a ela quando o seletor trouxe só arquivos recusados. */
+  private lastFiles: File[] = [];
 
   static get observedAttributes(): string[] {
     return [
       "accept",
+      "strict-accept",
+      "max-size",
+      "transient",
       "multiple",
       "directory",
       "label",
@@ -153,6 +164,8 @@ export class ArkFileInput extends HTMLElementBase {
   clear(): void {
     if (!this.inputEl) return;
     this.inputEl.value = "";
+    // Sem isso, um seletor que trouxesse só recusados devolveria a seleção que acabou de ser limpa.
+    this.lastFiles = [];
     this.resetSelection();
     this.syncList();
   }
@@ -175,15 +188,101 @@ export class ArkFileInput extends HTMLElementBase {
   // O change nativo do input oculto não sobe ao host: quem escuta no host recebe só o CustomEvent com detail.
   private readonly handleChange = (event: Event): void => {
     event.stopPropagation();
+    // O seletor já filtra pelo `accept` (a menos que a pessoa escolha "todos os arquivos"), mas não pelo tamanho.
+    const picked = this.files;
+    const { kept, rejected } = this.screen(picked);
+    if (kept.length < picked.length && this.inputEl) {
+      if (kept.length === 0) {
+        // Só arquivos recusados: a seleção volta à anterior e não há `change`, como num drop sem nada aproveitável.
+        this.inputEl.files = ArkFileInput.toFileList(this.lastFiles);
+        this.rejected = rejected;
+        this.syncList();
+        announce(this.notices(this.getLocale()).join(". "));
+        return;
+      }
+      this.inputEl.files = ArkFileInput.toFileList(kept);
+    }
     this.resetSelection();
+    this.rejected = rejected;
     this.publish();
   };
 
-  // Uma seleção nova (seletor, drop ou clear) descarta o aviso, os caminhos do drop anterior e a leitura em curso.
+  // Uma seleção nova (seletor, drop ou clear) descarta os avisos, os caminhos do drop anterior e a leitura em curso.
   private resetSelection(): void {
     this.folderRejected = false;
     this.droppedPaths = null;
+    this.rejected = { accept: [], size: [] };
     this.selectionSeq += 1;
+  }
+
+  private static toFileList(files: File[]): FileList {
+    const transfer = new DataTransfer();
+    for (const file of files) transfer.items.add(file);
+    return transfer.files;
+  }
+
+  // Tamanho máximo em bytes (`max-size`); 0 sem limite.
+  private maxSize(): number {
+    const max = Number(this.getAttribute("max-size"));
+    return Number.isFinite(max) && max > 0 ? max : 0;
+  }
+
+  // O arquivo casa com o `accept` (extensão, tipo ou tipo/*), a mesma conferência do seletor nativo. Um arquivo sem
+  // tipo (alguns sistemas entregam `type` vazio) só passa por uma regra de extensão.
+  private accepts(file: File): boolean {
+    const rules = (this.getAttribute("accept") || "")
+      .split(",")
+      .map((rule) => rule.trim().toLowerCase())
+      .filter(Boolean);
+    if (rules.length === 0) return true;
+    const name = file.name.toLowerCase();
+    const type = file.type.toLowerCase();
+    return rules.some((rule) => {
+      if (rule === "*" || rule === "*/*") return true;
+      if (rule.startsWith(".")) return name.endsWith(rule);
+      return rule.endsWith("/*") ? type.startsWith(rule.slice(0, -1)) : type === rule;
+    });
+  }
+
+  // Separa os arquivos aceitos dos recusados pelo `accept` (só com `strict-accept`) e pelo `max-size`, e avisa o app
+  // com um `ark-reject` por motivo. Sem os dois atributos, e em modo pasta, tudo passa, como sempre foi.
+  private screen(files: File[]): { kept: File[]; rejected: Rejected } {
+    const rejected: Rejected = { accept: [], size: [] };
+    if (this.directory) return { kept: files, rejected };
+    const strict = this.hasAttribute("strict-accept");
+    const max = this.maxSize();
+    const kept: File[] = [];
+    for (const file of files) {
+      if (strict && !this.accepts(file)) {
+        rejected.accept.push(file);
+      } else if (max > 0 && file.size > max) {
+        rejected.size.push(file);
+      } else {
+        kept.push(file);
+      }
+    }
+    for (const reason of ["accept", "size"] as const) {
+      if (rejected[reason].length === 0) continue;
+      const detail: ArkFileRejectDetail = { files: rejected[reason], reason };
+      this.dispatchEvent(new CustomEvent("ark-reject", { detail, bubbles: true, composed: true }));
+    }
+    return { kept, rejected };
+  }
+
+  // Avisos da última seleção, na ordem da lista: pasta recusada, tipo recusado, tamanho excedido.
+  private notices(locale: ArkLocale): string[] {
+    const names = (files: File[]): string => files.map((file) => file.name).join(", ");
+    const notes: string[] = [];
+    if (this.folderRejected) notes.push(locale.foldersNotAccepted);
+    if (this.rejected.accept.length) notes.push(locale.typeNotAccepted.replace("{files}", names(this.rejected.accept)));
+    if (this.rejected.size.length) {
+      notes.push(
+        locale.sizeExceeded
+          .replace("{size}", ArkFileInput.formatSize(this.maxSize()))
+          .replace("{files}", names(this.rejected.size))
+      );
+    }
+    return notes;
   }
 
   // Lista, anúncio e `change` da seleção atual do input. Em modo pasta o anúncio é o resumo e `detail` leva os
@@ -200,8 +299,16 @@ export class ArkFileInput extends HTMLElementBase {
       return;
     }
     const selection = files.length ? files.map((file) => file.name).join(", ") : locale.noFile;
-    announce(this.folderRejected ? `${selection}. ${locale.foldersNotAccepted}` : selection);
+    announce([selection, ...this.notices(locale)].join(". "));
+    this.lastFiles = files;
     this.dispatchEvent(new CustomEvent("change", { detail: { files }, bubbles: true, composed: true }));
+    // `transient`: o app cuida da lista (envio ao escolher); o campo entrega os arquivos e volta vazio, mantendo o
+    // aviso dos recusados até a próxima seleção.
+    if (this.hasAttribute("transient") && this.inputEl) {
+      this.inputEl.value = "";
+      this.lastFiles = [];
+      this.syncList();
+    }
   }
 
   // Resumo da seleção em modo pasta: o nome da pasta, quando todos os caminhos saem da mesma, a contagem e o tamanho.
@@ -308,25 +415,25 @@ export class ArkFileInput extends HTMLElementBase {
     this.dragDepth = 0;
     this.setDragover(false);
     if (!event.dataTransfer || !this.inputEl) return;
-    const { files, folders } = ArkFileInput.readDrop(event.dataTransfer);
-    if (files.length === 0 && folders.length === 0) return;
+    const { files: dropped, folders } = ArkFileInput.readDrop(event.dataTransfer);
+    if (dropped.length === 0 && folders.length === 0) return;
     if (this.directory) {
-      void this.selectDropped(files, folders);
+      void this.selectDropped(dropped, folders);
       return;
     }
+    const { kept: files, rejected } = this.screen(dropped);
     if (files.length === 0) {
-      // Só pastas: a seleção fica como estava e não há `change`.
-      this.folderRejected = true;
+      // Só pastas ou só arquivos recusados: a seleção fica como estava e não há `change`.
+      this.folderRejected = folders.length > 0;
+      this.rejected = rejected;
       this.syncList();
-      announce(this.getLocale().foldersNotAccepted);
+      announce(this.notices(this.getLocale()).join(". "));
       return;
     }
     this.resetSelection();
     this.folderRejected = folders.length > 0;
-    const transfer = new DataTransfer();
-    const count = this.multiple ? files.length : 1;
-    for (let index = 0; index < count; index += 1) transfer.items.add(files[index]);
-    this.inputEl.files = transfer.files;
+    this.rejected = rejected;
+    this.inputEl.files = ArkFileInput.toFileList(this.multiple ? files : files.slice(0, 1));
     this.publish();
   };
 
@@ -471,21 +578,27 @@ export class ArkFileInput extends HTMLElementBase {
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   }
 
-  // Lista dos nomes (com o tamanho) ou a string noFile; por último, o aviso da pasta recusada. Em modo pasta a
-  // seleção pode ter centenas de arquivos, então a lista é uma linha só: a pasta, a contagem e o tamanho total.
+  // Lista dos nomes (com o tamanho) ou a string noFile; por último, os avisos (pasta, tipo e tamanho recusados). Em
+  // modo pasta a seleção pode ter centenas de arquivos, então a lista é uma linha só: a pasta, a contagem e o tamanho
+  // total. Com `transient` a lista é do app: só os avisos aparecem, e sem eles a lista some.
   private syncList(): void {
     if (!this.listEl) return;
     const files = this.files;
     const locale = this.getLocale();
     const directory = this.directory;
     const text = this.getSizing().text;
+    const transient = this.hasAttribute("transient");
+    const notices = this.notices(locale);
     this.listEl.textContent = "";
     // max-w-full: centrada na zona, a lista teria a largura do nome mais longo e o truncate dos itens nunca cortaria.
     this.listEl.className = [
       "ark:m-0 ark:flex ark:max-w-full ark:list-none ark:flex-col ark:items-center ark:gap-0.5 ark:p-0",
       text
     ].join(" ");
-    if (files.length === 0) {
+    this.listEl.hidden = transient && notices.length === 0;
+    if (transient) {
+      // Só os avisos (a lista de arquivos é do app).
+    } else if (files.length === 0) {
       const item = document.createElement("li");
       item.className = "ark:text-fg-muted";
       item.textContent = directory ? locale.noFolder : locale.noFile;
@@ -523,10 +636,10 @@ export class ArkFileInput extends HTMLElementBase {
       applyTestHooks(this, "file-input", item, "item");
       this.listEl.appendChild(item);
     }
-    if (this.folderRejected) {
+    for (const notice of notices) {
       const item = document.createElement("li");
       item.className = "ark:text-danger-soft-fg";
-      item.textContent = locale.foldersNotAccepted;
+      item.textContent = notice;
       applyTestHooks(this, "file-input", item, "rejected");
       this.listEl.appendChild(item);
     }

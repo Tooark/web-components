@@ -48,6 +48,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   `name` stays on the hidden input and `intent` still goes only to the panels. `full-width` makes the field fill the
   container. The popup is now anchored to the `<input>`, so with a label or a message it opens right below the field;
   without them the box is the same as before. Props in the three wrappers. `InputFieldAttributes` story.
+- `ark-file-input`: refusals, all opt-in and outside `directory`. `strict-accept` applies `accept` to dropped files
+  too (and to the picker's "All files" option), `max-size` (bytes) refuses larger files on both paths, and each
+  reason emits one `ark-reject` with `detail: { files, reason }` (`"accept"` or `"size"`, type
+  `ArkFileRejectDetail`) plus a notice in the list and in the announcement (new strings `typeNotAccepted` and
+  `sizeExceeded` in en/pt/es); when nothing is left, the selection stays and no `change` is emitted. `transient`
+  hands the files over in `change` and empties itself, without a list of its own, for upload on select. Without these
+  attributes a drop outside `accept` is still accepted, as documented since 1.0.0. Props and the reject handler
+  (`onReject`, `@ark-reject`, `(arkReject)`) in the wrappers. `RejectsAndTransient` story.
 
 ## [1.9.4] - 2026-11-26
 

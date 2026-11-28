@@ -14,7 +14,7 @@ export const OPT_IN_COLUMNS = [
  * Confere os atributos opt-in da 1.10.0 renderizados por um wrapper (React, Vue ou Angular), na mesma cena nos três:
  * cada prop nova chega ao elemento e produz o efeito dela.
  */
-export async function expectOptInAttributes(canvasElement: HTMLElement): Promise<void> {
+export async function expectOptInAttributes(canvasElement: HTMLElement, rejects: string[]): Promise<void> {
   const textarea = canvasElement.querySelector("ark-textarea") as HTMLElement;
   await waitFor(() => expect(textarea).toHaveAttribute("max-rows", "4"));
   await expect((textarea.querySelector("textarea") as HTMLTextAreaElement).style.maxHeight).not.toBe("");
@@ -44,4 +44,23 @@ export async function expectOptInAttributes(canvasElement: HTMLElement): Promise
   await expect(field).toHaveAttribute("required", "");
   await expect(field).toHaveAttribute("error-message", "Obrigatório");
   await expect(field).toHaveAttribute("size", "sm");
+
+  // O ark-reject chega ao handler do wrapper (onReject, @ark-reject, (arkReject)), com o motivo.
+  const upload = canvasElement.querySelector("ark-file-input") as HTMLElement;
+  await expect(upload).toHaveAttribute("strict-accept", "");
+  await expect(upload).toHaveAttribute("max-size", "1024");
+  await expect(upload).toHaveAttribute("transient", "");
+  const transfer = new DataTransfer();
+  transfer.items.add(new File(["x"], "nota.txt", { type: "text/plain" }));
+  transfer.items.add(new File([new Uint8Array(2048)], "grande.png", { type: "image/png" }));
+  upload
+    .querySelector('[data-ark="file-input-zone"]')!
+    .dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: transfer }));
+  await waitFor(() => expect(rejects).toEqual(["accept:nota.txt", "size:grande.png"]));
+}
+
+/** Registra um ark-reject no formato que a cena confere. */
+export function rejectEntry(event: Event): string {
+  const { files, reason } = (event as CustomEvent<{ files: File[]; reason: string }>).detail;
+  return `${reason}:${files.map((file) => file.name).join(",")}`;
 }
