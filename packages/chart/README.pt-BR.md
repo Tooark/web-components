@@ -62,7 +62,7 @@ Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram 
 ### `ark-chart`
 
 - Atributos: `theme` (`auto` | `light` | `dark`, padrão `auto`), `palette` (`default` | `tokens`, padrão `default`; `tokens` monta o tema do ECharts a partir dos tokens `--ark-color-*` da página, no lado que o `theme` resolve: séries nos intents primary, info, success, warning, danger e neutral, texto, eixos e legenda em `fg`/`fg-muted`, linhas de grade em `border`, tooltip em `surface-raised`, fundo transparente, e as mesmas cores de texto e linha no gauge e no radar (faixas do radar em `surface-muted`); cada cor é convertida para sRGB, já que a maioria dos tokens é `oklch()`, que o ECharts não lê; o `option.color` continua vencendo, e sem o CSS dos tokens na página, os estilos do `@tooark/core` ou do `@tooark/web-components`, cai no `default`), `renderer` (`canvas` | `svg`), `height` (comprimento CSS, padrão `320px`), `auto-resize` (`"false"` desliga; onde não existe `ResizeObserver`, como no jsdom, o gráfico renderiza do mesmo jeito, sem acompanhar o tamanho), `testid`, `aria-label`/`aria-labelledby` (o host vira `role="img"` com esse nome, a menos que você tenha dado um `role`; sem eles nada muda, e a descrição gerada pelo ECharts, `option.aria`, continua disponível).
-- Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`, `resolvedPalette` (`tokens` só quando os tokens foram encontrados).
+- Propriedades: `option` (o `EChartsOption`; atribuir re-renderiza com `notMerge`), `resolvedTheme`, `resolvedPalette` (`tokens` só quando os tokens foram encontrados), `chart` (só leitura: a instância do ECharts, para exportar com `getDataURL()` ou `renderToSVGString()` com `renderer="svg"`, `dispatchAction` e eventos além do clique; `null` antes do primeiro render e enquanto desconectado, e uma instância nova sempre que `theme`, `palette` ou `renderer` recriam o gráfico, então leia na hora de usar em vez de guardar).
 - Eventos: `ark-chart-click` com os params do ECharts em `detail`.
 - Hooks: o contêiner do gráfico (`[part="canvas"]`) leva `data-ark="chart"` e o `testid` como `data-testid`.
 
@@ -91,6 +91,9 @@ chart.addEventListener("ark-chart-click", (event) => {
   console.log((event as CustomEvent).detail.name, (event as CustomEvent).detail.value);
 });
 document.body.appendChild(chart);
+
+// Depois, para levar a um relatório: um data URL PNG (ou o texto do SVG com renderer="svg").
+const png = chart.chart?.getDataURL({ type: "png", pixelRatio: 2 });
 ```
 
 ### O engine sem o elemento

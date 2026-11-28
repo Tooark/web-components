@@ -1,5 +1,5 @@
 import { type ArkThemeSelected, observeColorScheme } from "@tooark/tokens";
-import type { EChartsOption } from "echarts";
+import type { EChartsOption, EChartsType } from "echarts";
 import { type ArkChartInstance, createChart } from "../engine";
 import type { ArkChartPalette, ArkChartRenderer, ArkChartTheme } from "../types";
 import { HTMLElementBase } from "./html-element-base";
@@ -68,6 +68,15 @@ export class ArkChart extends HTMLElementBase {
   /** Paleta efetivamente aplicada: "tokens" só com o CSS dos tokens na página; `null` antes de renderizar. */
   get resolvedPalette(): ArkChartPalette | null {
     return this.instance?.resolvedPalette() ?? null;
+  }
+
+  /**
+   * Instância do ECharts (exportar com `getDataURL`/`renderToSVGString`, `dispatchAction`, eventos além do clique);
+   * `null` antes de renderizar. Troca quando o gráfico é recriado (`theme`, `palette`, `renderer` ou reconexão): leia
+   * na hora de usar, sem guardar.
+   */
+  get chart(): EChartsType | null {
+    return this.instance?.chart ?? null;
   }
 
   connectedCallback(): void {

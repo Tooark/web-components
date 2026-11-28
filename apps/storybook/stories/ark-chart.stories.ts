@@ -456,6 +456,37 @@ export const ResolveTokenColors = {
   }
 };
 
+// `chart` entrega a instância do ECharts, para exportar (PNG no canvas, SVG no svg) e para o resto da API; `null` antes
+// de renderizar e fora do DOM, e a instância nova depois de uma troca que recria o gráfico.
+export const ChartInstance = {
+  render: () => document.createElement("div"),
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const el = document.createElement("ark-chart") as ArkChart;
+    el.setAttribute("height", "200px");
+    el.setAttribute("theme", "light");
+    await expect(el.chart).toBeNull();
+    el.option = buildOption("bar");
+    await expect(el.chart).toBeNull();
+
+    canvasElement.appendChild(el);
+    const first = el.chart!;
+    await expect(Boolean(first.isDisposed())).toBe(false);
+    await expect(first.getDom()).toBe(el.querySelector('[data-ark="chart"]'));
+    await expect(first.getDataURL({ type: "png" })).toMatch(/^data:image\/png;base64,/);
+
+    el.setAttribute("renderer", "svg");
+    await expect(first.isDisposed()).toBe(true);
+    await expect(el.chart!.renderToSVGString()).toMatch(/^<svg/);
+
+    el.setAttribute("theme", "dark");
+    await expect(Boolean(el.chart!.isDisposed())).toBe(false);
+    await expect(el.chart!.getDom()).toBe(el.querySelector('[data-ark="chart"]'));
+
+    el.remove();
+    await expect(el.chart).toBeNull();
+  }
+};
+
 // Engine sem o elemento: autoResize (padrão) acompanha o tamanho do container.
 export const EngineAutoResize = {
   render: () => {

@@ -19,6 +19,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
   out in a fixed order). `null` outside the browser or without the tokens CSS on the page, `""` for a name that is
   not a token. The probe that `palette="tokens"` already used is now shared by both. Type `ArkTokenColorOptions`.
   `ResolveTokenColors` story.
+- `ark-chart`: read-only `chart` property with the ECharts instance (`null` before the first render and while
+  disconnected), for exporting the chart (`getDataURL()`, or `renderToSVGString()` with `renderer="svg"`) and the
+  rest of the ECharts API without reaching for `echarts.getInstanceByDom`. `ChartInstance` story.
 
 ## [1.9.4] - 2026-11-26
 
