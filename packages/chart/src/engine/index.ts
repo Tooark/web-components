@@ -1,8 +1,8 @@
 import { type ArkThemeSelected, resolveColorScheme } from "@tooark/tokens";
 import type { EChartsOption, EChartsType } from "echarts";
 import * as echarts from "echarts";
-import type { ArkChartOptions, ArkChartPalette, ArkChartTheme } from "../types";
-import { tokensChartTheme } from "./tokens-theme";
+import type { ArkChartOptions, ArkChartPalette, ArkChartTheme, ArkTokenColorOptions } from "../types";
+import { createTokenReader, hasTokens, tokensChartTheme } from "./tokens-theme";
 
 export type ArkChartInstance = {
   /** Instância nativa do ECharts (para uso avançado: on/off, dispatchAction, etc.). */
@@ -28,6 +28,35 @@ export function resolveChartTheme(theme: ArkChartTheme | undefined, element?: El
   if (theme === "dark") return "dark";
   if (theme === "light") return "light";
   return resolveColorScheme(element);
+}
+
+/**
+ * Cores dos tokens `--ark-color-*` prontas para a `option` do ECharts, em `rgba()` sRGB (a maioria dos tokens é
+ * `oklch()`, que o ECharts não lê): a cor de uma série pelo intent dela (`success`, `danger`), a de um rótulo (`fg`).
+ * Os nomes vão sem o prefixo e o resultado traz uma chave por nome; um nome que não é token volta como "". O lado vem
+ * de `theme` (em "auto", o color-scheme de `element`, como o gráfico resolve). `null` fora do navegador ou sem o CSS dos
+ * tokens na página, como a `palette="tokens"` cai no padrão.
+ */
+export function resolveTokenColors<T extends string>(
+  tokens: readonly T[],
+  options: ArkTokenColorOptions = {}
+): Record<T, string> | null {
+  if (typeof document === "undefined") return null;
+  const element = options.element ?? document.body ?? document.documentElement;
+  if (!hasTokens(element)) return null;
+
+  const style = getComputedStyle(element);
+  const { read, dispose } = createTokenReader(element, resolveChartTheme(options.theme, element));
+  try {
+    const colors = {} as Record<T, string>;
+    for (const token of tokens) {
+      // Sem o token, o `var()` da sonda seria inválido e a cor herdada do elemento passaria por cor do token.
+      colors[token] = style.getPropertyValue(`--ark-color-${token}`).trim() ? read(token) : "";
+    }
+    return colors;
+  } finally {
+    dispose();
+  }
 }
 
 /**

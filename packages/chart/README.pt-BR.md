@@ -70,7 +70,8 @@ Em React, Vue ou Angular use a tag diretamente (os READMEs dos wrappers mostram 
 
 - `createChart(container, { option, theme?, palette?, renderer?, autoResize? })` → `{ chart, setOption(option, { notMerge }), setTheme(theme), setPalette(palette), resize(), resolvedTheme(), resolvedPalette(), destroy() }`; `autoResize` (padrão `true`) redimensiona o gráfico junto com o container.
 - `resolveChartTheme(theme, element)`.
-- Tipos: `ArkChartOptions`, `ArkChartTheme`, `ArkChartRenderer`, `ArkChartInstance`, `EChartsOption` (reexportado).
+- `resolveTokenColors(tokens, { theme?, element? })` → `{ [token]: "rgba(...)" }`: as cores dos tokens `--ark-color-*` (nomes sem o prefixo: `success`, `danger`, `fg`, `surface-muted`) em sRGB, prontas para a `option`, para uma série levar um intent determinado enquanto a `palette="tokens"` distribui os intents numa ordem fixa. `theme` (padrão `auto`, o `color-scheme` de `element`) escolhe o lado, e `element` (padrão `document.body`) é onde as cores são lidas, então um override de marca num trecho da página vale ali. Um nome que não é token volta como `""`; fora do navegador ou sem o CSS dos tokens na página o resultado é `null`, como a `palette="tokens"` cai no `default`. Leia as cores de novo quando o tema mudar (`resolvedTheme` do `ark-chart`).
+- Tipos: `ArkChartOptions`, `ArkChartTheme`, `ArkChartRenderer`, `ArkChartInstance`, `ArkTokenColorOptions`, `EChartsOption` (reexportado).
 
 ---
 
@@ -101,6 +102,23 @@ const instancia = createChart(document.querySelector("#vendas")!, { option, them
 instancia.setOption(proximaOption, { notMerge: true });
 instancia.chart.on("legendselectchanged", handler); // API crua do ECharts
 instancia.destroy();
+```
+
+### Uma série num intent determinado
+
+```ts
+import { resolveTokenColors } from "@tooark/chart";
+
+const chart = document.querySelector("ark-chart")!;
+const cores = resolveTokenColors(["success", "danger"], { theme: chart.resolvedTheme ?? "auto" });
+chart.option = {
+  xAxis: { type: "category", data: ["T1", "T2", "T3"] },
+  yAxis: {},
+  series: [
+    { name: "Aprovado", type: "bar", data: [12, 18, 15], color: cores?.success },
+    { name: "Recusado", type: "bar", data: [3, 2, 4], color: cores?.danger }
+  ]
+};
 ```
 
 ---

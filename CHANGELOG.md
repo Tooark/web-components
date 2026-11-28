@@ -14,6 +14,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-select`: `lang` on an option (`ArkSelectOption`) is written on its `<option>`, so a label in another language
   than the page (the list of a language picker) is read with its own pronunciation (WCAG 3.1.2). Options without it
   render as before. `OptionLang` story.
+- `@tooark/chart`: `resolveTokenColors(tokens, { theme?, element? })` returns the colors of `--ark-color-*` tokens
+  in sRGB, ready for an ECharts `option`, so a series can carry a given intent (`palette="tokens"` hands the intents
+  out in a fixed order). `null` outside the browser or without the tokens CSS on the page, `""` for a name that is
+  not a token. The probe that `palette="tokens"` already used is now shared by both. Type `ArkTokenColorOptions`.
+  `ResolveTokenColors` story.
 
 ## [1.9.4] - 2026-11-26
 
