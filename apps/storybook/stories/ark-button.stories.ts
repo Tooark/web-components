@@ -940,3 +940,117 @@ export const LinkNavigateAndDownload = {
     }
   }
 };
+
+// `soft-disabled`: a ação bloqueada continua no Tab e sob o ponteiro, com `aria-disabled`, para um tooltip dizer o
+// motivo; clique, Enter, Espaço e o envio implícito do formulário não fazem nada. `disabled` continua tirando o botão
+// do Tab, e vence quando os dois estão presentes.
+export const SoftDisabled = {
+  render: () => {
+    const wrap = document.createElement("div");
+    wrap.className = "flex flex-col items-start gap-3";
+    const before = document.createElement("button");
+    before.textContent = "Antes";
+    const tooltip = document.createElement("ark-tooltip");
+    tooltip.setAttribute("content", "Já existe execução para a versão");
+    const soft = document.createElement("ark-button");
+    soft.setAttribute("soft-disabled", "");
+    soft.textContent = "Executar";
+    tooltip.appendChild(soft);
+    const hard = document.createElement("ark-button");
+    hard.setAttribute("disabled", "");
+    hard.textContent = "Desabilitado";
+    const link = document.createElement("ark-button");
+    link.setAttribute("href", "/relatorios");
+    link.setAttribute("soft-disabled", "");
+    link.textContent = "Relatórios";
+    const form = document.createElement("form");
+    form.className = "flex gap-2";
+    const field = document.createElement("input");
+    field.name = "versao";
+    field.setAttribute("aria-label", "Versão");
+    const submit = document.createElement("ark-button");
+    submit.setAttribute("type", "submit");
+    submit.setAttribute("soft-disabled", "");
+    submit.textContent = "Publicar";
+    form.append(field, submit);
+    const copy = document.createElement("ark-copy-button");
+    copy.setAttribute("value", "abc");
+    copy.setAttribute("soft-disabled", "");
+    wrap.append(before, tooltip, hard, link, form, copy);
+    return wrap;
+  },
+  play: async ({ canvasElement }: { canvasElement: HTMLElement }) => {
+    const [soft, hard, link, submit] = Array.from(canvasElement.querySelectorAll("ark-button")) as ArkButton[];
+    const copy = canvasElement.querySelector("ark-copy-button") as HTMLElement;
+    const bubble = canvasElement.querySelector('[data-ark="tooltip-bubble"]') as HTMLElement;
+    const clicks: string[] = [];
+    for (const el of [soft, link, submit, copy]) {
+      el.addEventListener("click", () => clicks.push(el.textContent || el.tagName));
+    }
+    const copies: unknown[] = [];
+    copy.addEventListener("ark-copy", (event) => copies.push(event));
+    const submits: unknown[] = [];
+    const form = canvasElement.querySelector("form")!;
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      submits.push(event);
+    });
+
+    // No Tab, anunciado como desabilitado, e o tooltip abre no foco; o `disabled` é pulado.
+    (canvasElement.querySelector("button") as HTMLButtonElement).focus();
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(soft);
+    await expect(soft).toHaveAttribute("aria-disabled", "true");
+    await expect(soft).toHaveAccessibleName("Executar");
+    await waitFor(() => expect(bubble.matches(":popover-open")).toBe(true));
+    await userEvent.tab();
+    await expect(document.activeElement).toBe(link.querySelector("a"));
+    await expect(hard).toHaveAttribute("tabindex", "-1");
+
+    // Enter e Espaço no botão focado não ativam; o ponteiro chega (o tooltip abre no hover) e o clique é bloqueado.
+    soft.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(getComputedStyle(soft).pointerEvents).toBe("auto");
+    await expect(getComputedStyle(hard).pointerEvents).toBe("none");
+    await userEvent.click(soft);
+    await expect(clicks).toEqual([]);
+
+    // Link: no Tab, anunciado como link desabilitado, sem href e sem navegar.
+    const anchor = link.querySelector("a") as HTMLAnchorElement;
+    await expect(anchor).toHaveAttribute("role", "link");
+    await expect(anchor).toHaveAttribute("tabindex", "0");
+    await expect(anchor).toHaveAttribute("aria-disabled", "true");
+    await expect(anchor.hasAttribute("href")).toBe(false);
+    const navigations: unknown[] = [];
+    link.addEventListener("ark-navigate", (event) => navigations.push(event));
+    await userEvent.click(anchor);
+    await expect(navigations).toEqual([]);
+
+    // Formulário: o Enter implícito e o clique no submit não enviam; o ark-copy-button herda o atributo.
+    await userEvent.type(canvasElement.querySelector("input[name=versao]") as HTMLInputElement, "1.2{Enter}");
+    await userEvent.click(submit);
+    await expect(copy).toHaveAttribute("tabindex", "0");
+    await userEvent.click(copy);
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await expect(submits).toEqual([]);
+    await expect(copies).toEqual([]);
+    await expect(clicks).toEqual([]);
+
+    // `disabled` vence: fora do Tab e sem ponteiro.
+    soft.setAttribute("disabled", "");
+    await expect(soft).toHaveAttribute("tabindex", "-1");
+    await expect(getComputedStyle(soft).pointerEvents).toBe("none");
+    soft.removeAttribute("disabled");
+
+    // Sem o atributo, volta a ser um botão comum; o link volta a ter href e perde o role.
+    soft.softDisabled = false;
+    link.removeAttribute("soft-disabled");
+    await expect(soft.hasAttribute("aria-disabled")).toBe(false);
+    await expect(anchor).toHaveAttribute("href", "/relatorios");
+    await expect(anchor.hasAttribute("role")).toBe(false);
+    await expect(anchor.hasAttribute("tabindex")).toBe(false);
+    await userEvent.click(soft);
+    await expect(clicks).toEqual(["Executar"]);
+  }
+};

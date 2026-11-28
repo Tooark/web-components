@@ -16,6 +16,8 @@ export type ArkCopyButtonProps = PropsWithChildren<
       /** Duração do feedback "copiado" em ms. Padrão: 1500. */
       feedbackMs?: number;
       disabled?: boolean;
+      /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+      softDisabled?: boolean;
       className?: string;
       onCopy?: (event: CustomEvent<{ value: string }>) => void;
     }
@@ -35,6 +37,7 @@ export const ArkCopyButton = forwardRef<ArkCopyButtonElement, ArkCopyButtonProps
       iconOnly,
       fullWidth,
       disabled,
+      softDisabled,
       onCopy,
       ...rest
     } = props;
@@ -63,6 +66,7 @@ export const ArkCopyButton = forwardRef<ArkCopyButtonElement, ArkCopyButtonProps
       "locale-json": localeJson,
       loading: loading ? "" : undefined,
       disabled: disabled ? "" : undefined,
+      "soft-disabled": softDisabled ? "" : undefined,
       "icon-only": iconOnly ? "" : undefined,
       "full-width": fullWidth ? "" : undefined
     };

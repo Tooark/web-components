@@ -17,6 +17,8 @@ export type ArkButtonProps = PropsWithChildren<
     ArkButtonStyleOptions & {
       type?: ArkButtonType;
       disabled?: boolean;
+      /** Desabilitado só para a ação: continua no Tab e sob o ponteiro, para um tooltip dizer o motivo. */
+      softDisabled?: boolean;
       /** Id do formulário a que o botão pertence quando fica fora dele, como no `<button form>` nativo. */
       form?: string;
       /** Clique simples no link (`href`), cancelável: `event.preventDefault()` e o roteamento da SPA. */
@@ -36,6 +38,7 @@ export const ArkButton = forwardRef<ArkButtonElement, ArkButtonProps>(
       iconOnly,
       fullWidth,
       disabled,
+      softDisabled,
       download,
       onNavigate,
       ...rest
@@ -63,6 +66,7 @@ export const ArkButton = forwardRef<ArkButtonElement, ArkButtonProps>(
       class: className,
       "text-color": textColor,
       disabled: disabled ? "" : undefined,
+      "soft-disabled": softDisabled ? "" : undefined,
       loading: loading ? "" : undefined,
       "status-label": statusLabel,
       "icon-only": iconOnly ? "" : undefined,

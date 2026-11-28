@@ -2603,7 +2603,8 @@ export const ReactOptInAttributes = {
         null,
         createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
         createElement(ReactArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, "Resumo"),
-        createElement(ReactArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS })
+        createElement(ReactArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS }),
+        createElement(ReactArkButton, { softDisabled: true }, "Executar")
       )
     );
     await expect(errors).toEqual([]);
@@ -2620,7 +2621,8 @@ export const VueOptInAttributes = {
         h("div", [
           h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
           h(VueArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, () => "Resumo"),
-          h(VueArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS })
+          h(VueArkDataView, { view: "table", rows: OPT_IN_ROWS, columns: OPT_IN_COLUMNS }),
+          h(VueArkButton, { softDisabled: true }, () => "Executar")
         ])
     });
     app.config.warnHandler = (message) => problems.push(message);
