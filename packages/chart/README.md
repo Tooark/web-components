@@ -62,7 +62,7 @@ In React, Vue or Angular use the tag directly (the framework READMEs show how); 
 ### `ark-chart`
 
 - Attributes: `theme` (`auto` | `light` | `dark`, default `auto`), `palette` (`default` | `tokens`, default `default`; `tokens` builds the ECharts theme from the `--ark-color-*` tokens of the page, on the side `theme` resolves: series in the intents primary, info, success, warning, danger and neutral, text, axes and legend in `fg`/`fg-muted`, grid lines in `border`, tooltip in `surface-raised`, transparent background, and the same text and line colors on gauges and radars (radar bands in `surface-muted`); each color is converted to sRGB, since most tokens are `oklch()`, which ECharts does not parse; `option.color` still wins, and without the tokens CSS on the page, `@tooark/core` or `@tooark/web-components` styles, it falls back to `default`), `renderer` (`canvas` | `svg`), `height` (CSS length, default `320px`), `auto-resize` (`"false"` turns it off; where `ResizeObserver` does not exist, as in jsdom, the chart still renders, without following its size), `testid`, `aria-label`/`aria-labelledby` (the host becomes `role="img"` with that name, unless you gave it a `role`; without them nothing changes, and ECharts' generated description, `option.aria`, stays available).
-- Properties: `option` (the `EChartsOption`; assigning re-renders with `notMerge`), `resolvedTheme`, `resolvedPalette` (`tokens` only when the tokens were found).
+- Properties: `option` (the `EChartsOption`; assigning re-renders with `notMerge`), `resolvedTheme`, `resolvedPalette` (`tokens` only when the tokens were found), `chart` (read-only: the ECharts instance, for exporting with `getDataURL()` or `renderToSVGString()` under `renderer="svg"`, `dispatchAction` and events other than the click; `null` before the first render and while disconnected, and a new instance whenever `theme`, `palette` or `renderer` rebuild the chart, so read it when you need it instead of keeping it).
 - Events: `ark-chart-click` with the ECharts params in `detail`.
 - Hooks: the chart container (`[part="canvas"]`) carries `data-ark="chart"` and the `testid` as `data-testid`.
 
@@ -91,6 +91,9 @@ chart.addEventListener("ark-chart-click", (event) => {
   console.log((event as CustomEvent).detail.name, (event as CustomEvent).detail.value);
 });
 document.body.appendChild(chart);
+
+// Later, to put it in a report: a PNG data URL (or the SVG text with renderer="svg").
+const png = chart.chart?.getDataURL({ type: "png", pixelRatio: 2 });
 ```
 
 ### The engine without the element
