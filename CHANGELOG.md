@@ -25,6 +25,12 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 - `ark-textarea`: `max-rows` caps `autosize`: the field grows up to that many lines and then scrolls, also on the JS
   fallback used where `field-sizing` is missing. Without it `autosize` has no ceiling, as before. `maxRows` prop in
   the React, Vue and Angular wrappers. `AutosizeMaxRows` story, and `OptInAttributes` in the wrapper stories.
+- `ark-switch`: `label-position="start"` puts the visible label (the children) before the track, and on a stretched
+  host the track goes to the far end, the row of a settings screen. `helper` adds a hint below the label, as on
+  `ark-checkbox` and `ark-radio`: it describes the track through `aria-describedby`, toggles like the rest of the host,
+  and turns the host into a two-column grid (also without children, the hint next to the track). Hook
+  `switch-helper`. Without the two attributes the markup is the same as before. `labelPosition` and `helper` props in
+  the wrappers. `LabelPositionAndHelper` story.
 
 ## [1.9.4] - 2026-11-26
 

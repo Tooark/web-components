@@ -24,6 +24,8 @@ import { ensureTooarkComponentsRegistered } from "./register";
     [attr.label]="label"
     [attr.label-on]="labelOn"
     [attr.label-off]="labelOff"
+    [attr.label-position]="labelPosition"
+    [attr.helper]="helper"
     (change)="onChange($event)">
     <ng-content></ng-content>
   </ark-switch>`
@@ -56,6 +58,10 @@ export class ArkSwitchComponent {
   @Input() label: string | undefined;
   @Input() labelOn: string | undefined;
   @Input() labelOff: string | undefined;
+  /** Lado do rótulo visível (o conteúdo projetado) em relação ao trilho: "start" põe o texto antes. Padrão: "end". */
+  @Input() labelPosition: "start" | "end" | undefined;
+  /** Dica abaixo do rótulo, que descreve o trilho por aria-describedby. */
+  @Input() helper: string | undefined;
   @Output() changed = new EventEmitter<CustomEvent<{ checked: boolean }>>();
 
   onChange(event: Event): void {

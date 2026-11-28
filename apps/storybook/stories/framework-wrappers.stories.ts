@@ -2597,7 +2597,14 @@ export const ReactOptInAttributes = {
   play: async ({ canvasElement }: Ctx) => {
     const errors: unknown[] = [];
     const render = reactRoot(canvasElement, errors);
-    render(createElement("div", null, createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 })));
+    render(
+      createElement(
+        "div",
+        null,
+        createElement(ReactArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
+        createElement(ReactArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, "Resumo")
+      )
+    );
     await expect(errors).toEqual([]);
     await expectOptInAttributes(canvasElement);
   }
@@ -2608,7 +2615,11 @@ export const VueOptInAttributes = {
   play: async ({ canvasElement }: Ctx) => {
     const problems: string[] = [];
     const app = createApp({
-      setup: () => () => h("div", [h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 })])
+      setup: () => () =>
+        h("div", [
+          h(VueArkTextarea, { label: "Notas", autosize: true, maxRows: 4 }),
+          h(VueArkSwitch, { labelPosition: "start", helper: "Um resumo por dia." }, () => "Resumo")
+        ])
     });
     app.config.warnHandler = (message) => problems.push(message);
     app.mount(mountPoint(canvasElement));

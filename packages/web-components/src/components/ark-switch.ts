@@ -19,6 +19,7 @@ type ArkSwitchSizing = {
   translateLabels: string;
   icon: string;
   label: string;
+  helper: string;
 };
 
 const CHECK_SVG =
@@ -36,7 +37,9 @@ let nextId = 0;
  * própria, em vez da escala de altura dos demais controles. Nome acessível:
  * `aria-label`, senão `label`, senão os filhos do usuário, que viram rótulo
  * visível (opt-in por construção): o host passa a ser uma linha com o trilho
- * antes do texto, e um clique no texto alterna, como num `<label>`.
+ * antes do texto (depois com `label-position="start"`), e um clique no texto
+ * alterna, como num `<label>`. `helper` acrescenta uma dica, empilhada sob o
+ * rótulo, que descreve o trilho por aria-describedby.
  */
 export class ArkSwitch extends HTMLElementBase {
   static readonly tagName = "ark-switch";
@@ -46,6 +49,8 @@ export class ArkSwitch extends HTMLElementBase {
   private labelOnEl: HTMLSpanElement | null = null;
   private labelOffEl: HTMLSpanElement | null = null;
   private inputEl: HTMLInputElement | null = null;
+  /** Dica própria (atributo `helper`); só existe enquanto o atributo existir. */
+  private helperEl: HTMLSpanElement | null = null;
   private observer: MutationObserver | null = null;
   private ownClasses: string[] = [];
   private syncingClass = false;
@@ -66,6 +71,8 @@ export class ArkSwitch extends HTMLElementBase {
       "value",
       "label",
       "aria-label",
+      "label-position",
+      "helper",
       "class",
       "testid"
     ];
@@ -148,6 +155,7 @@ export class ArkSwitch extends HTMLElementBase {
       (node) =>
         node !== this.trackEl &&
         node !== this.inputEl &&
+        node !== this.helperEl &&
         ((node.nodeType === Node.TEXT_NODE && (node.textContent || "").trim() !== "") ||
           node.nodeType === Node.ELEMENT_NODE)
     );
@@ -248,7 +256,8 @@ export class ArkSwitch extends HTMLElementBase {
         translate: "ark:translate-x-2.5",
         translateLabels: "ark:translate-x-[1.625rem]",
         icon: "ark:h-1.5 ark:w-1.5",
-        label: "ark:text-[6px]"
+        label: "ark:text-[6px]",
+        helper: "ark:text-2xs"
       },
       sm: {
         track: "ark:h-4 ark:w-7",
@@ -257,7 +266,8 @@ export class ArkSwitch extends HTMLElementBase {
         translate: "ark:translate-x-3",
         translateLabels: "ark:translate-x-8",
         icon: "ark:h-2 ark:w-2",
-        label: "ark:text-[7px]"
+        label: "ark:text-[7px]",
+        helper: "ark:text-xs"
       },
       md: {
         track: "ark:h-6 ark:w-11",
@@ -266,7 +276,8 @@ export class ArkSwitch extends HTMLElementBase {
         translate: "ark:translate-x-5",
         translateLabels: "ark:translate-x-10",
         icon: "ark:h-2.5 ark:w-2.5",
-        label: "ark:text-[9px]"
+        label: "ark:text-[9px]",
+        helper: "ark:text-xs"
       },
       lg: {
         track: "ark:h-7 ark:w-12",
@@ -275,7 +286,8 @@ export class ArkSwitch extends HTMLElementBase {
         translate: "ark:translate-x-5",
         translateLabels: "ark:translate-x-[3.25rem]",
         icon: "ark:h-3 ark:w-3",
-        label: "ark:text-[11px]"
+        label: "ark:text-[11px]",
+        helper: "ark:text-sm"
       },
       xl: {
         track: "ark:h-8 ark:w-14",
@@ -284,7 +296,8 @@ export class ArkSwitch extends HTMLElementBase {
         translate: "ark:translate-x-6",
         translateLabels: "ark:translate-x-16",
         icon: "ark:h-3.5 ark:w-3.5",
-        label: "ark:text-xs"
+        label: "ark:text-xs",
+        helper: "ark:text-base"
       }
     };
 
@@ -343,13 +356,22 @@ export class ArkSwitch extends HTMLElementBase {
 
     const offTrack = "ark:bg-muted";
     const labelOffColor = "ark:text-fg-muted";
+    // Rótulo antes do trilho (`label-position="start"`, a linha de uma tela de configurações); o padrão é depois.
+    const start = (this.getAttribute("label-position") || "").toLowerCase() === "start";
+    const helper = this.syncHelper(sizing, start);
 
     this.trackEl.className = [
-      "ark:relative ark:order-first ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-full ark:border-2 ark:border-transparent ark:transition-colors ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50",
+      "ark:relative",
+      start ? "ark:order-last" : "ark:order-first",
+      "ark:inline-flex ark:shrink-0 ark:cursor-pointer ark:items-center ark:rounded-full ark:border-2 ark:border-transparent ark:transition-colors ark:focus:outline-none ark:focus-visible:ring-2 ark:focus-visible:ring-offset-2 ark:disabled:cursor-not-allowed ark:disabled:opacity-50",
       palette.focusRing,
       labels ? sizing.trackLabels : sizing.track,
-      checked ? palette.onTrack : offTrack
-    ].join(" ");
+      checked ? palette.onTrack : offTrack,
+      // Com a dica o host é grid: o trilho na primeira linha, na coluna do lado escolhido.
+      helper ? (start ? "ark:col-start-2 ark:row-start-1" : "ark:col-start-1 ark:row-start-1") : ""
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     this.trackEl.setAttribute("aria-checked", checked ? "true" : "false");
     this.trackEl.disabled = disabled;
@@ -369,20 +391,41 @@ export class ArkSwitch extends HTMLElementBase {
       this.trackEl.removeAttribute("aria-label");
       this.trackEl.removeAttribute("aria-labelledby");
     }
+    // Nomeado pelo host, o trilho levaria a dica no nome: ela sai da árvore e segue como descrição (aria-describedby
+    // alcança nós ocultos), como no ark-checkbox.
+    if (helper) {
+      if (this.trackEl.getAttribute("aria-labelledby") === this.id) {
+        helper.setAttribute("aria-hidden", "true");
+      } else {
+        helper.removeAttribute("aria-hidden");
+      }
+    }
 
     // Com rótulo visível o host vira uma linha (trilho primeiro, pela ordem do flex, sem mover nós) que responde ao
-    // clique; sem filhos, nenhuma classe no host, como sempre.
-    this.applyOwnClasses(
-      childLabel
-        ? [
-            "ark:inline-flex",
-            "ark:items-center",
-            "ark:gap-2",
-            "ark:select-none",
-            disabled ? "ark:cursor-not-allowed" : "ark:cursor-pointer"
-          ]
-        : []
-    );
+    // clique, e com a dica uma grid de duas colunas (trilho numa, rótulo e dica empilhados na outra; os filhos do
+    // usuário vão para a coluna do texto pelo components.css). Sem filhos e sem dica, nenhuma classe no host.
+    const cursor = disabled ? "ark:cursor-not-allowed" : "ark:cursor-pointer";
+    if (helper) {
+      this.applyOwnClasses([
+        "ark:inline-grid",
+        start ? "ark:grid-cols-[minmax(0,1fr)_auto]" : "ark:grid-cols-[auto_minmax(0,1fr)]",
+        "ark:content-start",
+        "ark:items-center",
+        "ark:gap-x-2",
+        "ark:gap-y-0.5",
+        "ark:select-none",
+        cursor
+      ]);
+    } else if (childLabel) {
+      // Com o rótulo antes, numa linha esticada (w-full) o trilho vai para a ponta.
+      this.applyOwnClasses(
+        ["ark:inline-flex", "ark:items-center", "ark:gap-2", "ark:select-none", cursor].concat(
+          start ? ["ark:justify-between"] : []
+        )
+      );
+    } else {
+      this.applyOwnClasses([]);
+    }
 
     this.thumbEl.className = [
       "ark:pointer-events-none ark:inline-flex ark:items-center ark:justify-center ark:rounded-full ark:shadow ark:transition-transform",
@@ -436,6 +479,37 @@ export class ArkSwitch extends HTMLElementBase {
     applyTestHooks(this, "switch", this.labelOnEl, "label-on");
     applyTestHooks(this, "switch", this.labelOffEl, "label-off");
     applyTestHooks(this, "switch", this.inputEl, "input");
+    if (this.helperEl) applyTestHooks(this, "switch", this.helperEl, "helper");
+  }
+
+  // Dica própria: um <span> no fim do host, só enquanto `helper` existir, que descreve o trilho por aria-describedby;
+  // devolve o nó (ou null). `order: 1` a mantém depois de um rótulo que um framework acrescente depois.
+  private syncHelper(sizing: ArkSwitchSizing, start: boolean): HTMLSpanElement | null {
+    if (!this.trackEl) return null;
+    const text = this.getAttribute("helper");
+    if (!text) {
+      if (this.helperEl) {
+        this.helperEl.remove();
+        this.helperEl = null;
+        this.trackEl.removeAttribute("aria-describedby");
+      }
+      return null;
+    }
+    if (!this.helperEl) {
+      const helper = document.createElement("span");
+      helper.setAttribute("data-ark-chrome", "helper");
+      helper.id = `ark-switch-${++nextId}-helper`;
+      this.appendChild(helper);
+      this.helperEl = helper;
+    }
+    if (this.helperEl.textContent !== text) this.helperEl.textContent = text;
+    this.helperEl.className = [
+      start ? "ark:col-start-1" : "ark:col-start-2",
+      "ark:order-1 ark:text-fg-muted",
+      sizing.helper
+    ].join(" ");
+    this.trackEl.setAttribute("aria-describedby", this.helperEl.id);
+    return this.helperEl;
   }
 }
 

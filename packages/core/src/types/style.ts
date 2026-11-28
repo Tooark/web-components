@@ -632,6 +632,10 @@ export type ArkSwitchStyleOptions = {
   icons?: boolean;
   /** Cor CSS custom do trilho ligado, com precedência sobre intent. */
   color?: string;
+  /** Lado do rótulo visível (os filhos) em relação ao trilho: "start" põe o texto antes. Padrão: "end". */
+  labelPosition?: "start" | "end";
+  /** Dica abaixo do rótulo, que descreve o trilho por aria-describedby. */
+  helper?: string;
 };
 
 /** Props de estilo e comportamento do ark-toggle. */

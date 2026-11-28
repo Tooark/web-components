@@ -8,4 +8,10 @@ export async function expectOptInAttributes(canvasElement: HTMLElement): Promise
   const textarea = canvasElement.querySelector("ark-textarea") as HTMLElement;
   await waitFor(() => expect(textarea).toHaveAttribute("max-rows", "4"));
   await expect((textarea.querySelector("textarea") as HTMLTextAreaElement).style.maxHeight).not.toBe("");
+
+  const toggle = canvasElement.querySelector("ark-switch") as HTMLElement;
+  await expect(toggle).toHaveAttribute("label-position", "start");
+  const helper = toggle.querySelector('[data-ark="switch-helper"]') as HTMLElement;
+  await expect(helper).toHaveTextContent("Um resumo por dia.");
+  await expect(toggle.querySelector('[role="switch"]')).toHaveAttribute("aria-describedby", helper.id);
 }
